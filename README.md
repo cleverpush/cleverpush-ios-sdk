@@ -24,8 +24,6 @@ Enable "Background Modes" and check "Remote notifications"
     // Make sure to insert your CleverPush channelId
     [CleverPush initWithLaunchOptions:launchOptions channelId:@"INSERT-YOUR-CHANNEL-ID-HERE"];
 
-    [UNUserNotificationCenter currentNotificationCenter].delegate = [PushNotificationManager pushManager].notificationCenterDelegate;
-
     return YES;
 }
 
