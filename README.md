@@ -1,7 +1,9 @@
 # Usage
 1. Add CleverPush to your Podfile
 
-    pod 'CleverPush'
+```
+pod 'CleverPush'
+```
 
 
 2. Enable the requiremed capabilities
