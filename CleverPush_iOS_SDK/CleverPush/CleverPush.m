@@ -23,6 +23,8 @@
 
 @implementation CleverPush
 
+NSString * const SDK_VERSION = @"0.0.1";
+
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
 static BOOL startFromNotification = NO;
@@ -162,9 +164,9 @@ BOOL subscriptionSet;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-+ (void)updateDeviceToken:(NSString*)deviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)updateDeviceToken:(NSString*)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId == nil) {
-        deviceToken = deviceToken;
+        deviceToken = newDeviceToken;
         tokenUpdateSuccessBlock = successBlock;
         tokenUpdateFailureBlock = failureBlock;
         
@@ -172,26 +174,13 @@ BOOL subscriptionSet;
         return;
     }
     
-    if ([deviceToken isEqualToString:deviceToken]) {
+    if ([deviceToken isEqualToString:newDeviceToken]) {
         if (successBlock)
             successBlock(nil);
         return;
     }
     
-    deviceToken = deviceToken;
-    
-    NSMutableURLRequest* request;
-    request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-    
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             deviceToken, @"token",
-                             nil];
-    
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    
-    [self enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
+    deviceToken = newDeviceToken;
 }
 
 static BOOL registrationInProgress = false;
@@ -204,41 +193,28 @@ static BOOL registrationInProgress = false;
     
     registrationInProgress = true;
     
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
+    NSMutableURLRequest* request;
+    request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
     
-    struct utsname systemInfo;
-    uname(&systemInfo);
-    NSString *deviceModel   = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-    
-    NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                    channelId, @"channelId",
-                                    deviceModel, @"deviceModel",
-                                    [[UIDevice currentDevice] systemVersion], @"devicePlatform",
-                                    [[NSLocale preferredLanguages] objectAtIndex:0], @"language",
-                                    [NSNumber numberWithInt:(int)[[NSTimeZone localTimeZone] secondsFromGMT]], @"timezone",
-                                    deviceToken, @"token",
-                                    nil];
-    
-    if (subscriptionId == nil) {
-        dataDic[@"ios_bundle"] = [[NSBundle mainBundle] bundleIdentifier];
-    }
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             deviceToken, @"apnsToken",
+                             @"SDK", @"browserType",
+                             SDK_VERSION, @"browserVersion",
+                             @"iOS", @"platformName",
+                             [[UIDevice currentDevice] systemVersion], @"platformVersion",
+                             subscriptionId, @"subscriptionId",
+                             nil];
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        
         registrationInProgress = false;
         
         if ([results objectForKey:@"id"] != nil) {
-            
             subscriptionId = [results objectForKey:@"id"];
             [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:@"CleverPush_SUBSCRIPTION_ID"];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            if (deviceToken) {
-                [self updateDeviceToken:deviceToken onSuccess:tokenUpdateSuccessBlock onFailure:tokenUpdateFailureBlock];
-            }
         }
     } onFailure:^(NSError* error) {
         registrationInProgress = false;
