@@ -21,6 +21,8 @@ extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
 @interface CleverPush : NSObject
 
+extern NSString * const SDK_VERSION;
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback settings:(NSDictionary*)settings;
