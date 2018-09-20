@@ -84,7 +84,7 @@
    ```objective-c
    // ...
 
-	[CleverPush initWithLaunchOptions:launchOptions channelId:@"HX5h5pAyCMix2hBZx" handleNotificationOpened:^(CPNotificationOpenedResult *result) {
+	[CleverPush initWithLaunchOptions:launchOptions channelId:@"INSERT-YOUR-CHANNEL-ID-HERE" handleNotificationOpened:^(CPNotificationOpenedResult *result) {
         NSLog(@"Received Notification with URL: %@", [result.notification valueForKey:@"url"]);
         
         UIAlertController* alert = [UIAlertController alertControllerWithTitle:[result.notification valueForKey:@"title"]
