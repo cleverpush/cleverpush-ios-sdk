@@ -59,7 +59,7 @@
 		297B4E351E58A1AA00BAF990 /* CleverPush.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CleverPush.podspec; path = ../CleverPush.podspec; sourceTree = "<group>"; };
 		297B4E371E58A1BD00BAF990 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		297B4E381E58A1BD00BAF990 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		29C1BAE11E58B5EB00815CD6 /* libCleverPush.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libCleverPush.a"; path = libCleverPush.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		29C1BAE11E58B5EB00815CD6 /* libCleverPush.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCleverPush.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		29C1BAF51E58BAB800815CD6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "CleverPush-Dynamic/Info.plist"; sourceTree = "<group>"; };
@@ -225,7 +225,7 @@
 				TargetAttributes = {
 					297B4DF41E589AFE00BAF990 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = U3N7KV9R44;
+						DevelopmentTeam = KWJDGZUQ72;
 						ProvisioningStyle = Automatic;
 					};
 					297B4DFD1E589AFE00BAF990 = {
@@ -429,9 +429,9 @@
 		297B4E0A1E589AFE00BAF990 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = U3N7KV9R44;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -452,7 +452,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = U3N7KV9R44;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

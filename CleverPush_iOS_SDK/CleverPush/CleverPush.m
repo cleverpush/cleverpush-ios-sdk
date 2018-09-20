@@ -11,10 +11,18 @@
 
 @implementation CPNotificationOpenedResult
 
--(instancetype)initWithPayload:(NSDictionary *)inPayload {
+- (instancetype)initWithPayload:(NSDictionary *)inPayload {
     self = [super init];
     if (self) {
         _payload = inPayload;
+        _notification = [_payload valueForKey:@"notification"];
+        if ([_notification valueForKey:@"title"] == nil) {
+            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
+        }
+        if ([_notification valueForKey:@"text"] == nil) {
+            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
+        }
+        _subscription = [_payload valueForKey:@"subscription"];
     }
     return self;
 }
@@ -23,21 +31,23 @@
 
 @implementation CleverPush
 
-NSString * const SDK_VERSION = @"0.0.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
 static BOOL startFromNotification = NO;
 
 static NSString* channelId;
+NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 CleverPushHTTPClient *httpClient;
 CPResultSuccessBlock tokenUpdateSuccessBlock;
 CPFailureBlock tokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
+CPHandleSubscribedBlock handleSubscribed;
 
-BOOL subscriptionSet;
+BOOL handleSubscribedCalled = false;
 
 + (NSString*)channelId {
     return channelId;
@@ -54,27 +64,45 @@ BOOL subscriptionSet;
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId {
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL settings:@{@"autoPrompt":@YES}];
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:NULL settings:@{@"autoPrompt":@YES}];
 }
 
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)actionCallback {
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:actionCallback settings:@{@"autoPrompt":@YES}];
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:NULL settings:@{@"autoPrompt":@YES}];
 }
 
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)actionCallback settings:(NSDictionary*)settings {
-    
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback  settings:(NSDictionary*)settings {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:NULL settings:settings];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:subscribedCallback settings:@{@"autoPrompt":@YES}];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback  settings:(NSDictionary*)settings {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:subscribedCallback settings:settings];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback settings:@{@"autoPrompt":@YES}];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback settings:(NSDictionary*)settings {
+    handleNotificationOpened = openedCallback;
+    handleSubscribed = subscribedCallback;
+
     if (self) {
         UIApplication* sharedApp = [UIApplication sharedApplication];
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        
+
         httpClient = [[CleverPushHTTPClient alloc] init];
-        
+
         if (newChannelId) {
             channelId = newChannelId;
         } else {
             channelId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CleverPush_CHANNEL_ID"];
         }
-        
+
         if (channelId == nil) {
             channelId  = [userDefaults stringForKey:@"CleverPush_CHANNEL_ID"];
         } else if (![channelId isEqualToString:[userDefaults stringForKey:@"CleverPush_CHANNEL_ID"]]) {
@@ -82,11 +110,11 @@ BOOL subscriptionSet;
             [userDefaults setObject:nil forKey:@"CleverPush_SUBSCRIPTION_ID"];
             [userDefaults synchronize];
         }
-        
+
         if (!channelId) {
             return self;
         }
-        
+
         subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
         deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
         if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
@@ -94,10 +122,9 @@ BOOL subscriptionSet;
         } else {
             registeredWithApple = deviceToken != nil;
         }
-        subscriptionSet = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION"] == nil;
-        
+
         BOOL autoPrompt = YES;
-        if (settings[@"autoPromt"] && [settings[@"autoPrompt"] isKindOfClass:[NSNumber class]]) {
+        if (settings[@"autoPrompt"] && [settings[@"autoPrompt"] isKindOfClass:[NSNumber class]]) {
             autoPrompt = [settings[@"autoPrompt"] boolValue];
         }
         if (autoPrompt || registeredWithApple) {
@@ -106,21 +133,31 @@ BOOL subscriptionSet;
             waitingForApnsResponse = true;
             [sharedApp registerForRemoteNotifications];
         }
-        
+
+        lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+        NSDate* nextSync = [NSDate date];
+        if (lastSync) {
+            // 3 days after last sync
+            nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60];
+        }
+
         if (subscriptionId != nil) {
-            [self registerUser];
-        } else {
-            [self performSelector:@selector(registerUser) withObject:nil afterDelay:30.0f];
+            if (nextSync < [NSDate date]) {
+                [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+            } else if (handleSubscribed && !handleSubscribedCalled) {
+                handleSubscribed(subscriptionId);
+                handleSubscribedCalled = true;
+            }
         }
     }
-    
+
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
     }
-    
+
     [self clearBadge:false];
-    
+
     return self;
 }
 
@@ -129,7 +166,7 @@ BOOL subscriptionSet;
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
         NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
-        
+
         [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
@@ -139,7 +176,7 @@ BOOL subscriptionSet;
 
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err {
     waitingForApnsResponse = false;
-    
+
     if (err.code == 3000) {
         if ([((NSString*)[err.userInfo objectForKey:NSLocalizedDescriptionKey]) rangeOfString:@"no valid 'aps-environment'"].location != NSNotFound) {
             NSLog(@"ERROR! 'Push Notification' capability not turned on! Enable it in Xcode under 'Project Target' -> Capability.");
@@ -155,9 +192,9 @@ BOOL subscriptionSet;
 
 + (void)registerDeviceToken:(id)inDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     waitingForApnsResponse = false;
-    
+
     [self updateDeviceToken:inDeviceToken onSuccess:successBlock onFailure:failureBlock];
-    
+
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICETOKEN"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -167,54 +204,63 @@ BOOL subscriptionSet;
         deviceToken = newDeviceToken;
         tokenUpdateSuccessBlock = successBlock;
         tokenUpdateFailureBlock = failureBlock;
-        
-        [CleverPush registerUser];
+
+        [CleverPush syncSubscription];
         return;
     }
-    
+
     if ([deviceToken isEqualToString:newDeviceToken]) {
         if (successBlock)
             successBlock(nil);
         return;
     }
-    
+
     deviceToken = newDeviceToken;
 }
 
 static BOOL registrationInProgress = false;
 
-+ (void)registerUser {
-    if (registrationInProgress)
++ (void)syncSubscription {
+    if (registrationInProgress) {
         return;
-    
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(registerUser) object:nil];
-    
+    }
+
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+
     registrationInProgress = true;
-    
+
     NSMutableURLRequest* request;
     request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-    
+
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              deviceToken, @"apnsToken",
                              @"SDK", @"browserType",
-                             SDK_VERSION, @"browserVersion",
+                             CLEVERPUSH_SDK_VERSION, @"browserVersion",
                              @"iOS", @"platformName",
                              [[UIDevice currentDevice] systemVersion], @"platformVersion",
                              subscriptionId, @"subscriptionId",
                              nil];
-    
+
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    
+
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
-        
+
         if ([results objectForKey:@"id"] != nil) {
             subscriptionId = [results objectForKey:@"id"];
             [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:@"CleverPush_SUBSCRIPTION_ID"];
+            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
             [[NSUserDefaults standardUserDefaults] synchronize];
+
+            if (handleSubscribed && !handleSubscribedCalled) {
+                handleSubscribed(subscriptionId);
+                handleSubscribedCalled = true;
+            }
         }
     } onFailure:^(NSError* error) {
+        NSLog(@"CleverPush Error: syncSubscription failure %@", error);
+
         registrationInProgress = false;
     }];
 }
@@ -222,38 +268,32 @@ static BOOL registrationInProgress = false;
 +(NSString*)getUsableDeviceToken {
     if (![[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)])
         return deviceToken;
-    
+
     return ([[UIApplication sharedApplication] currentUserNotificationSettings].types > 0) ? deviceToken : NULL;
 }
 
-
-// entrypoint for: notifications opened, notification received (iOS 9-10 while in focus)
 + (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
-    if (!channelId)
+    if (!channelId) {
         return;
-    
-    if (isActive) {
-        NSString* notificationId = [messageDict objectForKey:@"notificationId"];
-        [CleverPush setNotificationDelivered:notificationId];
-        [CleverPush setNotificationOpened:notificationId];
-    } else {
-        [self handleNotificationOpened:messageDict isActive:isActive];
     }
+
+    [self handleNotificationOpened:messageDict isActive:isActive];
 }
 
-
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {
-    NSString* notificationId = [payload objectForKey:@"notificationId"];
-    [CleverPush setNotificationOpened:notificationId];
-    
+    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
+
+    [CleverPush setNotificationDelivered:notificationId];
+    [CleverPush setNotificationClicked:notificationId];
+
     [self clearBadge:true];
-    
+
     if (!handleNotificationOpened) {
         return;
     }
-    
+
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload];
-    
+
     handleNotificationOpened(result);
 }
 
@@ -264,20 +304,20 @@ static BOOL registrationInProgress = false;
                              notificationId, @"notificationId",
                              subscriptionId, @"subscriptionId",
                              nil];
-    
+
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
 }
 
-+ (void)setNotificationOpened:(NSString*)notificationId {
++ (void)setNotificationClicked:(NSString*)notificationId {
     NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"notification/clicked"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
                              subscriptionId, @"subscriptionId",
                              nil];
-    
+
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
@@ -304,18 +344,16 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    [NSURLConnection
-     sendAsynchronousRequest:request
-     queue:[[NSOperationQueue alloc] init]
-     completionHandler:^(NSURLResponse* response,
-                         NSData* data,
-                         NSError* error) {
-         [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
-     }];
+    NSURLSession *session = [NSURLSession sharedSession];
+    [[session dataTaskWithRequest:request
+            completionHandler:^(NSData *data,
+                                NSURLResponse *response,
+                                NSError *error) {
+                [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+            }] resume];
 }
 
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    
     NSHTTPURLResponse* HTTPResponse = (NSHTTPURLResponse*)response;
     NSInteger statusCode = [HTTPResponse statusCode];
     NSError* jsonError = nil;

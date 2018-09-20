@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
 s.name             = "CleverPush"
-s.version          = "0.0.2"
+s.version          = "0.0.3"
 s.summary          = "CleverPush library for iOS."
 s.homepage         = "https://cleverpush.com"
 s.license          = { :type => 'MIT', :file => 'LICENSE' }
-s.author           = { "Marius Gebhardt" => "marius@justviral.de" }
+s.author           = { "Marius Gebhardt" => "m.gebhardt@cleverpush.com" }
 
 s.source           = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
 
