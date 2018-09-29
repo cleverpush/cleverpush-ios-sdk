@@ -47,4 +47,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 
++ (void)addSubscriptionTag:(NSString*)tagId;
++ (void)removeSubscriptionTag:(NSString*)tagId;
++ (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
+
 @end

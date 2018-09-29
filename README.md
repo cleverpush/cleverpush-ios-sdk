@@ -118,4 +118,12 @@
    * Upload your certificate in the CleverPush channel settings under the iOS tab
 
 
+Tag subscriptions and set attributes:
+
+```objective-c
+[CleverPush addSubscriptionTag:@"TAG_ID"]
+[CleverPush removeSubscriptionTag:@"TAG_ID"]
+[CleverPush setSubscriptionAttribute:@"ATTRIBUTE_ID" value:@"ATTRIBUTE_VALUE"] 
+```
+
 

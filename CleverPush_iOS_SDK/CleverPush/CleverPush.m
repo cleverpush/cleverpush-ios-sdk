@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -384,6 +384,46 @@ static BOOL registrationInProgress = false;
         else
             failureBlock([NSError errorWithDomain:@"CleverPushError" code:statusCode userInfo:nil]);
     }
+}
+
++ (void)addSubscriptionTag:(NSString*)tagId {
+    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/tag"];
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             channelId, @"channelId",
+                             tagId, @"tagId",
+                             subscriptionId, @"subscriptionId",
+                             nil];
+    
+    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+}
+
++ (void)removeSubscriptionTag:(NSString*)tagId {
+    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/untag"];
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             channelId, @"channelId",
+                             tagId, @"tagId",
+                             subscriptionId, @"subscriptionId",
+                             nil];
+    
+    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+}
+
++ (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
+    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/attribute"];
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             channelId, @"channelId",
+                             attributeId, @"attributeId",
+                             value, @"value",
+                             subscriptionId, @"subscriptionId",
+                             nil];
+    
+    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil];
 }
 
 @end
