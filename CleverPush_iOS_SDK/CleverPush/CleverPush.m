@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -46,6 +46,7 @@ CPResultSuccessBlock tokenUpdateSuccessBlock;
 CPFailureBlock tokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
+NSDictionary* channelConfig;
 
 BOOL handleSubscribedCalled = false;
 
@@ -159,6 +160,30 @@ BOOL handleSubscribedCalled = false;
     [self clearBadge:false];
 
     return self;
+}
+
++ (NSDictionary*)getChannelConfig {
+    if (channelConfig) {
+        return channelConfig;
+    }
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(getChannelConfig) object:nil];
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    NSMutableURLRequest* request = [httpClient requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
+    [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+        if (result != nil) {
+            channelConfig = result;
+            dispatch_semaphore_signal(sema);
+        }
+    } onFailure:^(NSError* error) {
+        NSLog(@"CleverPush Error: getChannelConfig failure %@", error);
+    }];
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
+    return channelConfig;
 }
 
 + (void)registerForPushNotifications {
@@ -396,7 +421,18 @@ static BOOL registrationInProgress = false;
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        NSLog(@"add attribute success");
+        
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        if (!subscriptionTags) {
+            subscriptionTags = [[NSMutableArray alloc] init];
+        }
+        [subscriptionTags addObject:tagId];
+        [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+        [userDefaults synchronize];
+    } onFailure:nil];
 }
 
 + (void)removeSubscriptionTag:(NSString*)tagId {
@@ -409,7 +445,18 @@ static BOOL registrationInProgress = false;
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        NSLog(@"remove tag success");
+        
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        if (!subscriptionTags) {
+            subscriptionTags = [[NSMutableArray alloc] init];
+        }
+        [subscriptionTags removeObject:tagId];
+        [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+        [userDefaults synchronize];
+    } onFailure:nil];
 }
 
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
@@ -423,7 +470,66 @@ static BOOL registrationInProgress = false;
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        NSLog(@"set attribute success");
+        
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+        if (!subscriptionAttributes) {
+            subscriptionAttributes = [[NSMutableDictionary alloc] init];
+        }
+        [subscriptionAttributes setValue:value forKey:attributeId];
+        [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+        [userDefaults synchronize];
+    } onFailure:nil];
+}
+
++ (NSArray*)getAvailableTags {
+    NSDictionary* channelConfig = [self getChannelConfig];
+    if (channelConfig != nil) {
+        NSArray* channelTags = [channelConfig valueForKey:@"channelTags"];
+        if (channelTags != nil) {
+            return channelTags;
+        }
+    }
+    return [[NSArray alloc] init];
+}
+
++ (NSDictionary*)getAvailableAttributes {
+    NSDictionary* channelConfig = [self getChannelConfig];
+    if (channelConfig != nil) {
+        NSDictionary* customAttributes = [channelConfig valueForKey:@"customAttributes"];
+        if (customAttributes != nil) {
+            return customAttributes;
+        }
+    }
+    return [[NSDictionary alloc] init];
+}
+
++ (NSArray*)getSubscriptionTags {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* subscriptionTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+    if (!subscriptionTags) {
+        return [[NSArray alloc] init];
+    }
+    return subscriptionTags;
+}
+
++ (bool)hasSubscriptionTag:(NSString*)tagId {
+    return [[self getSubscriptionTags] containsObject:tagId];
+}
+
++ (NSDictionary*)getSubscriptionAttributes {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary* subscriptionAttributes = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+    if (!subscriptionAttributes) {
+        return [[NSDictionary alloc] init];
+    }
+    return subscriptionAttributes;
+}
+
++ (NSDictionary*)getSubscriptionAttribute:(NSString*)attributeId {
+    return [[self getSubscriptionAttributes] objectForKey:attributeId];
 }
 
 @end

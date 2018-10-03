@@ -1,4 +1,5 @@
-# Usage
+# Installation
+
 1. Add CleverPush to your Podfile
 
    ```
@@ -118,12 +119,21 @@
    * Upload your certificate in the CleverPush channel settings under the iOS tab
 
 
+
+# Usage
+
 Tag subscriptions and set attributes:
 
 ```objective-c
-[CleverPush addSubscriptionTag:@"TAG_ID"]
-[CleverPush removeSubscriptionTag:@"TAG_ID"]
-[CleverPush setSubscriptionAttribute:@"ATTRIBUTE_ID" value:@"ATTRIBUTE_VALUE"] 
+NSArray* channelTags = [CleverPush getAvailableTags];
+NSDictionary* customAttributes = [CleverPush getAvailableAttributes];
+
+[CleverPush addSubscriptionTag:@"TAG_ID"];
+[CleverPush removeSubscriptionTag:@"TAG_ID"];
+[CleverPush setSubscriptionAttribute:@"ATTRIBUTE_ID" value:@"ATTRIBUTE_VALUE"];
+
+NSArray* subscriptionTags = [CleverPush getSubscriptionTags];
+NSDictionary* subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+NSString* attribute = [CleverPush getSubscriptionAttribute:@"ATTRIBUTE_ID"];
+bool hasTag = [CleverPush hasSubscriptionTag:@"TAG_ID"];
 ```
-
-
