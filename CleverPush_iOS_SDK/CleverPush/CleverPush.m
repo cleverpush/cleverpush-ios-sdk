@@ -422,8 +422,6 @@ static BOOL registrationInProgress = false;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSLog(@"add attribute success");
-        
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
         if (!subscriptionTags) {
@@ -446,8 +444,6 @@ static BOOL registrationInProgress = false;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSLog(@"remove tag success");
-        
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
         if (!subscriptionTags) {
@@ -471,8 +467,6 @@ static BOOL registrationInProgress = false;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSLog(@"set attribute success");
-        
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
         if (!subscriptionAttributes) {
@@ -521,7 +515,7 @@ static BOOL registrationInProgress = false;
 
 + (NSDictionary*)getSubscriptionAttributes {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary* subscriptionAttributes = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+    NSDictionary* subscriptionAttributes = [userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
     if (!subscriptionAttributes) {
         return [[NSDictionary alloc] init];
     }
