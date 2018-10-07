@@ -53,8 +53,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getAvailableTags;
 + (NSDictionary*)getAvailableAttributes;
 + (NSArray*)getSubscriptionTags;
-+ (bool)hasSubscriptionTag;
++ (bool)hasSubscriptionTag:(NSString*)tagId;
 + (NSDictionary*)getSubscriptionAttributes;
-+ (NSDictionary*)getSubscriptionAttribute;
++ (NSDictionary*)getSubscriptionAttribute:(NSString*)attributeId;
 
 @end

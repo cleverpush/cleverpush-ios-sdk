@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.6";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.7";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
