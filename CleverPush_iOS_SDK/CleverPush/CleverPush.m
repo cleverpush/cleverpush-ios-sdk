@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.7";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.8";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -522,7 +522,7 @@ static BOOL registrationInProgress = false;
     return subscriptionAttributes;
 }
 
-+ (NSDictionary*)getSubscriptionAttribute:(NSString*)attributeId {
++ (NSString*)getSubscriptionAttribute:(NSString*)attributeId {
     return [[self getSubscriptionAttributes] objectForKey:attributeId];
 }
 
