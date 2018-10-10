@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.9";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.10";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -46,6 +46,7 @@ CPResultSuccessBlock tokenUpdateSuccessBlock;
 CPFailureBlock tokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
+CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
 
 BOOL handleSubscribedCalled = false;
@@ -145,9 +146,14 @@ BOOL handleSubscribedCalled = false;
         if (subscriptionId != nil) {
             if (nextSync < [NSDate date]) {
                 [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
-            } else if (handleSubscribed && !handleSubscribedCalled) {
-                handleSubscribed(subscriptionId);
-                handleSubscribedCalled = true;
+            } else {
+                if (handleSubscribed && !handleSubscribedCalled) {
+                    handleSubscribed(subscriptionId);
+                    handleSubscribedCalled = true;
+                }
+                if (handleSubscribedInternal) {
+                    handleSubscribedInternal(subscriptionId);
+                }
             }
         }
     }
@@ -184,6 +190,21 @@ BOOL handleSubscribedCalled = false;
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     
     return channelConfig;
+}
+
++ (NSString*)getSubscriptionId {
+    if (subscriptionId) {
+        return subscriptionId;
+    }
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    handleSubscribedInternal = ^(NSString *subscriptionIdNew) {
+        dispatch_semaphore_signal(sema);
+    };
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
+    return subscriptionId;
 }
 
 + (void)registerForPushNotifications {
@@ -282,6 +303,9 @@ static BOOL registrationInProgress = false;
                 handleSubscribed(subscriptionId);
                 handleSubscribedCalled = true;
             }
+            if (handleSubscribedInternal) {
+                handleSubscribedInternal(subscriptionId);
+            }
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
@@ -327,7 +351,7 @@ static BOOL registrationInProgress = false;
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
-                             subscriptionId, @"subscriptionId",
+                             [self getSubscriptionId], @"subscriptionId",
                              nil];
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -340,7 +364,7 @@ static BOOL registrationInProgress = false;
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
-                             subscriptionId, @"subscriptionId",
+                             [self getSubscriptionId], @"subscriptionId",
                              nil];
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -416,7 +440,7 @@ static BOOL registrationInProgress = false;
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              tagId, @"tagId",
-                             subscriptionId, @"subscriptionId",
+                             [self getSubscriptionId], @"subscriptionId",
                              nil];
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -438,7 +462,7 @@ static BOOL registrationInProgress = false;
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              tagId, @"tagId",
-                             subscriptionId, @"subscriptionId",
+                             [self getSubscriptionId], @"subscriptionId",
                              nil];
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -461,7 +485,7 @@ static BOOL registrationInProgress = false;
                              channelId, @"channelId",
                              attributeId, @"attributeId",
                              value, @"value",
-                             subscriptionId, @"subscriptionId",
+                             [self getSubscriptionId], @"subscriptionId",
                              nil];
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
