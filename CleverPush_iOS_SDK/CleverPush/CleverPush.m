@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.9";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -393,7 +393,7 @@ static BOOL registrationInProgress = false;
         }
     }
     
-    if (error == nil && statusCode == 200) {
+    if (error == nil && statusCode >= 200 && statusCode <= 299) {
         if (successBlock != nil) {
             if (innerJson != nil)
                 successBlock(innerJson);
