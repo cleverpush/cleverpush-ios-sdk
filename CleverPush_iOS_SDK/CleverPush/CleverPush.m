@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.11";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.12";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -447,7 +447,6 @@ static BOOL registrationInProgress = false;
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        
         NSMutableSet* subscriptionTags = [self getSubscriptionTags];
         
         [subscriptionTags addObject:tagId];
@@ -468,10 +467,8 @@ static BOOL registrationInProgress = false;
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
-        if (!subscriptionTags) {
-            subscriptionTags = [[NSMutableArray alloc] init];
-        }
+        NSMutableArray* subscriptionTags = [self getSubscriptionTags];
+        
         [subscriptionTags removeObject:tagId];
         [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
         [userDefaults synchronize];
@@ -523,14 +520,14 @@ static BOOL registrationInProgress = false;
     return [[NSDictionary alloc] init];
 }
 
-+ (NSSet*)getSubscriptionTags {
++ (NSMutableSet*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSObject* userDefaultsSubscriptionTags = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
     NSMutableSet* subscriptionTags;
-    if (!userDefaultsSubscriptionTags) {
-        subscriptionTags = [[NSMutableSet alloc] init];
-    } else if ([userDefaultsSubscriptionTags isKindOfClass:[NSArray class]]) {
+    if (userDefaultsSubscriptionTags && ([userDefaultsSubscriptionTags isKindOfClass:[NSArray class]] || [userDefaultsSubscriptionTags isKindOfClass:[NSMutableArray class]])) {
         subscriptionTags = [NSMutableSet setWithArray:((NSArray*)userDefaultsSubscriptionTags)];
+    } else {
+        subscriptionTags = [[NSMutableSet alloc] init];
     }
     return subscriptionTags;
 }
