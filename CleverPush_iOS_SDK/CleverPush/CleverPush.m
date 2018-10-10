@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.12";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.13";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -447,9 +447,14 @@ static BOOL registrationInProgress = false;
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableSet* subscriptionTags = [self getSubscriptionTags];
+        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        if (!subscriptionTags) {
+            subscriptionTags = [[NSMutableArray alloc] init];
+        }
         
-        [subscriptionTags addObject:tagId];
+        if (![subscriptionTags containsObject:tagId]) {
+            [subscriptionTags addObject:tagId];
+        }
         [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
         [userDefaults synchronize];
     } onFailure:nil];
@@ -467,8 +472,10 @@ static BOOL registrationInProgress = false;
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray* subscriptionTags = [self getSubscriptionTags];
-        
+        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        if (!subscriptionTags) {
+            subscriptionTags = [[NSMutableArray alloc] init];
+        }
         [subscriptionTags removeObject:tagId];
         [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
         [userDefaults synchronize];
@@ -520,14 +527,11 @@ static BOOL registrationInProgress = false;
     return [[NSDictionary alloc] init];
 }
 
-+ (NSMutableSet*)getSubscriptionTags {
++ (NSArray*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSObject* userDefaultsSubscriptionTags = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
-    NSMutableSet* subscriptionTags;
-    if (userDefaultsSubscriptionTags && ([userDefaultsSubscriptionTags isKindOfClass:[NSArray class]] || [userDefaultsSubscriptionTags isKindOfClass:[NSMutableArray class]])) {
-        subscriptionTags = [NSMutableSet setWithArray:((NSArray*)userDefaultsSubscriptionTags)];
-    } else {
-        subscriptionTags = [[NSMutableSet alloc] init];
+    NSArray* subscriptionTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+    if (!subscriptionTags) {
+        return [[NSArray alloc] init];
     }
     return subscriptionTags;
 }
