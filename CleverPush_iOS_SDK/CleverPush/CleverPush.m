@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.10";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.11";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -447,10 +447,9 @@ static BOOL registrationInProgress = false;
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
-        if (!subscriptionTags) {
-            subscriptionTags = [[NSMutableArray alloc] init];
-        }
+        
+        NSMutableSet* subscriptionTags = [self getSubscriptionTags];
+        
         [subscriptionTags addObject:tagId];
         [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
         [userDefaults synchronize];
@@ -524,11 +523,14 @@ static BOOL registrationInProgress = false;
     return [[NSDictionary alloc] init];
 }
 
-+ (NSArray*)getSubscriptionTags {
++ (NSSet*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* subscriptionTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
-    if (!subscriptionTags) {
-        return [[NSArray alloc] init];
+    NSObject* userDefaultsSubscriptionTags = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+    NSMutableSet* subscriptionTags;
+    if (!userDefaultsSubscriptionTags) {
+        subscriptionTags = [[NSMutableSet alloc] init];
+    } else if ([userDefaultsSubscriptionTags isKindOfClass:[NSArray class]]) {
+        subscriptionTags = [NSMutableSet setWithArray:((NSArray*)userDefaultsSubscriptionTags)];
     }
     return subscriptionTags;
 }
