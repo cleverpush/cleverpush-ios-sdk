@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.14";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.15";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -126,7 +126,7 @@ BOOL handleSubscribedCalled = false;
         }
 
         if (autoRegister || registeredWithApple) {
-            [self registerForPushNotifications];
+            [self subscribe];
         } else if ([sharedApp respondsToSelector:@selector(registerForRemoteNotifications)]) {
             waitingForApnsResponse = true;
             [sharedApp registerForRemoteNotifications];
@@ -203,7 +203,7 @@ BOOL handleSubscribedCalled = false;
     return subscriptionId;
 }
 
-+ (void)registerForPushNotifications {
++ (void)subscribe {
     waitingForApnsResponse = true;
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
@@ -213,6 +213,21 @@ BOOL handleSubscribedCalled = false;
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert];
+    }
+}
+
++ (void)unsubscribe {
+    NSString* subscriptionId = [self getSubscriptionId];
+    if (subscriptionId) {
+        NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 subscriptionId, @"subscriptionId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:nil onFailure:nil];
     }
 }
 

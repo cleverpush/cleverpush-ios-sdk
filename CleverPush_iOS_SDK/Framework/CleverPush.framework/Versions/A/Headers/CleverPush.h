@@ -38,7 +38,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (NSString*)channelId;
 
-+ (void)registerForPushNotifications;
++ (void)subscribe;
++ (void)unsubscribe;
 
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
