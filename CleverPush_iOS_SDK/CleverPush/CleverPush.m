@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.15";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.16";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -229,6 +229,10 @@ BOOL handleSubscribedCalled = false;
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:nil onFailure:nil];
     }
+}
+
++ (BOOL*)isSubscribed {
+    return subscriptionId != nil;
 }
 
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err {

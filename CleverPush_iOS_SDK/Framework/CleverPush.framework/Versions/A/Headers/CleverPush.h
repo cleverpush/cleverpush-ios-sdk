@@ -38,6 +38,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (NSString*)channelId;
 
++ (BOOL*)isSubscribed;
 + (void)subscribe;
 + (void)unsubscribe;
 
