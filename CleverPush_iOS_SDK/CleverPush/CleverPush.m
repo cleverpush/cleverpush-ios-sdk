@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.17";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.18";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -127,9 +127,6 @@ BOOL handleSubscribedCalled = false;
 
         if (autoRegister || registeredWithApple) {
             [self subscribe];
-        } else if ([sharedApp respondsToSelector:@selector(registerForRemoteNotifications)]) {
-            waitingForApnsResponse = true;
-            [sharedApp registerForRemoteNotifications];
         }
 
         lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
@@ -203,12 +200,33 @@ BOOL handleSubscribedCalled = false;
     return subscriptionId;
 }
 
++ (BOOL)notificationsEnabled {
+    BOOL isEnabled = NO;
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+        UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+        
+        if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+            isEnabled = NO;
+        } else {
+            isEnabled = YES;
+        }
+    } else {
+        
+        if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+            isEnabled = YES;
+        } else{
+            isEnabled = NO;
+        }
+    }
+    return isEnabled;
+}
+
 + (void)subscribe {
-    waitingForApnsResponse = true;
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
+        
         NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
-
+        
         [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
@@ -228,20 +246,22 @@ BOOL handleSubscribedCalled = false;
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:nil onFailure:nil];
+        
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
 + (BOOL)isSubscribed {
     BOOL isSubscribed = NO;
-    if (subscriptionId) {
+    if (subscriptionId && [self notificationsEnabled]) {
         isSubscribed = YES;
     }
     return isSubscribed;
 }
 
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err {
-    waitingForApnsResponse = false;
-
     if (err.code == 3000) {
         if ([((NSString*)[err.userInfo objectForKey:NSLocalizedDescriptionKey]) rangeOfString:@"no valid 'aps-environment'"].location != NSNotFound) {
             NSLog(@"ERROR! 'Push Notification' capability not turned on! Enable it in Xcode under 'Project Target' -> Capability.");
@@ -256,8 +276,6 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)registerDeviceToken:(id)inDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    waitingForApnsResponse = false;
-
     [self updateDeviceToken:inDeviceToken onSuccess:successBlock onFailure:failureBlock];
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICETOKEN"];
@@ -352,7 +370,10 @@ static BOOL registrationInProgress = false;
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
 
     [CleverPush setNotificationDelivered:notificationId];
-    [CleverPush setNotificationClicked:notificationId];
+    
+    if (!isActive) {
+        [CleverPush setNotificationClicked:notificationId];
+    }
 
     [self clearBadge:true];
 
