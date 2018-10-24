@@ -1,5 +1,11 @@
 ## Changelog
 
+### 0.0.19
+* minor fixes
+
+### 0.0.18
+* fix `unsubscribe` method
+
 ### 0.0.17
 * changed BOOL* to BOOL at some places and renamed internal blocks
 
