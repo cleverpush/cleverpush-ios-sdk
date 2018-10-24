@@ -31,7 +31,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.18";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.19";
 
 static BOOL registeredWithApple = NO;
 static BOOL waitingForApnsResponse = false;
@@ -235,12 +235,12 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)unsubscribe {
-    NSString* subscriptionId = [self getSubscriptionId];
-    if (subscriptionId) {
+    NSString* subscriptionIdLocal = [self getSubscriptionId];
+    if (subscriptionIdLocal) {
         NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
-                                 subscriptionId, @"subscriptionId",
+                                 subscriptionIdLocal, @"subscriptionId",
                                  nil];
         
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -250,6 +250,7 @@ BOOL handleSubscribedCalled = false;
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        subscriptionId = nil;
     }
 }
 
