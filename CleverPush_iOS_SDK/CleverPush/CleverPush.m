@@ -34,7 +34,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.21";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.22";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -354,24 +354,26 @@ static BOOL registrationInProgress = false;
     }];
 }
 
-+ (NSString*)getUsableDeviceToken {
-    if (![[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
-        return deviceToken;
-    }
-
-    return ([[UIApplication sharedApplication] currentUserNotificationSettings].types > 0) ? deviceToken : NULL;
++ (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
+    [self handleNotificationReceived:messageDict isActive:isActive wasOpened:NO];
 }
 
-+ (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
-    [self handlePushReceived:messageDict isActive:isActive wasOpened:NO];
-}
-
-+ (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened {
++ (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened {
     if (!channelId) {
         return;
     }
     
     [self handleNotificationOpened:messageDict isActive:isActive];
+}
+
++ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    if (!channelId) {
+        return NO;
+    }
+    
+    [self handleNotificationOpened:messageDict isActive:application.applicationState == UIApplicationStateActive];
+    
+    return NO;
 }
 
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {

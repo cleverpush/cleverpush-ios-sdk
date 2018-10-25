@@ -7,7 +7,9 @@
 #import "CleverPush.h"
 
 @interface CleverPush (UN_extra)
-+ (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)opened;
+
++ (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)opened;
+
 @end
 
 @implementation CleverPushUNUserNotificationCenter
@@ -48,7 +50,7 @@ withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))compl
     NSUInteger completionHandlerOptions = 7;
     
     if ([CleverPush channelId]) {
-        [CleverPush handlePushReceived:notification.request.content.userInfo isActive:YES wasOpened:YES];
+        [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES wasOpened:YES];
     }
     
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
@@ -76,7 +78,7 @@ withCompletionHandler:(void(^)())completionHandler {
         return;
     }
     
-    [CleverPush handlePushReceived:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive wasOpened:YES];
+    [CleverPush handleNotificationReceived:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive wasOpened:YES];
     
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
         [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];

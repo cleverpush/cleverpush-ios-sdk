@@ -10,8 +10,8 @@
 + (void) didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 + (void) handleDidFailRegisterForRemoteNotification:(NSError*)error;
 + (NSString*) channelId;
-+ (void) handlePushReceived:(NSDictionary *)messageDict isActive:(BOOL)isActive:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened;
-+ (BOOL) remoteSilentNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
++ (void) handleNotificationReceived:(NSDictionary *)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened;
++ (BOOL) handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)userInfo completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 
 @end
 
@@ -39,7 +39,7 @@ static NSArray* delegateSubclasses = nil;
     delegateClass = getClassWithProtocolInHierarchy([delegate class], @protocol(UIApplicationDelegate));
     delegateSubclasses = ClassGetSubclasses(delegateClass);
     
-    injectToProperClass(@selector(cleverPushRemoteSilentNotification:UserInfo:fetchCompletionHandler:),
+    injectToProperClass(@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:),
                         @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:), delegateSubclasses, newClass, delegateClass);
     
     [CleverPushAppDelegate injectPreiOS10MethodsPhase1];
@@ -51,9 +51,6 @@ static NSArray* delegateSubclasses = nil;
                         @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:), delegateSubclasses, newClass, delegateClass);
     
     [CleverPushAppDelegate injectPreiOS10MethodsPhase2];
-    
-    injectToProperClass(@selector(cleverPushApplicationWillResignActive:),
-                        @selector(applicationWillResignActive:), delegateSubclasses, newClass, delegateClass);
     
     [self setCleverPushDelegate:delegate];
 }
@@ -67,9 +64,6 @@ static NSArray* delegateSubclasses = nil;
         return;
     }
     
-    injectToProperClass(@selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:),
-                        @selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
-    
     injectToProperClass(@selector(cleverPushDidRegisterUserNotifications:settings:),
                         @selector(application:didRegisterUserNotificationSettings:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
 }
@@ -81,9 +75,6 @@ static NSArray* delegateSubclasses = nil;
     
     injectToProperClass(@selector(cleverPushReceivedRemoteNotification:userInfo:),
                         @selector(application:didReceiveRemoteNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
-    
-    injectToProperClass(@selector(cleverPushLocalNotificationOpened:notification:),
-                        @selector(application:didReceiveLocalNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
 }
 
 
@@ -107,7 +98,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (void)cleverPushReceivedRemoteNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo {
     if ([CleverPush channelId]) {
-        [CleverPush handlePushReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive wasOpened:YES];
+        [CleverPush handleNotificationReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive wasOpened:YES];
     }
     
     if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]) {
@@ -115,29 +106,33 @@ static NSArray* delegateSubclasses = nil;
     }
 }
 
-- (void) cleverPushRemoteSilentNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {
+- (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {
 
-    BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushRemoteSilentNotification:UserInfo:fetchCompletionHandler:)];
+    BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:)];
     BOOL startedBackgroundJob = false;
     
     if ([CleverPush channelId]) {
-        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && userInfo[@"aps"][@"alert"])
-            [CleverPush handlePushReceived:userInfo isActive:YES wasOpened:NO];
-        else
-            startedBackgroundJob = [CleverPush remoteSilentNotification:application UserInfo:userInfo completionHandler:callExistingSelector ? nil : completionHandler];
+        // check if this is not a silent notification
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && userInfo[@"aps"][@"alert"]) {
+            [CleverPush handleNotificationReceived:userInfo isActive:YES wasOpened:NO];
+        } else {
+            startedBackgroundJob = [CleverPush handleSilentNotificationReceived:application UserInfo:userInfo completionHandler:callExistingSelector ? nil : completionHandler];
+        }
     }
     
     if (callExistingSelector) {
-        [self cleverPushRemoteSilentNotification:application UserInfo:userInfo fetchCompletionHandler:completionHandler];
+        [self cleverPushReceivedSilentRemoteNotification:application UserInfo:userInfo fetchCompletionHandler:completionHandler];
         return;
     }
     
     if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]
-        && ![[CleverPush valueForKey:@"startFromNotification"] boolValue])
+        && ![[CleverPush valueForKey:@"startFromNotification"] boolValue]) {
         [self cleverPushReceivedRemoteNotification:application userInfo:userInfo];
+    }
     
-    if (!startedBackgroundJob)
+    if (!startedBackgroundJob) {
         completionHandler(UIBackgroundFetchResultNewData);
+    }
 }
 
 @end
