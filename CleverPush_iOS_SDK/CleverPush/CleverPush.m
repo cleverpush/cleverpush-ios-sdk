@@ -1,5 +1,8 @@
 #import "CleverPush.h"
 #import "CleverPushHTTPClient.h"
+#import "UNUserNotificationCenter+CleverPush.h"
+#import "UIApplicationDelegate+CleverPush.h"
+#import "CleverPushSelectorHelpers.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -31,7 +34,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.20";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.21";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -351,18 +354,23 @@ static BOOL registrationInProgress = false;
     }];
 }
 
-+(NSString*)getUsableDeviceToken {
-    if (![[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)])
++ (NSString*)getUsableDeviceToken {
+    if (![[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
         return deviceToken;
+    }
 
     return ([[UIApplication sharedApplication] currentUserNotificationSettings].types > 0) ? deviceToken : NULL;
 }
 
 + (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
+    [self handlePushReceived:messageDict isActive:isActive wasOpened:NO];
+}
+
++ (void)handlePushReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened {
     if (!channelId) {
         return;
     }
-
+    
     [self handleNotificationOpened:messageDict isActive:isActive];
 }
 
@@ -591,6 +599,44 @@ static BOOL registrationInProgress = false;
 
 + (NSString*)getSubscriptionAttribute:(NSString*)attributeId {
     return [[self getSubscriptionAttributes] objectForKey:attributeId];
+}
+
+@end
+
+@implementation UIApplication (CleverPush)
+
+#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
++ (void)load {
+    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+    if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"])
+        return;
+    
+    if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"7.0")) {
+        return;
+    }
+    
+    BOOL existing = injectSelector([CleverPushAppDelegate class], @selector(cleverPushLoadedTagSelector:), self, @selector(cleverPushLoadedTagSelector:));
+    if (existing) {
+        return;
+    }
+    
+    injectToProperClass(@selector(setCleverPushDelegate:), @selector(setDelegate:), @[], [CleverPushAppDelegate class], [UIApplication class]);
+    
+    [self setupUNUserNotificationCenterDelegate];
+}
+
++ (void)setupUNUserNotificationCenterDelegate {
+    if (!NSClassFromString(@"UNUserNotificationCenter")) {
+        return;
+    }
+    
+    [CleverPushUNUserNotificationCenter injectSelectors];
+    
+    UNUserNotificationCenter* curNotifCenter = [UNUserNotificationCenter currentNotificationCenter];
+    
+    if (!curNotifCenter.delegate) {
+        curNotifCenter.delegate = (id)self;
+    }
 }
 
 @end
