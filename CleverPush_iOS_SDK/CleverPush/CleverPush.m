@@ -31,10 +31,9 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.19";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.20";
 
 static BOOL registeredWithApple = NO;
-static BOOL waitingForApnsResponse = false;
 static BOOL startFromNotification = NO;
 
 static NSString* channelId;
