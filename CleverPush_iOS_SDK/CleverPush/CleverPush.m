@@ -34,7 +34,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.22";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.23";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -317,6 +317,17 @@ static BOOL registrationInProgress = false;
 
     NSMutableURLRequest* request;
     request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
+    
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+    NSString* country = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+    if (!language) {
+        language = [[NSLocale preferredLanguages] firstObject];
+    }
+    [request setAllHTTPHeaderFields:@{
+                                      @"User-Agent": [NSString stringWithFormat:@"CleverPush iOS SDK %@", CLEVERPUSH_SDK_VERSION],
+                                      @"Accept-Language": language
+                                      }];
 
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              deviceToken, @"apnsToken",
@@ -325,6 +336,8 @@ static BOOL registrationInProgress = false;
                              @"iOS", @"platformName",
                              [[UIDevice currentDevice] systemVersion], @"platformVersion",
                              subscriptionId, @"subscriptionId",
+                             country, @"country",
+                             language, @"language",
                              nil];
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -495,6 +508,7 @@ static BOOL registrationInProgress = false;
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
+    
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
@@ -601,6 +615,28 @@ static BOOL registrationInProgress = false;
 
 + (NSString*)getSubscriptionAttribute:(NSString*)attributeId {
     return [[self getSubscriptionAttributes] objectForKey:attributeId];
+}
+
++ (void)setSubscriptionLanguage:(NSString *)language {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* currentLanguage = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+    if (!currentLanguage || (language && ![currentLanguage isEqualToString:language])) {
+        [userDefaults setObject:language forKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+        [userDefaults synchronize];
+        
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+    }
+}
+
++ (void)setSubscriptionCountry:(NSString *)country {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* currentCountry = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+    if (!currentCountry || (country && ![currentCountry isEqualToString:country])) {
+        [userDefaults setObject:country forKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+        [userDefaults synchronize];
+        
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+    }
 }
 
 @end

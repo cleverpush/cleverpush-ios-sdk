@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.0.23
+* added `setSubscriptionLanguage` and `setSubscriptionCountry`
+
 ### 0.0.19
 * minor fixes
 

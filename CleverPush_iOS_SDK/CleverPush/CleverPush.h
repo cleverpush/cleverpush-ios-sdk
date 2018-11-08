@@ -60,5 +60,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 + (NSDictionary*)getSubscriptionAttributes;
 + (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
++ (void)setSubscriptionLanguage:(NSString*)language;
++ (void)setSubscriptionCountry:(NSString*)country;
 
 @end
