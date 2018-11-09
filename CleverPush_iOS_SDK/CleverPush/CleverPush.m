@@ -34,7 +34,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.24";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.25";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -316,6 +316,8 @@ static BOOL registrationInProgress = false;
     if (registrationInProgress) {
         return;
     }
+    
+    NSLog(@"CleverPush: syncSubscription");
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 
@@ -465,6 +467,8 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    NSLog(@"CleverPush: HTTP: %@ %@", [request HTTPMethod], [request URL].absoluteString);
+    
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:request
             completionHandler:^(NSData *data,
@@ -633,7 +637,9 @@ static BOOL registrationInProgress = false;
         [userDefaults setObject:language forKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
         [userDefaults synchronize];
         
-        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+        });
     }
 }
 
@@ -644,7 +650,9 @@ static BOOL registrationInProgress = false;
         [userDefaults setObject:country forKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
         [userDefaults synchronize];
         
-        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+        });
     }
 }
 
