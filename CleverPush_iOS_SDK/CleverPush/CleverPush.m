@@ -34,7 +34,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.23";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.24";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -50,6 +50,11 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
+
+static id isNil(id object)
+{
+    return object ?: [NSNull null];
+}
 
 BOOL handleSubscribedCalled = false;
 
@@ -291,7 +296,7 @@ BOOL handleSubscribedCalled = false;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
 
-        [CleverPush syncSubscription];
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
         return;
     }
 
@@ -305,6 +310,7 @@ BOOL handleSubscribedCalled = false;
 }
 
 static BOOL registrationInProgress = false;
+
 
 + (void)syncSubscription {
     if (registrationInProgress) {
@@ -324,6 +330,8 @@ static BOOL registrationInProgress = false;
     if (!language) {
         language = [[NSLocale preferredLanguages] firstObject];
     }
+    NSString* timezone = [[NSTimeZone localTimeZone] name];
+    
     [request setAllHTTPHeaderFields:@{
                                       @"User-Agent": [NSString stringWithFormat:@"CleverPush iOS SDK %@", CLEVERPUSH_SDK_VERSION],
                                       @"Accept-Language": language
@@ -335,9 +343,10 @@ static BOOL registrationInProgress = false;
                              CLEVERPUSH_SDK_VERSION, @"browserVersion",
                              @"iOS", @"platformName",
                              [[UIDevice currentDevice] systemVersion], @"platformVersion",
+                             isNil(country), @"country",
+                             isNil(timezone), @"timezone",
+                             isNil(language), @"language",
                              subscriptionId, @"subscriptionId",
-                             country, @"country",
-                             language, @"language",
                              nil];
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
