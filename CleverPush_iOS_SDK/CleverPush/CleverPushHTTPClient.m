@@ -11,6 +11,15 @@
 
 @synthesize apiEndpoint;
 
++ (CleverPushHTTPClient *)sharedClient {
+    static CleverPushHTTPClient *sharedClient = nil;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        sharedClient = [CleverPushHTTPClient new];
+    });
+    return sharedClient;
+}
+
 - (id)init {
     self = [super init];
     if (self)

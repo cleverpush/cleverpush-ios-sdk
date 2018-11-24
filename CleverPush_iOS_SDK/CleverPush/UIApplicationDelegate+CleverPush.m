@@ -64,8 +64,13 @@ static NSArray* delegateSubclasses = nil;
         return;
     }
     
+    injectToProperClass(@selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:),
+                        @selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+    
+    /*
     injectToProperClass(@selector(cleverPushDidRegisterUserNotifications:settings:),
                         @selector(application:didRegisterUserNotificationSettings:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+     */
 }
 
 + (void)injectPreiOS10MethodsPhase2 {
@@ -75,6 +80,8 @@ static NSArray* delegateSubclasses = nil;
     
     injectToProperClass(@selector(cleverPushReceivedRemoteNotification:userInfo:),
                         @selector(application:didReceiveRemoteNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+    injectToProperClass(@selector(cleverPushLocalNotificationOpened:notification:),
+                        @selector(application:didReceiveLocalNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
 }
 
 
@@ -96,6 +103,16 @@ static NSArray* delegateSubclasses = nil;
     }
 }
 
+/*
+- (void)cleverPushDidRegisterUserNotifications:(UIApplication*)application settings:(UIUserNotificationSettings*)notificationSettings {
+    if ([CleverPush channelId])
+        [CleverPush updateNotificationTypes:notificationSettings.types];
+    
+    if ([self respondsToSelector:@selector(cleverPushDidRegisterUserNotifications:settings:)])
+        [self cleverPushDidRegisterUserNotifications:application settings:notificationSettings];
+}
+*/
+
 - (void)cleverPushReceivedRemoteNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo {
     if ([CleverPush channelId]) {
         [CleverPush handleNotificationReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive wasOpened:YES];
@@ -107,7 +124,6 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {
-
     BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:)];
     BOOL startedBackgroundJob = false;
     
@@ -132,6 +148,27 @@ static NSArray* delegateSubclasses = nil;
     
     if (!startedBackgroundJob) {
         completionHandler(UIBackgroundFetchResultNewData);
+    }
+}
+
+- (void)cleverPushLocalNotificationOpened:(UIApplication*)application handleActionWithIdentifier:(NSString*)identifier forLocalNotification:(UILocalNotification*)notification completionHandler:(void(^)()) completionHandler {
+    if ([CleverPush channelId]) {
+        [CleverPush processLocalActionBasedNotification:notification identifier:identifier];
+    }
+    
+    if ([self respondsToSelector:@selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:)]) {
+        [self cleverPushLocalNotificationOpened:application handleActionWithIdentifier:identifier forLocalNotification:notification completionHandler:completionHandler];
+    }
+    
+    completionHandler();
+}
+
+- (void)cleverPushLocalNotificationOpened:(UIApplication*)application notification:(UILocalNotification*)notification {
+    if ([CleverPush channelId])
+        [CleverPush processLocalActionBasedNotification:notification identifier:@"__DEFAULT__"];
+    
+    if ([self respondsToSelector:@selector(cleverPushLocalNotificationOpened:notification:)]) {
+        [self cleverPushLocalNotificationOpened:application notification:notification];
     }
 }
 

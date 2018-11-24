@@ -32,9 +32,96 @@
 
 @end
 
+
+@interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
+    NSError* error;
+    NSURLResponse* response;
+    BOOL done;
+    NSFileHandle* outputHandle;
+}
+@property (readonly, getter=isDone) BOOL done;
+@property (readonly) NSError* error;
+@property (readonly) NSURLResponse* response;
+
+@end
+
+
+@implementation DirectDownloadDelegate
+@synthesize error, response, done;
+
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    [outputHandle writeData:data];
+}
+
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)aResponse completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
+    response = aResponse;
+    completionHandler(NSURLSessionResponseAllow);
+}
+
+-(void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
+    error = anError;
+    done = YES;
+    
+    [outputHandle closeFile];
+}
+
+-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)anError {
+    done = YES;
+    error = anError;
+    [outputHandle closeFile];
+}
+
+- (id)initWithFilePath:(NSString*)path {
+    if (self = [super init]) {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:path])
+            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        
+        [[NSFileManager defaultManager] createFileAtPath:path contents:nil attributes:nil];
+        outputHandle = [NSFileHandle fileHandleForWritingAtPath:path];
+    }
+    return self;
+}
+@end
+
+@interface NSURLSession (DirectDownload)
++ (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error;
+@end
+
+@implementation NSURLSession (DirectDownload)
+
++ (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error {
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
+    
+    DirectDownloadDelegate *delegate = [[DirectDownloadDelegate alloc] initWithFilePath:localPath];
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:nil];
+    
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
+    
+    [task resume];
+    
+    [session finishTasksAndInvalidate];
+    
+    while (![delegate isDone]) {
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    }
+    
+    NSError *downloadError = [delegate error];
+    if (downloadError != nil) {
+        if (error)
+            *error = downloadError;
+        return nil;
+    }
+    
+    return delegate.response.MIMEType;
+}
+
+@end
+
+
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.25";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.26";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -43,13 +130,13 @@ static NSString* channelId;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
-CleverPushHTTPClient *httpClient;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
 CPFailureBlock cpTokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
+UIBackgroundTaskIdentifier mediaBackgroundTask;
 
 static id isNil(id object)
 {
@@ -103,8 +190,6 @@ BOOL handleSubscribedCalled = false;
     if (self) {
         UIApplication* sharedApp = [UIApplication sharedApplication];
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-
-        httpClient = [[CleverPushHTTPClient alloc] init];
 
         if (newChannelId) {
             channelId = newChannelId;
@@ -177,7 +262,7 @@ BOOL handleSubscribedCalled = false;
     
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
     [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
             channelConfig = result;
@@ -244,7 +329,7 @@ BOOL handleSubscribedCalled = false;
 + (void)unsubscribe {
     NSString* subscriptionIdLocal = [self getSubscriptionId];
     if (subscriptionIdLocal) {
-        NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
                                  subscriptionIdLocal, @"subscriptionId",
@@ -324,7 +409,7 @@ static BOOL registrationInProgress = false;
     registrationInProgress = true;
 
     NSMutableURLRequest* request;
-    request = [httpClient requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
+    request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
     
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
@@ -390,20 +475,115 @@ static BOOL registrationInProgress = false;
     [self handleNotificationOpened:messageDict isActive:isActive];
 }
 
-+ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    if (!channelId) {
-        return NO;
++ (NSString*)randomStringWithLength:(int)length {
+    NSString* letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    NSMutableString* randomString = [[NSMutableString alloc] initWithCapacity:length];
+    for (int i = 0; i < length; i++) {
+        int ln = (uint32_t)letters.length;
+        int rand = arc4random_uniform(ln);
+        [randomString appendFormat:@"%C", [letters characterAtIndex:rand]];
+    }
+    return randomString;
+}
+
++ (NSString*)downloadMedia:(NSString*)urlString {
+    NSURL* url = [NSURL URLWithString:urlString];
+    NSString* extension = url.pathExtension;
+    
+    if ([extension isEqualToString:@""]) {
+        extension = nil;
     }
     
-    [self handleNotificationOpened:messageDict isActive:application.applicationState == UIApplicationStateActive];
+    NSArray *supportedAttachmentTypes = @[@"aiff", @"wav", @"mp3", @"mp4", @"jpg", @"jpeg", @"png", @"gif", @"mpeg", @"mpg", @"avi", @"m4a", @"m4v"];
+    if (extension != nil && ![supportedAttachmentTypes containsObject:extension]) {
+        return nil;
+    }
     
-    return NO;
+    NSString* name = [self randomStringWithLength:8];
+    if (extension) {
+        name = [name stringByAppendingString:[NSString stringWithFormat:@".%@", extension]];
+    }
+    
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
+    
+    @try {
+        NSError *error;
+        [NSURLSession downloadItemAtURL:url toFile:filePath error:&error];
+        if (error) {
+            NSLog(@"CleverPush: error while attempting to download file with URL: %@", error);
+            return nil;
+        }
+        
+        /*
+        NSArray* cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
+        NSMutableArray* appendedCache;
+        if (cachedFiles) {
+            appendedCache = [[NSMutableArray alloc] initWithArray:cachedFiles];
+            [appendedCache addObject:name];
+        } else {
+            appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
+        }
+        
+        [[NSUserDefaults standardUserDefaults] setObject:appendedCache forKey:@"CACHED_MEDIA"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+         */
+        
+        return name;
+    } @catch (NSException *exception) {
+        NSLog(@"CleverPush: error while downloading file (%@), error: %@", url, exception.description);
+        return nil;
+    }
+}
+
++ (void)addAttachments:(NSString*)mediaUrl toContent:(UNMutableNotificationContent*)content {
+    NSMutableArray* unAttachments = [NSMutableArray new];
+    
+    NSURL* nsURL = [NSURL URLWithString:mediaUrl];
+    
+    if (nsURL) {
+        NSString* urlScheme = [nsURL.scheme lowercaseString];
+        if ([urlScheme isEqualToString:@"http"] || [urlScheme isEqualToString:@"https"]) {
+            NSString* name = [self downloadMedia:mediaUrl];
+            
+            if (name) {
+                NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+                NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
+                NSURL* url = [NSURL fileURLWithPath:filePath];
+                NSError* error;
+                UNNotificationAttachment* attachment = [UNNotificationAttachment
+                                                        attachmentWithIdentifier:@""
+                                                        URL:url
+                                                        options:0
+                                                        error:&error];
+                if (attachment) {
+                    [unAttachments addObject:attachment];
+                }
+            }
+        }
+    }
+    
+    content.attachments = unAttachments;
+}
+
++ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    BOOL startedBackgroundJob = NO;
+
+    NSDictionary* notification = [messageDict valueForKey:@"notification"];
+    
+    if (application.applicationState != UIApplicationStateBackground) {
+        [CleverPush handleNotificationReceived:messageDict isActive:NO wasOpened:YES];
+    } else {
+        [CleverPush setNotificationDelivered:[notification valueForKey:@"_id"]];
+    }
+    
+    return startedBackgroundJob;
 }
 
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
 
-    [CleverPush setNotificationDelivered:notificationId];
+    // [CleverPush setNotificationDelivered:notificationId];
     
     if (!isActive) {
         [CleverPush setNotificationClicked:notificationId];
@@ -420,8 +600,22 @@ static BOOL registrationInProgress = false;
     handleNotificationOpened(result);
 }
 
++ (void)processLocalActionBasedNotification:(UILocalNotification*) notification identifier:(NSString*)identifier {
+    if (!notification.userInfo) {
+        return;
+    }
+    
+    BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+    [self handleNotificationReceived:notification.userInfo isActive:isActive wasOpened:YES];
+    
+    if (!isActive) {
+        [self handleNotificationOpened:notification.userInfo
+                              isActive:isActive];
+    }
+}
+
 + (void)setNotificationDelivered:(NSString*)notificationId {
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"notification/delivered"];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
@@ -433,8 +627,21 @@ static BOOL registrationInProgress = false;
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
 }
 
++ (void)setNotificationDelivered:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             channelId, @"channelId",
+                             notificationId, @"notificationId",
+                             subscriptionId, @"subscriptionId",
+                             nil];
+    
+    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+}
+
 + (void)setNotificationClicked:(NSString*)notificationId {
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"notification/clicked"];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/clicked"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
@@ -474,7 +681,9 @@ static BOOL registrationInProgress = false;
             completionHandler:^(NSData *data,
                                 NSURLResponse *response,
                                 NSError *error) {
-                [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+                if (successBlock != nil || failureBlock != nil) {
+                    [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+                }
             }] resume];
 }
 
@@ -512,7 +721,7 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)addSubscriptionTag:(NSString*)tagId {
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/tag"];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              tagId, @"tagId",
@@ -538,7 +747,7 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)removeSubscriptionTag:(NSString*)tagId {
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/untag"];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              tagId, @"tagId",
@@ -560,7 +769,7 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
-    NSMutableURLRequest* request = [httpClient requestWithMethod:@"POST" path:@"subscription/attribute"];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/attribute"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              attributeId, @"attributeId",
@@ -654,6 +863,35 @@ static BOOL registrationInProgress = false;
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
         });
     }
+}
+
++ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
+    if (!replacementContent) {
+        replacementContent = [request.content mutableCopy];
+    }
+    
+    NSDictionary* payload = request.content.userInfo;
+    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
+    NSString* channelId = [payload valueForKeyPath:@"channel._id"];
+    NSString* subscriptionId = [payload valueForKeyPath:@"subscription._id"];
+    
+    [self setNotificationDelivered:notificationId withChannelId:channelId withSubscriptionId:subscriptionId];
+    
+    NSString* mediaUrl = [payload valueForKeyPath:@"notification.mediaUrl"];
+    if (![mediaUrl isKindOfClass:[NSNull class]]) {
+        NSLog(@"CleverPush: appending media: %@", mediaUrl);
+        [self addAttachments:mediaUrl toContent:replacementContent];
+    }
+    
+    return replacementContent;
+}
+
++ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
+    if (!replacementContent) {
+        replacementContent = [request.content mutableCopy];
+    }
+    
+    return replacementContent;
 }
 
 @end
