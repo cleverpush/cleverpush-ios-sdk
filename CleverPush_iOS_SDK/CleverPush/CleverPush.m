@@ -3,7 +3,6 @@
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
-#import "CZPickerView.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -907,8 +906,7 @@ static BOOL registrationInProgress = false;
     
     CZPickerView *picker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
                                                    cancelButtonTitle:@"Abbrechen"
-                                                  confirmButtonTitle:@"Speichern"
-                            ];
+                                                  confirmButtonTitle:@"Speichern"];
     picker.allowMultipleSelection = YES;
     picker.delegate = self;
     picker.dataSource = self;
@@ -918,12 +916,11 @@ static BOOL registrationInProgress = false;
     [picker show];
 }
 
-- (NSString *)czpickerView:(CZPickerView *)pickerView
-               titleForRow:(NSInteger)row{
++ (NSString *)czpickerView:(CZPickerView *)pickerView titleForRow:(NSInteger)row {
     return [channelTopics[row] valueForKey:@"title"];
 }
 
-- (bool)czpickerView:(CZPickerView *)pickerView checkedForRow:(NSInteger)row {
++ (bool)czpickerView:(CZPickerView *)pickerView checkedForRow:(NSInteger)row {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* selectedTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
     NSDictionary* topic = channelTopics[row];
@@ -934,11 +931,11 @@ static BOOL registrationInProgress = false;
     return selectedTags && [selectedTags containsObject:topicId];
 }
 
-- (NSInteger)numberOfRowsInPickerView:(CZPickerView *)pickerView {
++ (NSInteger)numberOfRowsInPickerView:(CZPickerView *)pickerView {
     return channelTopics.count;
 }
 
-- (void)czpickerView:(CZPickerView *)pickerView didConfirmWithItemsAtRows:(NSArray *)rows {
++ (void)czpickerView:(CZPickerView *)pickerView didConfirmWithItemsAtRows:(NSArray *)rows {
     NSMutableArray* selectedTopics = [[NSMutableArray alloc] init];
     for (NSNumber *n in rows) {
         NSInteger row = [n integerValue];

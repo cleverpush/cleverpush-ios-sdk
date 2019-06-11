@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "CZPickerView.h"
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
 #define XC8_AVAILABLE 1
@@ -24,7 +25,7 @@ typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult * res
 
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
-@interface CleverPush : NSObject
+@interface CleverPush : NSObject<CZPickerViewDataSource, CZPickerViewDelegate>
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
 
