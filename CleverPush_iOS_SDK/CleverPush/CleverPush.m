@@ -441,7 +441,7 @@ static BOOL registrationInProgress = false;
                              nil];
     
     NSArray* topics = [self getSubscriptionTopics];
-    if (topics && topics.count > 0) {
+    if (topics) {
         [dataDic setObject:topics forKey:@"topics"];
     }
 
@@ -943,7 +943,7 @@ static BOOL registrationInProgress = false;
     return channelTopics.count;
 }
 
-+ (void)czpickerViewDidClickCancelButton {
++ (void)czpickerViewDidClickCancelButton:(CZPickerView *)pickerView {
     channelTopicsPickerVisible = NO;
 }
 
