@@ -3,6 +3,7 @@
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
+#import "CZPickerView.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -136,6 +137,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
+NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 
 static id isNil(id object)
@@ -424,7 +426,7 @@ static BOOL registrationInProgress = false;
                                       @"Accept-Language": language
                                       }];
 
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                              deviceToken, @"apnsToken",
                              @"SDK", @"browserType",
                              CLEVERPUSH_SDK_VERSION, @"browserVersion",
@@ -435,6 +437,11 @@ static BOOL registrationInProgress = false;
                              isNil(language), @"language",
                              subscriptionId, @"subscriptionId",
                              nil];
+    
+    NSArray* topics = [self getSubscriptionTopics];
+    if (topics && topics.count > 0) {
+        [dataDic setObject:topics forKey:@"topics"];
+    }
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
@@ -863,6 +870,85 @@ static BOOL registrationInProgress = false;
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
         });
     }
+}
+
++ (NSArray*)getAvailableTopics {
+    NSDictionary* channelConfig = [self getChannelConfig];
+    if (channelConfig != nil) {
+        NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+        if (channelTopics != nil) {
+            return channelTopics;
+        }
+    }
+    return [[NSArray alloc] init];
+}
+
++ (NSArray*)getSubscriptionTopics {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    if (!subscriptionTopics) {
+        return [[NSArray alloc] init];
+    }
+    return subscriptionTopics;
+}
+
++ (void)setSubscriptionTopics:(NSMutableArray *)topics {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:topics forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    [userDefaults synchronize];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+    });
+}
+
++ (void)showTopicsDialog {
+    channelTopics = [self getAvailableTopics];
+    
+    CZPickerView *picker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
+                                                   cancelButtonTitle:@"Abbrechen"
+                                                  confirmButtonTitle:@"Speichern"
+                            ];
+    picker.allowMultipleSelection = YES;
+    picker.delegate = self;
+    picker.dataSource = self;
+    picker.headerBackgroundColor = [UIColor lightGrayColor];
+    picker.headerTitleColor = [UIColor darkGrayColor];
+    picker.confirmButtonBackgroundColor = [UIColor darkGrayColor];
+    [picker show];
+}
+
+- (NSString *)czpickerView:(CZPickerView *)pickerView
+               titleForRow:(NSInteger)row{
+    return [channelTopics[row] valueForKey:@"title"];
+}
+
+- (bool)czpickerView:(CZPickerView *)pickerView checkedForRow:(NSInteger)row {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* selectedTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    NSDictionary* topic = channelTopics[row];
+    NSString* topicId;
+    if (topic) {
+        topicId = [topic valueForKey:@"_id"];
+    }
+    return selectedTags && [selectedTags containsObject:topicId];
+}
+
+- (NSInteger)numberOfRowsInPickerView:(CZPickerView *)pickerView {
+    return channelTopics.count;
+}
+
+- (void)czpickerView:(CZPickerView *)pickerView didConfirmWithItemsAtRows:(NSArray *)rows {
+    NSMutableArray* selectedTopics = [[NSMutableArray alloc] init];
+    for (NSNumber *n in rows) {
+        NSInteger row = [n integerValue];
+        NSDictionary* topic = channelTopics[row];
+        if (topic) {
+            [selectedTopics addObject:[topic valueForKey:@"_id"]];
+        }
+    }
+    
+    [CleverPush setSubscriptionTopics:selectedTopics];
 }
 
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {

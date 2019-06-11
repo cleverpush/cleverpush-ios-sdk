@@ -22,6 +22,9 @@
 		29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */; };
 		29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */; };
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
+		29E290BF22B04A8900BFC74F /* CZPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E290BE22B04A8900BFC74F /* CZPickerView.m */; };
+		29E290C022B04DEB00BFC74F /* CZPickerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29E290BD22B04A7900BFC74F /* CZPickerView.h */; };
+		29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E290BE22B04A8900BFC74F /* CZPickerView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +78,8 @@
 		29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushSelectorHelpers.h; sourceTree = "<group>"; };
 		29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+CleverPush.m"; sourceTree = "<group>"; };
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
+		29E290BD22B04A7900BFC74F /* CZPickerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CZPickerView.h; sourceTree = "<group>"; };
+		29E290BE22B04A8900BFC74F /* CZPickerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CZPickerView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +147,8 @@
 				29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */,
 				29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */,
 				29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */,
+				29E290BD22B04A7900BFC74F /* CZPickerView.h */,
+				29E290BE22B04A8900BFC74F /* CZPickerView.m */,
 			);
 			path = CleverPush;
 			sourceTree = "<group>";
@@ -170,6 +177,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29E290C022B04DEB00BFC74F /* CZPickerView.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -263,6 +271,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 297B4DEB1E589AFE00BAF990;
@@ -311,6 +320,7 @@
 				297B4E271E58A16600BAF990 /* CleverPush.m in Sources */,
 				297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */,
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */,
 				29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
 			);
@@ -330,6 +340,7 @@
 				29C1BAEC1E58B61B00815CD6 /* CleverPush.m in Sources */,
 				29C1BAED1E58B61C00815CD6 /* CleverPushHTTPClient.m in Sources */,
 				29DC4ABB2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				29E290BF22B04A8900BFC74F /* CZPickerView.m in Sources */,
 				29DC4ABD2181E3100051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
 				29DC4AC02182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
 			);
