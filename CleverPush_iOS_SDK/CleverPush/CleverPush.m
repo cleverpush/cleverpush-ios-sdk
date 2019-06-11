@@ -3,6 +3,7 @@
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
+#import "CZPickerView.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -138,6 +139,7 @@ CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
+CZPickerView *channelTopicsPicker;
 
 static id isNil(id object)
 {
@@ -904,20 +906,22 @@ static BOOL registrationInProgress = false;
 + (void)showTopicsDialog {
     channelTopics = [self getAvailableTopics];
     
-    CZPickerView *picker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
-                                                   cancelButtonTitle:@"Abbrechen"
-                                                  confirmButtonTitle:@"Speichern"];
-    picker.allowMultipleSelection = YES;
-    picker.delegate = self;
-    picker.dataSource = self;
-    picker.headerBackgroundColor = [UIColor lightGrayColor];
-    picker.headerTitleColor = [UIColor darkGrayColor];
-    picker.confirmButtonBackgroundColor = [UIColor darkGrayColor];
-    [picker show];
+    if (!channelTopicsPicker) {
+        channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
+                                                      cancelButtonTitle:@"Abbrechen"
+                                                     confirmButtonTitle:@"Speichern"];
+        channelTopicsPicker.allowMultipleSelection = YES;
+        channelTopicsPicker.delegate = self;
+        channelTopicsPicker.dataSource = self;
+        channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
+        channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
+        channelTopicsPicker.confirmButtonBackgroundColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+    }
+    [channelTopicsPicker show];
 }
 
 + (NSString *)czpickerView:(CZPickerView *)pickerView titleForRow:(NSInteger)row {
-    return [channelTopics[row] valueForKey:@"title"];
+    return [channelTopics[row] valueForKey:@"name"];
 }
 
 + (bool)czpickerView:(CZPickerView *)pickerView checkedForRow:(NSInteger)row {
