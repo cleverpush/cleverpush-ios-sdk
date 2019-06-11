@@ -140,6 +140,7 @@ NSDictionary* channelConfig;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 CZPickerView *channelTopicsPicker;
+BOOL channelTopicsPickerVisible = NO;
 
 static id isNil(id object)
 {
@@ -904,19 +905,22 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)showTopicsDialog {
+    if (channelTopicsPickerVisible) {
+        return;
+    }
+    channelTopicsPickerVisible = YES;
+    
     channelTopics = [self getAvailableTopics];
     
-    if (!channelTopicsPicker) {
-        channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
-                                                      cancelButtonTitle:@"Abbrechen"
-                                                     confirmButtonTitle:@"Speichern"];
-        channelTopicsPicker.allowMultipleSelection = YES;
-        channelTopicsPicker.delegate = self;
-        channelTopicsPicker.dataSource = self;
-        channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
-        channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
-        channelTopicsPicker.confirmButtonBackgroundColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-    }
+    channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
+                                                  cancelButtonTitle:@"Abbrechen"
+                                                 confirmButtonTitle:@"Speichern"];
+    channelTopicsPicker.allowMultipleSelection = YES;
+    channelTopicsPicker.delegate = self;
+    channelTopicsPicker.dataSource = self;
+    channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
+    channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
+    channelTopicsPicker.confirmButtonBackgroundColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
     [channelTopicsPicker show];
 }
 
@@ -939,7 +943,16 @@ static BOOL registrationInProgress = false;
     return channelTopics.count;
 }
 
++ (void)czpickerViewDidClickCancelButton {
+    channelTopicsPickerVisible = NO;
+}
+
 + (void)czpickerView:(CZPickerView *)pickerView didConfirmWithItemsAtRows:(NSArray *)rows {
+    if (!channelTopicsPickerVisible) {
+        return;
+    }
+    channelTopicsPickerVisible = NO;
+    
     NSMutableArray* selectedTopics = [[NSMutableArray alloc] init];
     for (NSNumber *n in rows) {
         NSInteger row = [n integerValue];
