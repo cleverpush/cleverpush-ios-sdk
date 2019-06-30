@@ -921,7 +921,10 @@ static BOOL registrationInProgress = false;
     channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
     channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
     channelTopicsPicker.confirmButtonBackgroundColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-    [channelTopicsPicker show];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [channelTopicsPicker show];
+    });
 }
 
 + (NSString *)czpickerView:(CZPickerView *)pickerView titleForRow:(NSInteger)row {

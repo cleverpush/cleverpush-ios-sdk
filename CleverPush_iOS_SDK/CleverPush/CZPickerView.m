@@ -112,7 +112,7 @@ typedef void (^CZDismissCompletionCallback)(void);
 
 - (void)show {
     UIWindow *mainWindow = [[[UIApplication sharedApplication] delegate] window];
-    self.frame = mainWindow.frame;
+    self.frame = [UIScreen mainScreen].bounds;
     [self showInContainer:mainWindow];
 }
 
