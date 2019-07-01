@@ -122,7 +122,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.26";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.34";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -187,6 +187,22 @@ BOOL handleSubscribedCalled = false;
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
 }
 
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions {
+    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:YES];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+}
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister {
     handleNotificationOpened = openedCallback;
     handleSubscribed = subscribedCallback;
@@ -210,7 +226,14 @@ BOOL handleSubscribedCalled = false;
         }
 
         if (!channelId) {
-            return self;
+            NSLog(@"CleverPush: Channel ID not specified, trying to fetch config via Bundle Identifier...");
+            [self getChannelConfig];
+            
+            if (!channelId) {
+                NSLog(@"CleverPush: Initialization stopped - No Channel ID available");
+                return self;
+            }
+            NSLog(@"CleverPush: Got Channel ID, initializing");
         }
 
         subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
@@ -266,15 +289,37 @@ BOOL handleSubscribedCalled = false;
     
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
-    [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        if (result != nil) {
-            channelConfig = result;
-            dispatch_semaphore_signal(sema);
-        }
-    } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: getChannelConfig failure %@", error);
-    }];
+    if (channelId != NULL) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            if (result != nil) {
+                channelConfig = result;
+                dispatch_semaphore_signal(sema);
+            }
+        } onFailure:^(NSError* error) {
+            NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+        }];
+    } else {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", [[NSBundle mainBundle] bundleIdentifier]]];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            if (result != nil) {
+                channelId = [result objectForKey:@"channelId"];
+                NSLog(@"Detected Channel ID from Bundle Identifier: %@", channelId);
+                
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
+                [userDefaults setObject:nil forKey:@"CleverPush_SUBSCRIPTION_ID"];
+                [userDefaults synchronize];
+                
+                channelConfig = result;
+                
+                dispatch_semaphore_signal(sema);
+            }
+        } onFailure:^(NSError* error) {
+            NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error);
+        }];
+    }
+    
     
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     
@@ -911,6 +956,9 @@ static BOOL registrationInProgress = false;
     channelTopicsPickerVisible = YES;
     
     channelTopics = [self getAvailableTopics];
+    if ([channelTopics count] == 0) {
+        NSLog(@"CleverPush: showTopicsDialog: No topics found. Create some first in the CleverPush channel settings.");
+    }
     
     channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
                                                   cancelButtonTitle:@"Abbrechen"
