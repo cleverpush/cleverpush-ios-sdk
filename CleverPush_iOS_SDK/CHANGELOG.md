@@ -1,0 +1,8 @@
+# 0.1.1
+
+* Added API for retrieving the last received notifications
+
+
+# 0.1.0
+
+* Crash fixed when internet is not available on first launch
