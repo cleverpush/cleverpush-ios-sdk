@@ -122,12 +122,13 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.0.34";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 
 static NSString* channelId;
+static BOOL autoRegister = YES;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
@@ -203,9 +204,10 @@ BOOL handleSubscribedCalled = false;
     return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
 }
 
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister {
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegisterParam {
     handleNotificationOpened = openedCallback;
     handleSubscribed = subscribedCallback;
+    autoRegister = autoRegisterParam;
 
     if (self) {
         UIApplication* sharedApp = [UIApplication sharedApplication];
@@ -227,46 +229,22 @@ BOOL handleSubscribedCalled = false;
 
         if (!channelId) {
             NSLog(@"CleverPush: Channel ID not specified, trying to fetch config via Bundle Identifier...");
-            [self getChannelConfig];
             
-            if (!channelId) {
-                NSLog(@"CleverPush: Initialization stopped - No Channel ID available");
-                return self;
-            }
+            dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+                [self getChannelConfig];
+                
+                if (!channelId) {
+                    NSLog(@"CleverPush: Initialization stopped - No Channel ID available");
+                    return;
+                }
+                
+                dispatch_async(dispatch_get_main_queue(), ^(void){
+                    [self initWithChannelId];
+                });
+            });
             NSLog(@"CleverPush: Got Channel ID, initializing");
-        }
-
-        subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
-        deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
-        if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
-            registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
         } else {
-            registeredWithApple = deviceToken != nil;
-        }
-
-        if (autoRegister || registeredWithApple) {
-            [self subscribe];
-        }
-
-        lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
-        NSDate* nextSync = [NSDate date];
-        if (lastSync) {
-            // 3 days after last sync
-            nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60];
-        }
-
-        if (subscriptionId != nil) {
-            if (nextSync < [NSDate date]) {
-                [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
-            } else {
-                if (handleSubscribed && !handleSubscribedCalled) {
-                    handleSubscribed(subscriptionId);
-                    handleSubscribedCalled = true;
-                }
-                if (handleSubscribedInternal) {
-                    handleSubscribedInternal(subscriptionId);
-                }
-            }
+            [self initWithChannelId];
         }
     }
 
@@ -278,6 +256,44 @@ BOOL handleSubscribedCalled = false;
     [self clearBadge:false];
 
     return self;
+}
+
++ (void)initWithChannelId {
+    UIApplication* sharedApp = [UIApplication sharedApplication];
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+
+    subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
+    deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
+    if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
+        registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
+    } else {
+        registeredWithApple = deviceToken != nil;
+    }
+    
+    if (autoRegister || registeredWithApple) {
+        [self subscribe];
+    }
+    
+    lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+    NSDate* nextSync = [NSDate date];
+    if (lastSync) {
+        // 3 days after last sync
+        nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60];
+    }
+    
+    if (subscriptionId != nil) {
+        if (nextSync < [NSDate date]) {
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+        } else {
+            if (handleSubscribed && !handleSubscribedCalled) {
+                handleSubscribed(subscriptionId);
+                handleSubscribedCalled = true;
+            }
+            if (handleSubscribedInternal) {
+                handleSubscribedInternal(subscriptionId);
+            }
+        }
+    }
 }
 
 + (NSDictionary*)getChannelConfig {
