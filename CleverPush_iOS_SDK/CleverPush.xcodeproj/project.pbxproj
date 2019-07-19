@@ -80,6 +80,7 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E290BD22B04A7900BFC74F /* CZPickerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CZPickerView.h; sourceTree = "<group>"; };
 		29E290BE22B04A8900BFC74F /* CZPickerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CZPickerView.m; sourceTree = "<group>"; };
+		29F4C76822E0E20100FB4802 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +114,7 @@
 		297B4DEB1E589AFE00BAF990 = {
 			isa = PBXGroup;
 			children = (
+				29F4C76822E0E20100FB4802 /* CHANGELOG.md */,
 				297B4E351E58A1AA00BAF990 /* CleverPush.podspec */,
 				297B4E371E58A1BD00BAF990 /* LICENSE */,
 				297B4E381E58A1BD00BAF990 /* README.md */,

@@ -72,5 +72,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSMutableArray*)getSubscriptionTopics;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)showTopicsDialog;
++ (NSArray*)getNotifications;
 
 @end

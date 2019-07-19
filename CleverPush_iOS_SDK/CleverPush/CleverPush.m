@@ -644,7 +644,7 @@ static BOOL registrationInProgress = false;
     if (application.applicationState != UIApplicationStateBackground) {
         [CleverPush handleNotificationReceived:messageDict isActive:NO wasOpened:YES];
     } else {
-        [CleverPush setNotificationDelivered:[notification valueForKey:@"_id"]];
+        [CleverPush setNotificationDelivered:notification];
     }
     
     return startedBackgroundJob;
@@ -684,30 +684,40 @@ static BOOL registrationInProgress = false;
     }
 }
 
-+ (void)setNotificationDelivered:(NSString*)notificationId {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             notificationId, @"notificationId",
-                             [self getSubscriptionId], @"subscriptionId",
-                             nil];
-
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
++ (void)setNotificationDelivered:(NSDictionary*)notification {
+    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
 }
 
-+ (void)setNotificationDelivered:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
++ (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
-                             notificationId, @"notificationId",
+                             [notification valueForKey:@"_id"], @"notificationId",
                              subscriptionId, @"subscriptionId",
                              nil];
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    
+    // save notification to user defaults
+    NSBundle *bundle = [NSBundle mainBundle];
+    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
+        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
+        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
+    }
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    
+    NSMutableDictionary *notificationMutable = [notification mutableCopy];
+    [notificationMutable removeObjectsForKeys:[notification allKeysForObject:[NSNull null]]];
+    
+    NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"]];
+    if (!notifications) {
+        notifications = [[NSMutableArray alloc] init];
+    }
+    [notifications addObject:notificationMutable];
+    [userDefaults setObject:notifications forKey:@"CleverPush_NOTIFICATIONS"];
+    [userDefaults synchronize];
 }
 
 + (void)setNotificationClicked:(NSString*)notificationId {
@@ -965,6 +975,16 @@ static BOOL registrationInProgress = false;
     });
 }
 
++ (NSArray*)getNotifications {
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
+    NSArray* notifications = [userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"];
+    if (!notifications) {
+        return [[NSArray alloc] init];
+    }
+    
+    return notifications;
+}
+
 + (void)showTopicsDialog {
     if (channelTopicsPickerVisible) {
         return;
@@ -1038,11 +1058,11 @@ static BOOL registrationInProgress = false;
     }
     
     NSDictionary* payload = request.content.userInfo;
-    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
+    NSDictionary* notification = [payload valueForKey:@"notification"];
     NSString* channelId = [payload valueForKeyPath:@"channel._id"];
     NSString* subscriptionId = [payload valueForKeyPath:@"subscription._id"];
     
-    [self setNotificationDelivered:notificationId withChannelId:channelId withSubscriptionId:subscriptionId];
+    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:subscriptionId];
     
     NSString* mediaUrl = [payload valueForKeyPath:@"notification.mediaUrl"];
     if (![mediaUrl isKindOfClass:[NSNull class]]) {
