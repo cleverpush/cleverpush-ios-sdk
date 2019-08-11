@@ -1,3 +1,8 @@
+# 0.1.2
+
+* Fixed some bugs
+
+
 # 0.1.1
 
 * Added API for retrieving the last received notifications

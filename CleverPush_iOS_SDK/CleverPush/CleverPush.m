@@ -122,7 +122,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -368,7 +368,6 @@ BOOL handleSubscribedCalled = false;
             isEnabled = YES;
         }
     } else {
-        
         if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
             isEnabled = YES;
         } else{
@@ -441,7 +440,7 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)updateDeviceToken:(NSString*)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    if (subscriptionId == nil) {
+    if ([self notificationsEnabled] && subscriptionId == nil) {
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
