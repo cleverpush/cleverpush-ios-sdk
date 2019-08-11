@@ -1,6 +1,12 @@
+# 0.1.4
+
+* Let handleSubscribed be called multiple times when re-subscribing
+
+
 # 0.1.3
 
 * Always register after remote notifications have been enabled
+
 
 # 0.1.2
 

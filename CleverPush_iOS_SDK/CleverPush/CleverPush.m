@@ -122,7 +122,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -407,6 +407,7 @@ BOOL handleSubscribedCalled = false;
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         subscriptionId = nil;
+        handleSubscribedCalled = false;
     }
 }
 
