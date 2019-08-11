@@ -1,3 +1,7 @@
+# 0.1.3
+
+* Always register after remote notifications have been enabled
+
 # 0.1.2
 
 * Fixed some bugs

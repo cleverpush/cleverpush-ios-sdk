@@ -122,7 +122,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -440,7 +440,7 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)updateDeviceToken:(NSString*)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    if ([self notificationsEnabled] && subscriptionId == nil) {
+    if (subscriptionId == nil) {
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
