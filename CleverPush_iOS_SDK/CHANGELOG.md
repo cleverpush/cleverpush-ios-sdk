@@ -1,3 +1,7 @@
+# 0.1.5
+
+* Update for iOS 13
+
 # 0.1.4
 
 * Let handleSubscribed be called multiple times when re-subscribing
