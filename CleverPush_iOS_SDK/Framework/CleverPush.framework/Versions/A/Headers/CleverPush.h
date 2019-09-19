@@ -71,6 +71,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setSubscriptionCountry:(NSString*)country;
 + (NSMutableArray*)getSubscriptionTopics;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
++ (void)setBrandingColor:(UIColor *)color;
 + (void)showTopicsDialog;
 + (NSArray*)getNotifications;
 

@@ -1,3 +1,6 @@
+#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
 #import "CleverPush.h"
 #import "CleverPushHTTPClient.h"
 #import "UNUserNotificationCenter+CleverPush.h"
@@ -12,6 +15,9 @@
 #import <sys/sysctl.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
+#import <UserNotifications/UserNotifications.h>
+#endif
 
 @implementation CPNotificationOpenedResult
 
@@ -122,7 +128,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.6";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -142,6 +148,7 @@ NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 CZPickerView *channelTopicsPicker;
 BOOL channelTopicsPickerVisible = NO;
+UIColor* brandingColor;
 
 static id isNil(id object)
 {
@@ -208,6 +215,7 @@ BOOL handleSubscribedCalled = false;
     handleNotificationOpened = openedCallback;
     handleSubscribed = subscribedCallback;
     autoRegister = autoRegisterParam;
+    brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
 
     if (self) {
         UIApplication* sharedApp = [UIApplication sharedApplication];
@@ -274,15 +282,8 @@ BOOL handleSubscribedCalled = false;
         [self subscribe];
     }
     
-    lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
-    NSDate* nextSync = [NSDate date];
-    if (lastSync) {
-        // 3 days after last sync
-        nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60];
-    }
-    
     if (subscriptionId != nil) {
-        if (nextSync < [NSDate date]) {
+        if ([self shouldSync]) {
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
         } else {
             if (handleSubscribed && !handleSubscribedCalled) {
@@ -294,6 +295,17 @@ BOOL handleSubscribedCalled = false;
             }
         }
     }
+}
+
++ (BOOL)shouldSync {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+    NSDate* nextSync = [NSDate date];
+    if (lastSync) {
+        nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60]; // 3 days after last sync
+    }
+    NSLog(@"CleverPush next sync: %@", nextSync);
+    return [nextSync compare:[NSDate date]] == NSOrderedAscending;
 }
 
 + (NSDictionary*)getChannelConfig {
@@ -378,7 +390,39 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)subscribe {
-    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+        UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
+        [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (granted && subscriptionId == nil) {
+                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+
+                    NSDictionary* channelConfig = [self getChannelConfig];
+                    if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                        NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+                        if (channelTopics != nil && [channelTopics count] > 0) {
+                            NSArray* topics = [self getSubscriptionTopics];
+                            if (!topics || [topics count] == 0) {
+                                NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+                                for (id channelTopic in channelTopics) {
+                                    if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+                                        [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                                    }
+                                }
+                                if ([selectedTopicIds count] > 0) {
+                                    [self setSubscriptionTopics:selectedTopicIds];
+                                }
+                            }
+                            
+                            [self showTopicsDialog];
+                        }
+                    }
+                }
+            });
+        }];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    } else if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
         
         NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
@@ -433,20 +477,23 @@ BOOL handleSubscribedCalled = false;
     }
 }
 
-+ (void)registerDeviceToken:(id)inDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    [self updateDeviceToken:inDeviceToken onSuccess:successBlock onFailure:failureBlock];
-
-    [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICETOKEN"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-+ (void)updateDeviceToken:(NSString*)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId == nil) {
+        NSLog(@"CleverPush: registerDeviceToken: subscriptionId is nil");
+        
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
 
-        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+        if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+            [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
+                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+                }
+            }];
+        } else {
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+        }
         return;
     }
 
@@ -457,6 +504,9 @@ BOOL handleSubscribedCalled = false;
     }
 
     deviceToken = newDeviceToken;
+
+    [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICETOKEN"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 static BOOL registrationInProgress = false;
@@ -997,6 +1047,10 @@ static BOOL registrationInProgress = false;
     return notifications;
 }
 
++ (void)setBrandingColor:(UIColor *)color {
+    brandingColor = color;
+}
+
 + (void)showTopicsDialog {
     if (channelTopicsPickerVisible) {
         return;
@@ -1008,7 +1062,13 @@ static BOOL registrationInProgress = false;
         NSLog(@"CleverPush: showTopicsDialog: No topics found. Create some first in the CleverPush channel settings.");
     }
     
-    channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:@"Abonnierte Themen"
+    NSString* headerTitle = @"Abonnierte Themen";
+    NSDictionary* config = [self getChannelConfig];
+    if (config != nil && [config valueForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[config valueForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
+        headerTitle = [config valueForKey:@"confirmAlertSelectTopicsLaterTitle"];
+    }
+    
+    channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:headerTitle
                                                   cancelButtonTitle:@"Abbrechen"
                                                  confirmButtonTitle:@"Speichern"];
     channelTopicsPicker.allowMultipleSelection = YES;
@@ -1016,7 +1076,7 @@ static BOOL registrationInProgress = false;
     channelTopicsPicker.dataSource = self;
     channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
     channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
-    channelTopicsPicker.confirmButtonBackgroundColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+    channelTopicsPicker.confirmButtonBackgroundColor = brandingColor;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [channelTopicsPicker show];
@@ -1097,7 +1157,6 @@ static BOOL registrationInProgress = false;
 
 @implementation UIApplication (CleverPush)
 
-#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 + (void)load {
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
     if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"])
