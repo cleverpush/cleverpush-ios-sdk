@@ -1,3 +1,11 @@
+# 0.1.7
+
+* Run notificationsEnabled in main thread
+
+# 0.1.6
+
+* Show topic selection dialog after accepting notifications (if there are topics available)
+
 # 0.1.5
 
 * Update for iOS 13

@@ -128,7 +128,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.6";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.7";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -370,22 +370,32 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (BOOL)notificationsEnabled {
-    BOOL isEnabled = NO;
-    if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
-        UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-        
-        if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-            isEnabled = NO;
+    __block BOOL isEnabled = NO;
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+            UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+            
+            if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+                isEnabled = NO;
+            } else {
+                isEnabled = YES;
+            }
         } else {
-            isEnabled = YES;
+            if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+                isEnabled = YES;
+            } else{
+                isEnabled = NO;
+            }
         }
-    } else {
-        if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-            isEnabled = YES;
-        } else{
-            isEnabled = NO;
-        }
-    }
+        
+        dispatch_semaphore_signal(sema);
+    });
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
     return isEnabled;
 }
 
