@@ -1,3 +1,11 @@
+# 0.1.9
+
+* added `showAppBanners`
+
+# 0.1.8
+
+* Do not block main loop when channel does not exist
+
 # 0.1.7
 
 * Run notificationsEnabled in main thread

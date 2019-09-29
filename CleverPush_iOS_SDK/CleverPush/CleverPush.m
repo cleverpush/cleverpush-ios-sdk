@@ -7,6 +7,7 @@
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CZPickerView.h"
+#import "PopupView.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -15,6 +16,7 @@
 #import <sys/sysctl.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
+#import <WebKit/WKWebView.h>
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
 #import <UserNotifications/UserNotifications.h>
 #endif
@@ -128,7 +130,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.7";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.8";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -144,9 +146,11 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
+NSArray* appBanners;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 CZPickerView *channelTopicsPicker;
+PopupView* currentAppBannerPopup;
 BOOL channelTopicsPickerVisible = NO;
 UIColor* brandingColor;
 
@@ -322,10 +326,11 @@ BOOL handleSubscribedCalled = false;
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (result != nil) {
                 channelConfig = result;
-                dispatch_semaphore_signal(sema);
             }
+            dispatch_semaphore_signal(sema);
         } onFailure:^(NSError* error) {
             NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+            dispatch_semaphore_signal(sema);
         }];
     } else {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", [[NSBundle mainBundle] bundleIdentifier]]];
@@ -340,11 +345,13 @@ BOOL handleSubscribedCalled = false;
                 [userDefaults synchronize];
                 
                 channelConfig = result;
-                
-                dispatch_semaphore_signal(sema);
             }
+            
+            dispatch_semaphore_signal(sema);
         } onFailure:^(NSError* error) {
             NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error);
+            
+            dispatch_semaphore_signal(sema);
         }];
     }
     
@@ -1057,6 +1064,35 @@ static BOOL registrationInProgress = false;
     return notifications;
 }
 
++ (NSArray*)getAppBanners {
+    if (appBanners) {
+        return appBanners;
+    }
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(getChannelConfig) object:nil];
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    if (channelId != NULL) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/app-banners", channelId]];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            if (result != nil) {
+                appBanners = [result valueForKey:@"banners"];
+            }
+            dispatch_semaphore_signal(sema);
+        } onFailure:^(NSError* error) {
+            NSLog(@"CleverPush Error: Failed getting the app banners %@", error);
+            dispatch_semaphore_signal(sema);
+        }];
+    } else {
+        dispatch_semaphore_signal(sema);
+    }
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
+    return appBanners;
+}
+
 + (void)setBrandingColor:(UIColor *)color {
     brandingColor = color;
 }
@@ -1132,6 +1168,80 @@ static BOOL registrationInProgress = false;
     }
     
     [CleverPush setSubscriptionTopics:selectedTopics];
+}
+
+- (IBAction)closeCurrentAppBanner:(id)sender {
+    if (currentAppBannerPopup != nil) {
+        [currentAppBannerPopup dismiss:YES];
+        currentAppBannerPopup = nil;
+    }
+}
+
++ (void)showAppBanners {
+    NSArray *banners = [self getAppBanners];
+    if ([banners count] == 0) {
+        NSLog(@"CleverPush: showAppBanners: No topics found. Create some first in the CleverPush channel settings.");
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (NSDictionary *banner in banners) {
+            WKWebView *webView = [[WKWebView alloc] init];
+            [webView loadHTMLString:[banner valueForKey:@"content"] baseURL:nil];
+            
+            UIButton *closeButton = [[UIButton alloc] initWithFrame: CGRectMake(0,0,20,20)];
+            [closeButton setTitle:@"×" forState:UIControlStateNormal];
+            [closeButton addTarget:self action:@selector(closeCurrentAppBanner:) forControlEvents:UIControlEventTouchUpInside];
+            [webView addSubview:closeButton];
+            
+            PopupView *popup = [PopupView popupViewWithContentView:webView];
+            [popup show];
+            
+            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.5);
+            dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
+                /*
+                [webView evaluateJavaScript:@"document.body.scrollHeight"
+                completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+                    if (!error) {
+                        NSLog(@"eval 2 %@", result);
+                        
+                    }
+                }];
+                 */
+                
+                CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 100;
+                CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 100;
+                
+                CGRect frame = webView.frame;
+                frame.origin.x = 50;
+                frame.size.height = 1;
+                webView.frame = frame;
+                
+                frame.size = webView.scrollView.contentSize;
+                webView.frame = frame;
+                
+                if (frame.size.width > maxWidth) {
+                    frame.size.width = maxWidth;
+                }
+                if (frame.size.height > maxHeight) {
+                    frame.size.height = maxHeight;
+                }
+                
+                NSLog(@"frame.size.width %f", frame.size.width / 2);
+                NSLog(@"frame.size.height %f", frame.size.height / 2);
+                NSLog(@"x %f", ([UIScreen mainScreen].bounds.size.width / 2) - (frame.size.width / 2));
+                NSLog(@"y %f", ([UIScreen mainScreen].bounds.size.height / 2) - (frame.size.height / 2));
+                
+                frame.origin.x = -1 * (frame.size.width / 2);
+                frame.origin.y = -1 * (frame.size.height / 2);
+                
+                webView.frame = frame;
+            });
+            
+            currentAppBannerPopup = popup;
+            
+            break;
+        }
+    });
 }
 
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
