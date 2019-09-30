@@ -17,6 +17,7 @@
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <WebKit/WKWebView.h>
+#import <StoreKit/StoreKit.h>
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
 #import <UserNotifications/UserNotifications.h>
 #endif
@@ -130,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.9";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -270,6 +271,36 @@ BOOL handleSubscribedCalled = false;
     return self;
 }
 
++ (UIViewController*)topViewController {
+    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+}
+
++ (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
+    if ([viewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController* tabBarController = (UITabBarController*)viewController;
+        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+    } else if ([viewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController* navContObj = (UINavigationController*)viewController;
+        return [self topViewControllerWithRootViewController:navContObj.visibleViewController];
+    } else if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
+        UIViewController* presentedViewController = viewController.presentedViewController;
+        return [self topViewControllerWithRootViewController:presentedViewController];
+    }
+    else {
+        for (UIView *view in [viewController.view subviews])
+        {
+            id subViewController = [view nextResponder];
+            if ( subViewController && [subViewController isKindOfClass:[UIViewController class]])
+            {
+                if ([(UIViewController *)subViewController presentedViewController]  && ![subViewController presentedViewController].isBeingDismissed) {
+                    return [self topViewControllerWithRootViewController:[(UIViewController *)subViewController presentedViewController]];
+                }
+            }
+        }
+        return viewController;
+    }
+}
+
 + (void)initWithChannelId {
     UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -299,6 +330,95 @@ BOOL handleSubscribedCalled = false;
             }
         }
     }
+
+    NSInteger appOpens = [userDefaults integerForKey:@"CleverPush_APP_OPENS"];
+    appOpens++;
+    [userDefaults setInteger:appOpens forKey:@"CleverPush_APP_OPENS"];
+    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        
+        channelConfig = [self getChannelConfig];
+        
+        if ([channelConfig valueForKey:@"appReviewEnabled"]) {
+            int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
+            if (!appReviewOpens) {
+                appReviewOpens = 0;
+            }
+            int appReviewDays = (int)[[channelConfig valueForKey:@"appReviewDays"] integerValue];
+            if (!appReviewDays) {
+                appReviewDays = 0;
+            }
+            int appReviewSeconds = (int)[[channelConfig valueForKey:@"appReviewSeconds"] integerValue];
+            if (!appReviewSeconds) {
+                appReviewSeconds = 0;
+            }
+            NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
+              
+             NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
+            if (!appReviewTitle) {
+                appReviewTitle = @"Möchtest du unsere App im Store bewerten?";
+            }
+            
+            if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= appReviewOpens && currentAppDays >= appReviewDays) {
+                NSLog(@"CleverPush: showing app review alert");
+                
+                dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
+                dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
+                                                                                             message:@""
+                                                                                      preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:@"Ja"
+                                                                       style:UIAlertActionStyleDefault
+                                                                     handler:^(UIAlertAction * action) {
+                        [SKStoreReviewController requestReview];
+                    }];
+                    [alertController addAction:actionYes];
+                    UIAlertAction *actionNo = [UIAlertAction actionWithTitle:@"Nein"
+                                                                       style:UIAlertActionStyleDefault
+                                                                     handler:nil];
+                    [alertController addAction:actionNo];
+                    UIViewController* topViewController = [CleverPush topViewController];
+                    [topViewController presentViewController:alertController animated:YES completion:nil];
+                });
+            }
+        }
+    });
+}
+
++ (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime
+{
+    NSDate *fromDate;
+    NSDate *toDate;
+
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate
+        interval:NULL forDate:fromDateTime];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate
+        interval:NULL forDate:toDateTime];
+
+    NSDateComponents *difference = [calendar components:NSCalendarUnitDay
+        fromDate:fromDate toDate:toDate options:0];
+
+    return [difference day];
+}
+
+- (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
+    NSDate *fromDate;
+    NSDate *toDate;
+
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate
+        interval:NULL forDate:fromDateTime];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate
+        interval:NULL forDate:toDateTime];
+
+    NSDateComponents *difference = [calendar components:NSCalendarUnitDay
+        fromDate:fromDate toDate:toDate options:0];
+
+    return [difference day];
 }
 
 + (BOOL)shouldSync {
@@ -580,6 +700,10 @@ static BOOL registrationInProgress = false;
         registrationInProgress = false;
 
         if ([results objectForKey:@"id"] != nil) {
+            if (!subscriptionId) {
+                [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
+            }
+            
             subscriptionId = [results objectForKey:@"id"];
             [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:@"CleverPush_SUBSCRIPTION_ID"];
             [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];

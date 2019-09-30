@@ -1,9 +1,10 @@
 # 0.1.9
 
-* added `showAppBanners`
+* added app review alerts
 
 # 0.1.8
 
+* added `showAppBanners`
 * Do not block main loop when channel does not exist
 
 # 0.1.7
