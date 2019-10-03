@@ -131,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.10";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.11";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1319,6 +1319,10 @@ static BOOL registrationInProgress = false;
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
+}
+
++ (void)showAppBanners {
+    [self showAppBanners:nil];
 }
 
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback {
