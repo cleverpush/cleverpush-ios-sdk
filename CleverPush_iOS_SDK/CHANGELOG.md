@@ -1,3 +1,7 @@
+# 0.1.10
+
+* optimizations for in-app banners
+
 # 0.1.9
 
 * added app review alerts

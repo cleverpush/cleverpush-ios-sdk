@@ -7,7 +7,7 @@
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CZPickerView.h"
-#import "PopupView.h"
+#import "JKAlertDialog.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -131,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.9";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.10";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -151,7 +151,9 @@ NSArray* appBanners;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 CZPickerView *channelTopicsPicker;
-PopupView* currentAppBannerPopup;
+JKAlertDialog* currentAppBannerPopup;
+WKWebView* currentAppBannerWebView;
+id currentAppBannerUrlOpenedCallback;
 BOOL channelTopicsPickerVisible = NO;
 UIColor* brandingColor;
 
@@ -1294,76 +1296,113 @@ static BOOL registrationInProgress = false;
     [CleverPush setSubscriptionTopics:selectedTopics];
 }
 
-- (IBAction)closeCurrentAppBanner:(id)sender {
++ (IBAction)closeCurrentAppBanner:(id)sender {
     if (currentAppBannerPopup != nil) {
-        [currentAppBannerPopup dismiss:YES];
+        [currentAppBannerPopup dismiss];
         currentAppBannerPopup = nil;
     }
 }
 
-+ (void)showAppBanners {
++ (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if (currentAppBannerPopup != nil) {
+        [currentAppBannerWebView removeObserver:self forKeyPath:@"URL"] ;
+        
+        if ([keyPath isEqualToString:@"URL"] && currentAppBannerWebView != nil && currentAppBannerUrlOpenedCallback != nil) {
+            ((void(^)(NSString *))currentAppBannerUrlOpenedCallback)([currentAppBannerWebView URL].absoluteString);
+            currentAppBannerUrlOpenedCallback = nil;
+        } else {
+            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        }
+        
+        [currentAppBannerPopup dismiss];
+        currentAppBannerPopup = nil;
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
++ (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback {
     NSArray *banners = [self getAppBanners];
     if ([banners count] == 0) {
-        NSLog(@"CleverPush: showAppBanners: No topics found. Create some first in the CleverPush channel settings.");
+        NSLog(@"CleverPush: showAppBanners: No banners found. Create some first in the CleverPush channel settings.");
     }
+    
+    currentAppBannerUrlOpenedCallback = urlOpenedCallback;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         for (NSDictionary *banner in banners) {
-            WKWebView *webView = [[WKWebView alloc] init];
-            [webView loadHTMLString:[banner valueForKey:@"content"] baseURL:nil];
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableArray* shownAppBanners = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_SHOWN_APP_BANNERS"]];
+            if (!shownAppBanners) {
+                shownAppBanners = [[NSMutableArray alloc] init];
+            }
             
-            UIButton *closeButton = [[UIButton alloc] initWithFrame: CGRectMake(0,0,20,20)];
-            [closeButton setTitle:@"×" forState:UIControlStateNormal];
-            [closeButton addTarget:self action:@selector(closeCurrentAppBanner:) forControlEvents:UIControlEventTouchUpInside];
-            [webView addSubview:closeButton];
+            if (banner != nil && (([banner valueForKey:@"frequency"] != nil && ([[banner valueForKey:@"frequency"]  isEqual: @"always"] || [[banner valueForKey:@"oncePerSession"]  isEqual: @"once"])) || (([banner valueForKey:@"frequency"] == nil || [[banner valueForKey:@"frequency"]  isEqual: @"once"]) && ![shownAppBanners containsObject:[banner valueForKey:@"_id"]]))) {
+                [[NSUserDefaults standardUserDefaults] setObject:shownAppBanners forKey:@"CleverPush_SHOWN_APP_BANNERS"];
+                [userDefaults synchronize];
+
+                WKWebView *webView = [[WKWebView alloc] init];
+                [webView loadHTMLString:[banner valueForKey:@"content"] baseURL:nil];
+                [webView addObserver:self forKeyPath:@"URL" options:NSKeyValueObservingOptionNew context:NULL];
+                
+                UIButton *closeButton = [[UIButton alloc] initWithFrame: CGRectMake(0,0,20,20)];
+                [closeButton setTitle:@"×" forState:UIControlStateNormal];
+                [closeButton addTarget:self action:@selector(closeCurrentAppBanner:) forControlEvents:UIControlEventTouchUpInside];
+                [webView addSubview:closeButton];
+                
+                JKAlertDialog *alert = [[JKAlertDialog alloc]init];
             
-            PopupView *popup = [PopupView popupViewWithContentView:webView];
-            [popup show];
-            
-            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.5);
-            dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
-                /*
-                [webView evaluateJavaScript:@"document.body.scrollHeight"
-                completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-                    if (!error) {
-                        NSLog(@"eval 2 %@", result);
-                        
+                alert.contentView = webView;
+                [alert show];
+                
+                dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * 0.5);
+                dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
+                    /*
+                    [webView evaluateJavaScript:@"document.body.scrollHeight"
+                    completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+                        if (!error) {
+                            NSLog(@"eval 2 %@", result);
+                            
+                        }
+                    }];
+                     */
+                    
+                    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 100;
+                    // CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 100;
+                    
+                    CGRect frame = webView.frame;
+                    frame.size.height = 1;
+                    webView.frame = frame;
+                    
+                    frame.size = webView.scrollView.contentSize;
+                    webView.frame = frame;
+                    
+                    if (frame.size.width > maxWidth) {
+                        frame.size.width = maxWidth;
                     }
-                }];
-                 */
+                    /*
+                    if (frame.size.height > maxHeight) {
+                        frame.size.height = maxHeight;
+                    }
+                    */
+                    
+                    NSLog(@"frame.size.width %f", frame.size.width / 2);
+                    NSLog(@"frame.size.height %f", frame.size.height / 2);
+                    NSLog(@"x %f", ([UIScreen mainScreen].bounds.size.width / 2) - (frame.size.width / 2));
+                    NSLog(@"y %f", ([UIScreen mainScreen].bounds.size.height / 2) - (frame.size.height / 2));
+                    
+                    // frame.origin.x = -1 * (frame.size.width / 2);
+                    // frame.origin.y = -1 * (frame.size.height / 2);
+                    
+                    webView.frame = frame;
+                    [alert reLayout];
+                });
                 
-                CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 100;
-                CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 100;
+                currentAppBannerPopup = alert;
+                currentAppBannerWebView = webView;
                 
-                CGRect frame = webView.frame;
-                frame.origin.x = 50;
-                frame.size.height = 1;
-                webView.frame = frame;
-                
-                frame.size = webView.scrollView.contentSize;
-                webView.frame = frame;
-                
-                if (frame.size.width > maxWidth) {
-                    frame.size.width = maxWidth;
-                }
-                if (frame.size.height > maxHeight) {
-                    frame.size.height = maxHeight;
-                }
-                
-                NSLog(@"frame.size.width %f", frame.size.width / 2);
-                NSLog(@"frame.size.height %f", frame.size.height / 2);
-                NSLog(@"x %f", ([UIScreen mainScreen].bounds.size.width / 2) - (frame.size.width / 2));
-                NSLog(@"y %f", ([UIScreen mainScreen].bounds.size.height / 2) - (frame.size.height / 2));
-                
-                frame.origin.x = -1 * (frame.size.width / 2);
-                frame.origin.y = -1 * (frame.size.height / 2);
-                
-                webView.frame = frame;
-            });
-            
-            currentAppBannerPopup = popup;
-            
-            break;
+                break;
+            }
         }
     });
 }

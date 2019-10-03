@@ -73,7 +73,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)setBrandingColor:(UIColor *)color;
 + (void)showTopicsDialog;
-+ (void)showAppBanners;
++ (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;
 + (NSArray*)getNotifications;
 
 @end

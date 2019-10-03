@@ -14,6 +14,10 @@
 		297B4E261E58A16600BAF990 /* CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 297B4E211E58A16600BAF990 /* CleverPush.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		297B4E271E58A16600BAF990 /* CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E221E58A16600BAF990 /* CleverPush.m */; };
 		297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */; };
+		2983255F2345FCC000A5A85F /* JKAlertDialog.h in Headers */ = {isa = PBXBuildFile; fileRef = 2983255D2345FCC000A5A85F /* JKAlertDialog.h */; };
+		298325642346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
+		298325652346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
+		298325662346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
 		29C1BAEC1E58B61B00815CD6 /* CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E221E58A16600BAF990 /* CleverPush.m */; };
 		29C1BAED1E58B61C00815CD6 /* CleverPushHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */; };
 		29C1BAEE1E58B65800815CD6 /* CleverPush.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 297B4E211E58A16600BAF990 /* CleverPush.h */; };
@@ -73,6 +77,8 @@
 		297B4E351E58A1AA00BAF990 /* CleverPush.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CleverPush.podspec; path = ../CleverPush.podspec; sourceTree = "<group>"; };
 		297B4E371E58A1BD00BAF990 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		297B4E381E58A1BD00BAF990 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		2983255D2345FCC000A5A85F /* JKAlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JKAlertDialog.h; sourceTree = "<group>"; };
+		298325632346002100A5A85F /* JKAlertDialog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JKAlertDialog.m; sourceTree = "<group>"; };
 		29C1BAE11E58B5EB00815CD6 /* libCleverPush.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCleverPush.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -144,6 +150,8 @@
 		297B4E201E58A16600BAF990 /* CleverPush */ = {
 			isa = PBXGroup;
 			children = (
+				2983255D2345FCC000A5A85F /* JKAlertDialog.h */,
+				298325632346002100A5A85F /* JKAlertDialog.m */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
@@ -189,6 +197,7 @@
 				296FA7512341313200E20FFD /* PopupView.h in Headers */,
 				29E290C022B04DEB00BFC74F /* CZPickerView.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
+				2983255F2345FCC000A5A85F /* JKAlertDialog.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,6 +343,7 @@
 				29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */,
 				29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
+				298325642346002100A5A85F /* JKAlertDialog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,6 +351,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				298325652346002100A5A85F /* JKAlertDialog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +366,7 @@
 				29E290BF22B04A8900BFC74F /* CZPickerView.m in Sources */,
 				29DC4ABD2181E3100051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
 				29DC4AC02182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
+				298325662346002100A5A85F /* JKAlertDialog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
