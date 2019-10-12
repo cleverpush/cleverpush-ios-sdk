@@ -131,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.11";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.12";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -529,6 +529,20 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)subscribe {
+    if (subscriptionId == nil && channelId != nil) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 @"iOS", @"platformName",
+                                 @"SDK", @"browserType",
+                                 nil];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
+            NSLog(@"CleverPush Error: /channel/confirm-alert request error %@", error);
+        }];
+    }
+    
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
@@ -561,6 +575,7 @@ BOOL handleSubscribedCalled = false;
             });
         }];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
+        
     } else if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
         Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
         

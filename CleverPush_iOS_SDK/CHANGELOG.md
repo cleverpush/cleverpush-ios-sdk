@@ -1,3 +1,11 @@
+# 0.1.12
+
+* track opt-in rate correctly
+
+# 0.1.11
+
+* added `showAppBanners` method without arguments
+
 # 0.1.10
 
 * optimizations for in-app banners
