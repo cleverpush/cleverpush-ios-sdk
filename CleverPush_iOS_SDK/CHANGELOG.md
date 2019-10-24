@@ -1,3 +1,7 @@
+# 0.1.13
+
+* in-app banner fixes
+
 # 0.1.12
 
 * track opt-in rate correctly

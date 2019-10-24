@@ -131,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.12";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.13";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1366,6 +1366,7 @@ static BOOL registrationInProgress = false;
                 
                 UIButton *closeButton = [[UIButton alloc] initWithFrame: CGRectMake(0,0,20,20)];
                 [closeButton setTitle:@"×" forState:UIControlStateNormal];
+                [closeButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
                 [closeButton addTarget:self action:@selector(closeCurrentAppBanner:) forControlEvents:UIControlEventTouchUpInside];
                 [webView addSubview:closeButton];
                 
@@ -1387,7 +1388,7 @@ static BOOL registrationInProgress = false;
                      */
                     
                     CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 100;
-                    // CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 100;
+                    CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 100;
                     
                     CGRect frame = webView.frame;
                     frame.size.height = 1;
@@ -1399,11 +1400,11 @@ static BOOL registrationInProgress = false;
                     if (frame.size.width > maxWidth) {
                         frame.size.width = maxWidth;
                     }
-                    /*
+                
                     if (frame.size.height > maxHeight) {
                         frame.size.height = maxHeight;
                     }
-                    */
+                    
                     
                     NSLog(@"frame.size.width %f", frame.size.width / 2);
                     NSLog(@"frame.size.height %f", frame.size.height / 2);
