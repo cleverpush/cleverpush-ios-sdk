@@ -131,7 +131,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.13";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.14";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1356,7 +1356,8 @@ static BOOL registrationInProgress = false;
                 shownAppBanners = [[NSMutableArray alloc] init];
             }
             
-            if (banner != nil && (([banner valueForKey:@"frequency"] != nil && ([[banner valueForKey:@"frequency"]  isEqual: @"always"] || [[banner valueForKey:@"oncePerSession"]  isEqual: @"once"])) || (([banner valueForKey:@"frequency"] == nil || [[banner valueForKey:@"frequency"]  isEqual: @"once"]) && ![shownAppBanners containsObject:[banner valueForKey:@"_id"]]))) {
+            if (banner != nil && (([banner valueForKey:@"frequency"] != nil && ([[banner valueForKey:@"frequency"]  isEqual: @"oncePerSession"] || [[banner valueForKey:@"frequency"]  isEqual: @"always"])) || (([banner valueForKey:@"frequency"] == nil || [[banner valueForKey:@"frequency"]  isEqual: @"once"]) && ![shownAppBanners containsObject:[banner valueForKey:@"_id"]]))) {
+                [shownAppBanners addObject:[banner valueForKey:@"_id"]];
                 [[NSUserDefaults standardUserDefaults] setObject:shownAppBanners forKey:@"CleverPush_SHOWN_APP_BANNERS"];
                 [userDefaults synchronize];
 
