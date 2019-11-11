@@ -22,6 +22,26 @@
 #import <UserNotifications/UserNotifications.h>
 #endif
 
+@implementation CPNotificationReceivedResult
+
+- (instancetype)initWithPayload:(NSDictionary *)inPayload {
+    self = [super init];
+    if (self) {
+        _payload = inPayload;
+        _notification = [_payload valueForKey:@"notification"];
+        if ([_notification valueForKey:@"title"] == nil) {
+            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
+        }
+        if ([_notification valueForKey:@"text"] == nil) {
+            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
+        }
+        _subscription = [_payload valueForKey:@"subscription"];
+    }
+    return self;
+}
+
+@end
+
 @implementation CPNotificationOpenedResult
 
 - (instancetype)initWithPayload:(NSDictionary *)inPayload {
@@ -131,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.1.15";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -144,6 +164,7 @@ NSString* deviceToken;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
 CPFailureBlock cpTokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
+CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 NSDictionary* channelConfig;
@@ -156,6 +177,8 @@ WKWebView* currentAppBannerWebView;
 id currentAppBannerUrlOpenedCallback;
 BOOL channelTopicsPickerVisible = NO;
 UIColor* brandingColor;
+static NSString* lastNotificationReceivedId;
+static NSString* lastNotificationOpenedId;
 
 static id isNil(id object)
 {
@@ -186,8 +209,16 @@ BOOL handleSubscribedCalled = false;
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
 }
 
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+}
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister {
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister];
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister];
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
@@ -202,12 +233,23 @@ BOOL handleSubscribedCalled = false;
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
 }
 
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
+   handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+}
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions {
     return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback {
     return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
+    handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback {
+    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
@@ -219,13 +261,22 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegisterParam {
+    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
+}
+
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions
+                  channelId:(NSString*)newChannelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
+           handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
+               autoRegister:(BOOL)autoRegisterParam {
+    handleNotificationReceived = receivedCallback;
     handleNotificationOpened = openedCallback;
     handleSubscribed = subscribedCallback;
     autoRegister = autoRegisterParam;
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
 
     if (self) {
-        UIApplication* sharedApp = [UIApplication sharedApplication];
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
         if (newChannelId) {
@@ -320,7 +371,9 @@ BOOL handleSubscribedCalled = false;
     }
     
     if (subscriptionId != nil) {
-        if ([self shouldSync]) {
+        if (![self notificationsEnabled]) {
+            [self unsubscribe];
+        } else if ([self shouldSync]) {
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
         } else {
             if (handleSubscribed && !handleSubscribedCalled) {
@@ -498,32 +551,47 @@ BOOL handleSubscribedCalled = false;
     return subscriptionId;
 }
 
++ (void)ensureMainThreadSync:(dispatch_block_t) onMainBlock {
+    if ([NSThread isMainThread]) {
+        onMainBlock();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), onMainBlock);
+    }
+}
+
 + (BOOL)notificationsEnabled {
     __block BOOL isEnabled = NO;
     
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
-            UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-            
-            if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-                isEnabled = NO;
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+        [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
+            if (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                isEnabled = YES;
+            }
+            dispatch_semaphore_signal(sema);
+        }];
+
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    } else {
+        [self ensureMainThreadSync:^{
+            if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+                UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+                
+                if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+                    isEnabled = NO;
+                } else {
+                    isEnabled = YES;
+                }
             } else {
-                isEnabled = YES;
+                if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+                    isEnabled = YES;
+                } else{
+                    isEnabled = NO;
+                }
             }
-        } else {
-            if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-                isEnabled = YES;
-            } else{
-                isEnabled = NO;
-            }
-        }
-        
-        dispatch_semaphore_signal(sema);
-    });
-    
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        }];
+    }
     
     return isEnabled;
 }
@@ -742,15 +810,29 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
-    [self handleNotificationReceived:messageDict isActive:isActive wasOpened:NO];
-}
-
-+ (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive wasOpened:(BOOL)wasOpened {
-    if (!channelId) {
+    NSDictionary* notification = [messageDict valueForKey:@"notification"];
+    if (!notification) {
         return;
     }
     
-    [self handleNotificationOpened:messageDict isActive:isActive];
+    NSString* notificationId = [notification valueForKey:@"_id"];
+    
+    if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationReceivedId]) {
+        return;
+    }
+    lastNotificationReceivedId = notificationId;
+    
+    NSLog(@"CleverPush: handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict);
+    
+    [CleverPush setNotificationDelivered:notification withChannelId:[messageDict valueForKeyPath:@"channel._id"] withSubscriptionId:[messageDict valueForKeyPath:@"subscription._id"]];
+    
+    if (!handleNotificationReceived) {
+        return;
+    }
+
+    CPNotificationReceivedResult * result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
+
+    handleNotificationReceived(result);
 }
 
 + (NSString*)randomStringWithLength:(int)length {
@@ -846,26 +928,27 @@ static BOOL registrationInProgress = false;
 
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     BOOL startedBackgroundJob = NO;
-
-    NSDictionary* notification = [messageDict valueForKey:@"notification"];
     
-    if (application.applicationState != UIApplicationStateBackground) {
-        [CleverPush handleNotificationReceived:messageDict isActive:NO wasOpened:YES];
-    } else {
-        [CleverPush setNotificationDelivered:notification];
+    NSLog(@"CleverPush: handleSilentNotificationReceived");
+    
+    if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
+        [CleverPush handleNotificationReceived:messageDict isActive:NO];
     }
     
     return startedBackgroundJob;
 }
 
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {
-    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
-
-    // [CleverPush setNotificationDelivered:notificationId];
+    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];;
     
-    if (!isActive) {
-        [CleverPush setNotificationClicked:notificationId];
+    if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationOpenedId]) {
+        return;
     }
+    lastNotificationOpenedId = notificationId;
+    
+    NSLog(@"CleverPush: handleNotificationOpened, %@", payload);
+    
+    [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"]];
 
     [self clearBadge:true];
 
@@ -883,8 +966,10 @@ static BOOL registrationInProgress = false;
         return;
     }
     
+    NSLog(@"CleverPush processLocalActionBasedNotification");
+    
     BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
-    [self handleNotificationReceived:notification.userInfo isActive:isActive wasOpened:YES];
+    [self handleNotificationReceived:notification.userInfo isActive:isActive];
     
     if (!isActive) {
         [self handleNotificationOpened:notification.userInfo
@@ -897,6 +982,8 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    NSLog(@"CleverPush: setNotificationDelivered @% @% @%", channelId, [notification valueForKey:@"_id"], subscriptionId);
+    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
@@ -929,11 +1016,15 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setNotificationClicked:(NSString*)notificationId {
+    [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
+}
+
++ (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/clicked"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
-                             [self getSubscriptionId], @"subscriptionId",
+                             subscriptionId, @"subscriptionId",
                              nil];
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -1429,6 +1520,8 @@ static BOOL registrationInProgress = false;
 }
 
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
+    NSLog(@"CleverPush: didReceiveNotificationExtensionRequest");
+    
     if (!replacementContent) {
         replacementContent = [request.content mutableCopy];
     }
@@ -1438,7 +1531,7 @@ static BOOL registrationInProgress = false;
     NSString* channelId = [payload valueForKeyPath:@"channel._id"];
     NSString* subscriptionId = [payload valueForKeyPath:@"subscription._id"];
     
-    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:subscriptionId];
+    [self handleNotificationReceived:payload isActive:NO];
     
     NSString* mediaUrl = [payload valueForKeyPath:@"notification.mediaUrl"];
     if (![mediaUrl isKindOfClass:[NSNull class]]) {
@@ -1450,11 +1543,32 @@ static BOOL registrationInProgress = false;
 }
 
 + (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
+    NSLog(@"CleverPush: serviceExtensionTimeWillExpireRequest");
+    
     if (!replacementContent) {
         replacementContent = [request.content mutableCopy];
     }
     
     return replacementContent;
+}
+
+static CleverPush* singleInstance = nil;
++ (CleverPush*)sharedInstance {
+    @synchronized(singleInstance) {
+        if (!singleInstance)
+            singleInstance = [CleverPush new];
+    }
+    
+    return singleInstance;
+}
+
+static inline BOOL isEmpty(id thing) {
+    return thing == nil
+    || [thing isKindOfClass:[NSNull class]]
+    || ([thing respondsToSelector:@selector(length)]
+        && [(NSData *)thing length] == 0)
+    || ([thing respondsToSelector:@selector(count)]
+        && [(NSArray *)thing count] == 0);
 }
 
 @end
@@ -1466,7 +1580,7 @@ static BOOL registrationInProgress = false;
     if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"])
         return;
     
-    if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"7.0")) {
+    if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"8.0")) {
         return;
     }
     
@@ -1487,10 +1601,9 @@ static BOOL registrationInProgress = false;
     
     [CleverPushUNUserNotificationCenter injectSelectors];
     
-    UNUserNotificationCenter* curNotifCenter = [UNUserNotificationCenter currentNotificationCenter];
-    
-    if (!curNotifCenter.delegate) {
-        curNotifCenter.delegate = (id)self;
+    UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+    if (!currentNotificationCenter.delegate) {
+        currentNotificationCenter.delegate = (id)[CleverPush sharedInstance];
     }
 }
 

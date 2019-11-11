@@ -1,3 +1,10 @@
+# 0.2.0
+
+* automatically `unsubscribe` on app start if notification permission has been revoked
+* added `handleNotificationReceived` callback
+* display in-app notification banners by default
+* fixed `isSubscribed` lag
+
 # 0.1.15
 
 * in-app banner fixes

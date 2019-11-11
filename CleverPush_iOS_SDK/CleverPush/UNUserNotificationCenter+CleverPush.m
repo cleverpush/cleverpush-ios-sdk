@@ -22,6 +22,30 @@ __weak static id previousDelegate;
 
 + (void)injectSelectors {
     injectToProperClass(@selector(setCleverPushUNDelegate:), @selector(setDelegate:), @[], [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+    
+    injectToProperClass(@selector(cleverPushRequestAuthorizationWithOptions:completionHandler:),
+                        @selector(requestAuthorizationWithOptions:completionHandler:), @[],
+                        [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+    injectToProperClass(@selector(cleverPushGetNotificationSettingsWithCompletionHandler:),
+                        @selector(getNotificationSettingsWithCompletionHandler:), @[],
+                        [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+}
+
+- (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler {
+    
+    id wrapperBlock = ^(BOOL granted, NSError* error) {
+        completionHandler(granted, error);
+    };
+    
+    [self cleverPushRequestAuthorizationWithOptions:options completionHandler:wrapperBlock];
+}
+
+- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler {
+    id wrapperBlock = ^(UNNotificationSettings* settings) {
+        completionHandler(settings);
+    };
+    
+    [self cleverPushGetNotificationSettingsWithCompletionHandler:wrapperBlock];
 }
 
 - (void)setCleverPushUNDelegate:(id)delegate {
@@ -49,8 +73,10 @@ willPresentNotification:(UNNotification *)notification
 withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     NSUInteger completionHandlerOptions = 7;
     
+    NSLog(@"CleverPush cleverPushUserNotificationCenter willPresentNotification");
+    
     if ([CleverPush channelId]) {
-        [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES wasOpened:YES];
+        [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
     }
     
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
@@ -70,6 +96,8 @@ withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))compl
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
 didReceiveNotificationResponse:(UNNotificationResponse *)response
 withCompletionHandler:(void(^)())completionHandler {
+    NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
+    
     if (![CleverPush channelId]) {
         return;
     }
@@ -78,7 +106,7 @@ withCompletionHandler:(void(^)())completionHandler {
         return;
     }
     
-    [CleverPush handleNotificationReceived:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive wasOpened:YES];
+    [CleverPush handleNotificationOpened:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive];
     
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
         [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];

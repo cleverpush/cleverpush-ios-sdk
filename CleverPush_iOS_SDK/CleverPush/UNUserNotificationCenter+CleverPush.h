@@ -8,4 +8,4 @@
 @end
 
 
-#endif /* UNUserNotificationCenter_ClevrPush_h */
+#endif /* UNUserNotificationCenter_CleverPush_h */

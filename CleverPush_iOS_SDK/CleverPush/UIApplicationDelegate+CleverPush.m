@@ -5,6 +5,8 @@
 #import "CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
 @interface CleverPush(UN_extra)
 
 + (void) didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
@@ -114,8 +116,10 @@ static NSArray* delegateSubclasses = nil;
 */
 
 - (void)cleverPushReceivedRemoteNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo {
+    NSLog(@"CleverPush: cleverPushReceivedRemoteNotification");
+    
     if ([CleverPush channelId]) {
-        [CleverPush handleNotificationReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive wasOpened:YES];
+        [CleverPush handleNotificationReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive];
     }
     
     if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]) {
@@ -126,11 +130,13 @@ static NSArray* delegateSubclasses = nil;
 - (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {
     BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:)];
     BOOL startedBackgroundJob = false;
+
+    NSLog(@"CleverPush: cleverPushReceivedSilentRemoteNotification");
     
     if ([CleverPush channelId]) {
         // check if this is not a silent notification
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive && userInfo[@"aps"][@"alert"]) {
-            [CleverPush handleNotificationReceived:userInfo isActive:YES wasOpened:NO];
+            [CleverPush handleNotificationReceived:userInfo isActive:YES];
         } else {
             startedBackgroundJob = [CleverPush handleSilentNotificationReceived:application UserInfo:userInfo completionHandler:callExistingSelector ? nil : completionHandler];
         }
