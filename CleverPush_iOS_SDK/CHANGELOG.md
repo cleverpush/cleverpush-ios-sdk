@@ -1,3 +1,7 @@
+# 0.2.1
+* track app version
+* added `CPChatView`
+
 # 0.2.0
 
 * automatically `unsubscribe` on app start if notification permission has been revoked

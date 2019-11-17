@@ -6,6 +6,8 @@
 #import <UserNotifications/UserNotifications.h>
 #endif
 
+#import "CPChatView.h"
+
 @interface CPNotificationReceivedResult : NSObject
 
 @property(readonly)NSDictionary* payload;
@@ -92,5 +94,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showAppBanners;
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;
 + (NSArray*)getNotifications;
++ (NSDictionary*)getChannelConfig;
++ (NSString*)getSubscriptionId;
 
 @end

@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -767,6 +767,7 @@ static BOOL registrationInProgress = false;
                              CLEVERPUSH_SDK_VERSION, @"browserVersion",
                              @"iOS", @"platformName",
                              [[UIDevice currentDevice] systemVersion], @"platformVersion",
+                             [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @"appVersion",
                              isNil(country), @"country",
                              isNil(timezone), @"timezone",
                              isNil(language), @"language",
