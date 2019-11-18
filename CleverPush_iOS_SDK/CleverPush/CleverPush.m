@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1189,6 +1189,17 @@ static BOOL registrationInProgress = false;
         NSArray* channelTags = [channelConfig valueForKey:@"channelTags"];
         if (channelTags != nil) {
             return channelTags;
+        }
+    }
+    return [[NSArray alloc] init];
+}
+
++ (NSArray*)getAvailableTopics {
+    NSDictionary* channelConfig = [self getChannelConfig];
+    if (channelConfig != nil) {
+        NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+        if (channelTopics != nil) {
+            return channelTopics;
         }
     }
     return [[NSArray alloc] init];

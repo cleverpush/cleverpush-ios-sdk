@@ -1,3 +1,6 @@
+# 0.2.2
+* added `getAvailableTopics`
+
 # 0.2.1
 * track app version
 * added `CPChatView`

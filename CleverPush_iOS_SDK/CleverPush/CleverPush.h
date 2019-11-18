@@ -80,6 +80,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)removeSubscriptionTag:(NSString*)tagId;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
 + (NSArray*)getAvailableTags;
++ (NSArray*)getAvailableTopics;
 + (NSDictionary*)getAvailableAttributes;
 + (NSArray*)getSubscriptionTags;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
