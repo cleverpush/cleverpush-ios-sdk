@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1266,17 +1266,6 @@ static BOOL registrationInProgress = false;
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
         });
     }
-}
-
-+ (NSArray*)getAvailableTopics {
-    NSDictionary* channelConfig = [self getChannelConfig];
-    if (channelConfig != nil) {
-        NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
-        if (channelTopics != nil) {
-            return channelTopics;
-        }
-    }
-    return [[NSArray alloc] init];
 }
 
 + (NSArray*)getSubscriptionTopics {
