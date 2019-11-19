@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -177,6 +177,7 @@ WKWebView* currentAppBannerWebView;
 id currentAppBannerUrlOpenedCallback;
 BOOL channelTopicsPickerVisible = NO;
 UIColor* brandingColor;
+UIColor* chatBackgroundColor;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 
@@ -597,6 +598,10 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)subscribe {
+    [self subscribe:nil];
+}
+
++ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
     if (subscriptionId == nil && channelId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -639,6 +644,10 @@ BOOL handleSubscribedCalled = false;
                             [self showTopicsDialog];
                         }
                     }
+                }
+                
+                if (granted && subscribedBlock) {
+                    subscribedBlock(subscriptionId);
                 }
             });
         }];
@@ -1328,6 +1337,18 @@ static BOOL registrationInProgress = false;
 
 + (void)setBrandingColor:(UIColor *)color {
     brandingColor = color;
+}
+
++ (UIColor*)getBrandingColor {
+    return brandingColor;
+}
+
++ (void)setChatBackgroundColor:(UIColor *)color {
+    chatBackgroundColor = color;
+}
+
++ (UIColor*)getChatBackgroundColor {
+    return chatBackgroundColor;
 }
 
 + (void)showTopicsDialog {

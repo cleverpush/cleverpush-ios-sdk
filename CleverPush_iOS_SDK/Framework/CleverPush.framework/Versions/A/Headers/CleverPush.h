@@ -62,6 +62,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (BOOL)isSubscribed;
 + (void)subscribe;
++ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
 + (void)unsubscribe;
 
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
@@ -91,6 +92,9 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSMutableArray*)getSubscriptionTopics;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)setBrandingColor:(UIColor *)color;
++ (UIColor*)getBrandingColor;
++ (void)setChatBackgroundColor:(UIColor *)color;
++ (UIColor*)getChatBackgroundColor;
 + (void)showTopicsDialog;
 + (void)showAppBanners;
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;

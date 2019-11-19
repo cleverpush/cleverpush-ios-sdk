@@ -1,3 +1,9 @@
+# 0.2.4
+* Chat optimizations
+
+# 0.2.3
+* Chat optimizations
+
 # 0.2.2
 * added `getAvailableTopics`
 
