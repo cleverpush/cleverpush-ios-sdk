@@ -1,3 +1,6 @@
+# 0.2.5
+* Added `CPChatView.lockChat`  and `CPChatView.headerCodes`
+
 # 0.2.4
 * Chat optimizations
 

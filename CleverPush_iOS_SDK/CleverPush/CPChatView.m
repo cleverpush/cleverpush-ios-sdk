@@ -9,6 +9,7 @@
 
 CPChatURLOpenedCallback urlOpenedCallback;
 CPChatSubscribeCallback subscribeCallback;
+NSString* headerCodes;
 
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
@@ -40,7 +41,22 @@ CPChatSubscribeCallback subscribeCallback;
             lroundf(b * 255)];
 }
 
+- (void)lockChat {
+    [self loadChatWithSubscriptionId:@"preview"];
+}
+
 - (void)loadChat {
+    NSString* subscriptionId;
+    if ([CleverPush isSubscribed]) {
+        subscriptionId = [CleverPush getSubscriptionId];
+    } else {
+        subscriptionId = @"preview";
+    }
+    
+    [self loadChatWithSubscriptionId:subscriptionId];
+}
+
+- (void)loadChatWithSubscriptionId:(NSString*)subscriptionId {
     NSString *content;
     
     NSError *error;
@@ -67,6 +83,10 @@ CPChatSubscribeCallback subscribeCallback;
             backgroundColor = [self hexStringFromColor:[CleverPush getChatBackgroundColor]];
         }
         
+        if (!headerCodes) {
+            headerCodes = @"";
+        }
+        
         NSString *jsonConfig = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         content = [NSString stringWithFormat:@"\
         <!DOCTYPE html>\
@@ -76,6 +96,7 @@ CPChatSubscribeCallback subscribeCallback;
         <style>\
         html, body { margin: 0; padding: 0; height: 100%%; } \
         </style>\
+        %@\
         </head>\
         <body>\
         <div class='cleverpush-chat-target' style='height: 100%%;'></div>\
@@ -84,7 +105,7 @@ CPChatSubscribeCallback subscribeCallback;
         <script>var cleverpushConfig = %@; var cleverpushSubscriptionId = '%@'; cleverpushConfig.nativeApp = true; cleverpushConfig.brandingColor = '%@'; cleverpushConfig.chatBackgroundColor = '%@';</script>\
         <script src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
         </body>\
-        </html>", jsonConfig, subscriptionId, brandingColor, backgroundColor];
+        </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor];
     }
     
     NSLog(@"CleverPush: ChatView content: %@", content);
@@ -133,6 +154,15 @@ CPChatSubscribeCallback subscribeCallback;
     subscribeCallback = subscribeBlock;
 
     self = [self initWithFrame:frame];
+    return self;
+}
+
+- (id)initWithFrame:(CGRect)frame urlOpenedCallback:(CPChatURLOpenedCallback)urlOpenedBlock subscribeCallback:(CPChatSubscribeCallback)subscribeBlock headerCodes:(NSString *)headerHtmlCodes {
+    urlOpenedCallback = urlOpenedBlock;
+    subscribeCallback = subscribeBlock;
+    headerCodes = headerHtmlCodes;
+
+    self = [self initWithFrame:frame urlOpenedCallback:urlOpenedBlock subscribeCallback:subscribeBlock];
     return self;
 }
 
