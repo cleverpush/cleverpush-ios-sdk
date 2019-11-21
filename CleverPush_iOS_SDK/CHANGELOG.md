@@ -1,3 +1,6 @@
+# 0.2.6
+* Optimized App Banner behaviour
+
 # 0.2.5
 * Added `CPChatView.lockChat`  and `CPChatView.headerCodes`
 

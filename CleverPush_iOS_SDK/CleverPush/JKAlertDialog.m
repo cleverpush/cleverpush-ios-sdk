@@ -72,7 +72,7 @@
     plus = MAX(0, plus);
     CGFloat height = MIN([self screenBounds].size.height,_alertView.frame.size.height+plus);
     
-    int maxWidth = [UIScreen mainScreen].bounds.size.width - 100;
+    int maxWidth = [UIScreen mainScreen].bounds.size.width - 50;
     
     _alertView.frame = CGRectMake(_alertView.frame.origin.x, _alertView.frame.origin.y, maxWidth, height);
     _alertView.center = self.center;

@@ -98,6 +98,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showTopicsDialog;
 + (void)showAppBanners;
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;
++ (void)reLayoutAppBanner;
 + (NSArray*)getNotifications;
 + (NSDictionary*)getChannelConfig;
 + (NSString*)getSubscriptionId;
