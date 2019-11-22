@@ -1,3 +1,6 @@
+# 0.2.8
+* Do not cache HTTP requests (keeps config up to date)
+
 # 0.2.7
 * Fixed `CPChatView.lockChat`
 
