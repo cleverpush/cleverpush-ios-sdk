@@ -67,13 +67,6 @@ NSString* headerCodes;
     if (!jsonData) {
         content = [NSString stringWithFormat:@"Fehler: %@", error];
     } else {
-        NSString* subscriptionId;
-        if ([CleverPush isSubscribed]) {
-            subscriptionId = [CleverPush getSubscriptionId];
-        } else {
-            subscriptionId = @"preview";
-        }
-        
         NSString* brandingColor;
         NSString* backgroundColor;
         if ([CleverPush getBrandingColor]) {

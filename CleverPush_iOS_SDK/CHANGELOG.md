@@ -1,3 +1,6 @@
+# 0.2.7
+* Fixed `CPChatView.lockChat`
+
 # 0.2.6
 * Optimized App Banner behaviour
 
