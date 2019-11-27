@@ -149,4 +149,7 @@ didConfirmWithItemsAtRows:(NSArray *)rows;
 /** width of picker */
 @property CGFloat pickerWidth;
 
+/** width of picker */
+@property CGFloat headerHeight;
+
 @end

@@ -39,6 +39,8 @@ typedef void (^CZDismissCompletionCallback)(void);
        confirmButtonTitle:(NSString *)confirmButtonTitle{
     self = [super init];
     if(self){
+        self.headerHeight = CZP_HEADER_HEIGHT;
+        
         if([self needHandleOrientation]){
             [[NSNotificationCenter defaultCenter] addObserver: self
                                                      selector:@selector(deviceOrientationDidChange:)
@@ -80,10 +82,11 @@ typedef void (^CZDismissCompletionCallback)(void);
     self.containerView = [self buildContainerView];
     [self addSubview:self.containerView];
     
+    self.headerView = [self buildHeaderView];
+    
     self.tableView = [self buildTableView];
     [self.containerView addSubview:self.tableView];
     
-    self.headerView = [self buildHeaderView];
     [self.containerView addSubview:self.headerView];
     
     self.footerview = [self buildFooterView];
@@ -183,13 +186,13 @@ typedef void (^CZDismissCompletionCallback)(void);
     CGRect newRect = CGRectApplyAffineTransform(self.frame, transform);
     NSInteger n = [self.dataSource numberOfRowsInPickerView:self];
     CGRect tableRect;
-    float heightOffset = CZP_HEADER_HEIGHT + CZP_FOOTER_HEIGHT;
+    float heightOffset = self.headerHeight + CZP_FOOTER_HEIGHT;
     if(n > 0){
         float height = n * 44.0;
         height = height > newRect.size.height - heightOffset ? newRect.size.height -heightOffset : height;
-        tableRect = CGRectMake(0, 44.0, newRect.size.width, height);
+        tableRect = CGRectMake(0, self.headerHeight, newRect.size.width, height);
     } else {
-        tableRect = CGRectMake(0, 44.0, newRect.size.width, newRect.size.height - heightOffset);
+        tableRect = CGRectMake(0, self.headerHeight, newRect.size.width, newRect.size.height - heightOffset);
     }
     UITableView *tableView = [[UITableView alloc] initWithFrame:tableRect style:UITableViewStylePlain];
     tableView.delegate = self;
@@ -257,8 +260,8 @@ typedef void (^CZDismissCompletionCallback)(void);
 }
 
 - (UIView *)buildHeaderView{
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, CZP_HEADER_HEIGHT)];
-    view.backgroundColor = self.headerBackgroundColor;
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.containerView.frame.size.width, self.headerHeight)];
+    view.backgroundColor = UIColor.whiteColor;
     
     UIFont *headerFont = self.headerTitleFont == nil ? [UIFont systemFontOfSize:18.0] : self.headerTitleFont;
     
@@ -268,9 +271,17 @@ typedef void (^CZDismissCompletionCallback)(void);
                            };
     NSAttributedString *at = [[NSAttributedString alloc] initWithString:self.headerTitle attributes:dict];
     UILabel *label = [[UILabel alloc] initWithFrame:view.frame];
+    label.numberOfLines = 0;
+    label.textAlignment = NSTextAlignmentCenter;
     label.attributedText = at;
     [label sizeToFit];
     [view addSubview:label];
+    
+    self.headerHeight = label.frame.size.height + label.frame.origin.y + 22;
+    
+    NSLog(@"self.headerHeight %f", self.headerHeight);
+    
+    [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, self.headerHeight)];
     label.center = view.center;
     return view;
 }

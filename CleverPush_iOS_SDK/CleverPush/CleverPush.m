@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.9";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1377,6 +1377,7 @@ static BOOL registrationInProgress = false;
     channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
     channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
     channelTopicsPicker.confirmButtonBackgroundColor = brandingColor;
+    channelTopicsPicker.tapBackgroundToDismiss = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [channelTopicsPicker show];

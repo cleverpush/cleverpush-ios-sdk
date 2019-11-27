@@ -1,3 +1,6 @@
+# 0.2.9
+* Optimized TopicsDialog
+
 # 0.2.8
 * Do not cache HTTP requests (keeps config up to date)
 
