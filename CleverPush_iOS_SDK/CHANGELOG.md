@@ -1,3 +1,6 @@
+# 0.2.10
+* Fixed freeze when `unsubscribe` called and user is not subscribed
+
 # 0.2.9
 * Optimized TopicsDialog
 

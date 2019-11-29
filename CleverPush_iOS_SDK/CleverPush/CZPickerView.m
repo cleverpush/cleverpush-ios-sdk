@@ -279,8 +279,6 @@ typedef void (^CZDismissCompletionCallback)(void);
     
     self.headerHeight = label.frame.size.height + label.frame.origin.y + 22;
     
-    NSLog(@"self.headerHeight %f", self.headerHeight);
-    
     [view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, self.headerHeight)];
     label.center = view.center;
     return view;
