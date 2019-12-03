@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.11";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.12";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -975,7 +975,7 @@ static BOOL registrationInProgress = false;
         [self clearBadge:true];
     }
     
-    if ([notification valueForKey:@"chatNotification"] != nil && [[notification valueForKey:@"chatNotification"] boolValue]) {
+    if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
         for (CPChatView* chatView in chatViews) {
             [chatView loadChat];
         }

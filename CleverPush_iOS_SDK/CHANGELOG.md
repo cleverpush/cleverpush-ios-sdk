@@ -1,3 +1,6 @@
+# 0.2.12
+* Fixed crash when opening a notification
+
 # 0.2.11
 * Optimized Chat View
 * Added ability to disable automatic clearing of badge
