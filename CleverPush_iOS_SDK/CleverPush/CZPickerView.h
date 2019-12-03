@@ -1,13 +1,9 @@
-//
-//  CZPickerView.h
-//
-//  Created by chenzeyu on 9/6/15.
-//  Copyright (c) 2015 chenzeyu. All rights reserved.
-//
-
 #import <UIKit/UIKit.h>
 
 @class CZPickerView;
+
+
+typedef void (^CZDismissCompletionCallback)(void);
 
 @protocol CZPickerViewDataSource <NSObject>
 
@@ -98,6 +94,8 @@ didConfirmWithItemsAtRows:(NSArray *)rows;
 
 /** unselect all rows */
 - (void)unselectAll;
+
+- (void)dismissPicker:(CZDismissCompletionCallback)completion;
 
 @property id<CZPickerViewDelegate> delegate;
 

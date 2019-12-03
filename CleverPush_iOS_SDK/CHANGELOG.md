@@ -1,3 +1,6 @@
+# 0.2.13
+* Optimized Topics Dialog
+
 # 0.2.12
 * Fixed crash when opening a notification
 

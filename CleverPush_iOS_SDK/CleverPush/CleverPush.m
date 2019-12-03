@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.12";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.13";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -178,6 +178,7 @@ JKAlertDialog* currentAppBannerPopup;
 WKWebView* currentAppBannerWebView;
 id currentAppBannerUrlOpenedCallback;
 BOOL channelTopicsPickerVisible = NO;
+double channelTopicsPickerShownAt;
 UIColor* brandingColor;
 UIColor* chatBackgroundColor;
 static NSString* lastNotificationReceivedId;
@@ -1379,10 +1380,20 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)showTopicsDialog {
+    if (channelTopicsPickerVisible && channelTopicsPicker && channelTopicsPickerShownAt && (channelTopicsPickerShownAt + 2.0) < [[NSDate date] timeIntervalSince1970]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [channelTopicsPicker dismissPicker:^{
+                channelTopicsPickerVisible = NO;
+                [self showTopicsDialog];
+            }];
+        });
+    }
+    
     if (channelTopicsPickerVisible) {
         return;
     }
     channelTopicsPickerVisible = YES;
+    channelTopicsPickerShownAt = [[NSDate date] timeIntervalSince1970];
     
     channelTopics = [self getAvailableTopics];
     if ([channelTopics count] == 0) {

@@ -1,10 +1,3 @@
-//
-//  CZPickerView.h
-//
-//  Created by chenzeyu on 9/6/15.
-//  Copyright (c) 2015 chenzeyu. All rights reserved.
-//
-
 #import "CZPickerView.h"
 
 #define CZP_FOOTER_HEIGHT 44.0
@@ -16,8 +9,6 @@
 #endif
 
 
-
-typedef void (^CZDismissCompletionCallback)(void);
 
 @interface CZPickerView ()
 @property NSString *headerTitle;
