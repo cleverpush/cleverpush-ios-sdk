@@ -131,7 +131,7 @@ static NSArray* delegateSubclasses = nil;
     BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:)];
     BOOL startedBackgroundJob = false;
 
-    NSLog(@"CleverPush: cleverPushReceivedSilentRemoteNotification");
+    // NSLog(@"CleverPush: cleverPushReceivedSilentRemoteNotification %@", callExistingSelector);
     
     if ([CleverPush channelId]) {
         // check if this is not a silent notification

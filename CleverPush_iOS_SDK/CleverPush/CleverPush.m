@@ -151,13 +151,15 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.10";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.11";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 
 static NSString* channelId;
+static BOOL autoClearBadge = YES;
 static BOOL autoRegister = YES;
+NSMutableArray* chatViews;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
@@ -276,7 +278,8 @@ BOOL handleSubscribedCalled = false;
     handleSubscribed = subscribedCallback;
     autoRegister = autoRegisterParam;
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-
+    chatViews = [[NSMutableArray alloc] init];
+    
     if (self) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -319,8 +322,10 @@ BOOL handleSubscribedCalled = false;
     if (userInfo) {
         startFromNotification = YES;
     }
-
-    [self clearBadge:false];
+    
+    if (autoClearBadge) {
+        [self clearBadge:false];
+    }
 
     return self;
 }
@@ -746,8 +751,6 @@ static BOOL registrationInProgress = false;
     if (registrationInProgress) {
         return;
     }
-    
-    NSLog(@"CleverPush: syncSubscription");
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 
@@ -781,6 +784,8 @@ static BOOL registrationInProgress = false;
                              isNil(language), @"language",
                              subscriptionId, @"subscriptionId",
                              nil];
+                             
+                             NSLog(@"CleverPush: syncSubscription %@ %@", dataDic, deviceToken);
     
     NSArray* topics = [self getSubscriptionTopics];
     if (topics) {
@@ -826,7 +831,7 @@ static BOOL registrationInProgress = false;
     
     NSString* notificationId = [notification valueForKey:@"_id"];
     
-    if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationReceivedId]) {
+    if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"]) {
         return;
     }
     lastNotificationReceivedId = notificationId;
@@ -834,6 +839,12 @@ static BOOL registrationInProgress = false;
     NSLog(@"CleverPush: handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict);
     
     [CleverPush setNotificationDelivered:notification withChannelId:[messageDict valueForKeyPath:@"channel._id"] withSubscriptionId:[messageDict valueForKeyPath:@"subscription._id"]];
+    
+    if (isActive && [notification valueForKey:@"chatNotification"] != nil && [[notification valueForKey:@"chatNotification"] boolValue]) {
+        for (CPChatView* chatView in chatViews) {
+            [chatView loadChat];
+        }
+    }
     
     if (!handleNotificationReceived) {
         return;
@@ -948,7 +959,8 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {
-    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];;
+    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
+    NSDictionary* notification = [payload valueForKey:@"notification"];
     
     if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationOpenedId]) {
         return;
@@ -959,7 +971,15 @@ static BOOL registrationInProgress = false;
     
     [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"]];
 
-    [self clearBadge:true];
+    if (autoClearBadge) {
+        [self clearBadge:true];
+    }
+    
+    if ([notification valueForKey:@"chatNotification"] != nil && [[notification valueForKey:@"chatNotification"] boolValue]) {
+        for (CPChatView* chatView in chatViews) {
+            [chatView loadChat];
+        }
+    }
 
     if (!handleNotificationOpened) {
         return;
@@ -1342,12 +1362,20 @@ static BOOL registrationInProgress = false;
     return brandingColor;
 }
 
++ (void)setAutoClearBadge:(BOOL)autoClear {
+    autoClearBadge = autoClear;
+}
+
 + (void)setChatBackgroundColor:(UIColor *)color {
     chatBackgroundColor = color;
 }
 
 + (UIColor*)getChatBackgroundColor {
     return chatBackgroundColor;
+}
+
++ (void)addChatView:(CPChatView*)chatView {
+    [chatViews addObject:chatView];
 }
 
 + (void)showTopicsDialog {

@@ -87,12 +87,12 @@ NSString* headerCodes;
         <head>\
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>\
         <style>\
-        html, body { margin: 0; padding: 0; height: 100%%; } \
+        html, body { margin: 0; padding: 0; height: 100%%; -webkit-tap-highlight-color: rgba(0,0,0,0); } \
         </style>\
         %@\
         </head>\
         <body>\
-        <div class='cleverpush-chat-target' style='height: 100%%;'></div>\
+        <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
         <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
         <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
         <script>var cleverpushConfig = %@; var cleverpushSubscriptionId = '%@'; cleverpushConfig.nativeApp = true; cleverpushConfig.brandingColor = '%@'; cleverpushConfig.chatBackgroundColor = '%@';</script>\
@@ -123,6 +123,8 @@ NSString* headerCodes;
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        [CleverPush addChatView:self];
+        
         WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
         WKUserContentController* userController = [[WKUserContentController alloc] init];
 
@@ -130,8 +132,10 @@ NSString* headerCodes;
         configuration.userContentController = userController;
         
         _webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
+        
         _webView.scrollView.scrollEnabled = true;
         _webView.scrollView.bounces = false;
+        
         _webView.allowsBackForwardNavigationGestures = false;
         _webView.contentMode = UIViewContentModeScaleToFill;
         [self loadChat];

@@ -95,6 +95,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (UIColor*)getBrandingColor;
 + (void)setChatBackgroundColor:(UIColor *)color;
 + (UIColor*)getChatBackgroundColor;
++ (void)setAutoClearBadge:(BOOL)autoClear;
++ (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
 + (void)showAppBanners;
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;

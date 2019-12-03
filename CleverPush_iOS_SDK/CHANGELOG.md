@@ -1,3 +1,7 @@
+# 0.2.11
+* Optimized Chat View
+* Added ability to disable automatic clearing of badge
+
 # 0.2.10
 * Fixed freeze when `unsubscribe` called and user is not subscribed
 
