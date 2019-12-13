@@ -1,3 +1,10 @@
+# 0.2.15
+* Improved ChatView: Show an error when there is no internet connection
+* Improved Opt-in rate tracking
+
+# 0.2.14
+* Fixed a crash
+
 # 0.2.13
 * Optimized Topics Dialog
 

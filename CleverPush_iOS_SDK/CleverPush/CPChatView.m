@@ -10,6 +10,7 @@
 CPChatURLOpenedCallback urlOpenedCallback;
 CPChatSubscribeCallback subscribeCallback;
 NSString* headerCodes;
+NSString* lastSubscriptionId;
 
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
@@ -25,6 +26,12 @@ NSString* headerCodes;
          
             [self loadChat];
         }];
+    } else if ([message.body isEqualToString:@"reload"]) {
+        if (lastSubscriptionId != nil) {
+            [self loadChatWithSubscriptionId:lastSubscriptionId];
+        } else {
+            [self loadChat];
+        }
     }
 }
 
@@ -57,49 +64,96 @@ NSString* headerCodes;
 }
 
 - (void)loadChatWithSubscriptionId:(NSString*)subscriptionId {
+    lastSubscriptionId = subscriptionId;
+    
     NSString *content;
     
     NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[CleverPush getChannelConfig]
-                                                       options:0
-                                                         error:&error];
-
-    if (!jsonData) {
-        content = [NSString stringWithFormat:@"Fehler: %@", error];
-    } else {
-        NSString* brandingColor;
-        NSString* backgroundColor;
-        if ([CleverPush getBrandingColor]) {
-            brandingColor = [self hexStringFromColor:[CleverPush getBrandingColor]];
-        }
-        if ([CleverPush getChatBackgroundColor]) {
-            backgroundColor = [self hexStringFromColor:[CleverPush getChatBackgroundColor]];
-        }
+    NSDictionary* channelConfig = [CleverPush getChannelConfig];
+    NSData* jsonData;
+    NSString* jsonConfig = @"null";
+    
+    if (channelConfig != nil) {
+        jsonData = [NSJSONSerialization dataWithJSONObject:channelConfig
+                                                           options:0
+                                                             error:&error];
         
-        if (!headerCodes) {
-            headerCodes = @"";
+        if (jsonData != nil) {
+            jsonConfig = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
         }
-        
-        NSString *jsonConfig = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        content = [NSString stringWithFormat:@"\
-        <!DOCTYPE html>\
-        <html>\
-        <head>\
-        <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>\
-        <style>\
-        html, body { margin: 0; padding: 0; height: 100%%; -webkit-tap-highlight-color: rgba(0,0,0,0); } \
-        </style>\
-        %@\
-        </head>\
-        <body>\
-        <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
-        <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
-        <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
-        <script>var cleverpushConfig = %@; var cleverpushSubscriptionId = '%@'; cleverpushConfig.nativeApp = true; cleverpushConfig.brandingColor = '%@'; cleverpushConfig.chatBackgroundColor = '%@';</script>\
-        <script src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
-        </body>\
-        </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor];
     }
+
+    NSString* brandingColor;
+    NSString* backgroundColor;
+    if ([CleverPush getBrandingColor]) {
+        brandingColor = [self hexStringFromColor:[CleverPush getBrandingColor]];
+    }
+    if ([CleverPush getChatBackgroundColor]) {
+        backgroundColor = [self hexStringFromColor:[CleverPush getChatBackgroundColor]];
+    }
+    
+    if (!headerCodes) {
+        headerCodes = @"";
+    }
+    
+    content = [NSString stringWithFormat:@"\
+    <!DOCTYPE html>\
+    <html>\
+    <head>\
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>\
+    <style>\
+    html, body { margin: 0; padding: 0; height: 100%%; -webkit-tap-highlight-color: rgba(0,0,0,0); } \
+    </style>\
+    %@\
+    </head>\
+    <body>\
+    <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
+    <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
+    <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
+    <script>var cleverpushConfig = %@; var cleverpushSubscriptionId = '%@'; (cleverpushConfig || {}).nativeApp = true; (cleverpushConfig || {}).brandingColor = '%@'; (cleverpushConfig || {}).chatBackgroundColor = '%@';</script>\
+    <script>\
+      function showErrorView() {\
+        document.body.innerHTML = `\
+        <style>\
+        .cleverpush-chat-error {\
+          color: #555;\
+          text-align: center;\
+          font-family: sans-serif;\
+          padding: center;\
+          height: 100%%;\
+          display: flex;\
+          align-items: center;\
+          justify-content: center;\
+          flex-direction: column;\
+        }\
+        .cleverpush-chat-error h1 {\
+          font-size: 24px;\
+          font-weight: normal;\
+          margin-bottom: 25px;\
+        }\
+        .cleverpush-chat-error button {\
+          background-color: #555;\
+          color: #fff;\
+          border: none;\
+          font-weight: bold;\
+          display: block;\
+          font-size: 16px;\
+          border-radius: 200px;\
+          padding: 7.5px 15px;\
+          cursor: pointer;\
+          font-family: sans-serif;\
+        }\
+        </style>\
+        <div class='cleverpush-chat-error'>\
+        <h1>Laden fehlgeschlagen</h1>\
+        <button onclick='window.webkit.messageHandlers.chat.postMessage(\"reload\")' type='button'>Erneut versuchen</button>\
+        </div>`;\
+      }\
+      if (!cleverpushConfig) { showErrorView() }\
+    </script>\
+    <script onerror='showErrorView()' src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
+    </body>\
+    </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor];
     
     NSLog(@"CleverPush: ChatView content: %@", content);
     

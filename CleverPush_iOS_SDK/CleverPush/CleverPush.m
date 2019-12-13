@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.14";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.15";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -607,67 +607,95 @@ BOOL handleSubscribedCalled = false;
     [self subscribe:nil];
 }
 
++ (void)setConfirmAlertShown {
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
+    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                             channelId, @"channelId",
+                             @"iOS", @"platformName",
+                             @"SDK", @"browserType",
+                             nil];
+    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
+    [self enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
+        NSLog(@"CleverPush Error: /channel/confirm-alert request error %@", error);
+    }];
+}
+
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
-    if (subscriptionId == nil && channelId != nil) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 @"iOS", @"platformName",
-                                 @"SDK", @"browserType",
-                                 nil];
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
-            NSLog(@"CleverPush Error: /channel/confirm-alert request error %@", error);
-        }];
-    }
-    
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
-        [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (granted && subscriptionId == nil) {
-                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+        
+        [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
+            if (subscriptionId == nil && channelId != nil && notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
+                [self setConfirmAlertShown];
+            }
+            
+            UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
+            [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (granted && subscriptionId == nil) {
+                        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
 
-                    NSDictionary* channelConfig = [self getChannelConfig];
-                    if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                        NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
-                        if (channelTopics != nil && [channelTopics count] > 0) {
-                            NSArray* topics = [self getSubscriptionTopics];
-                            if (!topics || [topics count] == 0) {
-                                NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
-                                for (id channelTopic in channelTopics) {
-                                    if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
-                                        [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                        NSDictionary* channelConfig = [self getChannelConfig];
+                        if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                            NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+                            if (channelTopics != nil && [channelTopics count] > 0) {
+                                NSArray* topics = [self getSubscriptionTopics];
+                                if (!topics || [topics count] == 0) {
+                                    NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+                                    for (id channelTopic in channelTopics) {
+                                        if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+                                            [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                                        }
+                                    }
+                                    if ([selectedTopicIds count] > 0) {
+                                        [self setSubscriptionTopics:selectedTopicIds];
                                     }
                                 }
-                                if ([selectedTopicIds count] > 0) {
-                                    [self setSubscriptionTopics:selectedTopicIds];
-                                }
+                                
+                                [self showTopicsDialog];
                             }
-                            
-                            [self showTopicsDialog];
                         }
                     }
-                }
-                
-                if (granted && subscribedBlock) {
-                    subscribedBlock(subscriptionId);
-                }
-            });
+                    
+                    if (granted && subscribedBlock) {
+                        subscribedBlock(subscriptionId);
+                    }
+                });
+            }];
         }];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
         
-    } else if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-        Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
+        [self ensureMainThreadSync:^{
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }];
         
-        NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
-        
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert];
+        [self ensureMainThreadSync:^{
+            if (subscriptionId == nil && channelId != nil) {
+                if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+                    UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+                    
+                    if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+                        [self setConfirmAlertShown];
+                    }
+                } else {
+                    if (![[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+                        [self setConfirmAlertShown];
+                    }
+                }
+            }
+            
+            if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+                Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
+                
+                NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
+                
+                [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+            } else {
+                [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert];
+            }
+        }];
     }
 }
 
