@@ -151,7 +151,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.15";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.16";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -870,6 +870,7 @@ static BOOL registrationInProgress = false;
     [CleverPush setNotificationDelivered:notification withChannelId:[messageDict valueForKeyPath:@"channel._id"] withSubscriptionId:[messageDict valueForKeyPath:@"subscription._id"]];
     
     if (isActive && notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
+
         for (CPChatView* chatView in chatViews) {
             [chatView loadChat];
         }
@@ -991,7 +992,7 @@ static BOOL registrationInProgress = false;
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
-    if (isEmpty(notificationId) || [notificationId isEqualToString:lastNotificationOpenedId]) {
+    if (isEmpty(notificationId) || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
     lastNotificationOpenedId = notificationId;
@@ -1005,6 +1006,7 @@ static BOOL registrationInProgress = false;
     }
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
+
         for (CPChatView* chatView in chatViews) {
             [chatView loadChat];
         }

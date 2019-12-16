@@ -1,3 +1,6 @@
+# 0.2.16
+* Minor chat notification fix
+
 # 0.2.15
 * Improved ChatView: Show an error when there is no internet connection
 * Improved Opt-in rate tracking
