@@ -7,6 +7,7 @@
 #endif
 
 #import "CPChatView.h"
+#import "CPNotificationViewController.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
@@ -104,5 +105,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getNotifications;
 + (NSDictionary*)getChannelConfig;
 + (NSString*)getSubscriptionId;
++ (void)trackEvent:(NSString*)eventName;
++ (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
 
 @end

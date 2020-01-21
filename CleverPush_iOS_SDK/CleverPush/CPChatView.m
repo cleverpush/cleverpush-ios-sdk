@@ -53,6 +53,8 @@ NSString* lastSubscriptionId;
 }
 
 - (void)loadChat {
+    NSLog(@"CleverPush: CPChatView: loadChat");
+    
     NSString* subscriptionId;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
@@ -64,6 +66,8 @@ NSString* lastSubscriptionId;
 }
 
 - (void)loadChatWithSubscriptionId:(NSString*)subscriptionId {
+    NSLog(@"CleverPush: CPChatView: loadChatWithSubscriptionId: @%", subscriptionId);
+    
     lastSubscriptionId = subscriptionId;
     
     NSString *content;

@@ -8,6 +8,8 @@
 #import "CleverPushSelectorHelpers.h"
 #import "CZPickerView.h"
 #import "JKAlertDialog.h"
+#import "CPNotificationCategoryController.h"
+#import "NSURLSession+DirectDownload.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -63,95 +65,9 @@
 @end
 
 
-@interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
-    NSError* error;
-    NSURLResponse* response;
-    BOOL done;
-    NSFileHandle* outputHandle;
-}
-@property (readonly, getter=isDone) BOOL done;
-@property (readonly) NSError* error;
-@property (readonly) NSURLResponse* response;
-
-@end
-
-
-@implementation DirectDownloadDelegate
-@synthesize error, response, done;
-
--(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
-    [outputHandle writeData:data];
-}
-
--(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)aResponse completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
-    response = aResponse;
-    completionHandler(NSURLSessionResponseAllow);
-}
-
--(void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
-    error = anError;
-    done = YES;
-    
-    [outputHandle closeFile];
-}
-
--(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)anError {
-    done = YES;
-    error = anError;
-    [outputHandle closeFile];
-}
-
-- (id)initWithFilePath:(NSString*)path {
-    if (self = [super init]) {
-        if ([[NSFileManager defaultManager] fileExistsAtPath:path])
-            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-        
-        [[NSFileManager defaultManager] createFileAtPath:path contents:nil attributes:nil];
-        outputHandle = [NSFileHandle fileHandleForWritingAtPath:path];
-    }
-    return self;
-}
-@end
-
-@interface NSURLSession (DirectDownload)
-+ (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error;
-@end
-
-@implementation NSURLSession (DirectDownload)
-
-+ (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error {
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
-    
-    DirectDownloadDelegate *delegate = [[DirectDownloadDelegate alloc] initWithFilePath:localPath];
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:nil];
-    
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
-    
-    [task resume];
-    
-    [session finishTasksAndInvalidate];
-    
-    while (![delegate isDone]) {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-    }
-    
-    NSError *downloadError = [delegate error];
-    if (downloadError != nil) {
-        if (error)
-            *error = downloadError;
-        return nil;
-    }
-    
-    return delegate.response.MIMEType;
-}
-
-@end
-
-
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.2.16";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.3.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -184,8 +100,7 @@ UIColor* chatBackgroundColor;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 
-static id isNil(id object)
-{
+static id isNil(id object) {
     return object ?: [NSNull null];
 }
 
@@ -976,6 +891,45 @@ static BOOL registrationInProgress = false;
     content.attachments = unAttachments;
 }
 
++ (void)addCarouselAttachments:(NSDictionary*)notification toContent:(UNMutableNotificationContent*)content {
+    NSMutableArray* unAttachments = [NSMutableArray new];
+    
+    NSArray *images = [[NSArray alloc] init];
+    images = [notification objectForKey:@"carouselItems"];
+    [images enumerateObjectsUsingBlock:
+     ^(NSDictionary *image, NSUInteger index, BOOL *stop)
+     {
+         NSString* mediaUrl = [image objectForKey:@"mediaUrl"];
+        if (mediaUrl != nil) {
+            NSURL* nsURL = [NSURL URLWithString:mediaUrl];
+            
+            if (nsURL) {
+                NSString* urlScheme = [nsURL.scheme lowercaseString];
+                if ([urlScheme isEqualToString:@"http"] || [urlScheme isEqualToString:@"https"]) {
+                    NSString* name = [self downloadMedia:mediaUrl];
+                    
+                    if (name) {
+                        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+                        NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
+                        NSURL* url = [NSURL fileURLWithPath:filePath];
+                        NSError* error;
+                        UNNotificationAttachment* attachment = [UNNotificationAttachment
+                                                                attachmentWithIdentifier:[NSString stringWithFormat:@"media_%lu.jpg", (unsigned long)index]
+                                                                URL:url
+                                                                options:0
+                                                                error:&error];
+                        if (attachment) {
+                            [unAttachments addObject:attachment];
+                        }
+                    }
+                }
+            }
+        }
+     }];
+    
+    content.attachments = unAttachments;
+}
+
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     BOOL startedBackgroundJob = NO;
     
@@ -1080,6 +1034,8 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    NSLog(@"CleverPush: setNotificationClicked %@ %@ %@", notificationId, channelId, subscriptionId);
+    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/clicked"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
@@ -1385,6 +1341,49 @@ static BOOL registrationInProgress = false;
     return appBanners;
 }
 
++ (void)trackEvent:(NSString*)eventName {
+    return [self trackEvent:eventName amount:nil];
+}
+
++ (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSDictionary* channelConfig = [self getChannelConfig];
+        NSArray* channelEvents = [channelConfig valueForKey:@"channelEvents"];
+        if (channelEvents == nil) {
+            NSLog(@"Event not found");
+            return;
+        }
+        
+        NSUInteger eventIndex = [channelEvents indexOfObjectWithOptions:NSEnumerationConcurrent
+                                    passingTest:^BOOL(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSDictionary *event = (NSDictionary*) obj;
+            return event != nil && [[event valueForKey:@"name"] isEqualToString:eventName];
+        }];
+        if (eventIndex == NSNotFound) {
+            NSLog(@"Event not found");
+            return;
+        }
+        
+        NSDictionary *event = [channelEvents objectAtIndex:eventIndex];
+        NSString *eventId = [event valueForKey:@"_id"];
+        
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/conversion"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 eventId, @"eventId",
+                                 isNil(amount), @"amount",
+                                 [self getSubscriptionId], @"subscriptionId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            
+        } onFailure:nil];
+    });
+}
+
 + (void)setBrandingColor:(UIColor *)color {
     brandingColor = color;
 }
@@ -1636,15 +1635,26 @@ static BOOL registrationInProgress = false;
     
     NSDictionary* payload = request.content.userInfo;
     NSDictionary* notification = [payload valueForKey:@"notification"];
-    NSString* channelId = [payload valueForKeyPath:@"channel._id"];
-    NSString* subscriptionId = [payload valueForKeyPath:@"subscription._id"];
     
     [self handleNotificationReceived:payload isActive:NO];
     
-    NSString* mediaUrl = [payload valueForKeyPath:@"notification.mediaUrl"];
-    if (![mediaUrl isKindOfClass:[NSNull class]]) {
-        NSLog(@"CleverPush: appending media: %@", mediaUrl);
-        [self addAttachments:mediaUrl toContent:replacementContent];
+    if (notification != nil) {
+        bool isCarousel = [notification valueForKey:@"carouselEnabled"] != nil && ![[notification valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification valueForKey:@"carouselItems"] != nil && ![[notification valueForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"carouselEnabled"] boolValue];
+        
+        [self addActionButtonsToNotificationRequest:request
+                           withPayload:payload
+        withMutableNotificationContent:replacementContent];
+        
+        if (isCarousel) {
+            NSLog(@"CleverPush: appending carousel medias");
+            [self addCarouselAttachments:notification toContent:replacementContent];
+        } else {
+            NSString* mediaUrl = [notification valueForKey:@"mediaUrl"];
+            if (![mediaUrl isKindOfClass:[NSNull class]]) {
+                NSLog(@"CleverPush: appending media: %@", mediaUrl);
+                [self addAttachments:mediaUrl toContent:replacementContent];
+            }
+        }
     }
     
     return replacementContent;
@@ -1657,7 +1667,72 @@ static BOOL registrationInProgress = false;
         replacementContent = [request.content mutableCopy];
     }
     
+    NSDictionary* payload = request.content.userInfo;
+    
+    [self addActionButtonsToNotificationRequest:request
+                                 withPayload:payload
+              withMutableNotificationContent:replacementContent];
+    
     return replacementContent;
+}
+
++ (void)addActionButtonsToNotificationRequest:(UNNotificationRequest*)request
+                               withPayload:(NSDictionary*)payload
+            withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
+    if (request.content.categoryIdentifier && ![request.content.categoryIdentifier isEqualToString:@""]) {
+        return;
+    }
+    
+    NSDictionary* notification = [payload valueForKey:@"notification"];
+    bool isCarousel = notification != nil && [notification valueForKey:@"carouselEnabled"] != nil && ![[notification valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification valueForKey:@"carouselItems"] != nil && ![[notification valueForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"carouselEnabled"] boolValue];
+    
+    NSArray* actions = [notification objectForKey:@"actions"];
+    
+    NSMutableArray* actionArray = [NSMutableArray new];
+    
+    NSMutableSet<UNNotificationCategory*>* allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
+    
+    if (isCarousel) {
+        replacementContent.categoryIdentifier = @"carousel";
+        [[CPNotificationCategoryController sharedInstance] carouselCategory];
+        
+    } else if ([actions isKindOfClass:[NSNull class]] || !actions || [actions count] == 0) {
+        return;
+        
+    } else {
+        [actions enumerateObjectsUsingBlock:^(id item, NSUInteger idx, BOOL *stop) {
+            UNNotificationAction* action = [UNNotificationAction actionWithIdentifier:[NSString stringWithFormat: @"%@", @(idx)]
+                                                              title:item[@"title"]
+                                                            options:UNNotificationActionOptionForeground];
+            [actionArray addObject:action];
+        }];
+        
+        NSString* newCategoryIdentifier = [CPNotificationCategoryController.sharedInstance registerNotificationCategoryForNotificationId:[payload valueForKeyPath:@"notification._id"]];
+        
+        UNNotificationCategory* category = [UNNotificationCategory categoryWithIdentifier:newCategoryIdentifier
+                                                              actions:actionArray
+                                                    intentIdentifiers:@[]
+                                                              options:UNNotificationCategoryOptionCustomDismissAction];
+
+        replacementContent.categoryIdentifier = newCategoryIdentifier;
+        
+        if (allCategories) {
+            NSMutableSet<UNNotificationCategory*>* newCategorySet = [NSMutableSet new];
+            for (UNNotificationCategory *existingCategory in allCategories) {
+                if (![existingCategory.identifier isEqualToString:newCategoryIdentifier])
+                    [newCategorySet addObject:existingCategory];
+            }
+
+            [newCategorySet addObject:category];
+            allCategories = newCategorySet;
+        } else {
+            allCategories = [[NSMutableSet alloc] initWithArray:@[category]];
+        }
+    }
+
+    [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:allCategories];
+
+    allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
 }
 
 static CleverPush* singleInstance = nil;

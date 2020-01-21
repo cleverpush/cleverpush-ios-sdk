@@ -1,3 +1,7 @@
+# 0.3.0
+* Added `trackEvent` method
+* Added Carousel Notifications
+
 # 0.2.16
 * Minor chat notification fix
 
