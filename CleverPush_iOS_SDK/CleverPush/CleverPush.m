@@ -67,7 +67,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.3.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.3.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -695,6 +695,10 @@ static BOOL registrationInProgress = false;
     if (registrationInProgress) {
         return;
     }
+    
+    if (!deviceToken) {
+        deviceToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DEVICETOKEN"];
+    }
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 
@@ -728,19 +732,25 @@ static BOOL registrationInProgress = false;
                              isNil(language), @"language",
                              subscriptionId, @"subscriptionId",
                              nil];
-                             
-                             NSLog(@"CleverPush: syncSubscription %@ %@", dataDic, deviceToken);
     
     NSArray* topics = [self getSubscriptionTopics];
     if (topics) {
         [dataDic setObject:topics forKey:@"topics"];
+        NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+        if (topicsVersion) {
+            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
+        }
     }
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
+    
+    NSLog(@"CleverPush: syncSubscription Request %@", dataDic);
 
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
+        
+        NSLog(@"CleverPush: syncSubscription Result %@", results);
 
         if ([results objectForKey:@"id"] != nil) {
             if (!subscriptionId) {
@@ -759,6 +769,15 @@ static BOOL registrationInProgress = false;
             if (handleSubscribedInternal) {
                 handleSubscribedInternal(subscriptionId);
             }
+        }
+
+        if ([results valueForKey:@"topics"] != nil) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            [userDefaults setObject:[results valueForKey:@"topics"] forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+            if ([results valueForKey:@"topicsVersion"] != nil) {
+                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+            }
+            [userDefaults synchronize];
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
@@ -1294,7 +1313,16 @@ static BOOL registrationInProgress = false;
 
 + (void)setSubscriptionTopics:(NSMutableArray *)topics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    if (!topicsVersion) {
+        topicsVersion = 1;
+    } else {
+        topicsVersion += 1;
+    }
+    
     [userDefaults setObject:topics forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    [userDefaults setInteger:topicsVersion forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
     [userDefaults synchronize];
     
     dispatch_async(dispatch_get_main_queue(), ^{

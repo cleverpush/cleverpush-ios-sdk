@@ -1,3 +1,6 @@
+# 0.3.1
+* Sync topics from API to client
+
 # 0.3.0
 * Added `trackEvent` method
 * Added Carousel Notifications
