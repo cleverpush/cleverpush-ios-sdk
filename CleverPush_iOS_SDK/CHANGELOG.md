@@ -1,3 +1,6 @@
+# 0.4.0
+* Added Geo Fences
+
 # 0.3.1
 * Sync topics from API to client
 

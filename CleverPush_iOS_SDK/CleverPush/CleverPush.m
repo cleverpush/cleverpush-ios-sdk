@@ -67,7 +67,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.3.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.4.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -99,6 +99,7 @@ UIColor* brandingColor;
 UIColor* chatBackgroundColor;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
+CLLocationManager* locationManager;
 
 static id isNil(id object) {
     return object ?: [NSNull null];
@@ -312,55 +313,81 @@ BOOL handleSubscribedCalled = false;
     appOpens++;
     [userDefaults setInteger:appOpens forKey:@"CleverPush_APP_OPENS"];
     
+    [self initFeatures];
+}
+
++ (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        
-        channelConfig = [self getChannelConfig];
-        
-        if ([channelConfig valueForKey:@"appReviewEnabled"]) {
-            int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
-            if (!appReviewOpens) {
-                appReviewOpens = 0;
-            }
-            int appReviewDays = (int)[[channelConfig valueForKey:@"appReviewDays"] integerValue];
-            if (!appReviewDays) {
-                appReviewDays = 0;
-            }
-            int appReviewSeconds = (int)[[channelConfig valueForKey:@"appReviewSeconds"] integerValue];
-            if (!appReviewSeconds) {
-                appReviewSeconds = 0;
-            }
-            NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
-              
-             NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
-            if (!appReviewTitle) {
-                appReviewTitle = @"Möchtest du unsere App im Store bewerten?";
-            }
-            
-            if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= appReviewOpens && currentAppDays >= appReviewDays) {
-                NSLog(@"CleverPush: showing app review alert");
-                
-                dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
-                dispatch_after(delay, dispatch_get_main_queue(), ^(void){
-                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
-                                                                                             message:@""
-                                                                                      preferredStyle:UIAlertControllerStyleAlert];
-                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:@"Ja"
-                                                                       style:UIAlertActionStyleDefault
-                                                                     handler:^(UIAlertAction * action) {
-                        [SKStoreReviewController requestReview];
-                    }];
-                    [alertController addAction:actionYes];
-                    UIAlertAction *actionNo = [UIAlertAction actionWithTitle:@"Nein"
-                                                                       style:UIAlertActionStyleDefault
-                                                                     handler:nil];
-                    [alertController addAction:actionNo];
-                    UIViewController* topViewController = [CleverPush topViewController];
-                    [topViewController presentViewController:alertController animated:YES completion:nil];
-                });
-            }
-        }
+        [self initAppReview];
+        [self initGeoFences];
     });
+}
+
++ (void)initAppReview {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        
+    channelConfig = [self getChannelConfig];
+    if (channelConfig != nil && [channelConfig valueForKey:@"appReviewEnabled"]) {
+        int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
+        if (!appReviewOpens) {
+            appReviewOpens = 0;
+        }
+        int appReviewDays = (int)[[channelConfig valueForKey:@"appReviewDays"] integerValue];
+        if (!appReviewDays) {
+            appReviewDays = 0;
+        }
+        int appReviewSeconds = (int)[[channelConfig valueForKey:@"appReviewSeconds"] integerValue];
+        if (!appReviewSeconds) {
+            appReviewSeconds = 0;
+        }
+        NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
+          
+         NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
+        if (!appReviewTitle) {
+            appReviewTitle = @"Möchtest du unsere App im Store bewerten?";
+        }
+        
+        if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= appReviewOpens && currentAppDays >= appReviewDays) {
+            NSLog(@"CleverPush: showing app review alert");
+            
+            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
+            dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
+                                                                                         message:@""
+                                                                                  preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *actionYes = [UIAlertAction actionWithTitle:@"Ja"
+                                                                   style:UIAlertActionStyleDefault
+                                                                 handler:^(UIAlertAction * action) {
+                    [SKStoreReviewController requestReview];
+                }];
+                [alertController addAction:actionYes];
+                UIAlertAction *actionNo = [UIAlertAction actionWithTitle:@"Nein"
+                                                                   style:UIAlertActionStyleDefault
+                                                                 handler:nil];
+                [alertController addAction:actionNo];
+                UIViewController* topViewController = [CleverPush topViewController];
+                [topViewController presentViewController:alertController animated:YES completion:nil];
+            });
+        }
+    }
+}
+
++ (void)initGeoFences {
+    channelConfig = [self getChannelConfig];
+    if (channelConfig != nil && [channelConfig valueForKey:@"geoFences"] != nil) {
+        locationManager = [CLLocationManager new];
+        
+        NSArray* geoFencesDict = [channelConfig valueForKey:@"geoFences"];
+         for (NSDictionary *geoFence in geoFencesDict) {
+             if (geoFence != nil) {
+                 CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[geoFence objectForKey:@"latitude"] doubleValue], [[geoFence objectForKey:@"longitude"] doubleValue]);
+                 CLRegion *bridge = [[CLCircularRegion alloc]initWithCenter:center
+                                                                     radius:[[geoFence objectForKey:@"radius"] longValue]
+                                                                 identifier:[geoFence valueForKey:@"_id"]];
+                 [locationManager startMonitoringForRegion:bridge];
+             }
+         }
+    }
 }
 
 + (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime
@@ -1761,6 +1788,45 @@ static BOOL registrationInProgress = false;
     [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:allCategories];
 
     allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
+}
+
+- (BOOL)hasLocationPermission {
+    CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+    return status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse;
+}
+
++ (void)requestLocationPermission {
+    CLLocationManager* locationManager = [[CLLocationManager alloc] init];
+    [locationManager requestAlwaysAuthorization];
+}
+
++ (void)trackGeoFence:(NSString *)geoFenceId withState:(NSString *)state {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/geo-fence"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 geoFenceId, @"geoFenceId",
+                                 state, @"state",
+                                 [self getSubscriptionId], @"subscriptionId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            
+        } onFailure:nil];
+    });
+}
+
++ (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
+    NSLog(@"CleverPush: Entered Geo Fence");
+    [self trackGeoFence:[region identifier] withState:@"enter"];
+}
+
++ (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
+    NSLog(@"CleverPush: Exited Geo Fence");
+    [self trackGeoFence:[region identifier] withState:@"exit"];
 }
 
 static CleverPush* singleInstance = nil;

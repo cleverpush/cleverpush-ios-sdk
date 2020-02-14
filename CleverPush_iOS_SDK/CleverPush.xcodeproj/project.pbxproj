@@ -18,6 +18,7 @@
 		298325642346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
 		298325652346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
 		298325662346002100A5A85F /* JKAlertDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 298325632346002100A5A85F /* JKAlertDialog.m */; };
+		29B2CB6623F60EEC008A43F9 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */; };
 		29C1BAEC1E58B61B00815CD6 /* CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E221E58A16600BAF990 /* CleverPush.m */; };
 		29C1BAED1E58B61C00815CD6 /* CleverPushHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */; };
 		29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */; };
@@ -101,6 +102,7 @@
 		297B4E381E58A1BD00BAF990 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		2983255D2345FCC000A5A85F /* JKAlertDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JKAlertDialog.h; sourceTree = "<group>"; };
 		298325632346002100A5A85F /* JKAlertDialog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JKAlertDialog.m; sourceTree = "<group>"; };
+		29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		29C1BAE11E58B5EB00815CD6 /* libCleverPush.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCleverPush.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -132,6 +134,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29B2CB6623F60EEC008A43F9 /* CoreLocation.framework in Frameworks */,
 				29D71E7F23807E1700C48ACA /* WebKit.framework in Frameworks */,
 				29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */,
 				29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */,
@@ -225,6 +228,7 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */,
 				29D71E7E23807E1700C48ACA /* WebKit.framework */,
 				29C1BAF31E58B89900815CD6 /* UIKit.framework */,
 				29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */,

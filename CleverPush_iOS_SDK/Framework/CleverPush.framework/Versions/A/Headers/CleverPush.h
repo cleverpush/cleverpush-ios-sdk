@@ -5,6 +5,7 @@
 #define XC8_AVAILABLE 1
 #import <UserNotifications/UserNotifications.h>
 #endif
+#import <CoreLocation/CoreLocation.h>
 
 #import "CPChatView.h"
 #import "CPNotificationViewController.h"
@@ -37,7 +38,7 @@ typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult * res
 
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
-@interface CleverPush : NSObject
+@interface CleverPush : NSObject <CLLocationManagerDelegate>
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
 
