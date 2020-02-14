@@ -67,7 +67,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.4.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.4.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -375,7 +375,9 @@ BOOL handleSubscribedCalled = false;
 + (void)initGeoFences {
     channelConfig = [self getChannelConfig];
     if (channelConfig != nil && [channelConfig valueForKey:@"geoFences"] != nil) {
-        locationManager = [CLLocationManager new];
+        if (!locationManager) {
+            locationManager = [CLLocationManager new];
+        }
         
         NSArray* geoFencesDict = [channelConfig valueForKey:@"geoFences"];
          for (NSDictionary *geoFence in geoFencesDict) {
@@ -1796,7 +1798,9 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)requestLocationPermission {
-    CLLocationManager* locationManager = [[CLLocationManager alloc] init];
+    if (!locationManager) {
+        locationManager = [CLLocationManager new];
+    }
     [locationManager requestAlwaysAuthorization];
 }
 
