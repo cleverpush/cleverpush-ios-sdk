@@ -109,5 +109,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getSubscriptionId;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
++ (void)requestLocationPermission;
 
 @end
