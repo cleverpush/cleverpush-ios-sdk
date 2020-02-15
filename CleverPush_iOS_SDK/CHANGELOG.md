@@ -1,3 +1,6 @@
+# 0.4.3
+* Geo fence fix
+
 # 0.4.2
 * Location Prompt fix
 

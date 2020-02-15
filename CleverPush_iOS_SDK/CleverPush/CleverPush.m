@@ -67,7 +67,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.4.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.4.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -378,15 +378,16 @@ BOOL handleSubscribedCalled = false;
         if (!locationManager) {
             locationManager = [CLLocationManager new];
         }
+        locationManager.delegate = (id)self;
         
         NSArray* geoFencesDict = [channelConfig valueForKey:@"geoFences"];
          for (NSDictionary *geoFence in geoFencesDict) {
              if (geoFence != nil) {
                  CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[geoFence objectForKey:@"latitude"] doubleValue], [[geoFence objectForKey:@"longitude"] doubleValue]);
-                 CLRegion *bridge = [[CLCircularRegion alloc]initWithCenter:center
+                 CLRegion *region = [[CLCircularRegion alloc]initWithCenter:center
                                                                      radius:[[geoFence objectForKey:@"radius"] longValue]
                                                                  identifier:[geoFence valueForKey:@"_id"]];
-                 [locationManager startMonitoringForRegion:bridge];
+                 [locationManager startMonitoringForRegion:region];
              }
          }
     }
@@ -434,7 +435,7 @@ BOOL handleSubscribedCalled = false;
     if (lastSync) {
         nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60]; // 3 days after last sync
     }
-    NSLog(@"CleverPush next sync: %@", nextSync);
+    NSLog(@"CleverPush: next sync: %@", nextSync);
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
 }
 
@@ -1120,11 +1121,11 @@ static BOOL registrationInProgress = false;
 
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)deviceToken {
     NSString* parsedDeviceToken = [self stringFromDeviceToken:deviceToken];
-    NSLog(@"%@", [NSString stringWithFormat:@"Device Registered with Apple: %@", parsedDeviceToken]);
+    NSLog(@"CleverPush: %@", [NSString stringWithFormat:@"Device Registered with Apple: %@", parsedDeviceToken]);
     [CleverPush registerDeviceToken:parsedDeviceToken onSuccess:^(NSDictionary* results) {
-        NSLog(@"%@", [NSString stringWithFormat: @"Device Registered with CleverPush: %@", subscriptionId]);
+        NSLog(@"CleverPush: %@", [NSString stringWithFormat: @"Device Registered with CleverPush: %@", subscriptionId]);
     } onFailure:^(NSError* error) {
-        NSLog(@"%@", [NSString stringWithFormat: @"Error in CleverPush Registration: %@", error]);
+        NSLog(@"CleverPush: %@", [NSString stringWithFormat: @"Error in CleverPush Registration: %@", error]);
     }];
 }
 
@@ -1823,13 +1824,24 @@ static BOOL registrationInProgress = false;
     });
 }
 
++ (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
+    NSLog(@"CleverPush: LocationManager didStartMonitoringForRegion %@", [region identifier]);
+}
+
++ (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
+    NSLog(@"CleverPush: LocationManager didDetermineState %@", [region identifier]);
+    if (state == CLRegionStateInside) {
+        [self locationManager:manager didEnterRegion:region];
+    }
+}
+
 + (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: Entered Geo Fence");
+    NSLog(@"CleverPush: Entered Geo Fence %@", [region identifier]);
     [self trackGeoFence:[region identifier] withState:@"enter"];
 }
 
 + (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: Exited Geo Fence");
+    NSLog(@"CleverPush: Exited Geo Fence %@", [region identifier]);
     [self trackGeoFence:[region identifier] withState:@"exit"];
 }
 
