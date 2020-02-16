@@ -1,3 +1,6 @@
+# 0.4.4
+* Build with Xcode 11.3.1
+
 # 0.4.3
 * Geo fence fix
 
