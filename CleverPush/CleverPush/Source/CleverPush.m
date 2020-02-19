@@ -64,7 +64,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -423,7 +423,6 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)fireChannelConfigListeners {
-    NSLog(@"CleverPush: fireChannelConfigListeners %zd", [pendingChannelConfigListeners count]);
     pendingChannelConfigRequest = NO;
     for (id (^listener)() in pendingChannelConfigListeners) {
         listener(channelConfig);
@@ -436,9 +435,9 @@ BOOL handleSubscribedCalled = false;
         callback(channelConfig);
         return;
     }
-    
+
+    [pendingChannelConfigListeners addObject:[callback copy]];
     if (pendingChannelConfigRequest) {
-        [pendingChannelConfigListeners addObject:[callback copy]];
         return;
     }
     pendingChannelConfigRequest = YES;
@@ -1444,9 +1443,9 @@ static BOOL registrationInProgress = false;
         callback(appBanners);
         return;
     }
-    
+
+    [pendingAppBannersListeners addObject:[callback copy]];
     if (pendingAppBannersRequest) {
-        [pendingAppBannersListeners addObject:[callback copy]];
         return;
     }
     pendingAppBannersRequest = YES;

@@ -1,3 +1,6 @@
+# 0.5.1
+* Fixed getChannelConfig callback
+
 # 0.5.0
 * Split Location SDK in new Framework
 * Make most blocking internal calls asynchroneous

@@ -1,6 +1,0 @@
-framework module CleverPushLocation {
-  umbrella header "CleverPushLocation.h"
-
-  export *
-  module * { export * }
-}
