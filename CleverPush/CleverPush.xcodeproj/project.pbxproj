@@ -77,8 +77,6 @@
 		29DB578C23D75C9B0040E823 /* CPNotificationCategoryController.h in Headers */ = {isa = PBXBuildFile; fileRef = 29DB578823D4D62C0040E823 /* CPNotificationCategoryController.h */; };
 		29DB57A623D77A730040E823 /* NSURLSession+DirectDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DB57A523D77A730040E823 /* NSURLSession+DirectDownload.m */; };
 		29DB95C923FC1B70008FC985 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29DB95C823FC1B70008FC985 /* UserNotifications.framework */; };
-		29DB95DF23FC320C008FC985 /* CleverPushLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DB95DE23FC320C008FC985 /* CleverPushLocation.m */; };
-		29DB95E023FC320C008FC985 /* CleverPushLocation.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29DB95DD23FC320C008FC985 /* CleverPushLocation.h */; };
 		29DB95EB23FC327D008FC985 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF31E58B89900815CD6 /* UIKit.framework */; };
 		29DB95EC23FC3280008FC985 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29D71E7E23807E1700C48ACA /* WebKit.framework */; };
 		29DB95EE23FC3360008FC985 /* UIApplicationDelegate+CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */; };
@@ -101,12 +99,11 @@
 		29DB960223FC3790008FC985 /* CleverPush.h in Copy Files */ = {isa = PBXBuildFile; fileRef = 297B4E211E58A16600BAF990 /* CleverPush.h */; };
 		29DB960E23FC6622008FC985 /* CleverPushLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = 297C34D223FB710A00314A84 /* CleverPushLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */; };
-		29DB961123FC71D5008FC985 /* CleverPushHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */; };
-		29DB961223FC71D6008FC985 /* CleverPushHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */; };
-		29DB961323FC83F5008FC985 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		29DB961423FC8829008FC985 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF31E58B89900815CD6 /* UIKit.framework */; };
 		29DB961723FC8970008FC985 /* CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 297B4E211E58A16600BAF990 /* CleverPush.h */; };
 		29DB961B23FC9324008FC985 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29DB961A23FC9324008FC985 /* StoreKit.framework */; };
+		29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 297C34D023FB710100314A84 /* CleverPushLocation.m */; };
+		29DB961D23FD6F74008FC985 /* CleverPushLocation.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 297C34D223FB710A00314A84 /* CleverPushLocation.h */; };
 		29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */; };
 		29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */; };
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
@@ -132,7 +129,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				29DB95E023FC320C008FC985 /* CleverPushLocation.h in CopyFiles */,
+				29DB961D23FD6F74008FC985 /* CleverPushLocation.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,7 +191,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				29DB961423FC8829008FC985 /* UIKit.framework in Frameworks */,
-				29DB961323FC83F5008FC985 /* CleverPush.framework in Frameworks */,
 				294F7E9023FB5E0200806D23 /* SystemConfiguration.framework in Frameworks */,
 				294F7E8E23FB5DF800806D23 /* CoreLocation.framework in Frameworks */,
 			);
@@ -601,7 +597,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				297C34D123FB710100314A84 /* CleverPushLocation.m in Sources */,
-				29DB961223FC71D6008FC985 /* CleverPushHTTPClient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -649,8 +644,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				29DB95DF23FC320C008FC985 /* CleverPushLocation.m in Sources */,
-				29DB961123FC71D5008FC985 /* CleverPushHTTPClient.m in Sources */,
+				29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
