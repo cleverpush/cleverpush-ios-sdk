@@ -2,6 +2,7 @@ Pod::Spec.new do |s|
     s.name                    = "CleverPushLocation"
     s.version                 = "0.5.0"
     s.dependency                "CleverPush", "~> 0.5.0"
+    s.static_framework        = true
     s.summary                 = "CleverPush Location library for iOS."
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => 'MIT (modified)', :file => 'LICENSE' }
