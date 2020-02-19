@@ -1,0 +1,6 @@
+framework module CleverPush {
+  umbrella header "CleverPush.h"
+
+  export *
+  module * { export * }
+}
