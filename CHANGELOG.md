@@ -1,3 +1,6 @@
+# 0.5.2
+* Check if callbacks are not nil before calling them
+
 # 0.5.1
 * Fixed getChannelConfig callback
 

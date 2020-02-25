@@ -425,7 +425,9 @@ BOOL handleSubscribedCalled = false;
 + (void)fireChannelConfigListeners {
     pendingChannelConfigRequest = NO;
     for (id (^listener)() in pendingChannelConfigListeners) {
-        listener(channelConfig);
+        if (listener) {
+            listener(channelConfig);
+        }
     }
     pendingChannelConfigListeners = [NSMutableArray new];
 }
@@ -692,8 +694,6 @@ BOOL handleSubscribedCalled = false;
 
 + (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId == nil) {
-        NSLog(@"CleverPush: registerDeviceToken: subscriptionId is nil");
-        
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
@@ -1433,7 +1433,9 @@ static BOOL registrationInProgress = false;
 + (void)fireAppBannersListeners {
     pendingAppBannersRequest = NO;
     for (id (^listener)() in pendingAppBannersListeners) {
-        listener(appBanners);
+        if (listener) {
+            listener(appBanners);
+        }
     }
     pendingAppBannersListeners = [NSMutableArray new];
 }
