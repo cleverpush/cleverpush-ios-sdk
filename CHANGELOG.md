@@ -1,3 +1,6 @@
+# 0.5.3
+* Addded Bitcode Compiler Flags
+
 # 0.5.2
 * Check if callbacks are not nil before calling them
 
