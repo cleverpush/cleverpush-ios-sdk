@@ -64,7 +64,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -101,6 +101,8 @@ UIColor* brandingColor;
 UIColor* chatBackgroundColor;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
+int sessionVisits;
+long sessionStartedTimestamp;
 
 static id isNil(id object) {
     return object ?: [NSNull null];
@@ -318,6 +320,17 @@ BOOL handleSubscribedCalled = false;
     [userDefaults setInteger:appOpens forKey:@"CleverPush_APP_OPENS"];
     
     [self initFeatures];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
+}
+
+- (void)applicationWillEnterForeground {
+    
+}
+
+- (void)applicationDidEnterBackground {
+    
 }
 
 + (void)initFeatures {
@@ -1060,10 +1073,12 @@ static BOOL registrationInProgress = false;
 + (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
     NSLog(@"CleverPush: setNotificationDelivered @% @% @%", channelId, [notification valueForKey:@"_id"], subscriptionId);
     
+    NSString *notificationId = [notification valueForKey:@"_id"];
+    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
-                             [notification valueForKey:@"_id"], @"notificationId",
+                             notificationId, @"notificationId",
                              subscriptionId, @"subscriptionId",
                              nil];
     
@@ -1078,6 +1093,9 @@ static BOOL registrationInProgress = false;
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    
+    [userDefaults setObject:notificationId forKey:@"CleverPush_LAST_NOTIFICATION_ID"];
+    [userDefaults synchronize];
     
     NSMutableDictionary *notificationMutable = [notification mutableCopy];
     [notificationMutable removeObjectsForKeys:[notification allKeysForObject:[NSNull null]]];
@@ -1508,6 +1526,81 @@ static BOOL registrationInProgress = false;
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                 
             } onFailure:nil];
+        }];
+    });
+}
+
++ (void)trackSessionStart {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        [self getChannelConfig:^(NSDictionary* channelConfig) {
+            bool trackAppStatistics = [channelConfig valueForKey:@"trackAppStatistics"] != nil && ![[channelConfig valueForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig valueForKey:@"trackAppStatistics"] boolValue];
+            if (trackAppStatistics || subscriptionId) {
+                sessionVisits = 0;
+                sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
+                
+                if (!deviceToken) {
+                    deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
+                }
+                
+                NSUserDefaults* groupUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
+                NSString* lastNotificationId = [groupUserDefaults stringForKey:@"CleverPush_LAST_NOTIFICATION_ID"];
+                
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/session/start"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         subscriptionId, @"subscriptionId",
+                                         deviceToken, @"apnsToken",
+                                         isNil(lastNotificationId), @"lastNotificationId",
+                                         nil];
+                
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
+                
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                    
+                } onFailure:nil];
+            }
+        }];
+    });
+}
+
++ (void)increaseSessionVisits {
+    sessionVisits += 1;
+}
+
++ (void)trackSessionEnd {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        [self getChannelConfig:^(NSDictionary* channelConfig) {
+            bool trackAppStatistics = [channelConfig valueForKey:@"trackAppStatistics"] != nil && ![[channelConfig valueForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig valueForKey:@"trackAppStatistics"] boolValue];
+            if (trackAppStatistics || subscriptionId) {
+                if (!deviceToken) {
+                    deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
+                }
+
+                if (sessionStartedTimestamp == 0) {
+                    NSLog(@"CleverPush: Error tracking session end - session started timestamp is 0");
+                    return;
+                }
+                
+                long sessionEndedTimestamp = [[NSDate date] timeIntervalSince1970];
+                long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
+                
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/session/end"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         subscriptionId, @"subscriptionId",
+                                         deviceToken, @"apnsToken",
+                                         sessionVisits, @"visits",
+                                         sessionDuration, @"duration",
+                                         nil];
+                
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
+                
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                    
+                } onFailure:nil];
+            }
         }];
     });
 }

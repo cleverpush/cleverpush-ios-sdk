@@ -1,3 +1,6 @@
+# 0.5.4
+* Transmit last received notification
+
 # 0.5.3
 * Addded Bitcode Compiler Flags
 

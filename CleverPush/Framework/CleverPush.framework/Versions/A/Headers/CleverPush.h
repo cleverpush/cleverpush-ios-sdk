@@ -115,5 +115,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getChannelId;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
++ (void)increaseSessionVisits;
 
 @end
