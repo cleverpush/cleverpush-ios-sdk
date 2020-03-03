@@ -1,3 +1,6 @@
+# 0.5.5
+* Fixed a crash
+
 # 0.5.4
 * Transmit last received notification
 
