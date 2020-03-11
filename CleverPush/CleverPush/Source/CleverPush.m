@@ -64,7 +64,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.6";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -345,6 +345,15 @@ BOOL handleSubscribedCalled = false;
         
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil && [channelConfig valueForKey:@"appReviewEnabled"]) {
+            NSString* iosStoreId = [channelConfig valueForKey:@"iosStoreId"];
+            
+            if ([userDefaults objectForKey:@"CleverPush_APP_REVIEW_SHOWN"]) {
+                // already shown
+                return;
+            }
+            [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
+            [userDefaults synchronize];
+            
             int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
             if (!appReviewOpens) {
                 appReviewOpens = 0;
@@ -359,10 +368,27 @@ BOOL handleSubscribedCalled = false;
             }
             NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
               
-             NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
+            NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
             if (!appReviewTitle) {
-                appReviewTitle = @"Möchtest du unsere App im Store bewerten?";
+                appReviewTitle = @"Do you like our app?";
             }
+            
+            NSString *appReviewYes = [channelConfig valueForKey:@"appReviewYes"];
+            if (!appReviewYes) {
+                appReviewYes = @"Yes";
+            }
+            
+            NSString *appReviewNo = [channelConfig valueForKey:@"appReviewNo"];
+            if (!appReviewNo) {
+                appReviewNo = @"No";
+            }
+            
+            NSString *appReviewFeedbackTitle = [channelConfig valueForKey:@"appReviewFeedbackTitle"];
+            if (!appReviewFeedbackTitle) {
+                appReviewFeedbackTitle = @"Do you want to tell us what you do not like?";
+            }
+            
+            NSString *appReviewEmail = [channelConfig valueForKey:@"appReviewEmail"];
             
             if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= appReviewOpens && currentAppDays >= appReviewDays) {
                 NSLog(@"CleverPush: showing app review alert");
@@ -372,16 +398,46 @@ BOOL handleSubscribedCalled = false;
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
                                                                                              message:@""
                                                                                       preferredStyle:UIAlertControllerStyleAlert];
-                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:@"Ja"
+                    
+                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:appReviewYes
                                                                        style:UIAlertActionStyleDefault
                                                                      handler:^(UIAlertAction * action) {
-                        [SKStoreReviewController requestReview];
+                        if (iosStoreId == nil || [iosStoreId isKindOfClass:[NSNull class]]) {
+                            return;
+                        }
+                                                                         
+                        NSURL *storeUrl = [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/app/id%@?action=write-review", iosStoreId]];
+                        [[UIApplication sharedApplication] openURL:storeUrl options:@{} completionHandler:nil];
                     }];
                     [alertController addAction:actionYes];
-                    UIAlertAction *actionNo = [UIAlertAction actionWithTitle:@"Nein"
+                    
+                    UIAlertAction *actionNo = [UIAlertAction actionWithTitle:appReviewNo
                                                                        style:UIAlertActionStyleDefault
-                                                                     handler:nil];
+                                                                     handler:^(UIAlertAction * action) {
+                        if (appReviewEmail) {
+                            UIAlertController *alertFeedbackController = [UIAlertController alertControllerWithTitle:appReviewFeedbackTitle
+                                                                                                     message:@""
+                                                                                              preferredStyle:UIAlertControllerStyleAlert];
+                            
+                            UIAlertAction *actionFeedbackYes = [UIAlertAction actionWithTitle:appReviewYes
+                                                                               style:UIAlertActionStyleDefault
+                                                                             handler:^(UIAlertAction * action) {
+                                NSString *emailUrl = [NSString stringWithFormat:@"mailto:%@?subject=App Feedback", appReviewEmail];
+                                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
+                            }];
+                            [alertFeedbackController addAction:actionFeedbackYes];
+                            
+                            UIAlertAction *actionFeedbackNo = [UIAlertAction actionWithTitle:appReviewNo
+                                                                               style:UIAlertActionStyleDefault
+                                                                             handler:nil];
+                            [alertFeedbackController addAction:actionFeedbackNo];
+                            
+                            UIViewController* topViewController = [CleverPush topViewController];
+                            [topViewController presentViewController:alertController animated:YES completion:nil];
+                        }
+                    }];
                     [alertController addAction:actionNo];
+                    
                     UIViewController* topViewController = [CleverPush topViewController];
                     [topViewController presentViewController:alertController animated:YES completion:nil];
                 });

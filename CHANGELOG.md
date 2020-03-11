@@ -1,3 +1,6 @@
+# 0.5.6
+* Changed App Review behaviour
+
 # 0.5.5
 * Fixed a crash
 
