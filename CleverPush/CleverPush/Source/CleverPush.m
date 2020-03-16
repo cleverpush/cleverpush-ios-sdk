@@ -64,7 +64,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.6";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.7";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -336,6 +336,7 @@ BOOL handleSubscribedCalled = false;
 
 + (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        [self showPendingTopicsDialog];
         [self initAppReview];
     });
 }
@@ -422,8 +423,16 @@ BOOL handleSubscribedCalled = false;
                             UIAlertAction *actionFeedbackYes = [UIAlertAction actionWithTitle:appReviewYes
                                                                                style:UIAlertActionStyleDefault
                                                                              handler:^(UIAlertAction * action) {
-                                NSString *emailUrl = [NSString stringWithFormat:@"mailto:%@?subject=App Feedback", appReviewEmail];
-                                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
+                                NSString *emailUrl = [NSString stringWithFormat:@"mailto:%@?subject=App+Feedback", appReviewEmail];
+                                if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0){
+                                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl] options:@{} completionHandler:^(BOOL success) {
+                                        if (!success) {
+                                            NSLog(@"CleverPush: failed to open mail app: %@", emailUrl);
+                                        }
+                                    }];
+                                } else {
+                                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
+                                }
                             }];
                             [alertFeedbackController addAction:actionFeedbackYes];
                             
@@ -433,7 +442,7 @@ BOOL handleSubscribedCalled = false;
                             [alertFeedbackController addAction:actionFeedbackNo];
                             
                             UIViewController* topViewController = [CleverPush topViewController];
-                            [topViewController presentViewController:alertController animated:YES completion:nil];
+                            [topViewController presentViewController:alertFeedbackController animated:YES completion:nil];
                         }
                     }];
                     [alertController addAction:actionNo];
@@ -672,8 +681,12 @@ BOOL handleSubscribedCalled = false;
                                             [self setSubscriptionTopics:selectedTopicIds];
                                         }
                                     }
+
+                                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                    [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+                                    [userDefaults synchronize];
                                     
-                                    [self showTopicsDialog];
+                                    [self showPendingTopicsDialog];
                                 }
                             }
                         }];
@@ -1687,6 +1700,43 @@ static BOOL registrationInProgress = false;
         [currentChatView removeFromSuperview];
     }
     currentChatView = chatView;
+}
+
++ (void)showPendingTopicsDialog {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    if (![userDefaults boolForKey:@"CleverPush_TOPICS_DIALOG_PENDING"]) {
+        return;
+    }
+    
+    int topicsDialogSessions = (int)[[channelConfig valueForKey:@"topicsDialogMinimumSessions"] integerValue];
+    if (!topicsDialogSessions) {
+        topicsDialogSessions = 0;
+    }
+    int topicsDialogDays = (int)[[channelConfig valueForKey:@"topicsDialogMinimumDays"] integerValue];
+    if (!topicsDialogDays) {
+        topicsDialogDays = 0;
+    }
+    int topicsDialogSeconds = (int)[[channelConfig valueForKey:@"topicsDialogMinimumSeconds"] integerValue];
+    if (!topicsDialogSeconds) {
+        topicsDialogSeconds = 0;
+    }
+    NSInteger currentTopicsDialogDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
+
+    if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= topicsDialogSessions && currentTopicsDialogDays >= topicsDialogDays) {
+        NSLog(@"CleverPush: showing pending topics dialog");
+        
+        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * topicsDialogSeconds);
+        dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+            if (![userDefaults boolForKey:@"CleverPush_TOPICS_DIALOG_PENDING"]) {
+                return;
+            }
+            
+            [userDefaults setBool:NO forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+            [userDefaults synchronize];
+            
+            [self showTopicsDialog];
+        });
+    }
 }
 
 + (void)showTopicsDialog {

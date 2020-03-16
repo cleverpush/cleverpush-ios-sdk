@@ -1,3 +1,7 @@
+# 0.5.7
+* Added ability to show topics dialog after opens / days / seconds
+* Minor App Review fix
+
 # 0.5.6
 * Changed App Review behaviour
 
