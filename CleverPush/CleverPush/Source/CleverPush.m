@@ -64,7 +64,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.7";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.8";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -352,8 +352,6 @@ BOOL handleSubscribedCalled = false;
                 // already shown
                 return;
             }
-            [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
-            [userDefaults synchronize];
             
             int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
             if (!appReviewOpens) {
@@ -367,7 +365,7 @@ BOOL handleSubscribedCalled = false;
             if (!appReviewSeconds) {
                 appReviewSeconds = 0;
             }
-            NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
+            NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] andDate:[NSDate date]] : 0;
               
             NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
             if (!appReviewTitle) {
@@ -396,6 +394,13 @@ BOOL handleSubscribedCalled = false;
                 
                 dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
                 dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+                    if ([userDefaults objectForKey:@"CleverPush_APP_REVIEW_SHOWN"]) {
+                        return;
+                    }
+                    
+                    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
+                    [userDefaults synchronize];
+                    
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
                                                                                              message:@""
                                                                                       preferredStyle:UIAlertControllerStyleAlert];
