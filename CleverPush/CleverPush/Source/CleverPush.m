@@ -61,10 +61,18 @@
 
 @end
 
+@interface CPPendingCallbacks : NSObject
+ @property CPResultSuccessBlock successBlock;
+ @property CPFailureBlock failureBlock;
+@end
+
+@implementation CPPendingCallbacks
+@end
+
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.9";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -82,7 +90,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
-NSDictionary* channelConfig;
+static NSDictionary* channelConfig;
 BOOL pendingChannelConfigRequest = NO;
 NSMutableArray* pendingChannelConfigListeners;
 NSArray* appBanners;
@@ -198,6 +206,7 @@ BOOL handleSubscribedCalled = false;
     handleSubscribed = subscribedCallback;
     autoRegister = autoRegisterParam;
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
+    channelConfig = nil;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingAppBannersListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
@@ -508,9 +517,14 @@ BOOL handleSubscribedCalled = false;
 
 + (void)fireChannelConfigListeners {
     pendingChannelConfigRequest = NO;
-    for (id (^listener)() in pendingChannelConfigListeners) {
-        if (listener) {
-            listener(channelConfig);
+    
+    for (void (^listener)(NSDictionary *) in pendingChannelConfigListeners) {
+        
+        // NSLog(@"CleverPush: pendingChannelConfigListener channelConfig %@", channelConfig);
+        // check if listener and channelConfig are non-nil (otherwise: EXC_BAD_ACCESS)
+        if (listener && channelConfig) {
+            __strong void (^callbackBlock)(NSDictionary *) = listener;
+            callbackBlock(channelConfig);
         }
     }
     pendingChannelConfigListeners = [NSMutableArray new];
@@ -522,7 +536,7 @@ BOOL handleSubscribedCalled = false;
         return;
     }
 
-    [pendingChannelConfigListeners addObject:[callback copy]];
+    [pendingChannelConfigListeners addObject:callback];
     if (pendingChannelConfigRequest) {
         return;
     }

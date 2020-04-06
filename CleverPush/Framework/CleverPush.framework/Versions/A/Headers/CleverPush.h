@@ -37,6 +37,9 @@ typedef void (^CPHandleSubscribedBlock)(NSString * result);
 typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult * result);
 typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult * result);
 
+typedef void (^CPResultSuccessBlock)(NSDictionary* result);
+typedef void (^CPFailureBlock)(NSError* error);
+
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
 @interface CleverPush : NSObject
