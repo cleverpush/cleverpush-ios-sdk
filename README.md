@@ -2,4 +2,4 @@
 
 ## Documentation
 
-https://developers.cleverpush.com/sdks/ios/
+https://developers.cleverpush.com/
