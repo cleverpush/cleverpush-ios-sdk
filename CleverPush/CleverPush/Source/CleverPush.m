@@ -72,7 +72,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.10";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.11";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -760,7 +760,30 @@ BOOL handleSubscribedCalled = false;
     }
 }
 
++ (void)clearSubscriptionData {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    handleSubscribedCalled = false;
+    subscriptionId = nil;
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+}
+
 + (void)unsubscribe {
+    [self unsubscribe:^(BOOL success) {
+        if (success) {
+            NSLog(@"CleverPush: unsubscribe success");
+        } else {
+            NSLog(@"CleverPush: unsubscribe failure");
+        }
+    }];
+}
+
++ (void)unsubscribe:(void(^)(BOOL))callback {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+    
     if (subscriptionId) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -770,13 +793,17 @@ BOOL handleSubscribedCalled = false;
         
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:nil onFailure:nil];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            [self clearSubscriptionData];
+            callback(YES);
+        } onFailure:^(NSError* error) {
+            [self clearSubscriptionData];
+            callback(NO);
+        }];
         
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        subscriptionId = nil;
-        handleSubscribedCalled = false;
+    } else {
+        [self clearSubscriptionData];
+        callback(YES);
     }
 }
 
@@ -822,8 +849,9 @@ BOOL handleSubscribedCalled = false;
     }
 
     if ([deviceToken isEqualToString:newDeviceToken]) {
-        if (successBlock)
+        if (successBlock) {
             successBlock(nil);
+        }
         return;
     }
 
