@@ -1,3 +1,6 @@
+# 0.5.10
+* Fixed `autoRegister: false` behaviour
+
 # 0.5.9
 * Fixed crashes
 

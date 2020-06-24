@@ -72,7 +72,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.9";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.10";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -303,7 +303,7 @@ BOOL handleSubscribedCalled = false;
         registeredWithApple = deviceToken != nil;
     }
     
-    if (autoRegister || registeredWithApple) {
+    if (autoRegister) {
         [self subscribe];
     }
     
@@ -422,7 +422,11 @@ BOOL handleSubscribedCalled = false;
                         }
                                                                          
                         NSURL *storeUrl = [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/app/id%@?action=write-review", iosStoreId]];
-                        [[UIApplication sharedApplication] openURL:storeUrl options:@{} completionHandler:nil];
+                        if (@available(iOS 10.0, *)) {
+                            [[UIApplication sharedApplication] openURL:storeUrl options:@{} completionHandler:nil];
+                        } else {
+                            // Fallback on earlier versions
+                        }
                     }];
                     [alertController addAction:actionYes];
                     
@@ -439,11 +443,15 @@ BOOL handleSubscribedCalled = false;
                                                                              handler:^(UIAlertAction * action) {
                                 NSString *emailUrl = [NSString stringWithFormat:@"mailto:%@?subject=App+Feedback", appReviewEmail];
                                 if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0){
-                                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl] options:@{} completionHandler:^(BOOL success) {
-                                        if (!success) {
-                                            NSLog(@"CleverPush: failed to open mail app: %@", emailUrl);
-                                        }
-                                    }];
+                                    if (@available(iOS 10.0, *)) {
+                                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl] options:@{} completionHandler:^(BOOL success) {
+                                            if (!success) {
+                                                NSLog(@"CleverPush: failed to open mail app: %@", emailUrl);
+                                            }
+                                        }];
+                                    } else {
+                                        // Fallback on earlier versions
+                                    }
                                 } else {
                                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
                                 }
@@ -1160,7 +1168,6 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
-    NSLog(@"CleverPush: setNotificationDelivered @% @% @%", channelId, [notification valueForKey:@"_id"], subscriptionId);
     
     NSString *notificationId = [notification valueForKey:@"_id"];
     
@@ -1269,8 +1276,6 @@ static BOOL registrationInProgress = false;
     NSError* jsonError = nil;
     NSMutableDictionary* innerJson;
 
-    NSLog(@"CleverPush: HTTP <- %d", statusCode);
-    
     if (data != nil && [data length] > 0) {
         innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
         if (jsonError) {
