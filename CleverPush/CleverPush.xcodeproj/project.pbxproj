@@ -56,6 +56,7 @@
 /* Begin PBXBuildFile section */
 		294F7E8E23FB5DF800806D23 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */; };
 		294F7E9023FB5E0200806D23 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 294F7E8F23FB5E0200806D23 /* SystemConfiguration.framework */; };
+		2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2969757824C0FD8F009563C6 /* JavaScriptCore.framework */; };
 		296FA74B2341195900E20FFD /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 296FA74A2341195900E20FFD /* PopupView.m */; };
 		296FA7512341313200E20FFD /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 296FA74C2341197100E20FFD /* PopupView.h */; };
 		297B4E261E58A16600BAF990 /* CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 297B4E211E58A16600BAF990 /* CleverPush.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -138,6 +139,7 @@
 /* Begin PBXFileReference section */
 		294F7E7623FB5DB500806D23 /* CleverPushLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPushLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		294F7E8F23FB5E0200806D23 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		2969757824C0FD8F009563C6 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		296FA74A2341195900E20FFD /* PopupView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PopupView.m; sourceTree = "<group>"; };
 		296FA74C2341197100E20FFD /* PopupView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PopupView.h; sourceTree = "<group>"; };
 		297B4DF51E589AFE00BAF990 /* CleverPush.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPush.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -202,6 +204,7 @@
 			files = (
 				29DB961B23FC9324008FC985 /* StoreKit.framework in Frameworks */,
 				29D71E7F23807E1700C48ACA /* WebKit.framework in Frameworks */,
+				2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */,
 				29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */,
 				29DB95C923FC1B70008FC985 /* UserNotifications.framework in Frameworks */,
 				29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */,
@@ -273,6 +276,7 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2969757824C0FD8F009563C6 /* JavaScriptCore.framework */,
 				29DB961A23FC9324008FC985 /* StoreKit.framework */,
 				29DB95C823FC1B70008FC985 /* UserNotifications.framework */,
 				294F7E8F23FB5E0200806D23 /* SystemConfiguration.framework */,

@@ -1,3 +1,6 @@
+# 0.6.0
+* Introduced automatic assignment of tags with `trackPageView` method
+
 # 0.5.11
 * Fixed `unsubscribe` edge cases
 * Added async unsubscribe callback
