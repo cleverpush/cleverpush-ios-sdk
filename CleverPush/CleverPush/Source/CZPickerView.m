@@ -105,7 +105,10 @@
 }
 
 - (void)show {
-    UIWindow *mainWindow = [[[UIApplication sharedApplication] delegate] window];
+    UIWindow *mainWindow = [[[UIApplication sharedApplication] windows] firstObject];
+    if (!mainWindow) {
+        return;
+    }
     self.frame = [UIScreen mainScreen].bounds;
     [self showInContainer:mainWindow];
 }

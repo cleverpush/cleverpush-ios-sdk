@@ -19,6 +19,7 @@
 #import <objc/runtime.h>
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000
 #import <UserNotifications/UserNotifications.h>
+#import <JavaScriptCore/JavaScriptCore.h>
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -84,6 +85,8 @@ CPChatView* currentChatView;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
+NSString* currentPageUrl;
+NSMutableDictionary* autoAssignSessionsCounted;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
 CPFailureBlock cpTokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
@@ -210,6 +213,7 @@ BOOL handleSubscribedCalled = false;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingAppBannersListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
+    autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     
     if (self) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -760,7 +764,30 @@ BOOL handleSubscribedCalled = false;
     }
 }
 
++ (void)clearSubscriptionData {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    handleSubscribedCalled = false;
+    subscriptionId = nil;
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+}
+
 + (void)unsubscribe {
+    [self unsubscribe:^(BOOL success) {
+        if (success) {
+            NSLog(@"CleverPush: unsubscribe success");
+        } else {
+            NSLog(@"CleverPush: unsubscribe failure");
+        }
+    }];
+}
+
++ (void)unsubscribe:(void(^)(BOOL))callback {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+    
     if (subscriptionId) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -770,13 +797,17 @@ BOOL handleSubscribedCalled = false;
         
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:nil onFailure:nil];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            [self clearSubscriptionData];
+            callback(YES);
+        } onFailure:^(NSError* error) {
+            [self clearSubscriptionData];
+            callback(NO);
+        }];
         
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        subscriptionId = nil;
-        handleSubscribedCalled = false;
+    } else {
+        [self clearSubscriptionData];
+        callback(YES);
     }
 }
 
@@ -822,8 +853,9 @@ BOOL handleSubscribedCalled = false;
     }
 
     if ([deviceToken isEqualToString:newDeviceToken]) {
-        if (successBlock)
+        if (successBlock) {
             successBlock(nil);
+        }
         return;
     }
 
@@ -1307,74 +1339,88 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)addSubscriptionTag:(NSString*)tagId {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             tagId, @"tagId",
-                             [self getSubscriptionId], @"subscriptionId",
-                             nil];
+    NSLog(@"CleverPush: addSubscriptionTag: %@", tagId);
     
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    __block NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
     
-    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
-        if (!subscriptionTags) {
-            subscriptionTags = [[NSMutableArray alloc] init];
-        }
+    if ([subscriptionTags containsObject:tagId]) {
+        NSLog(@"CleverPush: addSubscriptionTag - already has tag, skipping API call");
+        return;
+    }
+    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 tagId, @"tagId",
+                                 [self getSubscriptionId], @"subscriptionId",
+                                 nil];
         
-        if (![subscriptionTags containsObject:tagId]) {
-            [subscriptionTags addObject:tagId];
-        }
-        [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
-        [userDefaults synchronize];
-    } onFailure:nil];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            if (!subscriptionTags) {
+                subscriptionTags = [[NSMutableArray alloc] init];
+            }
+            
+            if (![subscriptionTags containsObject:tagId]) {
+                [subscriptionTags addObject:tagId];
+            }
+            [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+            [userDefaults synchronize];
+        } onFailure:nil];
+    });
 }
 
 + (void)removeSubscriptionTag:(NSString*)tagId {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             tagId, @"tagId",
-                             [self getSubscriptionId], @"subscriptionId",
-                             nil];
-    
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
-        if (!subscriptionTags) {
-            subscriptionTags = [[NSMutableArray alloc] init];
-        }
-        [subscriptionTags removeObject:tagId];
-        [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
-        [userDefaults synchronize];
-    } onFailure:nil];
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 tagId, @"tagId",
+                                 [self getSubscriptionId], @"subscriptionId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+            if (!subscriptionTags) {
+                subscriptionTags = [[NSMutableArray alloc] init];
+            }
+            [subscriptionTags removeObject:tagId];
+            [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+            [userDefaults synchronize];
+        } onFailure:nil];
+    });
 }
 
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/attribute"];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             attributeId, @"attributeId",
-                             value, @"value",
-                             [self getSubscriptionId], @"subscriptionId",
-                             nil];
-    
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
-        if (!subscriptionAttributes) {
-            subscriptionAttributes = [[NSMutableDictionary alloc] init];
-        }
-        [subscriptionAttributes setValue:value forKey:attributeId];
-        [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
-        [userDefaults synchronize];
-    } onFailure:nil];
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/attribute"];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 attributeId, @"attributeId",
+                                 value, @"value",
+                                 [self getSubscriptionId], @"subscriptionId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+            if (!subscriptionAttributes) {
+                subscriptionAttributes = [[NSMutableDictionary alloc] init];
+            }
+            [subscriptionAttributes setValue:value forKey:attributeId];
+            [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+            [userDefaults synchronize];
+        } onFailure:nil];
+    });
 }
 
 + (NSArray*)getAvailableTags {
@@ -1625,6 +1671,217 @@ static BOOL registrationInProgress = false;
             } onFailure:nil];
         }];
     });
+}
+
++ (void)autoAssignTagMatches:(NSDictionary*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback {
+    NSString* path = [tag valueForKey:@"autoAssignPath"];
+    if (path != nil) {
+        if ([path isEqualToString:@"[EMPTY]"]) {
+            path = @"";
+        }
+        if ([pathname rangeOfString:path options:NSRegularExpressionSearch].location != NSNotFound) {
+            callback(YES);
+            return;
+        }
+    }
+
+    NSString* function = [tag valueForKey:@"autoAssignFunction"];
+    if (function != nil && params != nil) {
+        JSContext *context = [[JSContext alloc] initWithVirtualMachine:[[JSVirtualMachine alloc] init]];
+        [context evaluateScript:[NSString stringWithFormat:@"var _cp_autoAssignTagResult = function(params) { return %@ }", function]];
+        BOOL result = [[context[@"_cp_autoAssignTagResult"] callWithArguments:@[params]] toBool];
+
+        if (result) {
+            callback(YES);
+        } else {
+            callback(NO);
+        }
+        return;
+    }
+
+    if ([tag valueForKey:@"autoAssignSelector"] != nil) {
+        // not implemented
+        callback(NO);
+        return;
+    }
+    
+    NSLog(@"CleverPush: autoAssignTagMatches - no detection method found %@ %@", pathname, params);
+    
+    callback(NO);
+}
+
++ (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params {
+    NSURL* url = [NSURL URLWithString:urlStr];
+    NSString* pathname = [url path];
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+
+    [self getAvailableTags:^(NSArray *tags) {
+        for (NSDictionary* tag in tags) {
+            [self autoAssignTagMatches:tag pathname:pathname params:params callback:^(BOOL tagMatches) {
+                if (tagMatches) {
+                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:YES %@", [tag objectForKey:@"name"]);
+                    
+                    NSString* tagId = [tag valueForKey:@"_id"];
+                    NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
+                    NSString* sessionsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessions-%@", tagId];
+                    
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    [dateFormatter setDateFormat:@"dd-MM-yyyy"];
+
+                    int autoAssignVisits = [[tag valueForKey:@"autoAssignVisits"] intValue];
+
+                    NSString *dateKey = [dateFormatter stringFromDate:[NSDate date]];
+                    
+                    NSDate *dateAfter = nil;
+                    
+                    int autoAssignDays = [[tag valueForKey:@"autoAssignDays"] intValue];
+                    if (autoAssignDays > 0) {
+                        dateAfter = [[NSDate date] dateByAddingTimeInterval:-1*autoAssignDays*24*60*60];
+                    }
+
+                    int visits = 0;
+                    NSMutableDictionary* dailyVisits = [[NSMutableDictionary alloc] init];
+                    if (autoAssignDays > 0 && dateAfter != nil) {
+                        dailyVisits = [userDefaults objectForKey:visitsStorageKey];
+
+                        for (NSString* curDateKey in dailyVisits) {
+                            NSDate *currDate = [dateFormatter dateFromString:curDateKey];
+                            
+                            if ([currDate timeIntervalSinceDate:dateAfter] >= 0) {
+                                visits += [[dailyVisits objectForKey:curDateKey] integerValue];
+                            } else {
+                                [dailyVisits removeObjectForKey:curDateKey];
+                            }
+                        }
+                        /*
+                        try {
+                            
+                        } catch (Exception err) {
+                            dailyVisits = [[NSMutableDictionary alloc] init];
+                        }
+                         */
+                    } else {
+                        visits = (int) [userDefaults integerForKey:visitsStorageKey];
+                    }
+                    
+                    int autoAssignSessions = [[tag valueForKey:@"autoAssignSessions"] intValue];
+                    int autoAssignSeconds = [[tag valueForKey:@"autoAssignSeconds"] intValue];
+
+                    int sessions = 0;
+                    NSMutableDictionary* dailySessions = [[NSMutableDictionary alloc] init];
+                    if (autoAssignDays > 0 && dateAfter != nil) {
+                        dailySessions = [userDefaults objectForKey:sessionsStorageKey];
+                        
+                        for (NSString* curDateKey in dailySessions) {
+                            NSDate *currDate = [dateFormatter dateFromString:curDateKey];
+                            
+                            if ([currDate timeIntervalSinceDate:dateAfter] >= 0) {
+                                sessions += [[dailySessions objectForKey:curDateKey] integerValue];
+                            } else {
+                                [dailySessions removeObjectForKey:curDateKey];
+                            }
+                        }
+                        /*
+                        try {
+                            
+                        } catch (Exception err) {
+                            dailySessions = new HashMap<>();
+                        }
+                         */
+                    } else {
+                        sessions = (int) [userDefaults integerForKey:sessionsStorageKey];
+                    }
+
+                    if (sessions >= autoAssignSessions) {
+                        if (visits >= autoAssignVisits) {
+                            if (autoAssignSeconds > 0) {
+                                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(autoAssignSeconds * NSEC_PER_SEC));
+                                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                    if ([currentPageUrl isEqualToString:urlStr]) {
+                                        [self addSubscriptionTag:tagId];
+                                    }
+                                });
+                            } else {
+                                [self addSubscriptionTag:tagId];
+                            }
+                        } else {
+                            if (autoAssignDays > 0) {
+                                int dateVisits = 0;
+                                if ([dailyVisits objectForKey:dateKey] == nil) {
+                                    [dailyVisits setValue:0 forKey:dateKey];
+                                } else {
+                                    dateVisits = [[dailyVisits valueForKey:dateKey] intValue];
+                                }
+                                dateVisits += 1;
+                                [dailyVisits setObject:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
+
+                                [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
+                                [userDefaults synchronize];
+                            } else {
+                                visits += 1;
+                                [userDefaults setInteger:visits forKey:visitsStorageKey];
+                                [userDefaults synchronize];
+                            }
+                        }
+                    } else {
+                        if (autoAssignDays > 0) {
+                            int dateVisits = 0;
+                            if ([dailyVisits objectForKey:dateKey] == nil) {
+                                [dailyVisits setValue:0 forKey:dateKey];
+                            } else {
+                                dateVisits = [[dailyVisits objectForKey:dateKey] intValue];
+                            }
+                            dateVisits += 1;
+                            [dailyVisits setValue:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
+
+                            [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
+                            [userDefaults synchronize];
+
+                            if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
+                                int dateSessions = 0;
+                                if ([dailySessions objectForKey:dateKey] == nil) {
+                                    [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
+                                } else {
+                                    dateSessions = [[dailySessions valueForKey:dateKey] intValue];
+                                }
+                                dateSessions += 1;
+                                [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
+
+                                [autoAssignSessionsCounted setValue:false forKey:tagId];
+                                
+                                [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
+                                [userDefaults synchronize];
+                            }
+                        } else {
+                            visits += 1;
+                            [userDefaults setInteger:visits forKey:visitsStorageKey];
+                            [userDefaults synchronize];
+
+                            if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
+                                sessions += 1;
+                                [userDefaults setInteger:visits forKey:sessionsStorageKey];
+                                [userDefaults synchronize];
+
+                                [autoAssignSessionsCounted setValue:false forKey:tagId];
+                            }
+                        }
+                    }
+                } else {
+                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:NO %@", [tag objectForKey:@"name"]);
+                }
+            }];
+        }
+    }];
+}
+
++ (void)trackPageView:(NSString*)url {
+    [self trackPageView:url params:nil];
+}
+
++ (void)trackPageView:(NSString*)url params:(NSDictionary*)params {
+    currentPageUrl = url;
+    
+    [self checkTags:url params:params];
 }
 
 + (void)trackSessionStart {

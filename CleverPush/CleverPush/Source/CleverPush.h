@@ -70,6 +70,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
 + (void)unsubscribe;
++ (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
 
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
@@ -118,6 +119,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getChannelId;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
++ (void)trackPageView:(NSString*)url;
++ (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
 + (void)increaseSessionVisits;
 
 @end
