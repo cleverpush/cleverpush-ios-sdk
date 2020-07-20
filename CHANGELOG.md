@@ -1,3 +1,6 @@
+# 0.6.1
+* Use country from NSLocale
+
 # 0.6.0
 * Introduced automatic assignment of tags with `trackPageView` method
 
