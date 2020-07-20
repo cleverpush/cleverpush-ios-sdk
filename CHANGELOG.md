@@ -1,3 +1,6 @@
+# 0.6.2
+* Added `action` to `NotificationOpenedResult`
+
 # 0.6.1
 * Use country from NSLocale
 

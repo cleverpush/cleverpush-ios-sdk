@@ -159,7 +159,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (void)cleverPushLocalNotificationOpened:(UIApplication*)application handleActionWithIdentifier:(NSString*)identifier forLocalNotification:(UILocalNotification*)notification completionHandler:(void(^)()) completionHandler {
     if ([CleverPush channelId]) {
-        [CleverPush processLocalActionBasedNotification:notification identifier:identifier];
+        [CleverPush processLocalActionBasedNotification:notification actionIdentifier:identifier];
     }
     
     if ([self respondsToSelector:@selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:)]) {
@@ -171,7 +171,7 @@ static NSArray* delegateSubclasses = nil;
 
 - (void)cleverPushLocalNotificationOpened:(UIApplication*)application notification:(UILocalNotification*)notification {
     if ([CleverPush channelId])
-        [CleverPush processLocalActionBasedNotification:notification identifier:@"__DEFAULT__"];
+        [CleverPush processLocalActionBasedNotification:notification actionIdentifier:@"__DEFAULT__"];
     
     if ([self respondsToSelector:@selector(cleverPushLocalNotificationOpened:notification:)]) {
         [self cleverPushLocalNotificationOpened:application notification:notification];

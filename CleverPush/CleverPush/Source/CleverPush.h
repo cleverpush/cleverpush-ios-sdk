@@ -25,7 +25,8 @@
 @property(readonly)NSDictionary* payload;
 @property(readonly)NSDictionary* notification;
 @property(readonly)NSDictionary* subscription;
--(instancetype)initWithPayload:(NSDictionary *)payload;
+@property(readonly)NSString* action;
+-(instancetype)initWithPayload:(NSDictionary *)payload action:(NSString*)action;
 
 @end;
 
@@ -75,12 +76,12 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
-+ (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive;
++ (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
 + (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
-+ (void)processLocalActionBasedNotification:(UILocalNotification*) notification identifier:(NSString*)identifier;
++ (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
 
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;

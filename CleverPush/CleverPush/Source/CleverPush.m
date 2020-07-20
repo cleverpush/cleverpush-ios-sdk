@@ -28,13 +28,43 @@
     self = [super init];
     if (self) {
         _payload = inPayload;
-        _notification = [_payload valueForKey:@"notification"];
+        
+        _notification = [[_payload valueForKey:@"notification"] mutableCopy];
+        
         if ([_notification valueForKey:@"title"] == nil) {
             [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
         }
         if ([_notification valueForKey:@"text"] == nil) {
             [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
         }
+        
+        NSArray* actions = [_notification objectForKey:@"actions"];
+        if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {
+            NSMutableArray* actionArray = [NSMutableArray new];
+            [actions enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
+                NSString* actionId = [NSString stringWithFormat: @"%@", @(idx)];
+                
+                NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
+                
+                [action setValue:actionId forKey:@"id"];
+                if ([item valueForKey:@"title"]) {
+                    [action setValue:[item valueForKey:@"title"] forKey:@"title"];
+                }
+                if ([item valueForKey:@"url"]) {
+                    [action setValue:[item valueForKey:@"url"] forKey:@"url"];
+                }
+                if ([item valueForKey:@"type"]) {
+                    [action setValue:[item valueForKey:@"type"] forKey:@"type"];
+                }
+                if ([item valueForKey:@"customData"]) {
+                    [action setValue:[item valueForKey:@"customData"] forKey:@"customData"];
+                }
+                
+                [actionArray addObject:action];
+            }];
+            [_notification setValue:actionArray forKey:@"actions"];
+        }
+        
         _subscription = [_payload valueForKey:@"subscription"];
     }
     return self;
@@ -44,18 +74,49 @@
 
 @implementation CPNotificationOpenedResult
 
-- (instancetype)initWithPayload:(NSDictionary *)inPayload {
+- (instancetype)initWithPayload:(NSDictionary *)inPayload action:(NSString*)action {
     self = [super init];
     if (self) {
         _payload = inPayload;
-        _notification = [_payload valueForKey:@"notification"];
+        
+        _notification = [[_payload valueForKey:@"notification"] mutableCopy];
         if ([_notification valueForKey:@"title"] == nil) {
             [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
         }
         if ([_notification valueForKey:@"text"] == nil) {
             [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
         }
+        
+        NSArray* actions = [_notification objectForKey:@"actions"];
+        if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {
+            NSMutableArray* actionArray = [NSMutableArray new];
+            [actions enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
+                NSString* actionId = [NSString stringWithFormat: @"%@", @(idx)];
+                
+                NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
+                
+                [action setValue:actionId forKey:@"id"];
+                if ([item valueForKey:@"title"]) {
+                    [action setValue:[item valueForKey:@"title"] forKey:@"title"];
+                }
+                if ([item valueForKey:@"url"]) {
+                    [action setValue:[item valueForKey:@"url"] forKey:@"url"];
+                }
+                if ([item valueForKey:@"type"]) {
+                    [action setValue:[item valueForKey:@"type"] forKey:@"type"];
+                }
+                if ([item valueForKey:@"customData"]) {
+                    [action setValue:[item valueForKey:@"customData"] forKey:@"customData"];
+                }
+                
+                [actionArray addObject:action];
+            }];
+            [_notification setValue:actionArray forKey:@"actions"];
+        }
+        
         _subscription = [_payload valueForKey:@"subscription"];
+        
+        _action = action;
     }
     return self;
 }
@@ -73,7 +134,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.6.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.6.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1149,7 +1210,7 @@ static BOOL registrationInProgress = false;
     return startedBackgroundJob;
 }
 
-+ (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive {
++ (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
@@ -1158,9 +1219,15 @@ static BOOL registrationInProgress = false;
     }
     lastNotificationOpenedId = notificationId;
     
-    NSLog(@"CleverPush: handleNotificationOpened, %@", payload);
+    NSString* action = actionIdentifier;
     
-    [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"]];
+    if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
+        action = nil;
+    }
+    
+    NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
+    
+    [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
 
     if (autoClearBadge) {
         [self clearBadge:true];
@@ -1177,12 +1244,12 @@ static BOOL registrationInProgress = false;
         return;
     }
 
-    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload];
+    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
 
     handleNotificationOpened(result);
 }
 
-+ (void)processLocalActionBasedNotification:(UILocalNotification*) notification identifier:(NSString*)identifier {
++ (void)processLocalActionBasedNotification:(UILocalNotification*)notification actionIdentifier:(NSString*)actionIdentifier {
     if (!notification.userInfo) {
         return;
     }
@@ -1193,8 +1260,7 @@ static BOOL registrationInProgress = false;
     [self handleNotificationReceived:notification.userInfo isActive:isActive];
     
     if (!isActive) {
-        [self handleNotificationOpened:notification.userInfo
-                              isActive:isActive];
+        [self handleNotificationOpened:notification.userInfo isActive:isActive actionIdentifier:actionIdentifier];
     }
 }
 
@@ -1241,18 +1307,22 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)setNotificationClicked:(NSString*)notificationId {
-    [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
+    [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
 }
 
-+ (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
-    NSLog(@"CleverPush: setNotificationClicked %@ %@ %@", notificationId, channelId, subscriptionId);
++ (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+    NSLog(@"CleverPush: setNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, channelId, subscriptionId, action);
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/clicked"];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+    NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                              channelId, @"channelId",
                              notificationId, @"notificationId",
                              subscriptionId, @"subscriptionId",
                              nil];
+    
+    if (action != nil) {
+        [dataDic setValue:action forKey:@"action"];
+    }
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
