@@ -72,7 +72,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"0.5.10";
+NSString * const CLEVERPUSH_SDK_VERSION = @"0.6.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -858,9 +858,12 @@ static BOOL registrationInProgress = false;
     
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
-    NSString* country = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
     if (!language) {
         language = [[NSLocale preferredLanguages] firstObject];
+    }
+    NSString* country = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+    if (!country) {
+        country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
     }
     NSString* timezone = [[NSTimeZone localTimeZone] name];
     
