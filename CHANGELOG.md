@@ -1,3 +1,6 @@
+# 1.0.0
+* Added `setTrackingConsentRequired` and `setTrackingConsent` methods. If the tracking consent is required, tags, attributes and session tracking will only fire if the user gave his consent.
+
 # 0.6.2
 * Added `action` to `NotificationOpenedResult`
 
