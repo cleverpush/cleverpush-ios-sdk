@@ -104,6 +104,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
 + (void)setSubscriptionLanguage:(NSString*)language;
 + (void)setSubscriptionCountry:(NSString*)country;
++ (void)setTopicsDialogWindow:(UIWindow *)window;
 + (NSMutableArray*)getSubscriptionTopics;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)setBrandingColor:(UIColor *)color;

@@ -1,3 +1,6 @@
+# 1.0.2
+* Added `setTopicsDialogWindow` method
+
 # 1.0.1
 * Ability to specify `window` for `showTopicsDialog`
 
