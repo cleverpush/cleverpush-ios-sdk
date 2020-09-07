@@ -113,6 +113,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setAutoClearBadge:(BOOL)autoClear;
 + (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
++ (void)showTopicsDialog:(UIWindow *)targetWindow;
 + (void)showAppBanners;
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback;
 + (void)reLayoutAppBanner;

@@ -101,6 +101,9 @@ didConfirmWithItemsAtRows:(NSArray *)rows;
 
 @property id<CZPickerViewDataSource> dataSource;
 
+/** whether allow tap background to dismiss the picker, default YES */
+@property UIWindow* window;
+
 /** whether to show footer (including confirm and cancel buttons), default NO */
 @property BOOL needFooterView;
 

@@ -105,17 +105,13 @@
 }
 
 - (void)show {
-    UIWindow *mainWindow = [[[UIApplication sharedApplication] windows] firstObject];
-    if (!mainWindow) {
-        return;
-    }
     self.frame = [UIScreen mainScreen].bounds;
-    [self showInContainer:mainWindow];
+    [self showInContainer:self.window];
 }
 
 - (void)showInContainer:(id)container {
     
-    if([self.delegate respondsToSelector:@selector(czpickerViewWillDisplay:)]){
+    if ([self.delegate respondsToSelector:@selector(czpickerViewWillDisplay:)]){
         [self.delegate czpickerViewWillDisplay:self];
     }
     if (self.allowMultipleSelection && !self.needFooterView) {

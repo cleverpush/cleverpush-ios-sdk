@@ -134,7 +134,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -175,6 +175,7 @@ static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 int sessionVisits;
 long sessionStartedTimestamp;
+UIWindow* topicsDialogWindow;
 
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
@@ -2028,6 +2029,10 @@ static BOOL registrationInProgress = false;
     brandingColor = color;
 }
 
++ (void)setTopicsDialogWindow:(UIWindow *)window {
+    topicsDialogWindow = window;
+}
+
 + (UIColor*)getBrandingColor {
     return brandingColor;
 }
@@ -2088,7 +2093,26 @@ static BOOL registrationInProgress = false;
     }
 }
 
++ (UIWindow*)keyWindow {
+    UIWindow *foundWindow = nil;
+    NSArray *windows = [[UIApplication sharedApplication] windows];
+    for (UIWindow *window in windows) {
+        if (window.isKeyWindow) {
+            foundWindow = window;
+            break;
+        }
+    }
+    return foundWindow;
+}
+
 + (void)showTopicsDialog {
+    if (topicsDialogWindow) {
+        [self showTopicsDialog:topicsDialogWindow];
+    }
+    [self showTopicsDialog:[self keyWindow]];
+}
+
++ (void)showTopicsDialog:(UIWindow *)targetWindow {
     if (channelTopicsPickerVisible && channelTopicsPicker && channelTopicsPickerShownAt && (channelTopicsPickerShownAt + 2.0) < [[NSDate date] timeIntervalSince1970]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [channelTopicsPicker dismissPicker:^{
@@ -2120,6 +2144,7 @@ static BOOL registrationInProgress = false;
                 channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:headerTitle
                                                               cancelButtonTitle:@"Abbrechen"
                                                              confirmButtonTitle:@"Speichern"];
+                channelTopicsPicker.window = targetWindow;
                 channelTopicsPicker.allowMultipleSelection = YES;
                 channelTopicsPicker.delegate = self;
                 channelTopicsPicker.dataSource = self;
