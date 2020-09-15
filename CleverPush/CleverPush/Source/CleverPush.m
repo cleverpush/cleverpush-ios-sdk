@@ -134,7 +134,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -179,6 +179,7 @@ UIWindow* topicsDialogWindow;
 
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
+BOOL hasTrackingConsentCalled = NO;
 NSMutableArray* pendingTrackingConsentListeners;
 
 static id isNil(id object) {
@@ -200,9 +201,13 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)setTrackingConsent:(BOOL)consent {
+    hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
+    
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
+    } else {
+        pendingTrackingConsentListeners = [NSMutableArray new];
     }
 }
 
@@ -722,7 +727,9 @@ BOOL handleSubscribedCalled = false;
         return;
     }
 
-    [pendingTrackingConsentListeners addObject:callback];
+    if (!hasTrackingConsentCalled) {
+        [pendingTrackingConsentListeners addObject:callback];
+    }
 }
 
 
