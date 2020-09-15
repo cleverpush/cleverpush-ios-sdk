@@ -134,7 +134,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1031,7 +1031,7 @@ static BOOL registrationInProgress = false;
     }
     
     NSArray* topics = [self getSubscriptionTopics];
-    if (topics != nil && [topics count] > 0) {
+    if (topics != nil && [topics count] >= 0) {
         [dataDic setObject:topics forKey:@"topics"];
         NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
         if (topicsVersion) {

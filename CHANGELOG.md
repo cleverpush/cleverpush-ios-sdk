@@ -1,3 +1,6 @@
+# 1.0.4
+* Allow users to unsubscribe from all topics
+
 # 1.0.3
 * Modified `setTrackingConsent` behaviour: If called with `NO` no more future tracking calls will be queued and all recent queued calls will be removed
 
