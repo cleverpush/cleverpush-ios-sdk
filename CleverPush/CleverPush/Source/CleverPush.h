@@ -68,6 +68,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
 
++ (void)enableDevelopmentMode;
+
 + (NSString*)channelId;
 
 + (BOOL)isSubscribed;

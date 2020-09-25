@@ -134,7 +134,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -177,6 +177,8 @@ int sessionVisits;
 long sessionStartedTimestamp;
 UIWindow* topicsDialogWindow;
 
+BOOL developmentMode = NO;
+
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
 BOOL hasTrackingConsentCalled = NO;
@@ -209,6 +211,10 @@ BOOL handleSubscribedCalled = false;
     } else {
         pendingTrackingConsentListeners = [NSMutableArray new];
     }
+}
+
++ (void)enableDevelopmentMode {
+    developmentMode = YES;
 }
 
 + (BOOL)startFromNotification {
@@ -640,7 +646,12 @@ BOOL handleSubscribedCalled = false;
     pendingChannelConfigRequest = YES;
     
     if (channelId != NULL) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/config", channelId]];
+        NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", channelId];
+        if (developmentMode) {
+            configPath = [NSString stringWithFormat:@"%@?t=%f", configPath, NSDate.date.timeIntervalSince1970];
+        }
+        
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (result != nil) {
                 channelConfig = result;
