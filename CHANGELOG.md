@@ -1,3 +1,6 @@
+# 1.0.5
+* Modified build settings to fix warnings
+
 # 1.0.4
 * Allow users to unsubscribe from all topics
 
