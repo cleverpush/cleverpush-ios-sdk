@@ -6,10 +6,13 @@
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
-#import "CZPickerView.h"
 #import "JKAlertDialog.h"
 #import "CPNotificationCategoryController.h"
 #import "CleverPushUtils.h"
+#import "CPTopicsViewController.h"
+#import "CZPickerView.h"
+#import "DWAlertController/DWAlertController.h"
+#import "DWAlertController/DWAlertAction.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -163,7 +166,7 @@ NSMutableArray* pendingAppBannersListeners;
 NSMutableArray* pendingSubscriptionListeners;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
-CZPickerView *channelTopicsPicker;
+DWAlertController *channelTopicsPicker;
 JKAlertDialog* currentAppBannerPopup;
 WKWebView* currentAppBannerWebView;
 id currentAppBannerUrlOpenedCallback;
@@ -393,7 +396,10 @@ BOOL handleSubscribedCalled = false;
     subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
     deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
     if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated"
         registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
+        #pragma clang diagnostic pop
     } else {
         registeredWithApple = deviceToken != nil;
     }
@@ -548,7 +554,10 @@ BOOL handleSubscribedCalled = false;
                                         // Fallback on earlier versions
                                     }
                                 } else {
+                                    #pragma clang diagnostic push
+                                    #pragma clang diagnostic ignored "-Wdeprecated"
                                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
+                                    #pragma clang diagnostic pop
                                 }
                             }];
                             [alertFeedbackController addAction:actionFeedbackYes];
@@ -760,14 +769,16 @@ BOOL handleSubscribedCalled = false;
         dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     } else {
         [self ensureMainThreadSync:^{
-            if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+            if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Wdeprecated"
                 UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                
                 if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
                     isEnabled = NO;
                 } else {
                     isEnabled = YES;
                 }
+                #pragma clang diagnostic pop
             } else {
                 if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
                     isEnabled = YES;
@@ -854,11 +865,12 @@ BOOL handleSubscribedCalled = false;
         }];
         
     } else {
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated"
         [self ensureMainThreadSync:^{
             if (subscriptionId == nil && channelId != nil) {
-                if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+                if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
                     UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                    
                     if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
                         [self setConfirmAlertShown];
                     }
@@ -877,9 +889,10 @@ BOOL handleSubscribedCalled = false;
                 [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
                 [[UIApplication sharedApplication] registerForRemoteNotifications];
             } else {
-                [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert];
+                // iOS < 8.0
             }
         }];
+        #pragma clang diagnostic pop
     }
 }
 
@@ -1251,6 +1264,8 @@ static BOOL registrationInProgress = false;
     handleNotificationOpened(result);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
 + (void)processLocalActionBasedNotification:(UILocalNotification*)notification actionIdentifier:(NSString*)actionIdentifier {
     if (!notification.userInfo) {
         return;
@@ -1265,6 +1280,7 @@ static BOOL registrationInProgress = false;
         [self handleNotificationOpened:notification.userInfo isActive:isActive actionIdentifier:actionIdentifier];
     }
 }
+#pragma clang diagnostic pop
 
 + (void)setNotificationDelivered:(NSDictionary*)notification {
     [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
@@ -2133,10 +2149,12 @@ static BOOL registrationInProgress = false;
 + (void)showTopicsDialog:(UIWindow *)targetWindow {
     if (channelTopicsPickerVisible && channelTopicsPicker && channelTopicsPickerShownAt && (channelTopicsPickerShownAt + 2.0) < [[NSDate date] timeIntervalSince1970]) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            /*
             [channelTopicsPicker dismissPicker:^{
                 channelTopicsPickerVisible = NO;
                 [self showTopicsDialog];
             }];
+             */
         });
     }
     
@@ -2159,19 +2177,32 @@ static BOOL registrationInProgress = false;
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                channelTopicsPicker = [[CZPickerView alloc] initWithHeaderTitle:headerTitle
-                                                              cancelButtonTitle:@"Abbrechen"
-                                                             confirmButtonTitle:@"Speichern"];
+                CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] init];
+                channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
+
+                DWAlertAction *okAction = [DWAlertAction actionWithTitle:NSLocalizedString(@"Speichern", nil)
+                                                                   style:DWAlertActionStyleCancel
+                                                                 handler:nil];
+                [channelTopicsPicker addAction:okAction];
+                
+                UIViewController* topViewController = [CleverPush topViewController];
+                [topViewController presentViewController:channelTopicsPicker animated:YES completion:nil];
+                
+                /*
                 channelTopicsPicker.window = targetWindow;
                 channelTopicsPicker.allowMultipleSelection = YES;
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
                 channelTopicsPicker.delegate = self;
                 channelTopicsPicker.dataSource = self;
+                #pragma clang diagnostic pop
                 channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
                 channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
                 channelTopicsPicker.confirmButtonBackgroundColor = brandingColor;
                 channelTopicsPicker.tapBackgroundToDismiss = NO;
                 
                 [channelTopicsPicker show];
+                 */
             });
         }];
     }];
@@ -2219,7 +2250,7 @@ static BOOL registrationInProgress = false;
     [CleverPush setSubscriptionTopics:selectedTopics];
 }
 
-+ (IBAction)closeCurrentAppBanner:(id)sender {
++ (void)closeCurrentAppBanner:(id)sender {
     if (currentAppBannerPopup != nil) {
         [currentAppBannerPopup dismiss];
         currentAppBannerPopup = nil;
@@ -2328,7 +2359,10 @@ static BOOL registrationInProgress = false;
                     [userDefaults synchronize];
 
                     currentAppBannerWebView = [[WKWebView alloc] init];
+                    #pragma clang diagnostic push
+                    #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
                     [currentAppBannerWebView setNavigationDelegate:self];
+                    #pragma clang diagnostic pop
                     [currentAppBannerWebView loadHTMLString:[banner valueForKey:@"content"] baseURL:[[NSBundle mainBundle] resourceURL]];
                     currentAppBannerWebView.scrollView.scrollEnabled = true;
                     currentAppBannerWebView.contentMode = UIViewContentModeScaleToFill;
@@ -2489,12 +2523,16 @@ static inline BOOL isEmpty(id thing) {
 
 + (void)load {
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-    if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"])
+    if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"]) {
         return;
+    }
     
     if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"8.0")) {
         return;
     }
+    
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wundeclared-selector"
     
     BOOL existing = injectSelector([CleverPushAppDelegate class], @selector(cleverPushLoadedTagSelector:), self, @selector(cleverPushLoadedTagSelector:));
     if (existing) {
@@ -2502,6 +2540,8 @@ static inline BOOL isEmpty(id thing) {
     }
     
     injectToProperClass(@selector(setCleverPushDelegate:), @selector(setDelegate:), @[], [CleverPushAppDelegate class], [UIApplication class]);
+    
+    #pragma clang diagnostic pop
     
     [self setupUNUserNotificationCenterDelegate];
 }

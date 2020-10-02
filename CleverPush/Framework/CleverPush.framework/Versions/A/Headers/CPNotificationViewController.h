@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <UserNotifications/UserNotifications.h>
 #import <UserNotificationsUI/UserNotificationsUI.h>
-#import "CPiCarousel.h"
+#import <CleverPush/CPiCarousel.h>
 
 @interface CPNotificationViewController : UIViewController<iCarouselDataSource, iCarouselDelegate>
 

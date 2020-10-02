@@ -101,7 +101,6 @@
 
 - (UIView *)carousel:(CleverPushiCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(kPaddingLeft, kPaddingTop, self.view.frame.size.width - (kPaddingLeft + kpaddingRight), self.view.frame.size.height - (kPaddingTop + kPaddingBottom))];
-    NSDictionary *carouselElement = [self.carouselItems objectAtIndex:index];
     imageView.image = [items objectAtIndex:index];
     imageView.contentMode = [self setImageContentMode:@"AspectFill"];
     view = imageView;

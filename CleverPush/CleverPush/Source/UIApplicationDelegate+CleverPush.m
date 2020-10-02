@@ -157,6 +157,9 @@ static NSArray* delegateSubclasses = nil;
     }
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+
 - (void)cleverPushLocalNotificationOpened:(UIApplication*)application handleActionWithIdentifier:(NSString*)identifier forLocalNotification:(UILocalNotification*)notification completionHandler:(void(^)()) completionHandler {
     if ([CleverPush channelId]) {
         [CleverPush processLocalActionBasedNotification:notification actionIdentifier:identifier];
@@ -177,5 +180,7 @@ static NSArray* delegateSubclasses = nil;
         [self cleverPushLocalNotificationOpened:application notification:notification];
     }
 }
+
+#pragma clang diagnostic pop
 
 @end

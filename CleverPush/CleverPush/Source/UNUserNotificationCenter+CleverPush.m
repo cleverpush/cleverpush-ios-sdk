@@ -142,6 +142,8 @@ withCompletionHandler:(void(^)())completionHandler {
     if (isRemote) {
         NSDictionary* remoteUserInfo = notification.request.content.userInfo;
         
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wdeprecated"
         if (isTextReply &&
             [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:)]) {
             NSDictionary* responseInfo = @{UIUserNotificationActionResponseTypedTextKey: userText};
@@ -163,6 +165,7 @@ withCompletionHandler:(void(^)())completionHandler {
         else {
             completionHandler();
         }
+        #pragma clang diagnostic pop
     } else {
         completionHandler();
     }
