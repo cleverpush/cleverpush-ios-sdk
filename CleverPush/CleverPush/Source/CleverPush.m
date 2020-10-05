@@ -2155,6 +2155,7 @@ static BOOL registrationInProgress = false;
                 [self showTopicsDialog];
             }];
              */
+            channelTopicsPickerVisible = NO;
         });
     }
     

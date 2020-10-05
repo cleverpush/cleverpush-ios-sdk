@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
 
-@interface CPTopicsViewController : UIViewController
+@interface CPTopicsViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
 @end

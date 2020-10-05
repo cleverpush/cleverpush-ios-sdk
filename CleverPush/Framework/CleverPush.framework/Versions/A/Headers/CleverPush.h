@@ -8,8 +8,8 @@
 #import <UserNotifications/UserNotifications.h>
 #endif
 
-#import <CleverPush/CPChatView.h>
-#import <CleverPush/CPNotificationViewController.h>
+#import "CPChatView.h"
+#import "CPNotificationViewController.h"
 
 @interface CPNotificationReceivedResult : NSObject
 

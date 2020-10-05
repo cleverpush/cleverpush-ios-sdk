@@ -73,16 +73,20 @@
 		291FCD2E2525DC2800F5185E /* DWAlertController+DWKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD1D2525DC2800F5185E /* DWAlertController+DWKeyboard.m */; };
 		291FCD2F2525DC2800F5185E /* DWAlertPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD202525DC2800F5185E /* DWAlertPresentationController.m */; };
 		291FCD392525E2AD00F5185E /* CPTopicsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD382525E2AD00F5185E /* CPTopicsViewController.m */; };
-		291FCD532525E8B600F5185E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD522525E8B600F5185E /* AppDelegate.m */; };
-		291FCD562525E8B600F5185E /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD552525E8B600F5185E /* SceneDelegate.m */; };
-		291FCD5E2525E8BB00F5185E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 291FCD5D2525E8BB00F5185E /* Assets.xcassets */; };
-		291FCD612525E8BB00F5185E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 291FCD5F2525E8BB00F5185E /* LaunchScreen.storyboard */; };
-		291FCD642525E8BC00F5185E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD632525E8BC00F5185E /* main.m */; };
-		291FCD9D2525EA6800F5185E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 291FCD9C2525EA6800F5185E /* Main.storyboard */; };
-		291FCDAB2525EA7B00F5185E /* ViewController1.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCDA72525EA7A00F5185E /* ViewController1.m */; };
-		291FCDAC2525EA7B00F5185E /* ViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCDAA2525EA7B00F5185E /* ViewController2.m */; };
-		291FCDF82525ED2C00F5185E /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 291FCDF72525ED2C00F5185E /* CleverPush.framework */; };
-		291FCDF92525ED2C00F5185E /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 291FCDF72525ED2C00F5185E /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		291FCE5B252B5F1C00F5185E /* CPTopicsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD382525E2AD00F5185E /* CPTopicsViewController.m */; };
+		291FCE64252B5F1F00F5185E /* CPTopicsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 291FCD422525E2BB00F5185E /* CPTopicsViewController.h */; };
+		291FCE6D252B5F2E00F5185E /* DWAlertAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0B2525DC2800F5185E /* DWAlertAction.m */; };
+		291FCE76252B5F3500F5185E /* DWAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0A2525DC2800F5185E /* DWAlertController.m */; };
+		291FCE8B252B65D000F5185E /* DWAlertViewActionBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD132525DC2800F5185E /* DWAlertViewActionBaseView.m */; };
+		291FCE94252B65D200F5185E /* DWActionsStackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD112525DC2800F5185E /* DWActionsStackView.m */; };
+		291FCE9D252B65D400F5185E /* DWAlertDismissalAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0E2525DC2800F5185E /* DWAlertDismissalAnimationController.m */; };
+		291FCEA6252B65D600F5185E /* DWAlertPresentationAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0F2525DC2800F5185E /* DWAlertPresentationAnimationController.m */; };
+		291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD152525DC2800F5185E /* DWDimmingView.m */; };
+		291FCEB8252B65DC00F5185E /* DWAnimatableShapeLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD172525DC2800F5185E /* DWAnimatableShapeLayer.m */; };
+		291FCEC1252B65DF00F5185E /* DWAlertController+DWKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD1D2525DC2800F5185E /* DWAlertController+DWKeyboard.m */; };
+		291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD202525DC2800F5185E /* DWAlertPresentationController.m */; };
+		291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD1A2525DC2800F5185E /* DWAlertView.m */; };
+		291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD122525DC2800F5185E /* DWAlertViewActionButton.m */; };
 		2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2969757824C0FD8F009563C6 /* JavaScriptCore.framework */; };
 		296FA74B2341195900E20FFD /* PopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 296FA74A2341195900E20FFD /* PopupView.m */; };
 		296FA7512341313200E20FFD /* PopupView.h in Headers */ = {isa = PBXBuildFile; fileRef = 296FA74C2341197100E20FFD /* PopupView.h */; };
@@ -137,17 +141,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		291FCDFA2525ED2C00F5185E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				291FCDF92525ED2C00F5185E /* CleverPush.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		29DB95CC23FC3203008FC985 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -206,20 +199,6 @@
 		291FCD232525DC2800F5185E /* DWAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWAlertController.h; sourceTree = "<group>"; };
 		291FCD382525E2AD00F5185E /* CPTopicsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTopicsViewController.m; sourceTree = "<group>"; };
 		291FCD422525E2BB00F5185E /* CPTopicsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTopicsViewController.h; sourceTree = "<group>"; };
-		291FCD4F2525E8B600F5185E /* CleverPushExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CleverPushExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		291FCD512525E8B600F5185E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		291FCD522525E8B600F5185E /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		291FCD542525E8B600F5185E /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
-		291FCD552525E8B600F5185E /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
-		291FCD5D2525E8BB00F5185E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		291FCD602525E8BB00F5185E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		291FCD622525E8BC00F5185E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		291FCD632525E8BC00F5185E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		291FCD9C2525EA6800F5185E /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		291FCDA72525EA7A00F5185E /* ViewController1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController1.m; sourceTree = "<group>"; };
-		291FCDA82525EA7A00F5185E /* ViewController1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController1.h; sourceTree = "<group>"; };
-		291FCDA92525EA7A00F5185E /* ViewController2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController2.h; sourceTree = "<group>"; };
-		291FCDAA2525EA7B00F5185E /* ViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController2.m; sourceTree = "<group>"; };
 		291FCDF72525ED2C00F5185E /* CleverPush.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleverPush.framework; path = Framework/CleverPush.framework; sourceTree = "<group>"; };
 		294F7E7623FB5DB500806D23 /* CleverPushLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPushLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		294F7E8F23FB5E0200806D23 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
@@ -272,14 +251,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		291FCD4C2525E8B600F5185E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				291FCDF82525ED2C00F5185E /* CleverPush.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		294F7E7323FB5DB500806D23 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -364,26 +335,6 @@
 			path = Private;
 			sourceTree = "<group>";
 		};
-		291FCD502525E8B600F5185E /* CleverPushExample */ = {
-			isa = PBXGroup;
-			children = (
-				291FCD512525E8B600F5185E /* AppDelegate.h */,
-				291FCD522525E8B600F5185E /* AppDelegate.m */,
-				291FCD542525E8B600F5185E /* SceneDelegate.h */,
-				291FCDA82525EA7A00F5185E /* ViewController1.h */,
-				291FCDA72525EA7A00F5185E /* ViewController1.m */,
-				291FCDA92525EA7A00F5185E /* ViewController2.h */,
-				291FCDAA2525EA7B00F5185E /* ViewController2.m */,
-				291FCD552525E8B600F5185E /* SceneDelegate.m */,
-				291FCD9C2525EA6800F5185E /* Main.storyboard */,
-				291FCD5D2525E8BB00F5185E /* Assets.xcassets */,
-				291FCD5F2525E8BB00F5185E /* LaunchScreen.storyboard */,
-				291FCD622525E8BC00F5185E /* Info.plist */,
-				291FCD632525E8BC00F5185E /* main.m */,
-			);
-			path = CleverPushExample;
-			sourceTree = "<group>";
-		};
 		297B4DEB1E589AFE00BAF990 = {
 			isa = PBXGroup;
 			children = (
@@ -393,7 +344,6 @@
 				297C34CC23FB70D600314A84 /* CleverPushLocation */,
 				29DB95CF23FC3203008FC985 /* CleverPush */,
 				29DB95DC23FC320C008FC985 /* CleverPushLocation */,
-				291FCD502525E8B600F5185E /* CleverPushExample */,
 				297B4DF61E589AFE00BAF990 /* Products */,
 				29C1BAF01E58B89500815CD6 /* Frameworks */,
 			);
@@ -406,7 +356,6 @@
 				294F7E7623FB5DB500806D23 /* CleverPushLocation.framework */,
 				29DB95CE23FC3203008FC985 /* libCleverPush.a */,
 				29DB95DB23FC320C008FC985 /* libCleverPushLocation.a */,
-				291FCD4F2525E8B600F5185E /* CleverPushExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -540,6 +489,7 @@
 				29DB95EF23FC3360008FC985 /* CleverPushSelectorHelpers.h in Headers */,
 				29DB95EE23FC3360008FC985 /* UIApplicationDelegate+CleverPush.h in Headers */,
 				29E290C022B04DEB00BFC74F /* CZPickerView.h in Headers */,
+				291FCE64252B5F1F00F5185E /* CPTopicsViewController.h in Headers */,
 				298F4FC325002F1B00F086D3 /* CleverPushUtils.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
 				2983255F2345FCC000A5A85F /* JKAlertDialog.h in Headers */,
@@ -549,24 +499,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		291FCD4E2525E8B600F5185E /* CleverPushExample */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 291FCD652525E8BC00F5185E /* Build configuration list for PBXNativeTarget "CleverPushExample" */;
-			buildPhases = (
-				291FCD4B2525E8B600F5185E /* Sources */,
-				291FCD4C2525E8B600F5185E /* Frameworks */,
-				291FCD4D2525E8B600F5185E /* Resources */,
-				291FCDFA2525ED2C00F5185E /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = CleverPushExample;
-			productName = CleverPushExample;
-			productReference = 291FCD4F2525E8B600F5185E /* CleverPushExample.app */;
-			productType = "com.apple.product-type.application";
-		};
 		294F7E7523FB5DB500806D23 /* CleverPushLocationFramework */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 294F7E8723FB5DB500806D23 /* Build configuration list for PBXNativeTarget "CleverPushLocationFramework" */;
@@ -648,11 +580,6 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = CleverPush;
 				TargetAttributes = {
-					291FCD4E2525E8B600F5185E = {
-						CreatedOnToolsVersion = 12.0.1;
-						DevelopmentTeam = KWJDGZUQ72;
-						ProvisioningStyle = Automatic;
-					};
 					294F7E7523FB5DB500806D23 = {
 						CreatedOnToolsVersion = 11.3.1;
 						ProvisioningStyle = Automatic;
@@ -709,23 +636,9 @@
 				29DB95E423FC3249008FC985 /* CleverPush-Static-Framework */,
 				29DB960823FC6068008FC985 /* CleverPushLocation-Dynamic-Framework */,
 				29DB960423FC6059008FC985 /* CleverPushLocation-Static-Framework */,
-				291FCD4E2525E8B600F5185E /* CleverPushExample */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		291FCD4D2525E8B600F5185E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				291FCD9D2525EA6800F5185E /* Main.storyboard in Resources */,
-				291FCD612525E8BB00F5185E /* LaunchScreen.storyboard in Resources */,
-				291FCD5E2525E8BB00F5185E /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		297C34D823FBF3B300314A84 /* ShellScript */ = {
@@ -799,18 +712,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		291FCD4B2525E8B600F5185E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				291FCDAB2525EA7B00F5185E /* ViewController1.m in Sources */,
-				291FCD532525E8B600F5185E /* AppDelegate.m in Sources */,
-				291FCD642525E8BC00F5185E /* main.m in Sources */,
-				291FCD562525E8B600F5185E /* SceneDelegate.m in Sources */,
-				291FCDAC2525EA7B00F5185E /* ViewController2.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		294F7E7223FB5DB500806D23 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -823,18 +724,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
+				291FCEC1252B65DF00F5185E /* DWAlertController+DWKeyboard.m in Sources */,
+				291FCE5B252B5F1C00F5185E /* CPTopicsViewController.m in Sources */,
 				297B4E271E58A16600BAF990 /* CleverPush.m in Sources */,
+				291FCE9D252B65D400F5185E /* DWAlertDismissalAnimationController.m in Sources */,
+				291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */,
 				298F4FC525002F1F00F086D3 /* CleverPushUtils.m in Sources */,
 				297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */,
+				291FCE76252B5F3500F5185E /* DWAlertController.m in Sources */,
 				296FA74B2341195900E20FFD /* PopupView.m in Sources */,
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
 				29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */,
+				291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */,
+				291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */,
 				29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
+				291FCEB8252B65DC00F5185E /* DWAnimatableShapeLayer.m in Sources */,
 				29D71E772380742800C48ACA /* CPChatView.m in Sources */,
 				29DB578223D4D3960040E823 /* CPNotificationViewController.m in Sources */,
+				291FCE94252B65D200F5185E /* DWActionsStackView.m in Sources */,
+				291FCE8B252B65D000F5185E /* DWAlertViewActionBaseView.m in Sources */,
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
 				29DB578623D4D61F0040E823 /* CPNotificationCategoryController.m in Sources */,
+				291FCE6D252B5F2E00F5185E /* DWAlertAction.m in Sources */,
+				291FCEA6252B65D600F5185E /* DWAlertPresentationAnimationController.m in Sources */,
 				298325642346002100A5A85F /* JKAlertDialog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -882,93 +796,7 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		291FCD5F2525E8BB00F5185E /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				291FCD602525E8BB00F5185E /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		291FCD662525E8BC00F5185E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = KWJDGZUQ72;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Framework",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = CleverPushExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cleverpush.CleverPushExample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		291FCD672525E8BC00F5185E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = KWJDGZUQ72;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Framework",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = CleverPushExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.cleverpush.CleverPushExample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		294F7E8823FB5DB500806D23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1010,7 +838,6 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -1054,7 +881,6 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 			};
 			name = Release;
 		};
@@ -1198,7 +1024,6 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
 				SWIFT_VERSION = 3.0;
-				VALID_ARCHS = "x86_64 arm64e i396";
 			};
 			name = Debug;
 		};
@@ -1232,7 +1057,6 @@
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
 				SWIFT_VERSION = 3.0;
-				VALID_ARCHS = "x86_64 arm64e i396";
 			};
 			name = Release;
 		};
@@ -1529,15 +1353,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		291FCD652525E8BC00F5185E /* Build configuration list for PBXNativeTarget "CleverPushExample" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				291FCD662525E8BC00F5185E /* Debug */,
-				291FCD672525E8BC00F5185E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		294F7E8723FB5DB500806D23 /* Build configuration list for PBXNativeTarget "CleverPushLocationFramework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
