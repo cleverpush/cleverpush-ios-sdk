@@ -47,7 +47,7 @@ static UIViewAnimationOptions const DWAlertInplaceTransitionAnimationOptions = U
 
 static BOOL DWAlertHasTopNotch(void) {
     if (@available(iOS 11.0, *)) {
-        return [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom > 0.0;
+        return UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom > 0.0;
     }
 
     return NO;
@@ -194,8 +194,18 @@ static DWAlertAppearanceMode DWAlertAppearanceModeForUIInterfaceStyle(UIUserInte
     }
 }
 
+static UIColor* defaultSystemTintColor() {
+   static UIColor* systemTintColor = nil;
+   static dispatch_once_t onceToken;
+   dispatch_once(&onceToken, ^{
+      UIView* view = [[UIView alloc] init];
+      systemTintColor = view.tintColor;
+   });
+   return systemTintColor;
+}
+
 static UIColor *DWAlertViewNormalTextColor() {
-    return [UIColor colorWithRed:0.0f green:0.22f blue:122.0/255.0 alpha:1.0f];
+    return defaultSystemTintColor();
 }
 
 static UIColor *DWAlertViewDisabledTextColor() {

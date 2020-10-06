@@ -1,3 +1,7 @@
+# 1.1.0
+* Fixed some warnings
+* Added completely new Topics Dialog with support for sub-topics
+
 # 1.0.5
 * Modified build settings to fix warnings
 

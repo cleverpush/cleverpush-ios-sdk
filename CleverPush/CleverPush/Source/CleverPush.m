@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.0.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.1.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1563,7 +1563,11 @@ static BOOL registrationInProgress = false;
         if (channelConfig != nil) {
             NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
             if (channelTopics != nil) {
-                callback(channelTopics);
+                NSSortDescriptor *valueDescriptor = [[NSSortDescriptor alloc] initWithKey:@"sort" ascending:YES];
+                NSArray *descriptors = [NSArray arrayWithObject:valueDescriptor];
+                NSArray *sortedTopics = [channelTopics sortedArrayUsingDescriptors:descriptors];
+                
+                callback(sortedTopics);
                 return;
             }
         }
@@ -1656,6 +1660,12 @@ static BOOL registrationInProgress = false;
         return [[NSArray alloc] init];
     }
     return subscriptionTopics;
+}
+
++ (BOOL)hasSubscriptionTopics {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    return subscriptionTopics ? YES : NO;
 }
 
 + (void)setSubscriptionTopics:(NSMutableArray *)topics {
@@ -2147,24 +2157,6 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)showTopicsDialog:(UIWindow *)targetWindow {
-    if (channelTopicsPickerVisible && channelTopicsPicker && channelTopicsPickerShownAt && (channelTopicsPickerShownAt + 2.0) < [[NSDate date] timeIntervalSince1970]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            /*
-            [channelTopicsPicker dismissPicker:^{
-                channelTopicsPickerVisible = NO;
-                [self showTopicsDialog];
-            }];
-             */
-            channelTopicsPickerVisible = NO;
-        });
-    }
-    
-    if (channelTopicsPickerVisible) {
-        return;
-    }
-    channelTopicsPickerVisible = YES;
-    channelTopicsPickerShownAt = [[NSDate date] timeIntervalSince1970];
-    
     [self getAvailableTopics:^(NSArray* channelTopics_) {
         channelTopics = channelTopics_;
         if ([channelTopics count] == 0) {
@@ -2172,38 +2164,28 @@ static BOOL registrationInProgress = false;
         }
         
         [self getChannelConfig:^(NSDictionary* channelConfig) {
-            NSString* headerTitle = @"Abonnierte Themen";
+            NSString* headerTitle = NSLocalizedString(@"Subscribed Topics", nil);
             if (channelConfig != nil && [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
                 headerTitle = [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"];
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] init];
+                CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
+                
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
+                topicsController.title = headerTitle;
 
-                DWAlertAction *okAction = [DWAlertAction actionWithTitle:NSLocalizedString(@"Speichern", nil)
+                DWAlertAction *okAction = [DWAlertAction actionWithTitle:NSLocalizedString(@"Save", nil)
                                                                    style:DWAlertActionStyleCancel
-                                                                 handler:nil];
+                                                                 handler:^(DWAlertAction* action) {
+                    [topicsController dismissViewControllerAnimated:YES completion:nil];
+                    [self setSubscriptionTopics:[topicsController getSelectedTopics]];
+                }];
                 [channelTopicsPicker addAction:okAction];
                 
                 UIViewController* topViewController = [CleverPush topViewController];
+                
                 [topViewController presentViewController:channelTopicsPicker animated:YES completion:nil];
-                
-                /*
-                channelTopicsPicker.window = targetWindow;
-                channelTopicsPicker.allowMultipleSelection = YES;
-                #pragma clang diagnostic push
-                #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
-                channelTopicsPicker.delegate = self;
-                channelTopicsPicker.dataSource = self;
-                #pragma clang diagnostic pop
-                channelTopicsPicker.headerBackgroundColor = [UIColor whiteColor];
-                channelTopicsPicker.headerTitleColor = [UIColor darkGrayColor];
-                channelTopicsPicker.confirmButtonBackgroundColor = brandingColor;
-                channelTopicsPicker.tapBackgroundToDismiss = NO;
-                
-                [channelTopicsPicker show];
-                 */
             });
         }];
     }];

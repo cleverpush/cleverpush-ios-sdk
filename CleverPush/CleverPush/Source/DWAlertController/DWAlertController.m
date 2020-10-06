@@ -373,7 +373,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (CGFloat)maximumAllowedAlertHeightWithKeyboard:(CGFloat)keyboardHeight {
     CGFloat minInset;
     if (@available(iOS 11.0, *)) {
-        UIEdgeInsets insets = [UIApplication sharedApplication].delegate.window.safeAreaInsets;
+        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+        UIEdgeInsets insets = window.safeAreaInsets;
         minInset = MAX(insets.top, insets.bottom);
     }
     else {

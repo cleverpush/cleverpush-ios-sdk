@@ -1,13 +1,6 @@
-//
-//  IntrinsicTableView.h
-//  CleverPush
-//
-//  Created by Marius Gebhardt on 06/10/2020.
-//  Copyright © 2020 CleverPush. All rights reserved.
-//
+#import <UIKit/UIKit.h>
 
-#ifndef IntrinsicTableView_h
-#define IntrinsicTableView_h
+@interface IntrinsicTableView : UITableView
 
+@end
 
-#endif /* IntrinsicTableView_h */

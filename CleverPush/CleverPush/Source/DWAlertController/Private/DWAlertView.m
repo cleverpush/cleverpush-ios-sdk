@@ -193,6 +193,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     CGFloat contentHeight =
         [self.contentViewChildView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    NSLog(@"DWAlert contentHeight: %f", contentHeight);
     if (contentHeight > 0) {
         contentHeight += DWAlertViewContentVerticalPadding * 2;
     }

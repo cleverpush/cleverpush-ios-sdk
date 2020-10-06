@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name                    = "CleverPush"
-    s.version                 = "1.0.5"
+    s.version                 = "1.1.0"
     s.summary                 = "CleverPush library for iOS."
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => 'MIT (modified)', :file => 'LICENSE' }
@@ -11,4 +11,6 @@ Pod::Spec.new do |s|
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore"
     s.ios.vendored_frameworks = "CleverPush/Framework/CleverPush.framework"
+    s.resource_bundle = { "CleverPush" => ["CleverPush/Framework/*.lproj/*.strings"] }
+
 end
