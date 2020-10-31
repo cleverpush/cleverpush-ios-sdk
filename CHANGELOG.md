@@ -1,3 +1,6 @@
+# 1.1.1
+* Fixed App Banner crash
+
 # 1.1.0
 * Fixed some warnings
 * Added completely new Topics Dialog with support for sub-topics

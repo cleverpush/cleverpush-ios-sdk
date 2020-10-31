@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.1.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.1.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1699,9 +1699,11 @@ static BOOL registrationInProgress = false;
 
 + (void)fireAppBannersListeners {
     pendingAppBannersRequest = NO;
-    for (id (^listener)() in pendingAppBannersListeners) {
-        if (listener) {
-            listener(appBanners);
+    for (void (^listener)(void *) in pendingAppBannersListeners) {
+        // check if listener is non-nil (otherwise: EXC_BAD_ACCESS)
+        if (listener && appBanners) {
+            __strong void (^callbackBlock)() = listener;
+            callbackBlock(appBanners);
         }
     }
     pendingAppBannersListeners = [NSMutableArray new];
@@ -1713,7 +1715,7 @@ static BOOL registrationInProgress = false;
         return;
     }
 
-    [pendingAppBannersListeners addObject:[callback copy]];
+    [pendingAppBannersListeners addObject:callback];
     if (pendingAppBannersRequest) {
         return;
     }
