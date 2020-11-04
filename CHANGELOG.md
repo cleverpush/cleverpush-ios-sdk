@@ -1,3 +1,6 @@
+# 1.2.0
+* Added `setIncrementBadge` option to automatically increment the badge count for every received notification
+
 # 1.1.1
 * Fixed App Banner crash
 
