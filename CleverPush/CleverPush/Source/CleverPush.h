@@ -135,4 +135,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
 + (void)increaseSessionVisits;
 
++ (void)setApiEndpoint:(NSString*)apiEndpoint;
++ (NSString*)getApiEndpoint;
+
 @end

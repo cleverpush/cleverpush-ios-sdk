@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name                    = "CleverPush"
-    s.version                 = "1.2.0"
+    s.version                 = "1.2.1"
     s.summary                 = "CleverPush library for iOS."
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => 'MIT (modified)', :file => 'LICENSE' }

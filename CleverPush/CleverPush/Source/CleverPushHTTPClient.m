@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "CleverPushHTTPClient.h"
+#import "CleverPush.h"
 
 @interface CleverPushHTTPClient()
 
@@ -23,7 +24,7 @@
 - (id)init {
     self = [super init];
     if (self)
-        self.apiEndpoint = [NSURL URLWithString:@"https://api.cleverpush.com/"];
+        self.apiEndpoint = [NSURL URLWithString:[NSString stringWithFormat:@"%@/", [CleverPush getApiEndpoint]]];
     return self;
 }
 

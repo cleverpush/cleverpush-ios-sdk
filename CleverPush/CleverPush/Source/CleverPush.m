@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -180,6 +180,7 @@ static NSString* lastNotificationOpenedId;
 int sessionVisits;
 long sessionStartedTimestamp;
 UIWindow* topicsDialogWindow;
+NSString* apiEndpoint = @"https://api.cleverpush.com";
 
 BOOL developmentMode = NO;
 
@@ -2125,6 +2126,14 @@ static BOOL registrationInProgress = false;
         [currentChatView removeFromSuperview];
     }
     currentChatView = chatView;
+}
+
++ (void)setApiEndpoint:(NSString*)endpoint {
+    apiEndpoint = endpoint;
+}
+
++ (NSString*)getApiEndpoint {
+    return apiEndpoint;
 }
 
 + (void)showPendingTopicsDialog {
