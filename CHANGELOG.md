@@ -1,3 +1,6 @@
+# 1.2.2
+* Fixed `subscribe` callback subscriptionId parameter on initial subscribe
+
 # 1.2.1
 * Added `setApiEndpoint` method
 

@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -853,9 +853,13 @@ BOOL handleSubscribedCalled = false;
                                 }
                             }
                         }];
-                    }
-                    
-                    if (granted && subscribedBlock) {
+                        
+                        if (subscribedBlock) {
+                            [self getSubscriptionId:^(NSString* subscriptionId) {
+                                subscribedBlock(subscriptionId);
+                            }];
+                        }
+                    } else if (granted && subscribedBlock) {
                         subscribedBlock(subscriptionId);
                     }
                 });
