@@ -13,6 +13,7 @@
 #import "CZPickerView.h"
 #import "DWAlertController/DWAlertController.h"
 #import "DWAlertController/DWAlertAction.h"
+#import "CleverPush-Swift.h"
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -450,6 +451,7 @@ BOOL handleSubscribedCalled = false;
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         [self showPendingTopicsDialog];
         [self initAppReview];
+        [AppBannerModule initBannersWithChannel:channelId showDrafts:false];
     });
 }
 

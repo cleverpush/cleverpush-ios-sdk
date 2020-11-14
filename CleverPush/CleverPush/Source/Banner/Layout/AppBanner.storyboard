@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--App Banner Controller-->
+        <scene sceneID="aWy-fY-vuX">
+            <objects>
+                <viewController storyboardIdentifier="CleverPushBanner" id="J8w-qX-1ih" customClass="AppBannerController" customModule="cpbanner_ios" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DJl-xs-RFD">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b03-DG-3GJ">
+                                <rect key="frame" x="20.5" y="248" width="373" height="400"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bEJ-Cp-nTi">
+                                        <rect key="frame" x="15" y="15" width="343" height="370"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstItem="bEJ-Cp-nTi" firstAttribute="leading" secondItem="b03-DG-3GJ" secondAttribute="leading" constant="15" id="OBP-m5-DUV"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" priority="250" constant="400" id="PXM-BY-N4U"/>
+                                    <constraint firstItem="bEJ-Cp-nTi" firstAttribute="top" secondItem="b03-DG-3GJ" secondAttribute="top" constant="15" id="Z82-Ia-x8q"/>
+                                    <constraint firstAttribute="bottom" secondItem="bEJ-Cp-nTi" secondAttribute="bottom" constant="15" id="e36-Kh-Uz7"/>
+                                    <constraint firstAttribute="trailing" secondItem="bEJ-Cp-nTi" secondAttribute="trailing" constant="15" id="e4c-yx-e5j"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="RYc-CD-khm"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.30006602112676056" colorSpace="custom" customColorSpace="displayP3"/>
+                        <constraints>
+                            <constraint firstItem="b03-DG-3GJ" firstAttribute="width" secondItem="DJl-xs-RFD" secondAttribute="width" multiplier="0.9" id="8Tl-RD-Egt"/>
+                            <constraint firstItem="b03-DG-3GJ" firstAttribute="centerX" secondItem="DJl-xs-RFD" secondAttribute="centerX" id="QQe-KB-CBH"/>
+                            <constraint firstItem="b03-DG-3GJ" firstAttribute="centerY" secondItem="DJl-xs-RFD" secondAttribute="centerY" id="U4u-hg-SHi"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="bannerBody" destination="b03-DG-3GJ" id="nk0-9c-ryj"/>
+                        <outlet property="bannerBodyContent" destination="bEJ-Cp-nTi" id="ajN-gx-rdT"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zSK-oR-fqu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-347.82608695652175" y="154.6875"/>
+        </scene>
+    </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
