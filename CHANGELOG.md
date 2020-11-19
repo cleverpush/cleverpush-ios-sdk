@@ -1,3 +1,6 @@
+# 1.2.3
+* Decrement badge count when notification is opened
+
 # 1.2.2
 * Fixed `subscribe` callback subscriptionId parameter on initial subscribe
 

@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1252,6 +1252,26 @@ static BOOL registrationInProgress = false;
 
     if (autoClearBadge) {
         [self clearBadge:true];
+    }
+    
+    // badge count
+    NSBundle *bundle = [NSBundle mainBundle];
+    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
+        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
+        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
+    }
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    if ([userDefaults boolForKey:@"CleverPush_INCREMENT_BADGE"]) {
+        long badgeCount = 0;
+        if ([userDefaults objectForKey:@"CleverPush_BADGE_COUNT"] != nil) {
+            badgeCount = [userDefaults integerForKey:@"CleverPush_BADGE_COUNT"];
+        }
+        badgeCount -= 1;
+        
+        [UIApplication sharedApplication].applicationIconBadgeNumber = badgeCount;
+        
+        [userDefaults setInteger:badgeCount forKey:@"CleverPush_BADGE_COUNT"];
+        [userDefaults synchronize];
     }
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
