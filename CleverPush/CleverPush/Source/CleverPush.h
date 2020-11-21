@@ -10,6 +10,7 @@
 
 #import "CPChatView.h"
 #import "CPNotificationViewController.h"
+#import "CPTranslate.h"
 
 @interface CPNotificationReceivedResult : NSObject
 

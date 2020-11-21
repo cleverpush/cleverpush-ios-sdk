@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name                    = "CleverPush"
-    s.version                 = "1.2.3"
+    s.version                 = "1.2.4"
     s.summary                 = "CleverPush library for iOS."
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => 'MIT (modified)', :file => 'LICENSE' }
@@ -11,7 +11,6 @@ Pod::Spec.new do |s|
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore"
     s.ios.vendored_frameworks = "CleverPush/Framework/CleverPush.framework"
-    s.resources 	          = "CleverPush/CleverPush/Source/*.lproj/*.strings"
     s.pod_target_xcconfig     = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
     s.user_target_xcconfig    = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 

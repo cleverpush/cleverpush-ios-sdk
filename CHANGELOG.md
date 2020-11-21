@@ -1,3 +1,7 @@
+# 1.2.4
+* Fixed a display issue with the topics dialog
+* Fixed translations
+
 # 1.2.3
 * Decrement badge count when notification is opened
 

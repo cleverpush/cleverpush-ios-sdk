@@ -56,7 +56,6 @@
     tableView.rowHeight = UITableViewAutomaticDimension;
     tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     
-    
     tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.001)];
     
     tableView.delegate = self;
@@ -65,11 +64,13 @@
     self.view = tableView;
 }
 
-- (void) viewWillAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     if (!tableView.tableHeaderView) {
-        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 20)];
+        int labelPaddingBottom = 15;
+        
+        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
         titleLabel.textAlignment = NSTextAlignmentCenter;
         titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
         
@@ -82,10 +83,15 @@
         
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:titleLabel.frame];
         [tableView.tableHeaderView addSubview:titleLabel];
+        
+        // add some padding
+        tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
+        
+        [tableView reloadData];
     }
 }
 
-- (void) switchChanged:(id)sender {
+- (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     NSDictionary* topic = availableTopics[(int) switcher.tag - 1];
     
@@ -104,7 +110,7 @@
     }
 }
 
-- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = 0;
     for (NSDictionary *topic in availableTopics) {
         NSString* parentTopicId = [topic objectForKey:@"parentTopic"];
@@ -115,10 +121,9 @@
     return count;
 }
 
-- (NSDictionary*) getTopic:(int)row {
+- (NSDictionary*)getTopic:(int)row {
     int count = -1;
     for (NSDictionary *topic in availableTopics) {
-        // NSString* topicId = [topic objectForKey:@"_id"];
         NSString* parentTopicId = [topic objectForKey:@"parentTopic"];
         if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
             count += 1;
@@ -130,7 +135,7 @@
     return nil;
 }
 
-- (int) getTopicIndex:(NSString*)topicId {
+- (int)getTopicIndex:(NSString*)topicId {
     int index = -1;
     for (NSDictionary *topic in availableTopics) {
         index += 1;
@@ -142,7 +147,7 @@
     return -1;
 }
 
-- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     int row = (int)indexPath.row;
     NSDictionary *topic = [self getTopic:row];
     
@@ -158,7 +163,7 @@
     [self switchChanged:switcher];
 }
 
-- (BOOL) defaultTopicState:(NSDictionary*)topic {
+- (BOOL)defaultTopicState:(NSDictionary*)topic {
     BOOL defaultUnchecked = NO;
     if (topic && [topic objectForKey:@"defaultUnchecked"]) {
         defaultUnchecked = YES;
@@ -167,7 +172,7 @@
     return state;
 }
 
-- (UITableViewCell*) tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
+- (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     int row = (int)indexPath.row;
     NSDictionary *topic = [self getTopic:row];
     

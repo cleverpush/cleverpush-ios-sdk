@@ -107,6 +107,9 @@
 		29D623E02535BE070020F893 /* IntrinsicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29D22E6E252C8E6400977567 /* IntrinsicTableView.h */; };
 		29D71E772380742800C48ACA /* CPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D71E762380742800C48ACA /* CPChatView.m */; };
 		29D71E792380743000C48ACA /* CPChatView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29D71E75238073FE00C48ACA /* CPChatView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		29D9052C25698B7F002D6F9E /* CPTranslate.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D9052B25698B7F002D6F9E /* CPTranslate.m */; };
+		29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D9052B25698B7F002D6F9E /* CPTranslate.m */; };
+		29D9053725698BB6002D6F9E /* CPTranslate.h in Headers */ = {isa = PBXBuildFile; fileRef = 29D9053625698BB6002D6F9E /* CPTranslate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29DB578223D4D3960040E823 /* CPNotificationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DB578123D4D3960040E823 /* CPNotificationViewController.m */; };
 		29DB578623D4D61F0040E823 /* CPNotificationCategoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DB578523D4D61F0040E823 /* CPNotificationCategoryController.m */; };
 		29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DB577E23D4CB0A0040E823 /* CPiCarousel.m */; };
@@ -226,14 +229,16 @@
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		29C1BAF51E58BAB800815CD6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		29D22E68252C7E9300977567 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/CleverPush.strings; sourceTree = "<group>"; };
-		29D22E6A252C7EDB00977567 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/CleverPush.strings; sourceTree = "<group>"; };
-		29D22E6B252C7EF100977567 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CleverPush.strings; sourceTree = "<group>"; };
 		29D22E6E252C8E6400977567 /* IntrinsicTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntrinsicTableView.h; sourceTree = "<group>"; };
 		29D22E6F252C8E7500977567 /* IntrinsicTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IntrinsicTableView.m; sourceTree = "<group>"; };
 		29D71E75238073FE00C48ACA /* CPChatView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChatView.h; sourceTree = "<group>"; };
 		29D71E762380742800C48ACA /* CPChatView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChatView.m; sourceTree = "<group>"; };
 		29D71E7E23807E1700C48ACA /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
+		29D9052025698381002D6F9E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29D905212569838A002D6F9E /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29D905222569839C002D6F9E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29D9052B25698B7F002D6F9E /* CPTranslate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTranslate.m; sourceTree = "<group>"; };
+		29D9053625698BB6002D6F9E /* CPTranslate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTranslate.h; sourceTree = "<group>"; };
 		29DB577E23D4CB0A0040E823 /* CPiCarousel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPiCarousel.m; sourceTree = "<group>"; };
 		29DB578023D4CB1A0040E823 /* CPiCarousel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPiCarousel.h; sourceTree = "<group>"; };
 		29DB578123D4D3960040E823 /* CPNotificationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPNotificationViewController.m; sourceTree = "<group>"; };
@@ -428,11 +433,14 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				29D9051F25698381002D6F9E /* Localizable.strings */,
 				291FCD072525DC1500F5185E /* DWAlertController */,
 				29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */,
 				29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */,
 				29DC4AB92181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.h */,
 				29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */,
+				29D9053625698BB6002D6F9E /* CPTranslate.h */,
+				29D9052B25698B7F002D6F9E /* CPTranslate.m */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				298F4FC225002DA400F086D3 /* CleverPushUtils.h */,
@@ -457,7 +465,6 @@
 				29E290BE22B04A8900BFC74F /* CZPickerView.m */,
 				296FA74C2341197100E20FFD /* PopupView.h */,
 				296FA74A2341195900E20FFD /* PopupView.m */,
-				29D22E69252C7E9300977567 /* CleverPush.strings */,
 				29D22E6E252C8E6400977567 /* IntrinsicTableView.h */,
 				29D22E6F252C8E7500977567 /* IntrinsicTableView.m */,
 			);
@@ -495,6 +502,7 @@
 				29DB578A23D75C970040E823 /* CPiCarousel.h in Headers */,
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
 				29D71E792380743000C48ACA /* CPChatView.h in Headers */,
+				29D9053725698BB6002D6F9E /* CPTranslate.h in Headers */,
 				296FA7512341313200E20FFD /* PopupView.h in Headers */,
 				29DB578C23D75C9B0040E823 /* CPNotificationCategoryController.h in Headers */,
 				29DB95EF23FC3360008FC985 /* CleverPushSelectorHelpers.h in Headers */,
@@ -633,8 +641,8 @@
 			knownRegions = (
 				English,
 				en,
-				Base,
 				de,
+				Base,
 			);
 			mainGroup = 297B4DEB1E589AFE00BAF990;
 			productRefGroup = 297B4DF61E589AFE00BAF990 /* Products */;
@@ -746,6 +754,7 @@
 				291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */,
 				298F4FC525002F1F00F086D3 /* CleverPushUtils.m in Sources */,
 				297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */,
+				29D9052C25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				291FCE76252B5F3500F5185E /* DWAlertController.m in Sources */,
 				29D22E70252C8E7500977567 /* IntrinsicTableView.m in Sources */,
 				296FA74B2341195900E20FFD /* PopupView.m in Sources */,
@@ -780,6 +789,7 @@
 				29DB95F223FC33C3008FC985 /* UIApplicationDelegate+CleverPush.m in Sources */,
 				291FCD272525DC2800F5185E /* DWAlertPresentationAnimationController.m in Sources */,
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,
+				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
 				29D22E71252C8E7500977567 /* IntrinsicTableView.m in Sources */,
 				29DB95F423FC33C9008FC985 /* CPChatView.m in Sources */,
@@ -812,14 +822,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		29D22E69252C7E9300977567 /* CleverPush.strings */ = {
+		29D9051F25698381002D6F9E /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				29D22E68252C7E9300977567 /* en */,
-				29D22E6A252C7EDB00977567 /* English */,
-				29D22E6B252C7EF100977567 /* de */,
+				29D9052025698381002D6F9E /* de */,
+				29D905212569838A002D6F9E /* English */,
+				29D905222569839C002D6F9E /* en */,
 			);
-			name = CleverPush.strings;
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -311,6 +311,11 @@ BOOL handleSubscribedCalled = false;
     
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     
+    NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo) {
+        startFromNotification = YES;
+    }
+    
     if (self) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -347,11 +352,6 @@ BOOL handleSubscribedCalled = false;
         } else {
             [self initWithChannelId];
         }
-    }
-
-    NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-    if (userInfo) {
-        startFromNotification = YES;
     }
     
     if (autoClearBadge) {
@@ -1029,7 +1029,7 @@ static BOOL registrationInProgress = false;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
     if (!language) {
-        language = [[NSLocale preferredLanguages] firstObject];
+        language = [[[NSLocale preferredLanguages] firstObject] substringToIndex:2];
     }
     NSString* country = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
     if (!country) {
@@ -2224,7 +2224,8 @@ static BOOL registrationInProgress = false;
         }
         
         [self getChannelConfig:^(NSDictionary* channelConfig) {
-            NSString* headerTitle = NSLocalizedString(@"Subscribed Topics", nil);
+            NSString* headerTitle = [CPTranslate translate:@"subscribedTopics"];
+
             if (channelConfig != nil && [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
                 headerTitle = [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"];
             }
@@ -2235,7 +2236,7 @@ static BOOL registrationInProgress = false;
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
 
-                DWAlertAction *okAction = [DWAlertAction actionWithTitle:NSLocalizedString(@"Save", nil)
+                DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"]
                                                                    style:DWAlertActionStyleCancel
                                                                  handler:^(DWAlertAction* action) {
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
