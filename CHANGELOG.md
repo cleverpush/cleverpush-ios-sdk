@@ -1,3 +1,6 @@
+# 1.2.5
+* Improved generation of badge counts
+
 # 1.2.4
 * Fixed a display issue with the topics dialog
 * Fixed translations
