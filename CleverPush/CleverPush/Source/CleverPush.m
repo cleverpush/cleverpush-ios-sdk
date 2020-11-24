@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.6";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -438,11 +438,11 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)applicationWillEnterForeground {
-    [self updateBadge];
+    [self updateBadge:nil];
 }
 
 + (void)applicationDidEnterBackground {
-    [self updateBadge];
+    [self updateBadge:nil];
 }
 
 + (void)initFeatures {
@@ -1254,7 +1254,7 @@ static BOOL registrationInProgress = false;
     }
     
     // badge count
-    [self updateBadge];
+    [self updateBadge:nil];
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
         
@@ -1272,7 +1272,9 @@ static BOOL registrationInProgress = false;
     handleNotificationOpened(result);
 }
 
-+ (void)updateBadge {
++ (void)updateBadge:(UNMutableNotificationContent*)replacementContent {
+    NSLog(@"CleverPush: updateBadge");
+    
     NSBundle *bundle = [NSBundle mainBundle];
     if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
         // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
@@ -1282,9 +1284,15 @@ static BOOL registrationInProgress = false;
     if ([userDefaults boolForKey:@"CleverPush_INCREMENT_BADGE"]) {
         [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                if (replacementContent) {
+                    replacementContent.badge = @([notifications count] + 1);
+                }
+                
                 [UIApplication sharedApplication].applicationIconBadgeNumber = [notifications count];
             });
         }];
+    } else {
+        NSLog(@"CleverPush: updateBadge - no incrementBadge used");
     }
 }
 
@@ -2427,10 +2435,10 @@ static BOOL registrationInProgress = false;
     NSDictionary* payload = request.content.userInfo;
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
-    [self handleNotificationReceived:payload isActive:NO];
-    
     // badge count
-    [self updateBadge];
+    [self updateBadge:replacementContent];
+    
+    [self handleNotificationReceived:payload isActive:NO];
     
     // rich notifications
     if (notification != nil) {

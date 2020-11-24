@@ -103,6 +103,7 @@ withCompletionHandler:(void(^)())completionHandler {
     }
     
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
+        [CleverPush updateBadge:nil];
         return;
     }
     

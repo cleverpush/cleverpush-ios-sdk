@@ -139,4 +139,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (NSString*)getApiEndpoint;
 
++ (void)updateBadge:(UNMutableNotificationContent*)replacementContent;
+
 @end
