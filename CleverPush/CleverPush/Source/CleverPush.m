@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.6";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.7";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -335,14 +335,14 @@ BOOL handleSubscribedCalled = false;
 
         if (!channelId) {
             NSLog(@"CleverPush: Channel ID not specified, trying to fetch config via Bundle Identifier...");
-            
+
             dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
                 [self getChannelConfig:^(NSDictionary* channelConfig) {
                     if (!channelId) {
                         NSLog(@"CleverPush: Initialization stopped - No Channel ID available");
                         return;
                     }
-                    
+
                     dispatch_async(dispatch_get_main_queue(), ^(void){
                         [self initWithChannelId];
                     });
@@ -353,7 +353,7 @@ BOOL handleSubscribedCalled = false;
             [self initWithChannelId];
         }
     }
-    
+
     if (autoClearBadge) {
         [self clearBadge:false];
     }
@@ -1128,9 +1128,9 @@ static BOOL registrationInProgress = false;
         return;
     }
     lastNotificationReceivedId = notificationId;
-    
+
     NSLog(@"CleverPush: handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict);
-    
+
     [CleverPush setNotificationDelivered:notification withChannelId:[messageDict valueForKeyPath:@"channel._id"] withSubscriptionId:[messageDict valueForKeyPath:@"subscription._id"]];
     
     if (isActive && notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
@@ -1273,8 +1273,6 @@ static BOOL registrationInProgress = false;
 }
 
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent {
-    NSLog(@"CleverPush: updateBadge");
-    
     NSBundle *bundle = [NSBundle mainBundle];
     if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
         // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
@@ -1282,15 +1280,24 @@ static BOOL registrationInProgress = false;
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
     if ([userDefaults boolForKey:@"CleverPush_INCREMENT_BADGE"]) {
-        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (replacementContent) {
-                    replacementContent.badge = @([notifications count] + 1);
-                }
+        if (replacementContent != nil) {
+            dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+            
+            [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
+                replacementContent.badge = @([notifications count] + 1);
                 
-                [UIApplication sharedApplication].applicationIconBadgeNumber = [notifications count];
-            });
-        }];
+                dispatch_semaphore_signal(sema);
+            }];
+            
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        } else {
+            [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                });
+            }];
+        }
+        
     } else {
         NSLog(@"CleverPush: updateBadge - no incrementBadge used");
     }
@@ -2435,10 +2442,10 @@ static BOOL registrationInProgress = false;
     NSDictionary* payload = request.content.userInfo;
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
+    [self handleNotificationReceived:payload isActive:NO];
+    
     // badge count
     [self updateBadge:replacementContent];
-    
-    [self handleNotificationReceived:payload isActive:NO];
     
     // rich notifications
     if (notification != nil) {
@@ -2469,6 +2476,9 @@ static BOOL registrationInProgress = false;
     if (!replacementContent) {
         replacementContent = [request.content mutableCopy];
     }
+    
+    // badge count
+    [self updateBadge:replacementContent];
     
     NSDictionary* payload = request.content.userInfo;
     

@@ -1,3 +1,6 @@
+# 1.2.7
+* Further optimized generation of badge counts
+
 # 1.2.6
 * Further optimized generation of badge counts
 
