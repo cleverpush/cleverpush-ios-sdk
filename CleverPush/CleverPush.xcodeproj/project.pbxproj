@@ -144,6 +144,43 @@
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
 		29E290C022B04DEB00BFC74F /* CZPickerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29E290BD22B04A7900BFC74F /* CZPickerView.h */; };
 		29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E290BE22B04A8900BFC74F /* CZPickerView.m */; };
+		9692142525604EBA0020BD90 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692142325604EBA0020BD90 /* UIColorExtension.swift */; };
+		9692142625604EBA0020BD90 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692142325604EBA0020BD90 /* UIColorExtension.swift */; };
+		9692142725604EBA0020BD90 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692142425604EBA0020BD90 /* UIImageExtension.swift */; };
+		9692142825604EBA0020BD90 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692142425604EBA0020BD90 /* UIImageExtension.swift */; };
+		9692143E25604F410020BD90 /* BannerFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143725604F410020BD90 /* BannerFrequency.swift */; };
+		9692143F25604F410020BD90 /* BannerFrequency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143725604F410020BD90 /* BannerFrequency.swift */; };
+		9692144025604F410020BD90 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143825604F410020BD90 /* Banner.swift */; };
+		9692144125604F410020BD90 /* Banner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143825604F410020BD90 /* Banner.swift */; };
+		9692144225604F410020BD90 /* BannerStopAtType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143925604F410020BD90 /* BannerStopAtType.swift */; };
+		9692144325604F410020BD90 /* BannerStopAtType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143925604F410020BD90 /* BannerStopAtType.swift */; };
+		9692144425604F410020BD90 /* BannerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143A25604F410020BD90 /* BannerStatus.swift */; };
+		9692144525604F410020BD90 /* BannerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143A25604F410020BD90 /* BannerStatus.swift */; };
+		9692144625604F410020BD90 /* BannerDismissType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143B25604F410020BD90 /* BannerDismissType.swift */; };
+		9692144725604F410020BD90 /* BannerDismissType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143B25604F410020BD90 /* BannerDismissType.swift */; };
+		9692144825604F410020BD90 /* CleverPushError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143C25604F410020BD90 /* CleverPushError.swift */; };
+		9692144925604F410020BD90 /* CleverPushError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143C25604F410020BD90 /* CleverPushError.swift */; };
+		9692144A25604F410020BD90 /* BannerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143D25604F410020BD90 /* BannerType.swift */; };
+		9692144B25604F410020BD90 /* BannerType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692143D25604F410020BD90 /* BannerType.swift */; };
+		9692145C25604F730020BD90 /* BannerButtonBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145525604F730020BD90 /* BannerButtonBlock.swift */; };
+		9692145D25604F730020BD90 /* BannerButtonBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145525604F730020BD90 /* BannerButtonBlock.swift */; };
+		9692145E25604F730020BD90 /* BannerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145625604F730020BD90 /* BannerBackground.swift */; };
+		9692145F25604F730020BD90 /* BannerBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145625604F730020BD90 /* BannerBackground.swift */; };
+		9692146025604F730020BD90 /* BannerImageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145725604F730020BD90 /* BannerImageBlock.swift */; };
+		9692146125604F730020BD90 /* BannerImageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145725604F730020BD90 /* BannerImageBlock.swift */; };
+		9692146225604F730020BD90 /* BannerTextBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145825604F730020BD90 /* BannerTextBlock.swift */; };
+		9692146325604F730020BD90 /* BannerTextBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145825604F730020BD90 /* BannerTextBlock.swift */; };
+		9692146425604F730020BD90 /* Alignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145925604F730020BD90 /* Alignment.swift */; };
+		9692146525604F730020BD90 /* Alignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145925604F730020BD90 /* Alignment.swift */; };
+		9692146625604F730020BD90 /* BannerBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145A25604F730020BD90 /* BannerBlock.swift */; };
+		9692146725604F730020BD90 /* BannerBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145A25604F730020BD90 /* BannerBlock.swift */; };
+		9692146825604F730020BD90 /* BannerBlockType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145B25604F730020BD90 /* BannerBlockType.swift */; };
+		9692146925604F730020BD90 /* BannerBlockType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692145B25604F730020BD90 /* BannerBlockType.swift */; };
+		9692147425604F890020BD90 /* AppBannerModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692147225604F890020BD90 /* AppBannerModule.swift */; };
+		9692147525604F890020BD90 /* AppBannerModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692147225604F890020BD90 /* AppBannerModule.swift */; };
+		9692147625604F890020BD90 /* AppBannerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692147325604F890020BD90 /* AppBannerController.swift */; };
+		9692147725604F890020BD90 /* AppBannerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9692147325604F890020BD90 /* AppBannerController.swift */; };
+		96921494256052740020BD90 /* Banner-Bridging-Header.h in Headers */ = {isa = PBXBuildFile; fileRef = 96921493256052740020BD90 /* Banner-Bridging-Header.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -261,6 +298,26 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E290BD22B04A7900BFC74F /* CZPickerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CZPickerView.h; sourceTree = "<group>"; };
 		29E290BE22B04A8900BFC74F /* CZPickerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CZPickerView.m; sourceTree = "<group>"; };
+		9692142325604EBA0020BD90 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
+		9692142425604EBA0020BD90 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
+		9692143325604F150020BD90 /* AppBanner.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = AppBanner.storyboard; sourceTree = "<group>"; };
+		9692143725604F410020BD90 /* BannerFrequency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerFrequency.swift; sourceTree = "<group>"; };
+		9692143825604F410020BD90 /* Banner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Banner.swift; sourceTree = "<group>"; };
+		9692143925604F410020BD90 /* BannerStopAtType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerStopAtType.swift; sourceTree = "<group>"; };
+		9692143A25604F410020BD90 /* BannerStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerStatus.swift; sourceTree = "<group>"; };
+		9692143B25604F410020BD90 /* BannerDismissType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerDismissType.swift; sourceTree = "<group>"; };
+		9692143C25604F410020BD90 /* CleverPushError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CleverPushError.swift; sourceTree = "<group>"; };
+		9692143D25604F410020BD90 /* BannerType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerType.swift; sourceTree = "<group>"; };
+		9692145525604F730020BD90 /* BannerButtonBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerButtonBlock.swift; sourceTree = "<group>"; };
+		9692145625604F730020BD90 /* BannerBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerBackground.swift; sourceTree = "<group>"; };
+		9692145725604F730020BD90 /* BannerImageBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerImageBlock.swift; sourceTree = "<group>"; };
+		9692145825604F730020BD90 /* BannerTextBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerTextBlock.swift; sourceTree = "<group>"; };
+		9692145925604F730020BD90 /* Alignment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Alignment.swift; sourceTree = "<group>"; };
+		9692145A25604F730020BD90 /* BannerBlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerBlock.swift; sourceTree = "<group>"; };
+		9692145B25604F730020BD90 /* BannerBlockType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BannerBlockType.swift; sourceTree = "<group>"; };
+		9692147225604F890020BD90 /* AppBannerModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppBannerModule.swift; sourceTree = "<group>"; };
+		9692147325604F890020BD90 /* AppBannerController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppBannerController.swift; sourceTree = "<group>"; };
+		96921493256052740020BD90 /* Banner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Banner-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -434,6 +491,7 @@
 			isa = PBXGroup;
 			children = (
 				29D9051F25698381002D6F9E /* Localizable.strings */,
+				9692142125604E930020BD90 /* Banner */,
 				291FCD072525DC1500F5185E /* DWAlertController */,
 				29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */,
 				29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */,
@@ -480,6 +538,65 @@
 			path = Source;
 			sourceTree = "<group>";
 		};
+		9692142125604E930020BD90 /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				9692147325604F890020BD90 /* AppBannerController.swift */,
+				9692147225604F890020BD90 /* AppBannerModule.swift */,
+				9692143425604F1D0020BD90 /* Models */,
+				9692143225604F060020BD90 /* Layout */,
+				9692143125604ECD0020BD90 /* Extensions */,
+				96921493256052740020BD90 /* Banner-Bridging-Header.h */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		9692143125604ECD0020BD90 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9692142325604EBA0020BD90 /* UIColorExtension.swift */,
+				9692142425604EBA0020BD90 /* UIImageExtension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		9692143225604F060020BD90 /* Layout */ = {
+			isa = PBXGroup;
+			children = (
+				9692143325604F150020BD90 /* AppBanner.storyboard */,
+			);
+			path = Layout;
+			sourceTree = "<group>";
+		};
+		9692143425604F1D0020BD90 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9692145425604F660020BD90 /* Blocks */,
+				9692143825604F410020BD90 /* Banner.swift */,
+				9692143B25604F410020BD90 /* BannerDismissType.swift */,
+				9692143725604F410020BD90 /* BannerFrequency.swift */,
+				9692143A25604F410020BD90 /* BannerStatus.swift */,
+				9692143925604F410020BD90 /* BannerStopAtType.swift */,
+				9692143D25604F410020BD90 /* BannerType.swift */,
+				9692143C25604F410020BD90 /* CleverPushError.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9692145425604F660020BD90 /* Blocks */ = {
+			isa = PBXGroup;
+			children = (
+				9692145925604F730020BD90 /* Alignment.swift */,
+				9692145625604F730020BD90 /* BannerBackground.swift */,
+				9692145A25604F730020BD90 /* BannerBlock.swift */,
+				9692145B25604F730020BD90 /* BannerBlockType.swift */,
+				9692145525604F730020BD90 /* BannerButtonBlock.swift */,
+				9692145725604F730020BD90 /* BannerImageBlock.swift */,
+				9692145825604F730020BD90 /* BannerTextBlock.swift */,
+			);
+			path = Blocks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -499,6 +616,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29DB95F023FC3360008FC985 /* CleverPushHTTPClient.h in Headers */,
+				96921494256052740020BD90 /* Banner-Bridging-Header.h in Headers */,
 				29DB578A23D75C970040E823 /* CPiCarousel.h in Headers */,
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
 				29D71E792380743000C48ACA /* CPChatView.h in Headers */,
@@ -610,6 +728,7 @@
 					};
 					297C34D423FBF3AE00314A84 = {
 						CreatedOnToolsVersion = 11.3.1;
+						LastSwiftMigration = 1210;
 						ProvisioningStyle = Automatic;
 					};
 					29DB95CD23FC3203008FC985 = {
@@ -622,6 +741,7 @@
 					};
 					29DB95E423FC3249008FC985 = {
 						CreatedOnToolsVersion = 11.3.1;
+						LastSwiftMigration = 1210;
 						ProvisioningStyle = Automatic;
 					};
 					29DB960423FC6059008FC985 = {
@@ -749,21 +869,38 @@
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
 				291FCEC1252B65DF00F5185E /* DWAlertController+DWKeyboard.m in Sources */,
 				291FCE5B252B5F1C00F5185E /* CPTopicsViewController.m in Sources */,
+				9692144225604F410020BD90 /* BannerStopAtType.swift in Sources */,
+				9692143E25604F410020BD90 /* BannerFrequency.swift in Sources */,
 				297B4E271E58A16600BAF990 /* CleverPush.m in Sources */,
+				9692144A25604F410020BD90 /* BannerType.swift in Sources */,
+				9692144425604F410020BD90 /* BannerStatus.swift in Sources */,
+				9692144625604F410020BD90 /* BannerDismissType.swift in Sources */,
 				291FCE9D252B65D400F5185E /* DWAlertDismissalAnimationController.m in Sources */,
 				291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */,
 				298F4FC525002F1F00F086D3 /* CleverPushUtils.m in Sources */,
+				9692146825604F730020BD90 /* BannerBlockType.swift in Sources */,
+				9692144825604F410020BD90 /* CleverPushError.swift in Sources */,
+				9692146225604F730020BD90 /* BannerTextBlock.swift in Sources */,
+				9692146625604F730020BD90 /* BannerBlock.swift in Sources */,
 				297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */,
 				29D9052C25698B7F002D6F9E /* CPTranslate.m in Sources */,
+				9692145C25604F730020BD90 /* BannerButtonBlock.swift in Sources */,
 				291FCE76252B5F3500F5185E /* DWAlertController.m in Sources */,
+				9692146025604F730020BD90 /* BannerImageBlock.swift in Sources */,
 				29D22E70252C8E7500977567 /* IntrinsicTableView.m in Sources */,
+				9692146425604F730020BD90 /* Alignment.swift in Sources */,
 				296FA74B2341195900E20FFD /* PopupView.m in Sources */,
+				9692144025604F410020BD90 /* Banner.swift in Sources */,
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				9692145E25604F730020BD90 /* BannerBackground.swift in Sources */,
 				29E290C122B04DED00BFC74F /* CZPickerView.m in Sources */,
 				291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */,
+				9692147425604F890020BD90 /* AppBannerModule.swift in Sources */,
+				9692142525604EBA0020BD90 /* UIColorExtension.swift in Sources */,
 				291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */,
 				29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
 				291FCEB8252B65DC00F5185E /* DWAnimatableShapeLayer.m in Sources */,
+				9692142725604EBA0020BD90 /* UIImageExtension.swift in Sources */,
 				29D71E772380742800C48ACA /* CPChatView.m in Sources */,
 				29DB578223D4D3960040E823 /* CPNotificationViewController.m in Sources */,
 				291FCE94252B65D200F5185E /* DWActionsStackView.m in Sources */,
@@ -771,6 +908,7 @@
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
 				29DB578623D4D61F0040E823 /* CPNotificationCategoryController.m in Sources */,
 				291FCE6D252B5F2E00F5185E /* DWAlertAction.m in Sources */,
+				9692147625604F890020BD90 /* AppBannerController.swift in Sources */,
 				291FCEA6252B65D600F5185E /* DWAlertPresentationAnimationController.m in Sources */,
 				298325642346002100A5A85F /* JKAlertDialog.m in Sources */,
 			);
@@ -784,21 +922,38 @@
 				298F4FC125002D6700F086D3 /* CleverPushUtils.m in Sources */,
 				29DB960123FC3763008FC985 /* CleverPush.m in Sources */,
 				291FCD2D2525DC2800F5185E /* DWAlertView.m in Sources */,
+				9692144325604F410020BD90 /* BannerStopAtType.swift in Sources */,
+				9692143F25604F410020BD90 /* BannerFrequency.swift in Sources */,
 				29DB95F323FC33C6008FC985 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				9692144B25604F410020BD90 /* BannerType.swift in Sources */,
+				9692144525604F410020BD90 /* BannerStatus.swift in Sources */,
+				9692144725604F410020BD90 /* BannerDismissType.swift in Sources */,
 				291FCD2A2525DC2800F5185E /* DWAlertViewActionBaseView.m in Sources */,
 				29DB95F223FC33C3008FC985 /* UIApplicationDelegate+CleverPush.m in Sources */,
 				291FCD272525DC2800F5185E /* DWAlertPresentationAnimationController.m in Sources */,
+				9692146925604F730020BD90 /* BannerBlockType.swift in Sources */,
+				9692144925604F410020BD90 /* CleverPushError.swift in Sources */,
+				9692146325604F730020BD90 /* BannerTextBlock.swift in Sources */,
+				9692146725604F730020BD90 /* BannerBlock.swift in Sources */,
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,
 				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
+				9692145D25604F730020BD90 /* BannerButtonBlock.swift in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
+				9692146125604F730020BD90 /* BannerImageBlock.swift in Sources */,
 				29D22E71252C8E7500977567 /* IntrinsicTableView.m in Sources */,
+				9692146525604F730020BD90 /* Alignment.swift in Sources */,
 				29DB95F423FC33C9008FC985 /* CPChatView.m in Sources */,
+				9692144125604F410020BD90 /* Banner.swift in Sources */,
 				291FCD2B2525DC2800F5185E /* DWDimmingView.m in Sources */,
+				9692145F25604F730020BD90 /* BannerBackground.swift in Sources */,
 				29DB95F523FC33CD008FC985 /* CPNotificationCategoryController.m in Sources */,
 				291FCD2C2525DC2800F5185E /* DWAnimatableShapeLayer.m in Sources */,
+				9692147525604F890020BD90 /* AppBannerModule.swift in Sources */,
+				9692142625604EBA0020BD90 /* UIColorExtension.swift in Sources */,
 				291FCD242525DC2800F5185E /* DWAlertController.m in Sources */,
 				291FCD2F2525DC2800F5185E /* DWAlertPresentationController.m in Sources */,
 				291FCD2E2525DC2800F5185E /* DWAlertController+DWKeyboard.m in Sources */,
+				9692142825604EBA0020BD90 /* UIImageExtension.swift in Sources */,
 				29DB95FE23FC34D8008FC985 /* CPNotificationViewController.m in Sources */,
 				29DB95F723FC33D4008FC985 /* CPiCarousel.m in Sources */,
 				291FCD392525E2AD00F5185E /* CPTopicsViewController.m in Sources */,
@@ -806,6 +961,7 @@
 				29DB95F823FC33D6008FC985 /* CleverPushHTTPClient.m in Sources */,
 				29DB95F923FC33D8008FC985 /* JKAlertDialog.m in Sources */,
 				29DB95FA23FC33DE008FC985 /* CZPickerView.m in Sources */,
+				9692147725604F890020BD90 /* AppBannerController.swift in Sources */,
 				291FCD252525DC2800F5185E /* DWAlertAction.m in Sources */,
 				29DB95FB23FC33E0008FC985 /* PopupView.m in Sources */,
 			);
@@ -963,6 +1119,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1014,6 +1172,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1046,7 +1205,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1074,7 +1233,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SKIP_INSTALL = NO;
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1086,18 +1245,23 @@
 					x86_64h,
 					armv7s,
 				);
+				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPush;
 				CLEVERPUSH_TARGET_NAME = CleverPushFramework;
 				CODE_SIGN_STYLE = Automatic;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-fembed-bitcode",
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -1109,18 +1273,22 @@
 					x86_64h,
 					armv7s,
 				);
+				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPush;
 				CLEVERPUSH_TARGET_NAME = CleverPushFramework;
 				CODE_SIGN_STYLE = Automatic;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-fembed-bitcode",
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -1150,6 +1318,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1179,6 +1348,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1245,32 +1415,42 @@
 		29DB95E623FC3249008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPush;
 				CLEVERPUSH_TARGET_NAME = CleverPushFramework;
 				CODE_SIGN_STYLE = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CFLAGS = (
 					"-fembed-bitcode",
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		29DB95E723FC3249008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPush;
 				CLEVERPUSH_TARGET_NAME = CleverPushFramework;
 				CODE_SIGN_STYLE = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_CFLAGS = (
 					"-fembed-bitcode",
 					"-all_load",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPush/Source/Banner/Banner-Bridging-Header.h";
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
