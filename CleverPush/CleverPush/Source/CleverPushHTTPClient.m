@@ -23,8 +23,9 @@
 
 - (id)init {
     self = [super init];
-    if (self)
+    if (self) {
         self.apiEndpoint = [NSURL URLWithString:[NSString stringWithFormat:@"%@/", [CleverPush getApiEndpoint]]];
+    }
     return self;
 }
 

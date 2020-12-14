@@ -62,6 +62,7 @@ done
 
 # move info.plist into Resources and create appropriate symlinks
 mv Info.plist Versions/A/Resources/Info.plist
+#mv AppBanner.storyboard Versions/A/Resources/AppBanner.storyboard
 ln -s Versions/A/Resources Resources
 
 # Create a symlink directory for 'Versions/A' called 'Current'

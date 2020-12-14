@@ -2,18 +2,17 @@
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 #import "CleverPush.h"
-#import "CleverPushHTTPClient.h"
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
-#import "JKAlertDialog.h"
 #import "CPNotificationCategoryController.h"
-#import "CleverPushUtils.h"
+#import "CPUtils.h"
 #import "CPTopicsViewController.h"
-#import "CZPickerView.h"
+#import "CPTranslate.h"
+#import "CPAppBannerModule.h"
 #import "DWAlertController/DWAlertController.h"
 #import "DWAlertController/DWAlertAction.h"
-#import "CleverPush-Swift.h"
+
 
 #import <stdlib.h>
 #import <stdio.h>
@@ -138,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.2.7";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -169,7 +168,6 @@ NSMutableArray* pendingSubscriptionListeners;
 NSArray* channelTopics;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 DWAlertController *channelTopicsPicker;
-JKAlertDialog* currentAppBannerPopup;
 WKWebView* currentAppBannerWebView;
 id currentAppBannerUrlOpenedCallback;
 BOOL channelTopicsPickerVisible = NO;
@@ -221,6 +219,11 @@ BOOL handleSubscribedCalled = false;
 
 + (void)enableDevelopmentMode {
     developmentMode = YES;
+    NSLog(@"CleverPush: ! SDK is running in development mode. Only use this while testing !");
+}
+
++ (BOOL)isDevelopmentModeEnabled {
+    return developmentMode;
 }
 
 + (BOOL)startFromNotification {
@@ -440,17 +443,25 @@ BOOL handleSubscribedCalled = false;
 
 + (void)applicationWillEnterForeground {
     [self updateBadge:nil];
+    
+    [self trackSessionStart];
+    
+    [CPAppBannerModule initSession];
 }
 
 + (void)applicationDidEnterBackground {
     [self updateBadge:nil];
+    
+    [self trackSessionEnd];
 }
 
 + (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         [self showPendingTopicsDialog];
         [self initAppReview];
-        [AppBannerModule initBannersWithChannel:channelId showDrafts:false];
+        
+        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode];
+        [CPAppBannerModule initSession];
     });
 }
 
@@ -584,8 +595,7 @@ BOOL handleSubscribedCalled = false;
     }];
 }
 
-+ (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime
-{
++ (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
     NSDate *fromDate;
     NSDate *toDate;
 
@@ -1159,7 +1169,7 @@ static BOOL registrationInProgress = false;
     if (nsURL) {
         NSString* urlScheme = [nsURL.scheme lowercaseString];
         if ([urlScheme isEqualToString:@"http"] || [urlScheme isEqualToString:@"https"]) {
-            NSString* name = [CleverPushUtils downloadMedia:mediaUrl];
+            NSString* name = [CPUtils downloadMedia:mediaUrl];
             
             if (name) {
                 NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -1196,7 +1206,7 @@ static BOOL registrationInProgress = false;
             if (nsURL) {
                 NSString* urlScheme = [nsURL.scheme lowercaseString];
                 if ([urlScheme isEqualToString:@"http"] || [urlScheme isEqualToString:@"https"]) {
-                    NSString* name = [CleverPushUtils downloadMedia:mediaUrl];
+                    NSString* name = [CPUtils downloadMedia:mediaUrl];
                     
                     if (name) {
                         NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -2254,184 +2264,29 @@ static BOOL registrationInProgress = false;
 
 }
 
-+ (NSString *)czpickerView:(CZPickerView *)pickerView titleForRow:(NSInteger)row {
-    return [channelTopics[row] valueForKey:@"name"];
-}
-
-+ (bool)czpickerView:(CZPickerView *)pickerView checkedForRow:(NSInteger)row {
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* selectedTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
-    NSDictionary* topic = channelTopics[row];
-    NSString* topicId;
-    if (topic) {
-        topicId = [topic valueForKey:@"_id"];
-    }
-    return selectedTags && [selectedTags containsObject:topicId];
-}
-
-+ (NSInteger)numberOfRowsInPickerView:(CZPickerView *)pickerView {
-    return channelTopics.count;
-}
-
-+ (void)czpickerViewDidClickCancelButton:(CZPickerView *)pickerView {
-    channelTopicsPickerVisible = NO;
-}
-
-+ (void)czpickerView:(CZPickerView *)pickerView didConfirmWithItemsAtRows:(NSArray *)rows {
-    if (!channelTopicsPickerVisible) {
-        return;
-    }
-    channelTopicsPickerVisible = NO;
-    
-    NSMutableArray* selectedTopics = [[NSMutableArray alloc] init];
-    for (NSNumber *n in rows) {
-        NSInteger row = [n integerValue];
-        NSDictionary* topic = channelTopics[row];
-        if (topic) {
-            [selectedTopics addObject:[topic valueForKey:@"_id"]];
-        }
-    }
-    
-    [CleverPush setSubscriptionTopics:selectedTopics];
-}
-
-+ (void)closeCurrentAppBanner:(id)sender {
-    if (currentAppBannerPopup != nil) {
-        [currentAppBannerPopup dismiss];
-        currentAppBannerPopup = nil;
-    }
-}
-
-
-+ (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    NSURLRequest *request = navigationAction.request;
-    
-    if ([[[request URL] scheme] isEqualToString:@"file"]) {
-        decisionHandler(WKNavigationActionPolicyAllow);
-    } else {
-        if (currentAppBannerUrlOpenedCallback != nil) {
-            ((void(^)(NSString *))currentAppBannerUrlOpenedCallback)([request URL].absoluteString);
-            currentAppBannerUrlOpenedCallback = nil;
-        }
-        
-        decisionHandler(WKNavigationActionPolicyCancel);
-        
-        if (currentAppBannerPopup != nil) {
-            [currentAppBannerPopup dismiss];
-            currentAppBannerPopup = nil;
-        }
-    }
-}
-
-+ (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    NSLog(@"CleverPush didFinishNavigation");
-    
-    [CleverPush reLayoutAppBanner];
-}
-
-+ (void)reLayoutAppBanner {
-    if (currentAppBannerPopup == nil || currentAppBannerWebView == nil) {
-        return;
-    }
-    
-    CGFloat maxWidth = [UIScreen mainScreen].bounds.size.width - 50;
-    CGFloat maxHeight = [UIScreen mainScreen].bounds.size.height - 50;
-    
-    [currentAppBannerWebView evaluateJavaScript:@"Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)"
-    completionHandler:^(id _Nullable resultHeight, NSError * _Nullable error) {
-        if (!error) {
-            [currentAppBannerWebView evaluateJavaScript:@"Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth)"
-            completionHandler:^(id _Nullable resultWidth, NSError * _Nullable error) {
-                if (!error) {
-                    CGFloat height = [resultHeight floatValue];
-                    CGFloat width = [resultWidth floatValue];
-                    
-                    CGRect frame = currentAppBannerWebView.frame;
-                    
-                    frame.size.height = height;
-                    frame.size.width = width;
-
-                    currentAppBannerWebView.frame = frame;
-                    
-                    frame.size = currentAppBannerWebView.scrollView.contentSize;
-                    currentAppBannerWebView.frame = frame;
-                    
-                    if (frame.size.width > maxWidth) {
-                        frame.size.width = maxWidth;
-                    }
-
-                    if (frame.size.height > maxHeight) {
-                        frame.size.height = maxHeight;
-                    }
-                    
-                    NSLog(@"frame.size.width %f", frame.size.width / 2);
-                    NSLog(@"frame.size.height %f", frame.size.height / 2);
-                    
-                    currentAppBannerWebView.frame = frame;
-                    [currentAppBannerPopup reLayout];
-                }
-            }];
-        }
-    }];
-    
-}
-
 
 + (void)showAppBanners {
-    [self showAppBanners:nil];
+    NSLog(@"CleverPush: showAppBanners does not have to be called, app banners are initialized automatically");
 }
 
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback {
-    [self getAppBanners:^(NSArray* banners) {
-        if (banners == nil || [banners count] == 0) {
-            NSLog(@"CleverPush: showAppBanners: No banners found. Create some first in the CleverPush channel settings.");
-            return;
-        }
-        
-        currentAppBannerUrlOpenedCallback = urlOpenedCallback;
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for (NSDictionary *banner in banners) {
-                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableArray* shownAppBanners = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_SHOWN_APP_BANNERS"]];
-                if (!shownAppBanners) {
-                    shownAppBanners = [[NSMutableArray alloc] init];
-                }
-                
-                if (banner != nil && (([banner valueForKey:@"frequency"] != nil && ([[banner valueForKey:@"frequency"]  isEqual: @"oncePerSession"] || [[banner valueForKey:@"frequency"]  isEqual: @"always"])) || (([banner valueForKey:@"frequency"] == nil || [[banner valueForKey:@"frequency"]  isEqual: @"once"]) && ![shownAppBanners containsObject:[banner valueForKey:@"_id"]]))) {
-                    [shownAppBanners addObject:[banner valueForKey:@"_id"]];
-                    [[NSUserDefaults standardUserDefaults] setObject:shownAppBanners forKey:@"CleverPush_SHOWN_APP_BANNERS"];
-                    [userDefaults synchronize];
+    [CleverPush showAppBanners];
+}
 
-                    currentAppBannerWebView = [[WKWebView alloc] init];
-                    #pragma clang diagnostic push
-                    #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
-                    [currentAppBannerWebView setNavigationDelegate:self];
-                    #pragma clang diagnostic pop
-                    [currentAppBannerWebView loadHTMLString:[banner valueForKey:@"content"] baseURL:[[NSBundle mainBundle] resourceURL]];
-                    currentAppBannerWebView.scrollView.scrollEnabled = true;
-                    currentAppBannerWebView.contentMode = UIViewContentModeScaleToFill;
-                    currentAppBannerWebView.scrollView.bounces = false;
-                    currentAppBannerWebView.allowsBackForwardNavigationGestures = false;
-                    
-                    UIButton *closeButton = [[UIButton alloc] initWithFrame: CGRectMake(0,0,20,20)];
-                    [closeButton setTitle:@"×" forState:UIControlStateNormal];
-                    [closeButton setTitleColor:UIColor.blackColor forState:UIControlStateNormal];
-                    [closeButton addTarget:self action:@selector(closeCurrentAppBanner:) forControlEvents:UIControlEventTouchUpInside];
-                    [currentAppBannerWebView addSubview:closeButton];
-                    
-                    currentAppBannerPopup = [[JKAlertDialog alloc]init];
-                
-                    currentAppBannerPopup.contentView = currentAppBannerWebView;
-                    [currentAppBannerPopup show];
-                    
-                    [self reLayoutAppBanner];
-                    
-                    break;
-                }
-            }
-        });
-    }];
++ (void)reLayoutAppBanner {
+    NSLog(@"CleverPush: reLayoutAppBanner is deprecated");
+}
+
++ (void)showAppBanner:(NSString *)bannerId {
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId];
+}
+
++ (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value {
+    [CPAppBannerModule triggerEvent:key value:value];
+}
+
++ (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback {
+    [CPAppBannerModule setBannerOpenedCallback:callback];
 }
 
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {

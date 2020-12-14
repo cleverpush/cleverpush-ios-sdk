@@ -1,6 +1,6 @@
 #import "CPTopicsViewController.h"
 #import <CleverPush/CleverPush.h>
-#import "IntrinsicTableView.h"
+#import "CPIntrinsicTableView.h"
 
 @implementation CPTopicsViewController
 
@@ -48,7 +48,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    tableView = [[IntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     tableView.translatesAutoresizingMaskIntoConstraints = NO;
     tableView.backgroundColor = UIColor.clearColor;
     

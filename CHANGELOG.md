@@ -1,3 +1,6 @@
+# 1.3.0
+* New App Banners
+
 # 1.2.7
 * Further optimized generation of badge counts
 
