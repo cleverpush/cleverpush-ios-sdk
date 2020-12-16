@@ -1,3 +1,6 @@
+# 1.3.1
+* Removed not necessary public headers from Framework
+
 # 1.3.0
 * New App Banners
 
