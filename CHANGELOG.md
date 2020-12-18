@@ -1,3 +1,6 @@
+# 1.3.2
+* Optimized behaviour when channelId changes
+
 # 1.3.1
 * Removed not necessary public headers from Framework
 
