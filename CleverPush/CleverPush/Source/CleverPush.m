@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -333,8 +333,8 @@ BOOL handleSubscribedCalled = false;
             channelId  = [userDefaults stringForKey:@"CleverPush_CHANNEL_ID"];
         } else if (![channelId isEqualToString:[userDefaults stringForKey:@"CleverPush_CHANNEL_ID"]]) {
             [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
-            [userDefaults setObject:nil forKey:@"CleverPush_SUBSCRIPTION_ID"];
             [userDefaults synchronize];
+            [self clearSubscriptionData];
         }
 
         if (!channelId) {
@@ -396,6 +396,8 @@ BOOL handleSubscribedCalled = false;
 }
 
 + (void)initWithChannelId {
+    NSLog(@"CleverPush: initializing SDK %@ with channelId: %@", CLEVERPUSH_SDK_VERSION, channelId);
+    
     UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -836,7 +838,7 @@ BOOL handleSubscribedCalled = false;
             [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && subscriptionId == nil) {
-                        NSLog(@"CleverPush: syncSubscription called from subscribe");
+                        // NSLog(@"CleverPush: syncSubscription called from subscribe");
                         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
 
                         [self getChannelConfig:^(NSDictionary* channelConfig) {
@@ -917,6 +919,10 @@ BOOL handleSubscribedCalled = false;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     handleSubscribedCalled = false;
     subscriptionId = nil;
@@ -1083,12 +1089,12 @@ static BOOL registrationInProgress = false;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     
-    NSLog(@"CleverPush: syncSubscription Request %@ %@ %@", dataDic, deviceToken, subscriptionId);
+    NSLog(@"CleverPush: syncSubscription Request apnsToken:%@ subscriptionId:%@", deviceToken, subscriptionId);
 
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
         
-        NSLog(@"CleverPush: syncSubscription Result %@", results);
+        // NSLog(@"CleverPush: syncSubscription Result %@", results);
 
         if ([results objectForKey:@"id"] != nil) {
             if (!subscriptionId) {
@@ -2091,7 +2097,6 @@ static BOOL registrationInProgress = false;
                     }
 
                     if (sessionStartedTimestamp == 0) {
-                        NSLog(@"CleverPush: Error tracking session end - session started timestamp is 0");
                         return;
                     }
                     
