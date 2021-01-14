@@ -316,6 +316,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self fadeOut];
         [self jumpOut];
+        
+        [self dismissViewControllerAnimated:NO completion:nil];
     });
 }
 

@@ -1,3 +1,6 @@
+# 1.3.4
+* Fixed dismissal of app banners
+
 # 1.3.3
 * Fixed a crash when trying to display an app-banner with empty image block
 

@@ -41,10 +41,10 @@ CPAppBannerActionBlock handleBannerOpened;
 }
 
 + (void)initSession {
+    long minLength = [CleverPush isDevelopmentModeEnabled] ? 30 * 1000L : MIN_SESSION_LENGTH;
     if (
-        ![CleverPush isDevelopmentModeEnabled]
-        && lastSessionTimestamp > 0
-        && ((long)NSDate.date.timeIntervalSince1970 - lastSessionTimestamp) < MIN_SESSION_LENGTH
+        lastSessionTimestamp > 0
+        && ((long)NSDate.date.timeIntervalSince1970 - lastSessionTimestamp) < minLength
     ) {
         return;
     }
