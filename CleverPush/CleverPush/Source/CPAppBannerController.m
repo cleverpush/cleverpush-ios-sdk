@@ -122,6 +122,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 }
 
 - (void)composeBanner:(NSMutableArray<CPAppBannerBlock*>*)blocks {
+    NSLog(@"CleverPush: composeBanner");
+    
     UIView *prevView = nil;
     int index = 0;
     for (CPAppBannerBlock* block in blocks) {
@@ -157,6 +159,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 }
 
 - (UIView*)composeButtonBlock:(CPAppBannerButtonBlock*)block {
+    NSLog(@"CleverPush: composeButtonBlock");
     CPUIBlockButton *button = [CPUIBlockButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:block.text forState:UIControlStateNormal];
     [button setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
@@ -223,7 +226,9 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 - (UIImageView*)composeImageBlock:(CPAppBannerImageBlock*)block {
     UIImageView *imageView = [[CPAspectKeepImageView alloc] init];
-    [imageView setImageWithURL:[NSURL URLWithString:block.imageUrl]];
+    if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
+        [imageView setImageWithURL:[NSURL URLWithString:block.imageUrl]];
+    }
     
     CGFloat AspectRatio = block.scale > 0 ? (CGFloat)block.scale / 100 : 100.0f;
     

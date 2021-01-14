@@ -1,3 +1,6 @@
+# 1.3.3
+* Fixed a crash when trying to display an app-banner with empty image block
+
 # 1.3.2
 * Optimized behaviour when channelId changes
 

@@ -137,7 +137,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1467,7 +1467,7 @@ static BOOL registrationInProgress = false;
     NSError* jsonError = nil;
     NSMutableDictionary* innerJson;
 
-    if (data != nil && [data length] > 0) {
+    if (data != nil && !isEmpty(data)) {
         innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
         if (jsonError) {
             if (failureBlock != nil)
