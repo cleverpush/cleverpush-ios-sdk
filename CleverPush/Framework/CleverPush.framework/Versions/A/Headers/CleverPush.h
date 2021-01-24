@@ -12,12 +12,16 @@
 #import "CPNotificationViewController.h"
 #import "CleverPushHTTPClient.h"
 #import "CPAppBannerAction.h"
+#import "CPNotification.h"
+#import "CPSubscription.h"
+#import "CPChannelTag.h"
+#import "CPChannelTopic.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
 @property(readonly)NSDictionary* payload;
-@property(readonly)NSDictionary* notification;
-@property(readonly)NSDictionary* subscription;
+@property(readonly)CPNotification* notification;
+@property(readonly)CPSubscription* subscription;
 -(instancetype)initWithPayload:(NSDictionary *)payload;
 
 @end;
@@ -25,8 +29,8 @@
 @interface CPNotificationOpenedResult : NSObject
 
 @property(readonly)NSDictionary* payload;
-@property(readonly)NSDictionary* notification;
-@property(readonly)NSDictionary* subscription;
+@property(readonly)CPNotification* notification;
+@property(readonly)CPSubscription* subscription;
 @property(readonly)NSString* action;
 -(instancetype)initWithPayload:(NSDictionary *)payload action:(NSString*)action;
 

@@ -32,43 +32,8 @@
     if (self) {
         _payload = inPayload;
         
-        _notification = [[_payload valueForKey:@"notification"] mutableCopy];
-        
-        if ([_notification valueForKey:@"title"] == nil) {
-            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
-        }
-        if ([_notification valueForKey:@"text"] == nil) {
-            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
-        }
-        
-        NSArray* actions = [_notification objectForKey:@"actions"];
-        if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {
-            NSMutableArray* actionArray = [NSMutableArray new];
-            [actions enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
-                NSString* actionId = [NSString stringWithFormat: @"%@", @(idx)];
-                
-                NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
-                
-                [action setValue:actionId forKey:@"id"];
-                if ([item valueForKey:@"title"]) {
-                    [action setValue:[item valueForKey:@"title"] forKey:@"title"];
-                }
-                if ([item valueForKey:@"url"]) {
-                    [action setValue:[item valueForKey:@"url"] forKey:@"url"];
-                }
-                if ([item valueForKey:@"type"]) {
-                    [action setValue:[item valueForKey:@"type"] forKey:@"type"];
-                }
-                if ([item valueForKey:@"customData"]) {
-                    [action setValue:[item valueForKey:@"customData"] forKey:@"customData"];
-                }
-                
-                [actionArray addObject:action];
-            }];
-            [_notification setValue:actionArray forKey:@"actions"];
-        }
-        
-        _subscription = [_payload valueForKey:@"subscription"];
+        _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
+        _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
     }
     return self;
 }
@@ -82,42 +47,8 @@
     if (self) {
         _payload = inPayload;
         
-        _notification = [[_payload valueForKey:@"notification"] mutableCopy];
-        if ([_notification valueForKey:@"title"] == nil) {
-            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.title"] forKey:@"title"];
-        }
-        if ([_notification valueForKey:@"text"] == nil) {
-            [_notification setValue:[_payload valueForKeyPath:@"aps.alert.body"] forKey:@"text"];
-        }
-        
-        NSArray* actions = [_notification objectForKey:@"actions"];
-        if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {
-            NSMutableArray* actionArray = [NSMutableArray new];
-            [actions enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
-                NSString* actionId = [NSString stringWithFormat: @"%@", @(idx)];
-                
-                NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
-                
-                [action setValue:actionId forKey:@"id"];
-                if ([item valueForKey:@"title"]) {
-                    [action setValue:[item valueForKey:@"title"] forKey:@"title"];
-                }
-                if ([item valueForKey:@"url"]) {
-                    [action setValue:[item valueForKey:@"url"] forKey:@"url"];
-                }
-                if ([item valueForKey:@"type"]) {
-                    [action setValue:[item valueForKey:@"type"] forKey:@"type"];
-                }
-                if ([item valueForKey:@"customData"]) {
-                    [action setValue:[item valueForKey:@"customData"] forKey:@"customData"];
-                }
-                
-                [actionArray addObject:action];
-            }];
-            [_notification setValue:actionArray forKey:@"actions"];
-        }
-        
-        _subscription = [_payload valueForKey:@"subscription"];
+        _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
+        _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
         
         _action = action;
     }
@@ -137,7 +68,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.3.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1604,8 +1535,13 @@ static BOOL registrationInProgress = false;
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTags = [channelConfig valueForKey:@"channelTags"];
-            if (channelTags != nil) {
-                callback(channelTags);
+            if (channelTags != nil && ![channelTags isKindOfClass:[NSNull class]] && [channelTags count] > 0) {
+                NSMutableArray* channelTagsArray = [NSMutableArray new];
+                [channelTags enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
+                    CPChannelTag* tag = [CPChannelTag initWithJson:item];
+                    [channelTagsArray addObject:tag];
+                }];
+                callback(channelTagsArray);
                 return;
             }
         }
@@ -1630,12 +1566,17 @@ static BOOL registrationInProgress = false;
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
-            if (channelTopics != nil) {
+            if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
                 NSSortDescriptor *valueDescriptor = [[NSSortDescriptor alloc] initWithKey:@"sort" ascending:YES];
                 NSArray *descriptors = [NSArray arrayWithObject:valueDescriptor];
                 NSArray *sortedTopics = [channelTopics sortedArrayUsingDescriptors:descriptors];
                 
-                callback(sortedTopics);
+                NSMutableArray* channelTopicsArray = [NSMutableArray new];
+                [sortedTopics enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
+                    CPChannelTopic* topic = [CPChannelTopic initWithJson:item];
+                    [channelTopicsArray addObject:topic];
+                }];
+                callback(channelTopicsArray);
                 return;
             }
         }

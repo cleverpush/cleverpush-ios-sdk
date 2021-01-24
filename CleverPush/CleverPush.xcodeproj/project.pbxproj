@@ -122,6 +122,18 @@
 		296068AC25744C89002159D0 /* CPAppBannerAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 296068AA25744C89002159D0 /* CPAppBannerAction.m */; };
 		296068B625744C92002159D0 /* CPAppBannerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 296068B525744C92002159D0 /* CPAppBannerAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2969757824C0FD8F009563C6 /* JavaScriptCore.framework */; };
+		296A132525BE124900A2BEED /* CPNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 296A132425BE124900A2BEED /* CPNotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		296A133025BE127600A2BEED /* CPNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A132F25BE127600A2BEED /* CPNotification.m */; };
+		296A134225BE128700A2BEED /* CPSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A134125BE128700A2BEED /* CPSubscription.m */; };
+		296A134325BE128700A2BEED /* CPSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A134125BE128700A2BEED /* CPSubscription.m */; };
+		296A134C25BE128E00A2BEED /* CPNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A132F25BE127600A2BEED /* CPNotification.m */; };
+		296A135625BE16C100A2BEED /* CPChannelTopic.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A135525BE16C100A2BEED /* CPChannelTopic.m */; };
+		296A135725BE16C100A2BEED /* CPChannelTopic.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A135525BE16C100A2BEED /* CPChannelTopic.m */; };
+		296A136125BE16CF00A2BEED /* CPChannelTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A136025BE16CF00A2BEED /* CPChannelTag.m */; };
+		296A136225BE16CF00A2BEED /* CPChannelTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A136025BE16CF00A2BEED /* CPChannelTag.m */; };
+		296A136C25BE16DF00A2BEED /* CPChannelTag.h in Headers */ = {isa = PBXBuildFile; fileRef = 296A136B25BE16DF00A2BEED /* CPChannelTag.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		296A137625BE16EB00A2BEED /* CPChannelTopic.h in Headers */ = {isa = PBXBuildFile; fileRef = 296A137525BE16EB00A2BEED /* CPChannelTopic.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		296A139725BE230900A2BEED /* CPSubscription.h in Headers */ = {isa = PBXBuildFile; fileRef = 296A132E25BE125900A2BEED /* CPSubscription.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		296D0AD6257460E800531EFF /* UIControl+CPBlockActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 296D0AD5257460E800531EFF /* UIControl+CPBlockActions.m */; };
 		296D0AD7257460E800531EFF /* UIControl+CPBlockActions.m in Sources */ = {isa = PBXBuildFile; fileRef = 296D0AD5257460E800531EFF /* UIControl+CPBlockActions.m */; };
 		297810C52573E44B0083D1A6 /* CPAppBannerBackground.m in Sources */ = {isa = PBXBuildFile; fileRef = 298677292572DFAC0002E9F1 /* CPAppBannerBackground.m */; };
@@ -265,6 +277,14 @@
 		296068AA25744C89002159D0 /* CPAppBannerAction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerAction.m; sourceTree = "<group>"; };
 		296068B525744C92002159D0 /* CPAppBannerAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerAction.h; sourceTree = "<group>"; };
 		2969757824C0FD8F009563C6 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		296A132425BE124900A2BEED /* CPNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPNotification.h; sourceTree = "<group>"; };
+		296A132E25BE125900A2BEED /* CPSubscription.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPSubscription.h; sourceTree = "<group>"; };
+		296A132F25BE127600A2BEED /* CPNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPNotification.m; sourceTree = "<group>"; };
+		296A134125BE128700A2BEED /* CPSubscription.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSubscription.m; sourceTree = "<group>"; };
+		296A135525BE16C100A2BEED /* CPChannelTopic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChannelTopic.m; sourceTree = "<group>"; };
+		296A136025BE16CF00A2BEED /* CPChannelTag.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChannelTag.m; sourceTree = "<group>"; };
+		296A136B25BE16DF00A2BEED /* CPChannelTag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChannelTag.h; sourceTree = "<group>"; };
+		296A137525BE16EB00A2BEED /* CPChannelTopic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChannelTopic.h; sourceTree = "<group>"; };
 		296D0AD4257460D900531EFF /* UIControl+CPBlockActions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIControl+CPBlockActions.h"; sourceTree = "<group>"; };
 		296D0AD5257460E800531EFF /* UIControl+CPBlockActions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIControl+CPBlockActions.m"; sourceTree = "<group>"; };
 		297B4DF51E589AFE00BAF990 /* CleverPush.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPush.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -516,6 +536,14 @@
 				291FCD072525DC1500F5185E /* DWAlertController */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
+				296A132425BE124900A2BEED /* CPNotification.h */,
+				296A132F25BE127600A2BEED /* CPNotification.m */,
+				296A132E25BE125900A2BEED /* CPSubscription.h */,
+				296A134125BE128700A2BEED /* CPSubscription.m */,
+				296A137525BE16EB00A2BEED /* CPChannelTopic.h */,
+				296A135525BE16C100A2BEED /* CPChannelTopic.m */,
+				296A136B25BE16DF00A2BEED /* CPChannelTag.h */,
+				296A136025BE16CF00A2BEED /* CPChannelTag.m */,
 				296068B525744C92002159D0 /* CPAppBannerAction.h */,
 				296068AA25744C89002159D0 /* CPAppBannerAction.m */,
 				2986776C2572DFFA0002E9F1 /* CPAppBannerAlignment.h */,
@@ -614,10 +642,14 @@
 			files = (
 				2906A152258557B60078FD61 /* CPAppBannerBlock.h in Headers */,
 				2906A140258557B00078FD61 /* CPAppBannerAlignment.h in Headers */,
+				296A139725BE230900A2BEED /* CPSubscription.h in Headers */,
 				2906A164258557BE0078FD61 /* CPAppBannerButtonBlock.h in Headers */,
 				2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */,
 				29DB95F023FC3360008FC985 /* CleverPushHTTPClient.h in Headers */,
+				296A136C25BE16DF00A2BEED /* CPChannelTag.h in Headers */,
+				296A137625BE16EB00A2BEED /* CPChannelTopic.h in Headers */,
 				29DB578A23D75C970040E823 /* CPiCarousel.h in Headers */,
+				296A132525BE124900A2BEED /* CPNotification.h in Headers */,
 				2906A137258557790078FD61 /* CPAppBannerType.h in Headers */,
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
 				2956401B258822E000FE7611 /* CPAppBannerTrigger.h in Headers */,
@@ -883,6 +915,8 @@
 				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
 				291FCEC1252B65DF00F5185E /* DWAlertController+DWKeyboard.m in Sources */,
+				296A134C25BE128E00A2BEED /* CPNotification.m in Sources */,
+				296A134225BE128700A2BEED /* CPSubscription.m in Sources */,
 				291FCE5B252B5F1C00F5185E /* CPTopicsViewController.m in Sources */,
 				298677B125732B8B0002E9F1 /* CPAppBanner.m in Sources */,
 				297B4E271E58A16600BAF990 /* CleverPush.m in Sources */,
@@ -894,6 +928,7 @@
 				29D9052C25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				291FCE76252B5F3500F5185E /* DWAlertController.m in Sources */,
 				296068852574374D002159D0 /* UIImageView+CleverPush.m in Sources */,
+				296A136125BE16CF00A2BEED /* CPChannelTag.m in Sources */,
 				29D22E70252C8E7500977567 /* CPIntrinsicTableView.m in Sources */,
 				2906A1EA25855B510078FD61 /* CPAppBannerAction.m in Sources */,
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
@@ -904,6 +939,7 @@
 				291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */,
 				296068A125744665002159D0 /* CPAspectKeepImageView.m in Sources */,
 				29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */,
+				296A135625BE16C100A2BEED /* CPChannelTopic.m in Sources */,
 				291FCEB8252B65DC00F5185E /* DWAnimatableShapeLayer.m in Sources */,
 				29D71E772380742800C48ACA /* CPChatView.m in Sources */,
 				29DB578223D4D3960040E823 /* CPNotificationViewController.m in Sources */,
@@ -943,6 +979,8 @@
 				2986773D2572DFC40002E9F1 /* CPAppBannerButtonBlock.m in Sources */,
 				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
+				296A134325BE128700A2BEED /* CPSubscription.m in Sources */,
+				296A136225BE16CF00A2BEED /* CPChannelTag.m in Sources */,
 				296068902574452B002159D0 /* CPAspectKeepImageView.m in Sources */,
 				29D22E71252C8E7500977567 /* CPIntrinsicTableView.m in Sources */,
 				298676AB2572CF6E0002E9F1 /* UIImageView+CleverPush.m in Sources */,
@@ -953,6 +991,8 @@
 				298676662572CC210002E9F1 /* CPAppBannerController.m in Sources */,
 				291FCD242525DC2800F5185E /* DWAlertController.m in Sources */,
 				291FCD2F2525DC2800F5185E /* DWAlertPresentationController.m in Sources */,
+				296A135725BE16C100A2BEED /* CPChannelTopic.m in Sources */,
+				296A133025BE127600A2BEED /* CPNotification.m in Sources */,
 				291FCD2E2525DC2800F5185E /* DWAlertController+DWKeyboard.m in Sources */,
 				29DB95FE23FC34D8008FC985 /* CPNotificationViewController.m in Sources */,
 				29DB95F723FC33D4008FC985 /* CPiCarousel.m in Sources */,
