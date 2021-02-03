@@ -1,3 +1,6 @@
+# 1.4.1
+* Fixed crash in Topics Dialog
+
 # 1.4.0
 * Potentially Breaking: Added own Model Classes (CPNotification, CPChannelTags, CPChannelTopics, ..) which are used in NotificationOpened and NotificationReceived listeners, getAvailableTopics and getAvailableTags. Existing implementations should still work but we encourage to use the new getters directly from our classes.
 

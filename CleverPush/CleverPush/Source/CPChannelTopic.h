@@ -3,8 +3,11 @@
 @interface CPChannelTopic : NSObject
 
 @property (readonly, nullable) NSString *id;
+
+@property (readonly, nullable) NSString *parentTopic;
 @property (readonly, nullable) NSString *name;
 @property (readonly, nullable) NSNumber *sort;
+@property (readonly) BOOL defaultUnchecked;
 
 @property (readonly, nullable) NSString *fcmBroadcastTopic;
 

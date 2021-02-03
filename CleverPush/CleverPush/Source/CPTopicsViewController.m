@@ -1,6 +1,7 @@
 #import "CPTopicsViewController.h"
 #import <CleverPush/CleverPush.h>
 #import "CPIntrinsicTableView.h"
+#import "CPChannelTopic.h"
 
 @implementation CPTopicsViewController
 
@@ -13,8 +14,8 @@
         
         childTopics = [NSMutableDictionary new];
         parentTopics = [NSMutableArray new];
-        for (NSDictionary *topic in topics) {
-            NSString* parentTopicId = [topic objectForKey:@"parentTopic"];
+        for (CPChannelTopic *topic in topics) {
+            NSString* parentTopicId = [topic parentTopic];
             if (!parentTopicId) {
                 [parentTopics addObject:topic];
             } else {
@@ -27,8 +28,8 @@
             }
         }
         
-        for (NSDictionary *topic in parentTopics) {
-            NSString* parentTopicId = [topic objectForKey:@"_id"];
+        for (CPChannelTopic *topic in parentTopics) {
+            NSString* parentTopicId = [topic id];
             [availableTopics addObject:topic];
             NSMutableArray *childArray = [childTopics objectForKey:parentTopicId];
             if (childArray) {
@@ -93,10 +94,10 @@
 
 - (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
-    NSDictionary* topic = availableTopics[(int) switcher.tag - 1];
+    CPChannelTopic* topic = availableTopics[(int) switcher.tag - 1];
     
     if (topic) {
-        NSString* topicId = [topic objectForKey:@"_id"];
+        NSString* topicId = [topic id];
         BOOL contains = [selectedTopics containsObject:topicId];
         if (switcher.on && !contains) {
             [selectedTopics addObject:topicId];
@@ -112,8 +113,8 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = 0;
-    for (NSDictionary *topic in availableTopics) {
-        NSString* parentTopicId = [topic objectForKey:@"parentTopic"];
+    for (CPChannelTopic *topic in availableTopics) {
+        NSString* parentTopicId = [topic parentTopic];
         if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
             count += 1;
         }
@@ -123,8 +124,8 @@
 
 - (NSDictionary*)getTopic:(int)row {
     int count = -1;
-    for (NSDictionary *topic in availableTopics) {
-        NSString* parentTopicId = [topic objectForKey:@"parentTopic"];
+    for (CPChannelTopic *topic in availableTopics) {
+        NSString* parentTopicId = [topic parentTopic];
         if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
             count += 1;
         }
@@ -137,9 +138,9 @@
 
 - (int)getTopicIndex:(NSString*)topicId {
     int index = -1;
-    for (NSDictionary *topic in availableTopics) {
+    for (CPChannelTopic *topic in availableTopics) {
         index += 1;
-        NSString* topicIdCurrent = [topic objectForKey:@"_id"];
+        NSString* topicIdCurrent = [topic id];
         if ([topicIdCurrent isEqualToString:topicId]) {
             return index;
         }
@@ -149,9 +150,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     int row = (int)indexPath.row;
-    NSDictionary *topic = [self getTopic:row];
+    CPChannelTopic *topic = [self getTopic:row];
     
-    NSString* topicId = [topic objectForKey:@"_id"];
+    NSString* topicId = [topic id];
     int topicIndex = [self getTopicIndex:topicId];
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -163,20 +164,20 @@
     [self switchChanged:switcher];
 }
 
-- (BOOL)defaultTopicState:(NSDictionary*)topic {
+- (BOOL)defaultTopicState:(CPChannelTopic*)topic {
     BOOL defaultUnchecked = NO;
-    if (topic && [topic objectForKey:@"defaultUnchecked"]) {
+    if (topic && [topic defaultUnchecked]) {
         defaultUnchecked = YES;
     }
-    BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic objectForKey:@"_id"]]);
+    BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
     return state;
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     int row = (int)indexPath.row;
-    NSDictionary *topic = [self getTopic:row];
+    CPChannelTopic *topic = [self getTopic:row];
     
-    NSString* topicId = [topic objectForKey:@"_id"];
+    NSString* topicId = [topic id];
     int topicIndex = [self getTopicIndex:topicId];
     
     NSString* cellIdentifier = [NSString stringWithFormat:@"switchCell-%@", topicId];
@@ -205,7 +206,7 @@
         CGRect labelFrame = CGRectInset(cell.contentView.bounds, 10.0f, 8.0f);
         labelFrame.size.width = cell.contentView.bounds.size.width / 2.0f;
         
-        if ([topic objectForKey:@"parentTopic"]) {
+        if ([topic parentTopic]) {
             float inset = 30.0f;
             labelFrame.size.width -= inset;
             labelFrame.origin.x += inset;
@@ -221,7 +222,7 @@
     UISwitch *switcher = (UISwitch*)[cell.contentView viewWithTag:(topicIndex + 1)];
     UILabel *nameLabel = (UILabel*)[cell.contentView viewWithTag:200];
     
-    nameLabel.text = [topic objectForKey:@"name"];
+    nameLabel.text = [topic name];
     
     switcher.on = [self defaultTopicState:topic] ? YES : NO;
     

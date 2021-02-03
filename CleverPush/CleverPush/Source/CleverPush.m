@@ -1833,10 +1833,10 @@ static BOOL registrationInProgress = false;
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
     [self getAvailableTags:^(NSArray *tags) {
-        for (NSDictionary* tag in tags) {
+        for (CPChannelTag *tag in tags) {
             [self autoAssignTagMatches:tag pathname:pathname params:params callback:^(BOOL tagMatches) {
                 if (tagMatches) {
-                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:YES %@", [tag objectForKey:@"name"]);
+                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:YES %@", [tag name]);
                     
                     NSString* tagId = [tag valueForKey:@"_id"];
                     NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
@@ -1970,7 +1970,7 @@ static BOOL registrationInProgress = false;
                         }
                     }
                 } else {
-                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:NO %@", [tag objectForKey:@"name"]);
+                    NSLog(@"CleverPush: checkTags: autoAssignTagMatches:NO %@", [tag name]);
                 }
             }];
         }

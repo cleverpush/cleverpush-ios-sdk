@@ -17,8 +17,14 @@
     _id = [json objectForKey:@"_id"];
     
     _name = [json objectForKey:@"name"];
+    _parentTopic = [json objectForKey:@"parentTopic"];
     
     _sort = [json objectForKey:@"sort"];
+    
+    _defaultUnchecked = NO;
+    if ([json objectForKey:@"defaultUnchecked"]) {
+        _defaultUnchecked = YES;
+    }
     
     _fcmBroadcastTopic = [json objectForKey:@"fcmBroadcastTopic"];
     
