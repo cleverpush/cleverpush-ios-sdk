@@ -1,3 +1,6 @@
+# 1.4.2
+* Fixed `setSubscriptionTopics` behaviour when called immediately inside the `subscribe` callback
+
 # 1.4.1
 * Fixed crash in Topics Dialog
 

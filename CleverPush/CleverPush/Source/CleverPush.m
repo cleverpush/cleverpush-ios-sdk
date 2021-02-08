@@ -68,7 +68,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -770,7 +770,7 @@ BOOL handleSubscribedCalled = false;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && subscriptionId == nil) {
                         // NSLog(@"CleverPush: syncSubscription called from subscribe");
-                        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+                        [self performSelector:@selector(syncSubscription) withObject:nil];
 
                         [self getChannelConfig:^(NSDictionary* channelConfig) {
                             if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1020,12 +1020,21 @@ static BOOL registrationInProgress = false;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     
-    NSLog(@"CleverPush: syncSubscription Request apnsToken:%@ subscriptionId:%@", deviceToken, subscriptionId);
+    NSLog(@"CleverPush: syncSubscription Request data:%@ id:%@", dataDic, subscriptionId);
 
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
         
         // NSLog(@"CleverPush: syncSubscription Result %@", results);
+        
+        if ([results valueForKey:@"topics"] != nil) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            [userDefaults setObject:[results valueForKey:@"topics"] forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+            if ([results valueForKey:@"topicsVersion"] != nil) {
+                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+            }
+            [userDefaults synchronize];
+        }
 
         if ([results objectForKey:@"id"] != nil) {
             if (!subscriptionId) {
@@ -1048,15 +1057,6 @@ static BOOL registrationInProgress = false;
                 listener(subscriptionId);
             }
             pendingSubscriptionListeners = [NSMutableArray new];
-        }
-
-        if ([results valueForKey:@"topics"] != nil) {
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:[results valueForKey:@"topics"] forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
-            if ([results valueForKey:@"topicsVersion"] != nil) {
-                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
-            }
-            [userDefaults synchronize];
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
@@ -1644,7 +1644,7 @@ static BOOL registrationInProgress = false;
         [userDefaults synchronize];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
         });
     }
 }
@@ -1657,7 +1657,7 @@ static BOOL registrationInProgress = false;
         [userDefaults synchronize];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
         });
     }
 }
@@ -1692,7 +1692,7 @@ static BOOL registrationInProgress = false;
     [userDefaults synchronize];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:5.0f];
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
     });
 }
 
