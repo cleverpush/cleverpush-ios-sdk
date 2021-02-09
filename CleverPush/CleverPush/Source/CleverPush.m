@@ -68,7 +68,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -621,7 +621,7 @@ BOOL handleSubscribedCalled = false;
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (result != nil) {
                 channelId = [result objectForKey:@"channelId"];
-                NSLog(@"Detected Channel ID from Bundle Identifier: %@", channelId);
+                NSLog(@"CleverPush: Detected Channel ID from Bundle Identifier: %@", channelId);
                 
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
@@ -768,43 +768,51 @@ BOOL handleSubscribedCalled = false;
             UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
             [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (granted && subscriptionId == nil) {
-                        // NSLog(@"CleverPush: syncSubscription called from subscribe");
-                        [self performSelector:@selector(syncSubscription) withObject:nil];
+                    if (error) {
+                        NSLog(@"CleverPush: requestAuthorizationWithOptions error: %@", error);
+                    } else if (!granted) {
+                        NSLog(@"CleverPush: requestAuthorizationWithOptions not granted");
+                    }
+                    
+                    if (granted) {
+                        if (subscriptionId == nil) {
+                            NSLog(@"CleverPush: syncSubscription called from subscribe");
+                            [self performSelector:@selector(syncSubscription) withObject:nil];
 
-                        [self getChannelConfig:^(NSDictionary* channelConfig) {
-                            if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                                NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
-                                if (channelTopics != nil && [channelTopics count] > 0) {
-                                    NSArray* topics = [self getSubscriptionTopics];
-                                    if (!topics || [topics count] == 0) {
-                                        NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
-                                        for (id channelTopic in channelTopics) {
-                                            if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
-                                                [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                            [self getChannelConfig:^(NSDictionary* channelConfig) {
+                                if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                                    NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+                                    if (channelTopics != nil && [channelTopics count] > 0) {
+                                        NSArray* topics = [self getSubscriptionTopics];
+                                        if (!topics || [topics count] == 0) {
+                                            NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+                                            for (id channelTopic in channelTopics) {
+                                                if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+                                                    [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                                                }
+                                            }
+                                            if ([selectedTopicIds count] > 0) {
+                                                [self setSubscriptionTopics:selectedTopicIds];
                                             }
                                         }
-                                        if ([selectedTopicIds count] > 0) {
-                                            [self setSubscriptionTopics:selectedTopicIds];
-                                        }
-                                    }
 
-                                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                    [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
-                                    [userDefaults synchronize];
-                                    
-                                    [self showPendingTopicsDialog];
+                                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                        [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+                                        [userDefaults synchronize];
+                                        
+                                        [self showPendingTopicsDialog];
+                                    }
                                 }
-                            }
-                        }];
-                        
-                        if (subscribedBlock) {
-                            [self getSubscriptionId:^(NSString* subscriptionId) {
-                                subscribedBlock(subscriptionId);
                             }];
+                            
+                            if (subscribedBlock) {
+                                [self getSubscriptionId:^(NSString* subscriptionId) {
+                                    subscribedBlock(subscriptionId);
+                                }];
+                            }
+                        } else if (subscribedBlock) {
+                            subscribedBlock(subscriptionId);
                         }
-                    } else if (granted && subscribedBlock) {
-                        subscribedBlock(subscriptionId);
                     }
                 });
             }];
@@ -929,7 +937,9 @@ BOOL handleSubscribedCalled = false;
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
                 if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
                     NSLog(@"CleverPush: syncSubscription called from registerDeviceToken");
-                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+                    });
                 }
             }];
         } else {
@@ -956,6 +966,7 @@ static BOOL registrationInProgress = false;
 
 + (void)syncSubscription {
     if (registrationInProgress) {
+        NSLog(@"CleverPush: syncSubscription aborted - registration already in progress");
         return;
     }
     
@@ -964,6 +975,7 @@ static BOOL registrationInProgress = false;
     }
     
     if (!deviceToken && !subscriptionId) {
+        NSLog(@"CleverPush: syncSubscription aborted - no deviceToken and no subscriptionId available");
         return;
     }
 

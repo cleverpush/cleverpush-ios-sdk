@@ -1,3 +1,6 @@
+# 1.4.4
+* Fixed `subscribe` behaviour when the push permission was already given earlier.
+
 # 1.4.3
 * Fixed an issue within `trackPageView` which was caused because the new CPChannelTag model class was missing a key
 
