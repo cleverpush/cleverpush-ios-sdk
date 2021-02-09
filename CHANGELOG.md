@@ -1,3 +1,6 @@
+# 1.4.3
+* Fixed an issue within `trackPageView` which was caused because the new CPChannelTag model class was missing a key
+
 # 1.4.2
 * Fixed `setSubscriptionTopics` behaviour when called immediately inside the `subscribe` callback
 

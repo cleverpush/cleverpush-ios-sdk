@@ -11,6 +11,7 @@
 @property (readonly, nullable) NSString *autoAssignSelector;
 @property (readonly, nullable) NSNumber* autoAssignVisits;
 @property (readonly, nullable) NSNumber* autoAssignSessions;
+@property (readonly, nullable) NSNumber* autoAssignSeconds;
 @property (readonly, nullable) NSNumber* autoAssignDays;
 
 @property (readonly, nullable) NSDate *createdAt;

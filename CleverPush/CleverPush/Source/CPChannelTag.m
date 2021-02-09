@@ -23,6 +23,7 @@
     _autoAssignSelector = [json objectForKey:@"autoAssignSelector"];
     _autoAssignVisits = [json objectForKey:@"autoAssignVisits"];
     _autoAssignSessions = [json objectForKey:@"autoAssignSessions"];
+    _autoAssignSeconds = [json objectForKey:@"autoAssignSeconds"];
     _autoAssignDays = [json objectForKey:@"autoAssignDays"];
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
