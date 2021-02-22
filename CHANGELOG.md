@@ -1,3 +1,6 @@
+# 1.4.5
+* Fixed `defaultUnchecked` field for topics.
+
 # 1.4.4
 * Fixed `subscribe` behaviour when the push permission was already given earlier.
 

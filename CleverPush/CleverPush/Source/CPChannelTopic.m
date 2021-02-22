@@ -22,7 +22,8 @@
     _sort = [json objectForKey:@"sort"];
     
     _defaultUnchecked = NO;
-    if ([json objectForKey:@"defaultUnchecked"]) {
+        
+    if ([json objectForKey:@"defaultUnchecked"] != nil && ![[json objectForKey:@"defaultUnchecked"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"defaultUnchecked"] boolValue]) {
         _defaultUnchecked = YES;
     }
     
