@@ -1,3 +1,6 @@
+# 1.4.6
+* Added platform name to App Banner path to make filtering by platform possible in the backend.
+
 # 1.4.5
 * Fixed `defaultUnchecked` field for topics.
 

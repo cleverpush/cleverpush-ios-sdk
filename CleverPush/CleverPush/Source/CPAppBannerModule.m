@@ -97,9 +97,9 @@ CPAppBannerActionBlock handleBannerOpened;
     }
     pendingBannerRequest = YES;
     
-    NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners", channelId];
+    NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
     if ([CleverPush isDevelopmentModeEnabled]) {
-        bannersPath = [NSString stringWithFormat:@"%@?t=%f", bannersPath, NSDate.date.timeIntervalSince1970];
+        bannersPath = [NSString stringWithFormat:@"%@&t=%f", bannersPath, NSDate.date.timeIntervalSince1970];
     }
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:bannersPath];
