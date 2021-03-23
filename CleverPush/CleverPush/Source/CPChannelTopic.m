@@ -28,6 +28,9 @@
     }
     
     _fcmBroadcastTopic = [json objectForKey:@"fcmBroadcastTopic"];
+    _externalId = [json objectForKey:@"externalId"];
+    
+    _customData = [json objectForKey:@"customData"];
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];

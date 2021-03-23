@@ -10,6 +10,9 @@
 @property (readonly) BOOL defaultUnchecked;
 
 @property (readonly, nullable) NSString *fcmBroadcastTopic;
+@property (readonly, nullable) NSString *externalId;
+
+@property (readonly, nullable) NSDictionary *customData;
 
 @property (readonly, nullable) NSDate *createdAt;
 
