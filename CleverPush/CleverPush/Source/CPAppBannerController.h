@@ -18,8 +18,8 @@
 #import "UIControl+CPBlockActions.h"
 #import "CPUIBlockButton.h"
 #import "CleverPush.h"
-
-@interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate>
+#import "CPWKWebKitView.h"
+@interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate>
 
 @property (strong, nonatomic) CPAppBanner *data;
 
@@ -28,8 +28,11 @@
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 
 - (id)initWithBanner:(CPAppBanner*)banner;
+- (id)initWithHTMLBanner:(CPAppBanner*)banner;
+
 - (void)onDismiss;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 + (UIViewController*)topViewController;
 
 @end
+

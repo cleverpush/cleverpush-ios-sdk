@@ -78,7 +78,56 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     return self;
 }
 
+- (id)initWithHTMLBanner:(CPAppBanner*)banner {
+    self = [super init];
+    if (self) {
+        self.data = banner;
+        
+        [self setModalPresentationStyle:UIModalPresentationCustom];
+        [self setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+        
+        [self.view setContentMode:UIViewContentModeScaleToFill];
 
+        self.view.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
+        self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        
+        self.bannerBody = [[UIView alloc] initWithFrame:CGRectMake(20, [[UIScreen mainScreen] bounds].size.width / 2 , [[UIScreen mainScreen] bounds].size.width - 40 , 400)];
+        [self.bannerBody setContentMode:UIViewContentModeScaleToFill];
+        [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+
+        [self.view addSubview:self.bannerBody];
+        
+        self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(20, 20, [[UIScreen mainScreen] bounds].size.width - 80, 360)];
+        [self.bannerBodyContent setContentMode:UIViewContentModeScaleToFill];
+        [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [self.bannerBodyContent setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        [self.bannerBody addSubview:self.bannerBodyContent];
+        
+        
+       
+        
+        self.bannerBody.layer.cornerRadius = 15.0;
+        self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
+        
+        self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0f];
+        
+        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDismiss)];
+        tapGesture.delegate = self;
+        tapGesture.cancelsTouchesInView = true;
+        tapGesture.numberOfTapsRequired = 1;
+        
+        [self.view addGestureRecognizer:tapGesture];
+        self.view.userInteractionEnabled = true;
+        
+        [self composeHTML:self.data.HTMLContent];
+    }
+    return self;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -154,6 +203,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             prevView = imageView;
         }
         
+        
         index++;
     }
 }
@@ -223,7 +273,35 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     
     return label;
 }
+- (WKWebView*)composeHTML:(NSString*)content {
+    WKWebView *webview = [[WKWebView alloc] init];
+    webview.frame = self.bannerBodyContent.bounds;
+    [webview loadHTMLString:content baseURL:nil];
+    [webview setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    webview.translatesAutoresizingMaskIntoConstraints = false;
+    webview.layer.cornerRadius = 15.0;
+    webview.clipsToBounds = YES;
+    webview.UIDelegate = self;
+    webview.navigationDelegate = self;
+    [self.bannerBodyContent addSubview:webview];
+    return webview;
+}
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    [webView evaluateJavaScript:@"Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)"
+              completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+                  if (!error) {
+                      CGFloat height = [result floatValue];
+                      // do with the height
+                      webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, height);
 
+                      self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, height);
+                      
+                      self.bannerBody.frame = CGRectMake(20, height/2, self.bannerBody.frame.size.width, height + 40);
+
+                      
+                  }
+              }];
+}
 - (UIImageView*)composeImageBlock:(CPAppBannerImageBlock*)block {
     UIImageView *imageView = [[CPAspectKeepImageView alloc] init];
     if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
@@ -251,7 +329,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     
     return imageView;
 }
-
 - (void)activateItemConstrants:(UIView*)view prevView:(UIView*)prevView parentConstraint:(ParentConstraint )parentConstraint {
     if (self.bannerBodyContent == nil) {
         return;
@@ -326,3 +403,4 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 }
 
 @end
+

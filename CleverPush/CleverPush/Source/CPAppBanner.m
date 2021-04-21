@@ -8,7 +8,8 @@
         self.id = [json objectForKey:@"_id"];
         self.channel = [json objectForKey:@"channel"];
         self.name = [json objectForKey:@"name"];
-        
+        self.HTMLContent = [json objectForKey:@"content"];
+        self.contentType = [json objectForKey:@"contentType"];
         if ([[json objectForKey:@"type"] isEqual:@"top"]) {
             self.status = CPAppBannerTypeTop;
         } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
@@ -26,6 +27,7 @@
         }
         
         self.background = [[CPAppBannerBackground alloc] initWithJson:[json objectForKey:@"background"]];
+
         
         self.blocks = [NSMutableArray new];
         if ([json objectForKey:@"blocks"] != nil) {
@@ -37,7 +39,8 @@
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson objectForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
-                } else {
+                }
+                else {
                     continue;
                 }
                 
@@ -97,3 +100,5 @@
 }
 
 @end
+
+

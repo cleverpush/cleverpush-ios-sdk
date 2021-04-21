@@ -274,35 +274,71 @@ CPAppBannerActionBlock handleBannerOpened;
 
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void){
-        CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         
-        __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
-            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
+        if ([banner.contentType isEqualToString:@"block"]){
+            CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
             
-            if (handleBannerOpened && action) {
-                handleBannerOpened(action);
+            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
+                [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
+                
+                if (handleBannerOpened && action) {
+                    handleBannerOpened(action);
+                }
+                
+                if (action && [action.type isEqualToString:@"subscribe"]) {
+                    [CleverPush subscribe];
+                }
+            };
+            [bannerController setActionCallback:callbackBlock];
+            
+            UIViewController* topController = [CPAppBannerController topViewController];
+            [topController presentViewController:bannerController animated:NO completion:nil];
+            
+            if (banner.frequency == CPAppBannerFrequencyOnce) {
+                [CPAppBannerModule setBannerIsShown:banner.id];
             }
             
-            if (action && [action.type isEqualToString:@"subscribe"]) {
-                [CleverPush subscribe];
+            if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
+                    [bannerController onDismiss];
+                });
             }
-        };
-        [bannerController setActionCallback:callbackBlock];
-        
-        UIViewController* topController = [CPAppBannerController topViewController];
-        [topController presentViewController:bannerController animated:NO completion:nil];
-        
-        if (banner.frequency == CPAppBannerFrequencyOnce) {
-            [CPAppBannerModule setBannerIsShown:banner.id];
+            
+            [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
+        }
+        else{
+            CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
+            
+            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
+                [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
+                
+                if (handleBannerOpened && action) {
+                    handleBannerOpened(action);
+                }
+                
+                if (action && [action.type isEqualToString:@"subscribe"]) {
+                    [CleverPush subscribe];
+                }
+            };
+            [bannerController setActionCallback:callbackBlock];
+            
+            UIViewController* topController = [CPAppBannerController topViewController];
+            [topController presentViewController:bannerController animated:NO completion:nil];
+            
+            if (banner.frequency == CPAppBannerFrequencyOnce) {
+                [CPAppBannerModule setBannerIsShown:banner.id];
+            }
+            
+            if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
+                    [bannerController onDismiss];
+                });
+            }
+            
+            [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
         }
         
-        if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
-                [bannerController onDismiss];
-            });
-        }
-        
-        [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
+       
     });
 }
 
