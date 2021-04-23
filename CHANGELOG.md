@@ -1,3 +1,6 @@
+# 1.5.0
+* Support silent push notifications
+
 # 1.4.7
 * Custom Data support for Topics
 

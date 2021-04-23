@@ -64,6 +64,11 @@
         _expiresAt = [formatter dateFromString:[json objectForKey:@"expiresAt"]];
     }
     
+    _silent = NO;
+    if ([json objectForKey:@"silent"] && [json valueForKey:@"silent"] != nil && ![[json valueForKey:@"silent"] isKindOfClass:[NSNull class]]) {
+        _silent = [[json objectForKey:@"silent"] boolValue];
+    }
+    
     _chatNotification = NO;
     if ([json objectForKey:@"chatNotification"] && [json valueForKey:@"chatNotification"] != nil && ![[json valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]]) {
         _chatNotification = [[json objectForKey:@"chatNotification"] boolValue];

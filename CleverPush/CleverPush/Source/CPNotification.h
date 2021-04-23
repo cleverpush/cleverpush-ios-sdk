@@ -18,6 +18,8 @@
 
 @property (readonly, nullable) NSDictionary *customData;
 
+@property (readonly) BOOL silent;
+
 @property (readonly) BOOL chatNotification;
 
 @property (readonly) BOOL carouselEnabled;
