@@ -1,3 +1,6 @@
+# 1.6.0
+* Support HTML content in app banners
+
 # 1.5.0
 * Support silent push notifications
 

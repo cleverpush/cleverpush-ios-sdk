@@ -275,7 +275,7 @@ CPAppBannerActionBlock handleBannerOpened;
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         CPAppBannerController* bannerController = nil;
-        if ([banner.contentType isEqualToString:@"block"]) {
+        if ([banner.contentType isEqualToString:@"html"]) {
             bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
         } else {
             bannerController = [[CPAppBannerController alloc] initWithBanner:banner];

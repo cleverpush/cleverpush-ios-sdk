@@ -271,6 +271,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     
     return label;
 }
+
 - (WKWebView*)composeHTML:(NSString*)content {
     WKWebView *webview = [[WKWebView alloc] init];
     webview.frame = self.bannerBodyContent.bounds;
@@ -284,6 +285,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [self.bannerBodyContent addSubview:webview];
     return webview;
 }
+
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [webView evaluateJavaScript:@"Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)"
               completionHandler:^(id _Nullable result, NSError * _Nullable error) {
