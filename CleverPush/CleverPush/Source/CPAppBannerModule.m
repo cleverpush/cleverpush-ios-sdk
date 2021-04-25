@@ -278,7 +278,7 @@ CPAppBannerActionBlock handleBannerOpened;
         if ([banner.contentType isEqualToString:@"block"]) {
             bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
         } else {
-            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];x
+            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         }
         
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
