@@ -10,16 +10,18 @@
 #import "CPAppBannerImageBlock.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerType.h"
-
 @interface CPAppBanner : NSObject
 
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString *channel;
 @property (nonatomic, strong) NSString *name;
+@property (nonatomic, strong) NSString *HTMLContent;
+@property (nonatomic, strong) NSString *contentType;
 @property (nonatomic) CPAppBannerType type;
 @property (nonatomic) CPAppBannerStatus status;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) CPAppBannerBackground *background;
+
 @property (nonatomic, strong) NSDate *startAt;
 @property (nonatomic, strong) NSDate *stopAt;
 @property (nonatomic) CPAppBannerStopAtType stopAtType;
@@ -33,3 +35,4 @@
 - (id)initWithJson:(NSDictionary*)json;
 
 @end
+

@@ -2,7 +2,6 @@
 #import "CPAppBannerButtonBlock.h"
 #import "CPAppBannerTextBlock.h"
 #import "CPAppBannerImageBlock.h"
-
 @implementation CPAppBannerBlock
 
 - (id)initWithJson:(NSDictionary*)json {
@@ -33,3 +32,5 @@
 }
 
 @end
+
+
