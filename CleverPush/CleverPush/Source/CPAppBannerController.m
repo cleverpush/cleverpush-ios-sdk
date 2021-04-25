@@ -108,9 +108,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
         [self.bannerBody addSubview:self.bannerBodyContent];
         
-        
-       
-        
         self.bannerBody.layer.cornerRadius = 15.0;
         self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
         
@@ -128,6 +125,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     }
     return self;
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
