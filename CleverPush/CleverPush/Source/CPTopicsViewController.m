@@ -2,9 +2,10 @@
 #import <CleverPush/CleverPush.h>
 #import "CPIntrinsicTableView.h"
 #import "CPChannelTopic.h"
-
+#import "CPTranslate.h"
 @implementation CPTopicsViewController
 
+#pragma mark - Get all the available topics with selected topics
 - (id)initWithAvailableTopics:(NSArray*)topics selectedTopics:(NSArray*)userTopics hasSubscriptionTopics:(BOOL)hasTopics_ {
     self = [super init];
     if (self) {
@@ -42,10 +43,12 @@
     return self;
 }
 
+#pragma mark - Get all the selected topics
 - (NSMutableArray*)getSelectedTopics {
     return selectedTopics;
 }
 
+#pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -61,7 +64,7 @@
     
     tableView.delegate = self;
     tableView.dataSource = self;
-
+    _deselectedAll = NO;
     self.view = tableView;
 }
 
@@ -77,7 +80,7 @@
         
         titleLabel.numberOfLines = 0;
         [titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
-
+        
         titleLabel.text = self.title;
         [titleLabel sizeToFit];
         titleLabel.frame = CGRectMake(0, 0, tableView.frame.size.width, titleLabel.frame.size.height);
@@ -92,6 +95,26 @@
     }
 }
 
+#pragma mark - Deselect Everything while switching off the switch from tableview's header
+- (void)DeselectEverything:(id)sender {
+    UISwitch* switcher = (UISwitch*)sender;
+    
+    if (switcher.on) {
+        NSLog(@"off");
+        [selectedTopics removeAllObjects];
+        for (CPChannelTopic *topic in availableTopics) {
+            topic.defaultUnchecked = YES;
+        }
+        hasTopics = NO;
+        _deselectedAll = YES;
+        [tableView reloadData];
+    }else{
+        _deselectedAll = NO;
+        NSLog(@"on");
+    }
+}
+
+#pragma mark - Handle the switch event when toggle the switch or Select/Deselect table raw.
 - (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     CPChannelTopic* topic = availableTopics[(int) switcher.tag - 1];
@@ -106,22 +129,17 @@
         }
         
         hasTopics = YES;
-        
+        if ([selectedTopics count] == 0){
+            _deselectedAll = YES;
+        }
+        else{
+            _deselectedAll = NO;
+        }
         [tableView reloadData];
     }
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = 0;
-    for (CPChannelTopic *topic in availableTopics) {
-        NSString* parentTopicId = [topic parentTopic];
-        if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
-            count += 1;
-        }
-    }
-    return count;
-}
-
+#pragma mark - get the details of individual topic.
 - (NSDictionary*)getTopic:(int)row {
     int count = -1;
     for (CPChannelTopic *topic in availableTopics) {
@@ -136,6 +154,7 @@
     return nil;
 }
 
+#pragma mark - get the index of topic.
 - (int)getTopicIndex:(NSString*)topicId {
     int index = -1;
     for (CPChannelTopic *topic in availableTopics) {
@@ -148,22 +167,7 @@
     return -1;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    int row = (int)indexPath.row;
-    CPChannelTopic *topic = [self getTopic:row];
-    
-    NSString* topicId = [topic id];
-    int topicIndex = [self getTopicIndex:topicId];
-    
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
-    int tag = topicIndex + 1;
-    UISwitch* switcher = (UISwitch*)[cell.contentView viewWithTag:tag];
-    [switcher setOn:!switcher.on animated:YES];
-    
-    [self switchChanged:switcher];
-}
-
+#pragma mark - get the default state of the current topic.
 - (BOOL)defaultTopicState:(CPChannelTopic*)topic {
     BOOL defaultUnchecked = NO;
     if (topic && [topic defaultUnchecked]) {
@@ -171,6 +175,48 @@
     }
     BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
     return state;
+}
+
+#pragma mark - Delegate & DataSource List of the subscription.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    int count = 0;
+    
+    for (CPChannelTopic *topic in availableTopics) {
+        NSLog(@"%d", count);
+        NSString* parentTopicId = [topic parentTopic];
+        if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
+            count += 1;
+            NSLog(@"%d", count);
+            
+        }
+    }
+    return count;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
+    
+    UISwitch* s = [[UISwitch alloc] init];
+    CGSize switchSize = [s sizeThatFits:CGSizeZero];
+    s.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
+    [s addTarget:self action:@selector(DeselectEverything:) forControlEvents:UIControlEventValueChanged];
+    s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    [headerView addSubview:s];
+    
+    if (_deselectedAll == YES){
+        s.on = YES;
+    }
+    else{
+        s.on = NO;
+    }
+    
+    UILabel* deselecteverything = [[UILabel alloc] init];
+    deselecteverything.text = [CPTranslate translate:@"deselecteverything"];
+    deselecteverything.frame = CGRectMake(10.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (10 + switchSize.width), switchSize.height);
+    [headerView addSubview:deselecteverything];
+    
+    return headerView;
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
@@ -199,9 +245,9 @@
         
         [s addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
         [cell.contentView addSubview:s];
-
+        
         UILabel* l = [[UILabel alloc] init];
-
+        
         l.text = @"";
         CGRect labelFrame = CGRectInset(cell.contentView.bounds, 10.0f, 8.0f);
         labelFrame.size.width = cell.contentView.bounds.size.width / 2.0f;
@@ -229,9 +275,41 @@
     return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    int row = (int)indexPath.row;
+    CPChannelTopic *topic = [self getTopic:row];
+    
+    NSString* topicId = [topic id];
+    int topicIndex = [self getTopicIndex:topicId];
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    UITableViewCell* cell = [tableView cellForRowAtIndexPath:indexPath];
+    int tag = topicIndex + 1;
+    UISwitch* switcher = (UISwitch*)[cell.contentView viewWithTag:tag];
+    [switcher setOn:!switcher.on animated:YES];
+    
+    [self switchChanged:switcher];
+}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return UITableViewAutomaticDimension;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section{
+    __block BOOL topicsDialogShowUnsubscribe;
+
+    [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
+        if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
+            topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
+        }
+    }];
+    if (topicsDialogShowUnsubscribe == NO) {
+        return 0;
+    }
+    else{
+        return 44;
+    }
+}
+
 @end
+
