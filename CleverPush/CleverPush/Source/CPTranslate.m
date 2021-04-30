@@ -11,11 +11,13 @@
     NSDictionary *messages = @{
         @"en": @{
                 @"subscribedTopics": @"Subscribed Topics",
-                @"save": @"Save"
+                @"save": @"Save",
+                @"deselectEverything": @"Deselect everything"
         },
         @"de": @{
                 @"subscribedTopics": @"Abonnierte Themen",
-                @"save": @"Speichern"
+                @"save": @"Speichern",
+                @"deselectEverything": @"Alles abwählen"
         },
     };
     

@@ -96,11 +96,13 @@
         
     }
 }
-- (void)viewDidAppear:(BOOL)animated{
-    [self ManageHeightLayout];
+
+- (void)viewDidAppear:(BOOL)animated {
+    [self manageHeightLayout];
 }
+
 #pragma mark - Deselect Everything while switching off the switch
-- (void)DeselectEverything:(id)sender {
+- (void)deselectEverything:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     
     if (switcher.on) {
@@ -111,16 +113,17 @@
         hasTopics = NO;
         _deselectedAll = YES;
         [tableView reloadData];
-        [self ManageHeightLayout];
-    }else{
+        [self manageHeightLayout];
+    } else {
         _deselectedAll = NO;
     }
 }
 
-- (void)ManageHeightLayout{
+- (void)manageHeightLayout {
     id<ManageHeight> strongDelegate = self.delegate;
     [strongDelegate rearrangeHeight];
 }
+
 #pragma mark - Handle the switch event when toggle the switch or Select/Deselect table raw.
 - (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
@@ -153,19 +156,16 @@
         }
         
         hasTopics = YES;
-        if ([selectedTopics count] == 0){
-            _deselectedAll = YES;
-        }
-        else{
+        if ([selectedTopics count] > 0) {
             _deselectedAll = NO;
         }
         [tableView reloadData];
-        [self ManageHeightLayout];
+        [self manageHeightLayout];
     }
 }
 
 #pragma mark - get the details of individual topic.
-- (NSDictionary*)getTopic:(int)row {
+- (CPChannelTopic*)getTopic:(int)row {
     int count = -1;
     for (CPChannelTopic *topic in availableTopics) {
         NSString* parentTopicId = [topic parentTopic];
@@ -216,25 +216,23 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
     
     UISwitch* s = [[UISwitch alloc] init];
     CGSize switchSize = [s sizeThatFits:CGSizeZero];
     s.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
-    [s addTarget:self action:@selector(DeselectEverything:) forControlEvents:UIControlEventValueChanged];
+    [s addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
     s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [headerView addSubview:s];
     
-    if (_deselectedAll == YES){
+    if (_deselectedAll == YES) {
         s.on = YES;
-    }
-    else{
+    } else {
         s.on = NO;
     }
     
     UILabel* deselecteverything = [[UILabel alloc] init];
-    deselecteverything.text = [CPTranslate translate:@"deselecteverything"];
+    deselecteverything.text = [CPTranslate translate:@"deselectEverything"];
     deselecteverything.frame = CGRectMake(10.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (10 + switchSize.width), switchSize.height);
     [headerView addSubview:deselecteverything];
     
