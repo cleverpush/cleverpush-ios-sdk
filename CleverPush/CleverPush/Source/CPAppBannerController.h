@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 #import "CPAppBanner.h"
 #import "CPAppBannerDismissType.h"
@@ -19,20 +20,19 @@
 #import "CPUIBlockButton.h"
 #import "CleverPush.h"
 #import "CPWKWebKitView.h"
-@interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate>
+@interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 
 @property (strong, nonatomic) CPAppBanner *data;
-
+@property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 @property (nonatomic, strong) IBOutlet UIView *bannerBody;
 @property (nonatomic, strong) IBOutlet UIView *bannerBodyContent;
-@property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 
 - (id)initWithBanner:(CPAppBanner*)banner;
 - (id)initWithHTMLBanner:(CPAppBanner*)banner;
 
 - (void)onDismiss;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
+
 + (UIViewController*)topViewController;
 
 @end
-
