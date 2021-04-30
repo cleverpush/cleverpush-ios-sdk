@@ -19,13 +19,13 @@
 
 #import "DWAlertAction.h"
 #import "DWAlertAppearanceMode.h"
-
+#import "CPTopicsViewController.h"
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  Custom implementation of `UIAlertController` with a child controller instead of title / message.
  */
-@interface DWAlertController : UIViewController <UIAppearance>
+@interface DWAlertController : UIViewController <UIAppearance, ManageHeight>
 
 /**
  Configure alert with subclass of `UIViewController`.

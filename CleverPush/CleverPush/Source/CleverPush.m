@@ -2194,7 +2194,9 @@ static id isNil(id object) {
                 
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
-                
+                topicsController.delegate = channelTopicsPicker;
+
+
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"]
                                                                    style:DWAlertActionStyleCancel
                                                                  handler:^(DWAlertAction* action) {
@@ -2217,6 +2219,10 @@ static id isNil(id object) {
         }];
     }];
     
+}
+- (void)setContentHeight{
+    [channelTopicsPicker.view setNeedsLayout];
+    [channelTopicsPicker.view layoutIfNeeded];
 }
 
 
@@ -2421,6 +2427,3 @@ static inline BOOL isEmpty(id thing) {
 }
 
 @end
-
-
-
