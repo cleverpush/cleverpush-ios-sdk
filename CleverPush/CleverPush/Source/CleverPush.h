@@ -54,7 +54,6 @@ extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 @interface CleverPush : NSObject
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
-
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
@@ -72,22 +71,17 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
    handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
-
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
-
 + (void)enableDevelopmentMode;
 + (BOOL)isDevelopmentModeEnabled;
-
 + (NSString*)channelId;
-
 + (BOOL)isSubscribed;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
-
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
@@ -99,10 +93,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 #pragma clang diagnostic ignored "-Wdeprecated"
 + (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
 #pragma clang diagnostic pop
-
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
-
 + (void)addSubscriptionTag:(NSString*)tagId;
 + (void)removeSubscriptionTag:(NSString*)tagId;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
@@ -141,16 +133,13 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)trackPageView:(NSString*)url;
 + (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
 + (void)increaseSessionVisits;
-
 + (void)showAppBanners __attribute__((deprecated));
 + (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback __attribute__((deprecated));
 + (void)showAppBanner:(NSString*)bannerId;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
-
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (NSString*)getApiEndpoint;
-
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent;
 
 @end

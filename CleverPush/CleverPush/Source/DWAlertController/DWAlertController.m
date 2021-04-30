@@ -190,7 +190,12 @@ NS_ASSUME_NONNULL_BEGIN
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
+- (void)rearrangeHeight{
+    [self.alertView setNeedsLayout];
+    [self.alertView layoutIfNeeded];
+    [self.view layoutIfNeeded];
 
+}
 - (nullable DWAlertAction *)preferredAction {
     return self.alertView.preferredAction;
 }

@@ -3,6 +3,7 @@
 #import "CPIntrinsicTableView.h"
 #import "CPChannelTopic.h"
 #import "CPTranslate.h"
+
 @implementation CPTopicsViewController
 
 #pragma mark - Get all the available topics with selected topics
@@ -87,20 +88,22 @@
         
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:titleLabel.frame];
         [tableView.tableHeaderView addSubview:titleLabel];
-        
+        tableView.scrollEnabled = NO;
         // add some padding
         tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
         
         [tableView reloadData];
+        
     }
 }
-
-#pragma mark - Deselect Everything while switching off the switch from tableview's header
+- (void)viewDidAppear:(BOOL)animated{
+    [self ManageHeightLayout];
+}
+#pragma mark - Deselect Everything while switching off the switch
 - (void)DeselectEverything:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     
     if (switcher.on) {
-        NSLog(@"off");
         [selectedTopics removeAllObjects];
         for (CPChannelTopic *topic in availableTopics) {
             topic.defaultUnchecked = YES;
@@ -108,12 +111,16 @@
         hasTopics = NO;
         _deselectedAll = YES;
         [tableView reloadData];
+        [self ManageHeightLayout];
     }else{
         _deselectedAll = NO;
-        NSLog(@"on");
     }
 }
 
+- (void)ManageHeightLayout{
+    id<ManageHeight> strongDelegate = self.delegate;
+    [strongDelegate rearrangeHeight];
+}
 #pragma mark - Handle the switch event when toggle the switch or Select/Deselect table raw.
 - (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
@@ -124,8 +131,25 @@
         BOOL contains = [selectedTopics containsObject:topicId];
         if (switcher.on && !contains) {
             [selectedTopics addObject:topicId];
+            
         } else if (!switcher.on && contains) {
             [selectedTopics removeObject:topicId];
+            for (CPChannelTopic *topicone in availableTopics) {
+                NSString* parentTopicId = [topicone parentTopic];
+                if (parentTopicId != nil) {
+                    if (topicId == parentTopicId) {
+                        BOOL contains = [selectedTopics containsObject:[topicone id]];
+                        if (contains) {
+                            NSString* topiconeId = [topicone id];
+                            
+                            NSLog(@"%@", [topicone name]);
+                            [selectedTopics removeObject:topiconeId];
+                            
+                            topicone.defaultUnchecked = YES;
+                        }
+                    }
+                }
+            }
         }
         
         hasTopics = YES;
@@ -136,6 +160,7 @@
             _deselectedAll = NO;
         }
         [tableView reloadData];
+        [self ManageHeightLayout];
     }
 }
 
@@ -182,19 +207,16 @@
     int count = 0;
     
     for (CPChannelTopic *topic in availableTopics) {
-        NSLog(@"%d", count);
         NSString* parentTopicId = [topic parentTopic];
         if (!parentTopicId || [selectedTopics containsObject:parentTopicId]) {
             count += 1;
-            NSLog(@"%d", count);
-            
         }
     }
     return count;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-
+    
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
     
     UISwitch* s = [[UISwitch alloc] init];
@@ -256,6 +278,8 @@
             float inset = 30.0f;
             labelFrame.size.width -= inset;
             labelFrame.origin.x += inset;
+            s.on = [self defaultTopicState:topic];
+            
         }
         
         l.frame = labelFrame;
@@ -297,7 +321,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section{
     __block BOOL topicsDialogShowUnsubscribe;
-
+    
     [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
             topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
@@ -312,4 +336,3 @@
 }
 
 @end
-
