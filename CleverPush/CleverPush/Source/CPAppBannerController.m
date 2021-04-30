@@ -303,7 +303,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     WKWebView *webBanner = [[WKWebView alloc] initWithFrame:self.bannerBodyContent.bounds configuration:config];
     webBanner.scrollView.scrollEnabled = true;
     webBanner.scrollView.bounces = false;
-    webBanner.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
     webBanner.allowsBackForwardNavigationGestures = false;
     webBanner.contentMode = UIViewContentModeScaleToFill;
     webBanner.navigationDelegate = self;

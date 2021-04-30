@@ -68,7 +68,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.6.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.7.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -2199,9 +2199,8 @@ static id isNil(id object) {
                                                                    style:DWAlertActionStyleCancel
                                                                  handler:^(DWAlertAction* action) {
                     if (topicsController.deselectedAll == YES) {
-                        [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                         [self unsubscribe];
-                    }else{
+                    } else {
                         [self subscribe];
                         NSLog(@"%@", [topicsController getSelectedTopics]);
                         [self setSubscriptionTopics:[topicsController getSelectedTopics]];
