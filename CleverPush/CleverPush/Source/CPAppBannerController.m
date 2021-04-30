@@ -1,4 +1,5 @@
 #import "CPAppBannerController.h"
+#import <WebKit/WebKit.h>
 
 @interface CPAppBannerController()
 
@@ -12,6 +13,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     ParentConstraintNone
 };
 
+#pragma mark - Initialise blocks banner
 - (id)initWithBanner:(CPAppBanner*)banner {
     self = [super init];
     if (self) {
@@ -30,7 +32,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-
+        
         [self.view addSubview:self.bannerBody];
         
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(15, 15, 343, 370)];
@@ -78,6 +80,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     return self;
 }
 
+#pragma mark - Initialise HTML banner
 - (id)initWithHTMLBanner:(CPAppBanner*)banner {
     self = [super init];
     if (self) {
@@ -87,7 +90,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
         
         [self.view setContentMode:UIViewContentModeScaleToFill];
-
+        
         self.view.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
         self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
@@ -97,7 +100,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-
+        
         [self.view addSubview:self.bannerBody];
         
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(20, 20, [[UIScreen mainScreen] bounds].size.width - 80, 360)];
@@ -110,7 +113,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         
         self.bannerBody.layer.cornerRadius = 15.0;
         self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
-        
         self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0f];
         
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDismiss)];
@@ -126,9 +128,9 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     return self;
 }
 
+#pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     if (self.data == nil) {
         return;
     }
@@ -136,7 +138,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
     [self fadeIn];
     [self jumpIn];
 }
@@ -145,6 +146,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
 
+#pragma mark - Define Root view controller
 + (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
     if ([viewController isKindOfClass:[UITabBarController class]]) {
         UITabBarController* tabBarController = (UITabBarController*)viewController;
@@ -168,6 +170,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     }
 }
 
+#pragma mark - composeBanner
 - (void)composeBanner:(NSMutableArray<CPAppBannerBlock*>*)blocks {
     NSLog(@"CleverPush: composeBanner");
     
@@ -175,6 +178,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     int index = 0;
     for (CPAppBannerBlock* block in blocks) {
         ParentConstraint parentConstraint = ParentConstraintNone;
+        
         if (index == 0) {
             parentConstraint = ParentConstraintTop;
         } else if (index == [blocks count] - 1) {
@@ -183,29 +187,22 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         
         if (block.type == CPAppBannerBlockTypeButton) {
             UIView *buttonView = [self composeButtonBlock:(CPAppBannerButtonBlock*)block];
-            
             [self activateItemConstrants:buttonView prevView:prevView parentConstraint:parentConstraint];
-        
             prevView = buttonView;
         } else if (block.type == CPAppBannerBlockTypeText) {
             UILabel *textView = [self composeTextBlock:(CPAppBannerTextBlock*)block];
-        
             [self activateItemConstrants:textView prevView:prevView parentConstraint:parentConstraint];
-        
             prevView = textView;
         } else if (block.type == CPAppBannerBlockTypeImage) {
             UIImageView *imageView = [self composeImageBlock:(CPAppBannerImageBlock*)block];
-            
             [self activateItemConstrants:imageView prevView:prevView parentConstraint:parentConstraint];
-        
             prevView = imageView;
         }
-        
-        
         index++;
     }
 }
 
+#pragma mark - creating a blocks of a Button
 - (UIView*)composeButtonBlock:(CPAppBannerButtonBlock*)block {
     NSLog(@"CleverPush: composeButtonBlock");
     CPUIBlockButton *button = [CPUIBlockButton buttonWithType:UIButtonTypeSystem];
@@ -240,21 +237,18 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     }];
     
     [self.bannerBodyContent addSubview:button];
-    
     return button;
 }
 
+#pragma mark - creating a blocks of a Text
 - (UILabel*)composeTextBlock:(CPAppBannerTextBlock*)block {
     UILabel *label = [[UILabel alloc] init];
     
     label.text = block.text;
     label.textColor = [UIColor colorWithHexString:block.color];
     [label setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightRegular]];
-    
     [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    
     label.translatesAutoresizingMaskIntoConstraints = false;
-    
     switch (block.alignment) {
         case CPAppBannerAlignmentRight:
             label.textAlignment = NSTextAlignmentRight;
@@ -266,42 +260,11 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             label.textAlignment = NSTextAlignmentCenter;
             break;
     }
-    
     [self.bannerBodyContent addSubview:label];
-    
     return label;
 }
 
-- (WKWebView*)composeHTML:(NSString*)content {
-    WKWebView *webview = [[WKWebView alloc] init];
-    webview.frame = self.bannerBodyContent.bounds;
-    [webview loadHTMLString:content baseURL:nil];
-    [webview setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    webview.translatesAutoresizingMaskIntoConstraints = false;
-    webview.layer.cornerRadius = 15.0;
-    webview.clipsToBounds = YES;
-    webview.UIDelegate = self;
-    webview.navigationDelegate = self;
-    [self.bannerBodyContent addSubview:webview];
-    return webview;
-}
-
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [webView evaluateJavaScript:@"Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)"
-              completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-                  if (!error) {
-                      CGFloat height = [result floatValue];
-                      // do with the height
-                      webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, height);
-
-                      self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, height);
-                      
-                      self.bannerBody.frame = CGRectMake(20, height/2, self.bannerBody.frame.size.width, height + 40);
-
-                      
-                  }
-              }];
-}
+#pragma mark - creating a blocks of a Image
 - (UIImageView*)composeImageBlock:(CPAppBannerImageBlock*)block {
     UIImageView *imageView = [[CPAspectKeepImageView alloc] init];
     if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
@@ -329,6 +292,71 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     
     return imageView;
 }
+
+#pragma mark - creating a banner with HTML
+- (WKWebView*)composeHTML:(NSString*)content {
+    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
+    WKUserContentController* userController = [[WKUserContentController alloc]init];
+    [userController addScriptMessageHandler:self name:@"close"];
+    config.userContentController = userController;
+    
+    WKWebView *webBanner = [[WKWebView alloc] initWithFrame:self.bannerBodyContent.bounds configuration:config];
+    webBanner.scrollView.scrollEnabled = true;
+    webBanner.scrollView.bounces = false;
+    webBanner.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
+    webBanner.allowsBackForwardNavigationGestures = false;
+    webBanner.contentMode = UIViewContentModeScaleToFill;
+    webBanner.navigationDelegate = self;
+    webBanner.layer.cornerRadius = 15.0;
+    [self.bannerBodyContent addSubview:webBanner];
+    
+    if ([content containsString:@"</body></html>"]) {
+        content = [content stringByReplacingOccurrencesOfString:@"</body></html>" withString:@""];
+    }
+    
+    NSString *script = @"<script type=\"text/javascript\">var keyword = 'close';function onCloseClick() {try {window.webkit.messageHandlers.close.postMessage(null);} catch (error) {console.log('Caught error on closeBTN click', error);}}var elemsWithId = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.id && item.id.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}var elemsWithClass = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.className && item.className.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}</script>";
+    NSString *bodyText = @"</body></html>";
+    NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, bodyText];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
+        [webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+        
+    });
+    return webBanner;
+}
+
+#pragma mark - UIWebView Delgate Method
+- (void)userContentController:(WKUserContentController*)userContentController
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+    if ([message.name isEqualToString:@"close"]){
+        [self onDismiss];
+    }
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    
+    [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        [webView evaluateJavaScript:@"document.body.scrollHeight" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+            CGFloat height = [result floatValue];
+            if (height > UIScreen.mainScreen.bounds.size.height) {
+                self.bannerBody.frame = CGRectMake(20, 70 , self.bannerBody.frame.size.width, UIScreen.mainScreen.bounds.size.height - 140);
+                self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
+                webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
+            }
+            else
+            {
+                CGFloat ScreenHeight = UIScreen.mainScreen.bounds.size.height;
+                CGFloat popupY = (ScreenHeight - height) / 2;
+                self.bannerBody.frame = CGRectMake(20, popupY , self.bannerBody.frame.size.width, height + 40);
+                self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
+                webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
+            }
+        }];
+    }];
+}
+
+#pragma mark - Managed Layout constraints
 - (void)activateItemConstrants:(UIView*)view prevView:(UIView*)prevView parentConstraint:(ParentConstraint )parentConstraint {
     if (self.bannerBodyContent == nil) {
         return;
@@ -365,6 +393,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     }
 }
 
+#pragma mark - Animations
 - (void)fadeIn {
     [UIView animateWithDuration:0.3 animations:^{
         self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3f];
@@ -403,4 +432,3 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 }
 
 @end
-
