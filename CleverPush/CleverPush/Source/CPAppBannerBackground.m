@@ -1,7 +1,7 @@
 #import "CPAppBannerBackground.h"
 
 @implementation CPAppBannerBackground
-
+#pragma mark - wrapping the data of the Background in to CPAppBannerBackground NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {

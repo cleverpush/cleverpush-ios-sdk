@@ -110,7 +110,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBodyContent setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
         [self.bannerBody addSubview:self.bannerBodyContent];
-        
         self.bannerBody.layer.cornerRadius = 15.0;
         self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
         self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0f];
@@ -295,6 +294,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 #pragma mark - creating a banner with HTML
 - (WKWebView*)composeHTML:(NSString*)content {
+    
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:self name:@"close"];
@@ -303,6 +303,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     WKWebView *webBanner = [[WKWebView alloc] initWithFrame:self.bannerBodyContent.bounds configuration:config];
     webBanner.scrollView.scrollEnabled = true;
     webBanner.scrollView.bounces = false;
+    webBanner.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
     webBanner.allowsBackForwardNavigationGestures = false;
     webBanner.contentMode = UIViewContentModeScaleToFill;
     webBanner.navigationDelegate = self;

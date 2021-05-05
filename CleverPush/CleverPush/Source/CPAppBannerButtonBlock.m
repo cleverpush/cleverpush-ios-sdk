@@ -1,7 +1,7 @@
 #import "CPAppBannerButtonBlock.h"
 
 @implementation CPAppBannerButtonBlock
-
+#pragma mark - wrapping the data of the Banner Button Block in to CPAppBannerButtonBlock NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
@@ -47,5 +47,3 @@
 }
 
 @end
-
-

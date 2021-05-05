@@ -30,7 +30,6 @@
     self = [super init];
     if (self) {
         _payload = inPayload;
-        
         _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
         _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
     }
@@ -45,10 +44,8 @@
     self = [super init];
     if (self) {
         _payload = inPayload;
-        
         _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
         _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
-        
         _action = action;
     }
     return self;
@@ -68,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.7.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.4.7";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -87,19 +84,22 @@ NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
-NSMutableDictionary* autoAssignSessionsCounted;
-NSMutableArray* pendingChannelConfigListeners;
+NSString* apiEndpoint = @"https://api.cleverpush.com";
+
 NSArray* appBanners;
+NSArray* channelTopics;
+
+NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingAppBannersListeners;
 NSMutableArray* pendingSubscriptionListeners;
-NSArray* channelTopics;
+NSMutableArray* pendingTrackingConsentListeners;
+
+NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* chatBackgroundColor;
 UIWindow* topicsDialogWindow;
-NSString* apiEndpoint = @"https://api.cleverpush.com";
-NSMutableArray* pendingTrackingConsentListeners;
 
 CPChatView* currentChatView;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
@@ -127,7 +127,6 @@ double channelTopicsPickerShownAt;
 static id isNil(id object) {
     return object ?: [NSNull null];
 }
-
 
 + (NSString*)channelId {
     return channelId;
@@ -167,6 +166,7 @@ static id isNil(id object) {
     return val;
 }
 
+#pragma mark - methods to initialise CHANNEL
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId {
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
 }
@@ -230,6 +230,7 @@ static id isNil(id object) {
     return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
 }
 
+#pragma mark - Common function to initialise CHANNEL and sync data to NSUserDefaults
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions
                   channelId:(NSString*)newChannelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
@@ -298,6 +299,7 @@ static id isNil(id object) {
     return self;
 }
 
+#pragma mark - Define the rootview controller of the UINavigation-Stack
 + (UIViewController*)topViewController {
     return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
@@ -328,6 +330,8 @@ static id isNil(id object) {
     }
 }
 
+
+#pragma mark - syncSubscription by calling initWithChannelId.
 + (void)initWithChannelId {
     NSLog(@"CleverPush: initializing SDK %@ with channelId: %@", CLEVERPUSH_SDK_VERSION, channelId);
     
@@ -376,17 +380,20 @@ static id isNil(id object) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
 
+#pragma mark - clear Badge count and start tracking the session when application goes to the Foreground.
 + (void)applicationWillEnterForeground {
     [self updateBadge:nil];
     [self trackSessionStart];
     [CPAppBannerModule initSession];
 }
 
+#pragma mark - clear Badge count and start tracking the session when application goes to the Background.
 + (void)applicationDidEnterBackground {
     [self updateBadge:nil];
     [self trackSessionEnd];
 }
 
+#pragma mark - Initialised Features.
 + (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         [self showPendingTopicsDialog];
@@ -397,6 +404,7 @@ static id isNil(id object) {
     });
 }
 
+#pragma mark - Initialised Appreviews.
 + (void)initAppReview {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -457,13 +465,9 @@ static id isNil(id object) {
                     [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
                     [userDefaults synchronize];
                     
-                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
-                                                                                             message:@""
-                                                                                      preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle message:@"" preferredStyle:UIAlertControllerStyleAlert];
                     
-                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:appReviewYes
-                                                                        style:UIAlertActionStyleDefault
-                                                                      handler:^(UIAlertAction * action) {
+                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:appReviewYes style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                         if (iosStoreId == nil || [iosStoreId isKindOfClass:[NSNull class]]) {
                             return;
                         }
@@ -521,37 +525,28 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - daysBetweenDate(instance method and class method)
 + (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
     NSDate *fromDate;
     NSDate *toDate;
-    
     NSCalendar *calendar = [NSCalendar currentCalendar];
-    
-    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate
-                 interval:NULL forDate:fromDateTime];
-    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate
-                 interval:NULL forDate:toDateTime];
-    
-    NSDateComponents *difference = [calendar components:NSCalendarUnitDay
-                                               fromDate:fromDate toDate:toDate options:0];
-    
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate interval:NULL forDate:fromDateTime];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate interval:NULL forDate:toDateTime];
+    NSDateComponents *difference = [calendar components:NSCalendarUnitDay fromDate:fromDate toDate:toDate options:0];
     return [difference day];
 }
 
 - (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
     NSDate *fromDate;
     NSDate *toDate;
-    
     NSCalendar *calendar = [NSCalendar currentCalendar];
-    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate
-                 interval:NULL forDate:fromDateTime];
-    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate
-                 interval:NULL forDate:toDateTime];
-    NSDateComponents *difference = [calendar components:NSCalendarUnitDay
-                                               fromDate:fromDate toDate:toDate options:0];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate interval:NULL forDate:fromDateTime];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate interval:NULL forDate:toDateTime];
+    NSDateComponents *difference = [calendar components:NSCalendarUnitDay fromDate:fromDate toDate:toDate options:0];
     return [difference day];
 }
 
+#pragma mark - determine the last sync and update the data on the next sync date
 + (BOOL)shouldSync {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
@@ -563,6 +558,7 @@ static id isNil(id object) {
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
 }
 
+#pragma mark - fireChannelConfigListeners.
 + (void)fireChannelConfigListeners {
     pendingChannelConfigRequest = NO;
     
@@ -578,6 +574,7 @@ static id isNil(id object) {
     pendingChannelConfigListeners = [NSMutableArray new];
 }
 
+#pragma mark - API call and get the data of the specific Channel.
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback {
     if (channelConfig) {
         callback(channelConfig);
@@ -635,6 +632,7 @@ static id isNil(id object) {
     return channelId;
 }
 
+#pragma mark - getSubscriptionId.
 + (void)getSubscriptionId:(void(^)(NSString *))callback {
     if (subscriptionId) {
         callback(subscriptionId);
@@ -659,6 +657,7 @@ static id isNil(id object) {
     return subscriptionId;
 }
 
+#pragma mark - perform on main thread.
 + (void)ensureMainThreadSync:(dispatch_block_t) onMainBlock {
     if ([NSThread isMainThread]) {
         onMainBlock();
@@ -667,6 +666,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Based on the trackingConsentRequired and hasTrackingConsent Triggered this method
 + (void)fireTrackingConsentListeners {
     for (void (^listener)(void *) in pendingTrackingConsentListeners) {
         // check if listener is non-nil (otherwise: EXC_BAD_ACCESS)
@@ -689,7 +689,7 @@ static id isNil(id object) {
     }
 }
 
-
+#pragma mark - notificationsEnabled
 + (BOOL)notificationsEnabled {
     __block BOOL isEnabled = NO;
     
@@ -729,6 +729,7 @@ static id isNil(id object) {
     return isEnabled;
 }
 
+#pragma mark - channel subscription
 + (void)subscribe {
     [self subscribe:nil];
 }
@@ -845,6 +846,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Clear the previous channel data from the NSUserDefaults on a fresh login and session expired.
 + (void)clearSubscriptionData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
@@ -860,6 +862,7 @@ static id isNil(id object) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 }
 
+#pragma mark - unsubscribe
 + (void)unsubscribe {
     [self unsubscribe:^(BOOL success) {
         if (success) {
@@ -896,6 +899,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - identify the channels being subscribed or not
 + (BOOL)isSubscribed {
     BOOL isSubscribed = NO;
     if (subscriptionId && [self notificationsEnabled]) {
@@ -904,6 +908,7 @@ static id isNil(id object) {
     return isSubscribed;
 }
 
+#pragma mark - handle the notification failed
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err {
     if (err.code == 3000) {
         if ([((NSString*)[err.userInfo objectForKey:NSLocalizedDescriptionKey]) rangeOfString:@"no valid 'aps-environment'"].location != NSNotFound) {
@@ -918,6 +923,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - register Device Token
 + (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId == nil) {
         deviceToken = newDeviceToken;
@@ -952,8 +958,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-
-
+#pragma mark - Api call and fetch out the subscription data and sync
 + (void)syncSubscription {
     if (registrationInProgress) {
         NSLog(@"CleverPush: syncSubscription aborted - registration already in progress");
@@ -1067,6 +1072,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - handle Notification Received
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
     NSDictionary* notification = [messageDict valueForKey:@"notification"];
     if (!notification) {
@@ -1100,6 +1106,7 @@ static id isNil(id object) {
     handleNotificationReceived(result);
 }
 
+#pragma mark - add Attachments to content
 + (void)addAttachments:(NSString*)mediaUrl toContent:(UNMutableNotificationContent*)content {
     NSMutableArray* unAttachments = [NSMutableArray new];
     
@@ -1130,6 +1137,7 @@ static id isNil(id object) {
     content.attachments = unAttachments;
 }
 
+#pragma mark - add Carousel Attachments to the content on a rich notification
 + (void)addCarouselAttachments:(NSDictionary*)notification toContent:(UNMutableNotificationContent*)content {
     NSMutableArray* unAttachments = [NSMutableArray new];
     
@@ -1169,9 +1177,9 @@ static id isNil(id object) {
     content.attachments = unAttachments;
 }
 
+#pragma mark - Handle silent notification
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     BOOL startedBackgroundJob = NO;
-    
     NSLog(@"CleverPush: handleSilentNotificationReceived");
     
     if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
@@ -1181,6 +1189,7 @@ static id isNil(id object) {
     return startedBackgroundJob;
 }
 
+#pragma mark - Handle function while notification is going to open
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
@@ -1204,7 +1213,6 @@ static id isNil(id object) {
         [self clearBadge:true];
     }
     
-    // badge count
     [self updateBadge:nil];
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
@@ -1223,6 +1231,7 @@ static id isNil(id object) {
     handleNotificationOpened(result);
 }
 
+#pragma mark - Update counts of the notification badge
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent {
     NSBundle *bundle = [NSBundle mainBundle];
     if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
@@ -1272,6 +1281,7 @@ static id isNil(id object) {
 }
 #pragma clang diagnostic pop
 
+#pragma mark - Api call to recognise notification has been delivered or not
 + (void)setNotificationDelivered:(NSDictionary*)notification {
     [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
 }
@@ -1314,6 +1324,7 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
+#pragma mark - Api call to recognise notification has been clicked or not
 + (void)setNotificationClicked:(NSString*)notificationId {
     [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
 }
@@ -1337,6 +1348,7 @@ static id isNil(id object) {
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
 }
 
+#pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
 + (BOOL)clearBadge:(BOOL)fromNotificationOpened {
     bool wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
     if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
@@ -1357,7 +1369,9 @@ static id isNil(id object) {
     return wasSet;
 }
 
+#pragma mark - Removed space from 32bytes and convert token in to string.
 + (NSString *)stringFromDeviceToken:(NSData *)deviceToken {
+    // deviceToken = <4618be8f 70f2a10f ce0e7435 5528fac9 86221163 94b282b1 553afc3c e31ec99c>
     NSUInteger length = deviceToken.length;
     if (length == 0) {
         return nil;
@@ -1367,9 +1381,11 @@ static id isNil(id object) {
     for (int i = 0; i < length; ++i) {
         [hexString appendFormat:@"%02x", buffer[i]];
     }
+    // hexString = 4618be8f70f2a10fce0e74355528fac98622116394b282b1553afc3ce31ec99cc>
     return [hexString copy];
 }
 
+#pragma mark - Initialised notification.
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)deviceToken {
     NSString* parsedDeviceToken = [self stringFromDeviceToken:deviceToken];
     NSLog(@"CleverPush: %@", [NSString stringWithFormat:@"Device Registered with Apple: %@", parsedDeviceToken]);
@@ -1380,9 +1396,10 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Generalised Api call.
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     NSLog(@"CleverPush: HTTP -> %@ %@", [request HTTPMethod], [request URL].absoluteString);
-    
+
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:request
                 completionHandler:^(NSData *data,
@@ -1399,7 +1416,7 @@ static id isNil(id object) {
     NSInteger statusCode = [HTTPResponse statusCode];
     NSError* jsonError = nil;
     NSMutableDictionary* innerJson;
-    
+
     if (data != nil && !isEmpty(data)) {
         innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
         if (jsonError) {
@@ -1408,7 +1425,7 @@ static id isNil(id object) {
             return;
         }
     }
-    
+
     if (error == nil && statusCode >= 200 && statusCode <= 299) {
         if (successBlock != nil) {
             if (innerJson != nil)
@@ -1426,7 +1443,6 @@ static id isNil(id object) {
             failureBlock([NSError errorWithDomain:@"CleverPushError" code:statusCode userInfo:nil]);
     }
 }
-
 + (void)addSubscriptionTag:(NSString*)tagId {
     NSLog(@"CleverPush: addSubscriptionTag: %@", tagId);
     
@@ -1467,6 +1483,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Remove subscription tag by calling api. subscription/untag
 + (void)removeSubscriptionTag:(NSString*)tagId {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -1493,6 +1510,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Set subscription attribute tag by calling api. subscription/attribute
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -1520,6 +1538,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Retrieving all the available tags from the channelConfig
 + (NSArray*)getAvailableTags {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
@@ -1551,6 +1570,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Retrieving all the available topics from the channelConfig
 + (NSArray*)getAvailableTopics {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
@@ -1586,6 +1606,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Retrieving all the available attributes from the channelConfig
 + (NSDictionary*)getAvailableAttributes {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
@@ -1612,6 +1633,7 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Retrieving subscription tag which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TAGS"
 + (NSArray*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
@@ -1621,10 +1643,12 @@ static id isNil(id object) {
     return subscriptionTags;
 }
 
+#pragma mark - check the tagId exists in the subscriptionTags or not
 + (BOOL)hasSubscriptionTag:(NSString*)tagId {
     return [[self getSubscriptionTags] containsObject:tagId];
 }
 
+#pragma mark - Retrieving subscription attributes which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_ATTRIBUTES"
 + (NSDictionary*)getSubscriptionAttributes {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSDictionary* subscriptionAttributes = [userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
@@ -1638,6 +1662,7 @@ static id isNil(id object) {
     return [[self getSubscriptionAttributes] objectForKey:attributeId];
 }
 
+#pragma mark - Update/Set subscription language which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_LANGUAGE"
 + (void)setSubscriptionLanguage:(NSString *)language {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* currentLanguage = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
@@ -1651,6 +1676,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Update/Set subscription country which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_COUNTRY"
 + (void)setSubscriptionCountry:(NSString *)country {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* currentCountry = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
@@ -1664,6 +1690,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 + (NSArray*)getSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
@@ -1673,12 +1700,14 @@ static id isNil(id object) {
     return subscriptionTopics;
 }
 
+#pragma mark - Check if the any topic is exists in the NSUserDefaults or not
 + (BOOL)hasSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
     return subscriptionTopics ? YES : NO;
 }
 
+#pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 + (void)setSubscriptionTopics:(NSMutableArray *)topics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -1698,6 +1727,7 @@ static id isNil(id object) {
     });
 }
 
+#pragma mark - Retrieving notifications which has been stored in NSUserDefaults by key "CleverPush_NOTIFICATIONS"
 + (NSArray*)getNotifications {
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
     NSArray* notifications = [userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"];
@@ -1708,6 +1738,7 @@ static id isNil(id object) {
     return notifications;
 }
 
+#pragma mark - Banner listeners
 + (void)fireAppBannersListeners {
     pendingAppBannersRequest = NO;
     for (void (^listener)(void *) in pendingAppBannersListeners) {
@@ -1720,6 +1751,7 @@ static id isNil(id object) {
     pendingAppBannersListeners = [NSMutableArray new];
 }
 
+#pragma mark - Retrieving App banner in from an Api channel/channel-id/app-banners
 + (void)getAppBanners:(void(^)(NSArray *))callback {
     if (appBanners) {
         callback(appBanners);
@@ -1748,6 +1780,7 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Tracking an event from an Api subscription/conversion
 + (void)trackEvent:(NSString*)eventName {
     return [self trackEvent:eventName amount:nil];
 }
@@ -1792,6 +1825,7 @@ static id isNil(id object) {
     });
 }
 
+#pragma mark - auto Assign Tag Matches
 + (void)autoAssignTagMatches:(NSDictionary*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback {
     NSString* path = [tag valueForKey:@"autoAssignPath"];
     if (path != nil) {
@@ -1829,6 +1863,7 @@ static id isNil(id object) {
     callback(NO);
 }
 
+#pragma mark - check Tags
 + (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params {
     NSURL* url = [NSURL URLWithString:urlStr];
     NSString* pathname = [url path];
@@ -1979,16 +2014,17 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - track Page View
 + (void)trackPageView:(NSString*)url {
     [self trackPageView:url params:nil];
 }
 
 + (void)trackPageView:(NSString*)url params:(NSDictionary*)params {
     currentPageUrl = url;
-    
     [self checkTags:url params:params];
 }
 
+#pragma mark - track Session Start by api call subscription/session/start
 + (void)trackSessionStart {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -2025,10 +2061,12 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - track the count of session visit
 + (void)increaseSessionVisits {
     sessionVisits += 1;
 }
 
+#pragma mark - session time gets end by calling this end point subscription/session/end
 + (void)trackSessionEnd {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -2067,58 +2105,7 @@ static id isNil(id object) {
     }];
 }
 
-+ (void)setBrandingColor:(UIColor *)color {
-    brandingColor = color;
-}
-
-+ (void)setTopicsDialogWindow:(UIWindow *)window {
-    topicsDialogWindow = window;
-}
-
-+ (UIColor*)getBrandingColor {
-    return brandingColor;
-}
-
-+ (void)setAutoClearBadge:(BOOL)autoClear {
-    autoClearBadge = autoClear;
-}
-
-+ (void)setIncrementBadge:(BOOL)increment {
-    incrementBadge = increment;
-    
-    NSBundle *bundle = [NSBundle mainBundle];
-    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
-        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
-    }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
-    [userDefaults setBool:increment forKey:@"CleverPush_INCREMENT_BADGE"];
-    [userDefaults synchronize];
-}
-
-+ (void)setChatBackgroundColor:(UIColor *)color {
-    chatBackgroundColor = color;
-}
-
-+ (UIColor*)getChatBackgroundColor {
-    return chatBackgroundColor;
-}
-
-+ (void)addChatView:(CPChatView*)chatView {
-    if (currentChatView != nil) {
-        [currentChatView removeFromSuperview];
-    }
-    currentChatView = chatView;
-}
-
-+ (void)setApiEndpoint:(NSString*)endpoint {
-    apiEndpoint = endpoint;
-}
-
-+ (NSString*)getApiEndpoint {
-    return apiEndpoint;
-}
-
+#pragma mark - Display pending topic dialog
 + (void)showPendingTopicsDialog {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     if (![userDefaults boolForKey:@"CleverPush_TOPICS_DIALOG_PENDING"]) {
@@ -2156,18 +2143,7 @@ static id isNil(id object) {
     }
 }
 
-+ (UIWindow*)keyWindow {
-    UIWindow *foundWindow = nil;
-    NSArray *windows = [[UIApplication sharedApplication] windows];
-    for (UIWindow *window in windows) {
-        if (window.isKeyWindow) {
-            foundWindow = window;
-            break;
-        }
-    }
-    return foundWindow;
-}
-
+#pragma mark - Display topic dialog
 + (void)showTopicsDialog {
     if (topicsDialogWindow) {
         [self showTopicsDialog:topicsDialogWindow];
@@ -2195,14 +2171,15 @@ static id isNil(id object) {
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
                 topicsController.delegate = channelTopicsPicker;
-
-
+                
+                
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"]
                                                                    style:DWAlertActionStyleCancel
                                                                  handler:^(DWAlertAction* action) {
                     if (topicsController.deselectedAll == YES) {
+                        [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                         [self unsubscribe];
-                    } else {
+                    }else{
                         [self subscribe];
                         NSLog(@"%@", [topicsController getSelectedTopics]);
                         [self setSubscriptionTopics:[topicsController getSelectedTopics]];
@@ -2220,11 +2197,72 @@ static id isNil(id object) {
     }];
     
 }
-- (void)setContentHeight{
-    [channelTopicsPicker.view setNeedsLayout];
-    [channelTopicsPicker.view layoutIfNeeded];
+
+#pragma mark - Badge count increment
++ (void)setIncrementBadge:(BOOL)increment {
+    incrementBadge = increment;
+    
+    NSBundle *bundle = [NSBundle mainBundle];
+    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
+        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
+        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
+    }
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    [userDefaults setBool:increment forKey:@"CleverPush_INCREMENT_BADGE"];
+    [userDefaults synchronize];
 }
 
++ (UIWindow*)keyWindow {
+    UIWindow *foundWindow = nil;
+    NSArray *windows = [[UIApplication sharedApplication] windows];
+    for (UIWindow *window in windows) {
+        if (window.isKeyWindow) {
+            foundWindow = window;
+            break;
+        }
+    }
+    return foundWindow;
+}
+
+#pragma mark - variable updates and call backs
++ (void)setBrandingColor:(UIColor *)color {
+    brandingColor = color;
+}
+
++ (void)setTopicsDialogWindow:(UIWindow *)window {
+    topicsDialogWindow = window;
+}
+
++ (UIColor*)getBrandingColor {
+    return brandingColor;
+}
+
++ (void)setAutoClearBadge:(BOOL)autoClear {
+    autoClearBadge = autoClear;
+}
+
++ (void)setChatBackgroundColor:(UIColor *)color {
+    chatBackgroundColor = color;
+}
+
++ (UIColor*)getChatBackgroundColor {
+    return chatBackgroundColor;
+}
+
++ (void)addChatView:(CPChatView*)chatView {
+    if (currentChatView != nil) {
+        [currentChatView removeFromSuperview];
+    }
+    currentChatView = chatView;
+}
+
++ (void)setApiEndpoint:(NSString*)endpoint {
+    apiEndpoint = endpoint;
+}
+
++ (NSString*)getApiEndpoint {
+    return apiEndpoint;
+}
 
 + (void)showAppBanners {
     NSLog(@"CleverPush: showAppBanners does not have to be called, app banners are initialized automatically");
@@ -2250,6 +2288,7 @@ static id isNil(id object) {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
 
+#pragma mark - recieved notifications from the Extension.
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
     NSLog(@"CleverPush: didReceiveNotificationExtensionRequest");
     
@@ -2288,6 +2327,7 @@ static id isNil(id object) {
     return replacementContent;
 }
 
+#pragma mark - service Extension Time Will Expire Request.
 + (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
     NSLog(@"CleverPush: serviceExtensionTimeWillExpireRequest");
     
@@ -2307,6 +2347,7 @@ static id isNil(id object) {
     return replacementContent;
 }
 
+#pragma mark - Add actions buttons on the carousel.
 + (void)addActionButtonsToNotificationRequest:(UNNotificationRequest*)request
                                   withPayload:(NSDictionary*)payload
                withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
@@ -2366,6 +2407,7 @@ static id isNil(id object) {
     allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
 }
 
+#pragma mark - Singleton shared instance of the cleverpush.
 + (CleverPush*)sharedInstance {
     @synchronized(singleInstance) {
         if (!singleInstance)
@@ -2413,6 +2455,7 @@ static inline BOOL isEmpty(id thing) {
     [self setupUNUserNotificationCenterDelegate];
 }
 
+#pragma mark - Notification delegates injections.
 + (void)setupUNUserNotificationCenterDelegate {
     if (!NSClassFromString(@"UNUserNotificationCenter")) {
         return;

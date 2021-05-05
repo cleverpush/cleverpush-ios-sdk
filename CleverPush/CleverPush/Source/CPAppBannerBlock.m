@@ -4,6 +4,7 @@
 #import "CPAppBannerImageBlock.h"
 @implementation CPAppBannerBlock
 
+#pragma mark - wrapping the data of the Banner Block in to CPAppBannerBlock NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
@@ -32,5 +33,3 @@
 }
 
 @end
-
-

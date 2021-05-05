@@ -3,11 +3,13 @@
 
 #import "CleverPushSelectorHelpers.h"
 
+#pragma mark - Instances Overrises selector.
 BOOL checkIfInstanceOverridesSelector(Class instance, SEL selector) {
     Class instSuperClass = [instance superclass];
     return [instance instanceMethodForSelector: selector] != [instSuperClass instanceMethodForSelector: selector];
 }
 
+#pragma mark - get Class With Protocol In Hierarchy
 Class getClassWithProtocolInHierarchy(Class searchClass, Protocol* protocolToFind) {
     if (!class_conformsToProtocol(searchClass, protocolToFind)) {
         if ([searchClass superclass] == nil)
@@ -20,6 +22,7 @@ Class getClassWithProtocolInHierarchy(Class searchClass, Protocol* protocolToFin
     return searchClass;
 }
 
+#pragma mark - inject Selector
 BOOL injectSelector(Class newClass, SEL newSel, Class addToClass, SEL makeLikeSel) {
     Method newMeth = class_getInstanceMethod(newClass, newSel);
     IMP imp = method_getImplementation(newMeth);
@@ -47,7 +50,6 @@ void injectToProperClass(SEL newSel, SEL makeLikeSel, NSArray* delegateSubclasse
             return;
         }
     }
-    
     injectSelector(myClass, newSel, delegateClass, makeLikeSel);
 }
 
