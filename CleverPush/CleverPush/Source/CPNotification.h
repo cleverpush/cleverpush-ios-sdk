@@ -19,6 +19,7 @@
 
 @property (readonly) BOOL chatNotification;
 @property (readonly) BOOL carouselEnabled;
+@property (readonly) BOOL silent;
 
 @property (readonly, nullable) NSDate *createdAt;
 @property (readonly, nullable) NSDate *expiresAt;
@@ -28,4 +29,3 @@
 - (void)parseJson:(nonnull NSDictionary*)json;
 
 @end
-

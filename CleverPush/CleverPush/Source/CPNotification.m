@@ -2,16 +2,20 @@
 
 @implementation CPNotification
 #pragma mark - Initialise notifications by NSDictionary
+
 + (instancetype)initWithJson:(nonnull NSDictionary*)json {
     if (!json) {
         return nil;
     }
+    
     CPNotification *cpNotification = [CPNotification new];
+    
     [cpNotification parseJson:json];
     return cpNotification;
 }
 
 #pragma mark - Parse json and set the data to the object variables
+
 - (void)parseJson:(NSDictionary*)json {
     _id = [json objectForKey:@"_id"];
     _title = [json objectForKey:@"title"];
@@ -58,6 +62,11 @@
     }
     if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]]) {
         _expiresAt = [formatter dateFromString:[json objectForKey:@"expiresAt"]];
+    }
+    
+    _silent = NO;
+    if ([json objectForKey:@"silent"] && [json valueForKey:@"silent"] != nil && ![[json valueForKey:@"silent"] isKindOfClass:[NSNull class]]) {
+        _silent = [[json objectForKey:@"silent"] boolValue];
     }
     
     _chatNotification = NO;
