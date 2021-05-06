@@ -22,6 +22,7 @@
 
 @interface CPAppBannerModule : NSObject
 
+#pragma mark - Class Methods
 + (void)initBannersWithChannel:(NSString*)channel showDrafts:(BOOL)showDrafts;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;

@@ -2,6 +2,7 @@
 
 @implementation CPAppBannerTextBlock
 
+#pragma mark - wrapping the data of the banner text block in to CPAppBannerTextBlock NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {

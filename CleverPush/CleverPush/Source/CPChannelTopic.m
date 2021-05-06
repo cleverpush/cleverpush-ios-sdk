@@ -2,16 +2,17 @@
 
 @implementation CPChannelTopic
 
+#pragma mark - Initialise channel topic by NSDictionary
 + (instancetype)initWithJson:(nonnull NSDictionary*)json {
     if (!json) {
         return nil;
     }
-    
     CPChannelTopic *topic = [CPChannelTopic new];
     [topic parseJson:json];
     return topic;
 }
 
+#pragma mark - Parse json and set the data to the object variables
 - (void)parseJson:(NSDictionary*)json {
     _id = [json objectForKey:@"_id"];
     _name = [json objectForKey:@"name"];

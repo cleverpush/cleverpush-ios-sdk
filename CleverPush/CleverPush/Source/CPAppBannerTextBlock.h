@@ -8,11 +8,13 @@
 
 @interface CPAppBannerTextBlock ()
 
+#pragma mark - Class Variables
+@property (nonatomic) CPAppBannerAlignment alignment;
 @property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic) int size;
-@property (nonatomic) CPAppBannerAlignment alignment;
 
+#pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;
 
 @end
