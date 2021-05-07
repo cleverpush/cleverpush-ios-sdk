@@ -78,6 +78,7 @@ static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 
 static NSString* channelId;
+static NSString* callBackDelay;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSDictionary* channelConfig;
@@ -199,6 +200,12 @@ static id isNil(id object) {
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
 }
 
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback delay:(NSString*)seconds
+{
+    callBackDelay = seconds;
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+}
+
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback {
@@ -228,6 +235,16 @@ static id isNil(id object) {
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegisterParam {
     return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
+}
+
++ (void) delayCallback: (void(^)(void))callback forTotalSeconds: (double)delayInSeconds{
+
+     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+           if(callback){
+                callback();
+           }
+      });
 }
 
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions

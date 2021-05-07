@@ -74,23 +74,26 @@ withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))compl
     NSUInteger completionHandlerOptions = 7;
     
     NSLog(@"CleverPush cleverPushUserNotificationCenter willPresentNotification");
-    
-    if ([CleverPush channelId]) {
-        [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
-    }
-    
-    if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
-        [self cleverPushUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
-    } else {
-        [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:notification
-                                                                isTextReply:false
-                                                           actionIdentifier:nil
-                                                                   userText:nil
-                                                    fromPresentNotification:true
-                                                      withCompletionHandler:^() {}];
-    }
-    
-    completionHandler(completionHandlerOptions);
+    [CleverPush delayCallback:^(void){
+        if ([CleverPush channelId]) {
+            [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
+        }
+        
+        if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
+            [self cleverPushUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
+        } else {
+            [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:notification
+                                                                    isTextReply:false
+                                                               actionIdentifier:nil
+                                                                       userText:nil
+                                                        fromPresentNotification:true
+                                                          withCompletionHandler:^() {}];
+        }
+        
+        completionHandler(completionHandlerOptions);
+
+    } forTotalSeconds:[CleverPush value]];
+
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
@@ -107,22 +110,25 @@ withCompletionHandler:(void(^)())completionHandler {
         return;
     }
     
-    [CleverPush handleNotificationOpened:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive actionIdentifier:response.actionIdentifier];
+    [CleverPush delayCallback:^(void){
+        [CleverPush handleNotificationOpened:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive actionIdentifier:response.actionIdentifier];
+        
+        if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
+            [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
+        } else if (![CleverPushUNUserNotificationCenter isDismissEvent:response]) {
+            BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
+            NSString* userText = isTextReply ? [response valueForKey:@"userText"] : nil;
+            [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:response.notification
+                                                                   isTextReply:isTextReply
+                                                              actionIdentifier:response.actionIdentifier
+                                                                      userText:userText
+                                                       fromPresentNotification:false
+                                                         withCompletionHandler:completionHandler];
+        } else {
+            completionHandler();
+        }
+    } forTotalSeconds:[CleverPush value]];
     
-    if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
-        [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-    } else if (![CleverPushUNUserNotificationCenter isDismissEvent:response]) {
-        BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
-        NSString* userText = isTextReply ? [response valueForKey:@"userText"] : nil;
-        [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:response.notification
-                                                               isTextReply:isTextReply
-                                                          actionIdentifier:response.actionIdentifier
-                                                                  userText:userText
-                                                   fromPresentNotification:false
-                                                     withCompletionHandler:completionHandler];
-    } else {
-        completionHandler();
-    }
 }
 
 + (BOOL)isDismissEvent:(UNNotificationResponse *)response {

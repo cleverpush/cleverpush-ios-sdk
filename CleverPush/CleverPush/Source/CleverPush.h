@@ -71,6 +71,9 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
    handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback delay:(NSString*)seconds;
+
++ (void)delayCallback: (void(^)(void))callback forTotalSeconds: (double)delayInSeconds;
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
 + (void)enableDevelopmentMode;
@@ -82,6 +85,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
++ (double)value;
 + (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
