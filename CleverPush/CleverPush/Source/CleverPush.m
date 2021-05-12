@@ -109,6 +109,7 @@ CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
+CPNotificationOpenedResult* pendingOpenedResult = nil;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -252,6 +253,9 @@ static id isNil(id object) {
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
+        if (pendingOpenedResult && handleNotificationOpened) {
+                handleNotificationOpened(pendingOpenedResult);
+        }
     }
     
     if (self) {
@@ -1182,6 +1186,7 @@ static id isNil(id object) {
 }
 
 + (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
+    
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
@@ -1195,16 +1200,15 @@ static id isNil(id object) {
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
     }
-    
     NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
     
     [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
+
     
     if (autoClearBadge) {
         [self clearBadge:true];
     }
     
-    // badge count
     [self updateBadge:nil];
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
@@ -1213,14 +1217,17 @@ static id isNil(id object) {
             [currentChatView loadChat];
         }
     }
-    
+    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
+
+    if (!channelId) { // not init
+        pendingOpenedResult = result;
+    }
     if (!handleNotificationOpened) {
         return;
     }
-    
-    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
-    
+        
     handleNotificationOpened(result);
+
 }
 
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent {

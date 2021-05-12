@@ -99,7 +99,7 @@ withCompletionHandler:(void(^)())completionHandler {
     NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
     
     if (![CleverPush channelId]) {
-        return;
+//        return;
     }
     
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
