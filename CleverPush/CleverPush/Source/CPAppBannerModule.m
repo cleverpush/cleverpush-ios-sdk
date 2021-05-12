@@ -163,6 +163,7 @@ CPAppBannerActionBlock handleBannerOpened;
                     BOOL conditionTrue = NO;
                     if (condition.type == CPAppBannerTriggerConditionTypeDuration) {
                         banner.delaySeconds = condition.seconds;
+                        conditionTrue = YES;
                     }
                     if (condition.type == CPAppBannerTriggerConditionTypeSessions) {
                         if (condition.relation != nil && [condition.relation isEqualToString:@"lt"]) {

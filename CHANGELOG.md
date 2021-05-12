@@ -1,3 +1,6 @@
+# 1.x.x
+* Improved App Banner Conditions
+
 # 1.7.0
 * Introduced optional 'Deselect all' switch in TopicsDialog (can be enabled in your CleverPush topic settings).
 * Added support for Close Buttons in HTML app banners
