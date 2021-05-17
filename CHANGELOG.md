@@ -1,4 +1,5 @@
-# 1.x.x
+# 1.7.1
+* Fixed Notification Opened handler when SDK was initialized delayed
 * Improved App Banner Conditions
 
 # 1.7.0

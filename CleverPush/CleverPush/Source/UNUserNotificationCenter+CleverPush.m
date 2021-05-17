@@ -98,12 +98,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 withCompletionHandler:(void(^)())completionHandler {
     NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
     
-    /*
-    if (![CleverPush channelId]) {
-        return;
-    }
-    */
-    
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
         [CleverPush updateBadge:nil];
         return;
