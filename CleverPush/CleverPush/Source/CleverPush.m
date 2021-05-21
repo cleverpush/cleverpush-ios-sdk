@@ -1217,6 +1217,10 @@ static id isNil(id object) {
             [currentChatView loadChat];
         }
     }
+    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification valueForKey:@"appBanner"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"appBanner"] boolValue]) {
+        [self showAppBanner:[notification valueForKey:@"appBanner"]];
+    }
+    
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
 
     if (!channelId) { // not init
@@ -2380,6 +2384,24 @@ static id isNil(id object) {
     }
     
     return singleInstance;
+}
++ (BOOL)fontFamilyExits:(NSString*)fontFamily
+{
+    if (fontFamily == nil) {
+        return NO;
+    }
+
+    UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
+    NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
+
+    return ([matches count] > 0);
+}
++ (void)disableAppBanners{
+    
+}
+
++ (void)enableAppBanners{
+    
 }
 
 static inline BOOL isEmpty(id thing) {

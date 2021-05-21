@@ -2,6 +2,7 @@
 
 @implementation CPAppBanner
 
+#pragma mark - wrapping the data of the banner in to CPAppBanner NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
@@ -27,18 +28,23 @@
         }
         
         self.background = [[CPAppBannerBackground alloc] initWithJson:[json objectForKey:@"background"]];
-
         
         self.blocks = [NSMutableArray new];
         if ([json objectForKey:@"blocks"] != nil) {
+            
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {
+                
                 CPAppBannerBlock* block;
+                
                 if ([[blockJson objectForKey:@"type"] isEqual:@"button"]) {
                     block = [[CPAppBannerButtonBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson objectForKey:@"type"] isEqual:@"text"]) {
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson objectForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
+                }
+                else if ([[blockJson objectForKey:@"type"] isEqual:@"html"]) {
+                    block = [[CPAppBannerHTMLBlock alloc] initWithJson:blockJson];
                 }
                 else {
                     continue;
@@ -84,6 +90,7 @@
         }
         
         self.triggers = [NSMutableArray new];
+        
         if ([json objectForKey:@"triggers"] != nil) {
             for (NSDictionary *triggerJson in [json objectForKey:@"triggers"]) {
                 [self.triggers addObject:[[CPAppBannerTrigger alloc] initWithJson:triggerJson]];
@@ -100,5 +107,3 @@
 }
 
 @end
-
-

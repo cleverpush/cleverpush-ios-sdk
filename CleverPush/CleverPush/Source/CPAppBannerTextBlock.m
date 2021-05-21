@@ -21,7 +21,9 @@
         if ([json objectForKey:@"size"]) {
             self.size = [[json objectForKey:@"size"] intValue];
         }
-        
+        if ([json objectForKey:@"family"]) {
+            self.family = [json objectForKey:@"family"];
+        }
         self.alignment = CPAppBannerAlignmentCenter;
         if ([[json objectForKey:@"alignment"] isEqual:@"right"]) {
             self.alignment = CPAppBannerAlignmentRight;
