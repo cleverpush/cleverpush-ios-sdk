@@ -110,6 +110,7 @@ CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
+NSMutableArray<CPAppBanner*> *Pendingbanners;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -1719,18 +1720,6 @@ static id isNil(id object) {
     return notifications;
 }
 
-+ (void)fireAppBannersListeners {
-    pendingAppBannersRequest = NO;
-    for (void (^listener)(void *) in pendingAppBannersListeners) {
-        // check if listener is non-nil (otherwise: EXC_BAD_ACCESS)
-        if (listener && appBanners) {
-            __strong void (^callbackBlock)() = listener;
-            callbackBlock(appBanners);
-        }
-    }
-    pendingAppBannersListeners = [NSMutableArray new];
-}
-
 + (void)getAppBanners:(void(^)(NSArray *))callback {
     if (appBanners) {
         callback(appBanners);
@@ -1757,6 +1746,26 @@ static id isNil(id object) {
     } else {
         [self fireAppBannersListeners];
     }
+}
+
++ (void)fireAppBannersListeners {
+    pendingAppBannersRequest = NO;
+    
+    if (appBanners != nil) {
+        NSLog(@"CleverPush banners %@", appBanners);
+        Pendingbanners = [NSMutableArray new];
+        for (NSDictionary* json in appBanners) {
+            [Pendingbanners addObject:[[CPAppBanner alloc] initWithJson:json]];
+        }
+        
+        for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingAppBannersListeners) {
+            if (listener && Pendingbanners) {
+                __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
+                callbackBlock(Pendingbanners);
+            }
+        }
+    }
+    pendingAppBannersListeners = [NSMutableArray new];
 }
 
 + (void)trackEvent:(NSString*)eventName {
@@ -2397,11 +2406,17 @@ static id isNil(id object) {
     return ([matches count] > 0);
 }
 + (void)disableAppBanners{
-    
+    [self getAppBanners:^(NSArray* AppBanners_) {}];
 }
 
 + (void)enableAppBanners{
-    
+    if (Pendingbanners) {
+        if ([Pendingbanners count] > 0) {
+            for (CPAppBanner* bannerPending in Pendingbanners) {
+                [self showAppBanner:bannerPending.id];
+            }
+        }
+    }
 }
 
 static inline BOOL isEmpty(id thing) {
