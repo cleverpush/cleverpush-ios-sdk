@@ -18,23 +18,23 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     self = [super init];
     if (self) {
         self.data = banner;
-
+        
         [self setModalPresentationStyle:UIModalPresentationCustom];
         [self setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-
+        
         [self.view setContentMode:UIViewContentModeScaleToFill];
         self.view.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
         self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
+        
         self.bannerBody = [[UIView alloc] initWithFrame:CGRectMake(20.5, 248, 373, 400)];
         [self.bannerBody setContentMode:UIViewContentModeScaleToFill];
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-
+        
         [self.view addSubview:self.bannerBody];
-
+        
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(15, 15, 343, 370)];
         [self.bannerBodyContent setContentMode:UIViewContentModeScaleToFill];
         [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBodyContent setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
         [self.bannerBody addSubview:self.bannerBodyContent];
-
+        
         NSLayoutConstraint *bannerBodyConstraint1 = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeLeading multiplier:1 constant:15];
         NSLayoutConstraint *bannerBodyConstraint2 = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeHeight multiplier:1 constant:400];
         bannerBodyConstraint2.priority = 250;
@@ -54,27 +54,27 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBody addConstraint:bannerBodyConstraint3];
         [self.bannerBody addConstraint:bannerBodyConstraint4];
         [self.bannerBody addConstraint:bannerBodyConstraint5];
-
+        
         NSLayoutConstraint *viewConstraint1 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeWidth multiplier:0.9 constant:0];
         NSLayoutConstraint *viewConstraint2 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
         NSLayoutConstraint *viewConstraint3 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
         [self.view addConstraint:viewConstraint1];
         [self.view addConstraint:viewConstraint2];
         [self.view addConstraint:viewConstraint3];
-
+        
         self.bannerBody.layer.cornerRadius = 15.0;
         self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
-
+        
         self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0f];
-
+        
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDismiss)];
         tapGesture.delegate = self;
         tapGesture.cancelsTouchesInView = true;
         tapGesture.numberOfTapsRequired = 1;
-
+        
         [self.view addGestureRecognizer:tapGesture];
         self.view.userInteractionEnabled = true;
-
+        
         [self composeBanner:self.data.blocks];
     }
     return self;
@@ -208,13 +208,20 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     CPUIBlockButton *button = [CPUIBlockButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:block.text forState:UIControlStateNormal];
     [button setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
+    button.backgroundColor = [UIColor colorWithHexString:block.background];
+    button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+    button.translatesAutoresizingMaskIntoConstraints = false;
+    button.layer.cornerRadius = (CGFloat)block.radius;
+    button.adjustsImageWhenHighlighted = YES;
+    [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    
     if ([CleverPush fontFamilyExits:block.family]){
         [button.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
     }else{
         NSLog(@"CleverPush: Font Family not found for button block");
         [button.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
-
+    
     switch (block.alignment) {
         case CPAppBannerAlignmentRight:
             button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -226,12 +233,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
             break;
     }
-    button.backgroundColor = [UIColor colorWithHexString:block.background];
-    button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
-    button.translatesAutoresizingMaskIntoConstraints = false;
-    button.layer.cornerRadius = (CGFloat)block.radius;
-    button.adjustsImageWhenHighlighted = YES;
-    [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     
     [button handleControlEvent:UIControlEventTouchUpInside withBlock:^{
         self.actionCallback(block.action);
@@ -248,17 +249,18 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 #pragma mark - creating a blocks of a Text
 - (UILabel*)composeTextBlock:(CPAppBannerTextBlock*)block {
     UILabel *label = [[UILabel alloc] init];
-    
     label.text = block.text;
     label.textColor = [UIColor colorWithHexString:block.color];
+    [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    label.translatesAutoresizingMaskIntoConstraints = false;
+    
     if ([CleverPush fontFamilyExits:block.family]){
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
     }else{
         NSLog(@"CleverPush: Font Family not found for Text block");
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
     }
-    [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    label.translatesAutoresizingMaskIntoConstraints = false;
+    
     switch (block.alignment) {
         case CPAppBannerAlignmentRight:
             label.textAlignment = NSTextAlignmentRight;
@@ -276,6 +278,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 #pragma mark - creating a blocks of a Image
 - (UIImageView*)composeImageBlock:(CPAppBannerImageBlock*)block {
+    NSLog(@"CleverPush: composeImageBlock");
     UIImageView *imageView = [[CPAspectKeepImageView alloc] init];
     if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
         [imageView setImageWithURL:[NSURL URLWithString:block.imageUrl]];
@@ -307,7 +310,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 - (WKWebView*)composeHTMLBlock:(CPAppBannerHTMLBlock*)block
 {
     NSLog(@"CleverPush: composeHTMLBlock");
-
     WKWebView *webView  = [[WKWebView alloc] init];
     if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
         webView.scrollView.scrollEnabled = true;
@@ -322,7 +324,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [webView loadRequest:request];
     }
     
-    
     NSLayoutConstraint *imageWidthConstraint = [NSLayoutConstraint constraintWithItem:webView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
     imageWidthConstraint.priority = UILayoutPriorityRequired;
     
@@ -334,7 +335,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [self.bannerBodyContent addSubview:webView];
     [self.bannerBodyContent addConstraint:imageWidthConstraint];
     [self.bannerBodyContent addConstraint:imageHeightConstraint];
-    
     return webView;
 }
 
@@ -396,8 +396,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
                     self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
                     webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
                 }
-            }else{
-                
             }
         }];
     }];

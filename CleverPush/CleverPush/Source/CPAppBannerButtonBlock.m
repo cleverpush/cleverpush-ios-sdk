@@ -12,21 +12,23 @@
             self.text = [json objectForKey:@"text"];
         }
         
-        if ([json objectForKey:@"color"]&& ![[json objectForKey:@"color"] isEqual:@""]) {
+        if ([json objectForKey:@"color"] && ![[json objectForKey:@"color"] isEqual:@""]) {
             self.color = [json objectForKey:@"color"];
         } else {
             self.color = @"#000000";
         }
-        if ([json objectForKey:@"family"]&& ![[json objectForKey:@"family"] isEqual:@""]) {
+        
+        if ([json objectForKey:@"family"] && ![[json objectForKey:@"family"] isEqual:@""]) {
             self.family = [json objectForKey:@"family"];
         }
+        
         if ([json objectForKey:@"background"] && ![[json objectForKey:@"background"] isEqual:@""]) {
             self.background = [json objectForKey:@"background"];
         } else {
             self.background = @"#FFFFFF";
         }
-        self.size = 18;
         
+        self.size = 18;
         if ([json objectForKey:@"size"]) {
             self.size = [[json objectForKey:@"size"] intValue];
         }

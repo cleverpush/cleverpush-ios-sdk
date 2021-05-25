@@ -110,7 +110,7 @@ CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
-NSMutableArray<CPAppBanner*> *Pendingbanners;
+NSMutableArray<CPAppBanner*> *pendingBanners;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -1753,15 +1753,15 @@ static id isNil(id object) {
     
     if (appBanners != nil) {
         NSLog(@"CleverPush banners %@", appBanners);
-        Pendingbanners = [NSMutableArray new];
+        pendingBanners = [NSMutableArray new];
         for (NSDictionary* json in appBanners) {
-            [Pendingbanners addObject:[[CPAppBanner alloc] initWithJson:json]];
+            [pendingBanners addObject:[[CPAppBanner alloc] initWithJson:json]];
         }
         
         for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingAppBannersListeners) {
-            if (listener && Pendingbanners) {
+            if (listener && pendingBanners) {
                 __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
-                callbackBlock(Pendingbanners);
+                callbackBlock(pendingBanners);
             }
         }
     }
@@ -2394,6 +2394,7 @@ static id isNil(id object) {
     
     return singleInstance;
 }
+
 + (BOOL)fontFamilyExits:(NSString*)fontFamily
 {
     if (fontFamily == nil) {
@@ -2405,14 +2406,15 @@ static id isNil(id object) {
 
     return ([matches count] > 0);
 }
+
 + (void)disableAppBanners{
     [self getAppBanners:^(NSArray* AppBanners_) {}];
 }
 
 + (void)enableAppBanners{
-    if (Pendingbanners) {
-        if ([Pendingbanners count] > 0) {
-            for (CPAppBanner* bannerPending in Pendingbanners) {
+    if (pendingBanners) {
+        if ([pendingBanners count] > 0) {
+            for (CPAppBanner* bannerPending in pendingBanners) {
                 [self showAppBanner:bannerPending.id];
             }
         }

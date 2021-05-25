@@ -1,4 +1,3 @@
-
 #import "CPAppBannerBlockType.h"
 #import "CPAppBannerAlignment.h"
 #import "CPAppBannerBlock.h"
