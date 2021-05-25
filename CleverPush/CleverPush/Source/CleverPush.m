@@ -110,6 +110,7 @@ CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
+NSMutableArray<CPAppBanner*> *pendingBanners;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -1217,6 +1218,10 @@ static id isNil(id object) {
             [currentChatView loadChat];
         }
     }
+    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification valueForKey:@"appBanner"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"appBanner"] boolValue]) {
+        [self showAppBanner:[notification valueForKey:@"appBanner"]];
+    }
+    
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
 
     if (!channelId) { // not init
@@ -1715,18 +1720,6 @@ static id isNil(id object) {
     return notifications;
 }
 
-+ (void)fireAppBannersListeners {
-    pendingAppBannersRequest = NO;
-    for (void (^listener)(void *) in pendingAppBannersListeners) {
-        // check if listener is non-nil (otherwise: EXC_BAD_ACCESS)
-        if (listener && appBanners) {
-            __strong void (^callbackBlock)() = listener;
-            callbackBlock(appBanners);
-        }
-    }
-    pendingAppBannersListeners = [NSMutableArray new];
-}
-
 + (void)getAppBanners:(void(^)(NSArray *))callback {
     if (appBanners) {
         callback(appBanners);
@@ -1753,6 +1746,26 @@ static id isNil(id object) {
     } else {
         [self fireAppBannersListeners];
     }
+}
+
++ (void)fireAppBannersListeners {
+    pendingAppBannersRequest = NO;
+    
+    if (appBanners != nil) {
+        NSLog(@"CleverPush banners %@", appBanners);
+        pendingBanners = [NSMutableArray new];
+        for (NSDictionary* json in appBanners) {
+            [pendingBanners addObject:[[CPAppBanner alloc] initWithJson:json]];
+        }
+        
+        for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingAppBannersListeners) {
+            if (listener && pendingBanners) {
+                __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
+                callbackBlock(pendingBanners);
+            }
+        }
+    }
+    pendingAppBannersListeners = [NSMutableArray new];
 }
 
 + (void)trackEvent:(NSString*)eventName {
@@ -2380,6 +2393,32 @@ static id isNil(id object) {
     }
     
     return singleInstance;
+}
+
++ (BOOL)fontFamilyExits:(NSString*)fontFamily
+{
+    if (fontFamily == nil) {
+        return NO;
+    }
+
+    UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
+    NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
+
+    return ([matches count] > 0);
+}
+
++ (void)disableAppBanners{
+    [self getAppBanners:^(NSArray* AppBanners_) {}];
+}
+
++ (void)enableAppBanners{
+    if (pendingBanners) {
+        if ([pendingBanners count] > 0) {
+            for (CPAppBanner* bannerPending in pendingBanners) {
+                [self showAppBanner:bannerPending.id];
+            }
+        }
+    }
 }
 
 static inline BOOL isEmpty(id thing) {

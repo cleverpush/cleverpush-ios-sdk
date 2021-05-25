@@ -20,13 +20,21 @@
 #import "CPUIBlockButton.h"
 #import "CleverPush.h"
 #import "CPWKWebKitView.h"
+#import "CPAppBannerHTMLBlock.h"
+
 @interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+
+#pragma mark - Class Variables
 
 @property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 @property (nonatomic, strong) IBOutlet UIView *bannerBody;
 @property (nonatomic, strong) IBOutlet UIView *bannerBodyContent;
+@property (nonatomic, strong) IBOutlet WKWebView *webBanner;
+@property (nonatomic, strong) IBOutlet WKWebView *webBlock;
 
+
+#pragma mark - Class Methods
 - (id)initWithBanner:(CPAppBanner*)banner;
 - (id)initWithHTMLBanner:(CPAppBanner*)banner;
 
@@ -36,3 +44,4 @@
 + (UIViewController*)topViewController;
 
 @end
+
