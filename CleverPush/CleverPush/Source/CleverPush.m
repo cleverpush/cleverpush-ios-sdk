@@ -1219,7 +1219,7 @@ static id isNil(id object) {
         }
     }
     if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification valueForKey:@"appBanner"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"appBanner"] boolValue]) {
-        [self showAppBanner:[notification valueForKey:@"appBanner"]];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] notificationId:notificationId];
     }
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
@@ -2259,7 +2259,11 @@ static id isNil(id object) {
 }
 
 + (void)showAppBanner:(NSString *)bannerId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId];
+    [self showAppBanner:bannerId notificationId:nil];
+}
+
++ (void)showAppBanner:(NSString *)bannerId notificationId:(NSString*)notificationId {
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value {

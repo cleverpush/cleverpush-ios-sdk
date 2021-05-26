@@ -15,11 +15,9 @@
             self.type = CPAppBannerBlockTypeText;
         } else if ([[json objectForKey:@"type"] isEqual:@"image"]) {
             self.type = CPAppBannerBlockTypeImage;
-        }
-        else if ([[json objectForKey:@"type"] isEqual:@"html"]) {
+        } else if ([[json objectForKey:@"type"] isEqual:@"html"]) {
             self.type = CPAppBannerBlockTypeHTML;
         }
-        
     }
     return self;
 }

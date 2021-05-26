@@ -50,6 +50,11 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Show banners by channel-id and banner-id
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
+    [self showBanner:channelId bannerId:bannerId notificationId:nil];
+}
+
+#pragma mark - Show banners by channel-id and banner-id
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
     [CPAppBannerModule getBanners:channelId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
@@ -57,7 +62,7 @@ dispatch_queue_t dispatchQueue = nil;
                 break;
             }
         }
-    }];
+    } notificationId:notificationId];
 }
 
 
@@ -123,6 +128,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Initialised a banner with channel
 + (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam {
+    NSLog(@"CleverPush: initBannersWithChannel");
     pendingBannerListeners = [[NSMutableArray alloc] init];
     activeBanners = [NSMutableArray new];
     dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
@@ -141,6 +147,11 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 + (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    NSLog(@"CleverPush: getBanners");
+    [CPAppBannerModule getBanners:channelId completion:callback notificationId:nil];
+}
+
++ (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback notificationId:(NSString*)notificationId {
     [pendingBannerListeners addObject:callback];
     if (pendingBannerRequest) {
         return;
@@ -148,16 +159,21 @@ dispatch_queue_t dispatchQueue = nil;
     pendingBannerRequest = YES;
     
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
+    
     if ([CleverPush isDevelopmentModeEnabled]) {
         bannersPath = [NSString stringWithFormat:@"%@&t=%f", bannersPath, NSDate.date.timeIntervalSince1970];
     }
+    
+    if (notificationId != nil) {
+        bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
+    }
+    
+    NSLog(@"CleverPush: loading banners: %@", bannersPath);
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSArray *jsonBanners = [result objectForKey:@"banners"];
         if (jsonBanners != nil) {
-            NSLog(@"CleverPush banners %@", result);
-            
             banners = [NSMutableArray new];
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];

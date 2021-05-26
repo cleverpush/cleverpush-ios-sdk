@@ -24,6 +24,7 @@
 
 + (void)initBannersWithChannel:(NSString*)channel showDrafts:(BOOL)showDrafts;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)initSession;
 + (void)triggerEvent:(NSString *)key value:(NSString *)value;
