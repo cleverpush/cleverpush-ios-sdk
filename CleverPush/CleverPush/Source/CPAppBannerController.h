@@ -28,20 +28,17 @@
 
 @property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
-@property (nonatomic, strong) IBOutlet UIView *bannerBody;
+@property (nonatomic, strong) IBOutlet UIScrollView *bannerBody;
 @property (nonatomic, strong) IBOutlet UIView *bannerBodyContent;
 @property (nonatomic, strong) IBOutlet WKWebView *webBanner;
 @property (nonatomic, strong) IBOutlet WKWebView *webBlock;
-
+@property (nonatomic, strong) IBOutlet UIView *htmlBannerBody;
 
 #pragma mark - Class Methods
 - (id)initWithBanner:(CPAppBanner*)banner;
 - (id)initWithHTMLBanner:(CPAppBanner*)banner;
-
-- (void)onDismiss;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
-
+- (void)onDismiss;
 + (UIViewController*)topViewController;
 
 @end
-

@@ -14,7 +14,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 };
 
 #pragma mark - Initialise blocks banner
-- (id)initWithBanner:(CPAppBanner*)banner {
+- (id)initWithBanner:(CPAppBanner*)banner
+{
     self = [super init];
     if (self) {
         self.data = banner;
@@ -26,13 +27,12 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         self.view.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
         self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
-        self.bannerBody = [[UIView alloc] initWithFrame:CGRectMake(20.5, 248, 373, 400)];
+        self.bannerBody = [[UIScrollView alloc] initWithFrame:CGRectMake(20.5, 248, 373, 400)];
         [self.bannerBody setContentMode:UIViewContentModeScaleToFill];
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
         [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-        
         [self.view addSubview:self.bannerBody];
         
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(15, 15, 343, 370)];
@@ -43,24 +43,40 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
         [self.bannerBody addSubview:self.bannerBodyContent];
         
-        NSLayoutConstraint *bannerBodyConstraint1 = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeLeading multiplier:1 constant:15];
-        NSLayoutConstraint *bannerBodyConstraint2 = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeHeight multiplier:1 constant:400];
-        bannerBodyConstraint2.priority = 250;
-        NSLayoutConstraint *bannerBodyConstraint3 = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeTop multiplier:1 constant:15];
-        NSLayoutConstraint *bannerBodyConstraint4 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeBottom multiplier:1 constant:15];
-        NSLayoutConstraint *bannerBodyConstraint5 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeTrailing multiplier:1 constant:15];
-        [self.bannerBody addConstraint:bannerBodyConstraint1];
-        [self.bannerBody addConstraint:bannerBodyConstraint2];
-        [self.bannerBody addConstraint:bannerBodyConstraint3];
-        [self.bannerBody addConstraint:bannerBodyConstraint4];
-        [self.bannerBody addConstraint:bannerBodyConstraint5];
+        NSLayoutConstraint *bannerBodyTop = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeTop multiplier:1 constant:15];
         
-        NSLayoutConstraint *viewConstraint1 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeWidth multiplier:0.9 constant:0];
-        NSLayoutConstraint *viewConstraint2 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
-        NSLayoutConstraint *viewConstraint3 = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
-        [self.view addConstraint:viewConstraint1];
-        [self.view addConstraint:viewConstraint2];
-        [self.view addConstraint:viewConstraint3];
+        NSLayoutConstraint *bannerBodyBottom = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeBottom multiplier:1 constant:15];
+        
+        NSLayoutConstraint *bannerBodyLeading = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeLeading multiplier:1 constant:15];
+        
+        NSLayoutConstraint *bannerBodyTrailing = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeTrailing multiplier:1 constant:15];
+        
+        NSLayoutConstraint *bannerBodyHeight = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeHeight multiplier:1 constant:400];
+        bannerBodyHeight.priority = 250;
+        
+        NSLayoutConstraint *bannerBodyWidth = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeWidth multiplier:0.9 constant:0];
+        
+        self.bannerBody.bounces = NO;
+        [self.bannerBody addConstraint:bannerBodyTop];
+        [self.bannerBody addConstraint:bannerBodyBottom];
+        [self.bannerBody addConstraint:bannerBodyLeading];
+        [self.bannerBody addConstraint:bannerBodyTrailing];
+        [self.bannerBody addConstraint:bannerBodyHeight];
+        [self.bannerBody addConstraint:bannerBodyWidth];
+        
+        NSLayoutConstraint *viewWidth = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeWidth multiplier:0.9 constant:0];
+        NSLayoutConstraint *viewCenterX  = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
+        NSLayoutConstraint *viewCenterY = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeCenterY multiplier:1 constant:0];
+        NSLayoutConstraint *viewHeight = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
+        NSLayoutConstraint *viewLeading = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1 constant:15];
+        NSLayoutConstraint *viewTrailing = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeTrailing multiplier:1 constant:15];
+        
+        [self.view addConstraint:viewWidth];
+        [self.view addConstraint:viewCenterX];
+        [self.view addConstraint:viewCenterY];
+        [self.view addConstraint:viewHeight];
+        [self.view addConstraint:viewLeading];
+        [self.view addConstraint:viewTrailing];
         
         self.bannerBody.layer.cornerRadius = 15.0;
         self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
@@ -74,7 +90,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         
         [self.view addGestureRecognizer:tapGesture];
         self.view.userInteractionEnabled = true;
-        
+        self.bannerBody.hidden = true;
         [self composeBanner:self.data.blocks];
     }
     return self;
@@ -88,20 +104,17 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         
         [self setModalPresentationStyle:UIModalPresentationCustom];
         [self setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-        
         [self.view setContentMode:UIViewContentModeScaleToFill];
-        
         self.view.frame = CGRectMake(self.view.frame.origin.x, self.view.frame.origin.y, [[UIScreen mainScreen] bounds].size.width, [[UIScreen mainScreen] bounds].size.height);
         self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
-        self.bannerBody = [[UIView alloc] initWithFrame:CGRectMake(20, [[UIScreen mainScreen] bounds].size.width / 2 , [[UIScreen mainScreen] bounds].size.width - 40 , 400)];
-        [self.bannerBody setContentMode:UIViewContentModeScaleToFill];
-        [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
-        [self.bannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-        
-        [self.view addSubview:self.bannerBody];
+        self.htmlBannerBody = [[UIView alloc] initWithFrame:CGRectMake(20, [[UIScreen mainScreen] bounds].size.width / 2 , [[UIScreen mainScreen] bounds].size.width - 40 , 400)];
+        [self.htmlBannerBody setContentMode:UIViewContentModeScaleToFill];
+        [self.htmlBannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self.htmlBannerBody setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [self.htmlBannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [self.htmlBannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        [self.view addSubview:self.htmlBannerBody];
         
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(20, 20, [[UIScreen mainScreen] bounds].size.width - 80, 360)];
         [self.bannerBodyContent setContentMode:UIViewContentModeScaleToFill];
@@ -109,10 +122,9 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBodyContent setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-        [self.bannerBody addSubview:self.bannerBodyContent];
-        
-        self.bannerBody.layer.cornerRadius = 15.0;
-        self.bannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
+        [self.htmlBannerBody addSubview:self.bannerBodyContent];
+        self.htmlBannerBody.layer.cornerRadius = 15.0;
+        self.htmlBannerBody.transform = CGAffineTransformMakeTranslation(0, self.view.bounds.size.height);
         self.view.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0f];
         
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDismiss)];
@@ -138,8 +150,33 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self fadeIn];
-    [self jumpIn];
+    if ([self.data.contentType isEqualToString:@"block"])
+    {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            NSLog(@"%f", self.bannerBodyContent.frame.size.height);
+            NSLog(@"%f", UIScreen.mainScreen.bounds.size.height);
+            if (self.bannerBodyContent.frame.size.height > UIScreen.mainScreen.bounds.size.height) {
+                CGFloat height = 00.00;
+                if (@available(iOS 11.0, *)) {
+                    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+                    CGFloat topPadding = window.safeAreaInsets.top;
+                    CGFloat bottomPadding = window.safeAreaInsets.bottom;
+                    height = UIScreen.mainScreen.bounds.size.height - (topPadding + bottomPadding);
+                    NSLayoutConstraint *viewHeight = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeWidth multiplier:1 constant:height - 30];
+                    [self.view addConstraint:viewHeight];
+                } else {
+                    NSLayoutConstraint *viewHeight = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeWidth multiplier:1 constant:height - 30];
+                    [self.view addConstraint:viewHeight];
+                }
+            } else {
+                NSLayoutConstraint *viewHeight = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeWidth multiplier:1 constant:self.bannerBodyContent.frame.size.height + 30];
+                [self.view addConstraint:viewHeight];
+            }
+            self.bannerBody.hidden = false;
+            [self fadeIn];
+            [self jumpIn];
+        });
+    }
 }
 
 + (UIViewController*)topViewController {
@@ -173,7 +210,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 #pragma mark - composeBanner
 - (void)composeBanner:(NSMutableArray<CPAppBannerBlock*>*)blocks {
     NSLog(@"CleverPush: composeBanner");
-    
     UIView *prevView = nil;
     int index = 0;
     for (CPAppBannerBlock* block in blocks) {
@@ -197,6 +233,10 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             UIImageView *imageView = [self composeImageBlock:(CPAppBannerImageBlock*)block];
             [self activateItemConstrants:imageView prevView:prevView parentConstraint:parentConstraint];
             prevView = imageView;
+        } else if (block.type == CPAppBannerBlockTypeHTML) {
+            WKWebView *blockHtml = [self composeHTMLBlock:(CPAppBannerHTMLBlock*)block];
+            [self activateItemConstrants:blockHtml prevView:prevView parentConstraint:parentConstraint];
+            prevView = blockHtml;
         }
         index++;
     }
@@ -208,12 +248,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     CPUIBlockButton *button = [CPUIBlockButton buttonWithType:UIButtonTypeSystem];
     [button setTitle:block.text forState:UIControlStateNormal];
     [button setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
-    button.backgroundColor = [UIColor colorWithHexString:block.background];
-    button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
-    button.translatesAutoresizingMaskIntoConstraints = false;
-    button.layer.cornerRadius = (CGFloat)block.radius;
-    button.adjustsImageWhenHighlighted = YES;
-    [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     
     if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
         [button.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
@@ -233,9 +267,15 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             break;
     }
     
+    button.backgroundColor = [UIColor colorWithHexString:block.background];
+    button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+    button.translatesAutoresizingMaskIntoConstraints = false;
+    button.layer.cornerRadius = (CGFloat)block.radius;
+    button.adjustsImageWhenHighlighted = YES;
+    [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     [button handleControlEvent:UIControlEventTouchUpInside withBlock:^{
         self.actionCallback(block.action);
-        
+
         if (block.action.dismiss) {
             [self onDismiss];
         }
@@ -247,11 +287,13 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 
 #pragma mark - creating a blocks of a Text
 - (UILabel*)composeTextBlock:(CPAppBannerTextBlock*)block {
+    NSLog(@"CleverPush: composeTextBlock");
+    
     UILabel *label = [[UILabel alloc] init];
+    
     label.text = block.text;
+    label.numberOfLines = 0;
     label.textColor = [UIColor colorWithHexString:block.color];
-    [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    label.translatesAutoresizingMaskIntoConstraints = false;
     
     if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
@@ -259,6 +301,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [label setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
     
+    [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    label.translatesAutoresizingMaskIntoConstraints = false;
     switch (block.alignment) {
         case CPAppBannerAlignmentRight:
             label.textAlignment = NSTextAlignmentRight;
@@ -277,6 +321,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 #pragma mark - creating a blocks of a Image
 - (UIImageView*)composeImageBlock:(CPAppBannerImageBlock*)block {
     NSLog(@"CleverPush: composeImageBlock");
+    
     UIImageView *imageView = [[CPAspectKeepImageView alloc] init];
     if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
         [imageView setImageWithURL:[NSURL URLWithString:block.imageUrl]];
@@ -308,6 +353,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 - (WKWebView*)composeHTMLBlock:(CPAppBannerHTMLBlock*)block
 {
     NSLog(@"CleverPush: composeHTMLBlock");
+    
     WKWebView *webView  = [[WKWebView alloc] init];
     if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
         webView.scrollView.scrollEnabled = true;
@@ -321,10 +367,12 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [webView loadRequest:request];
     }
     
+    
     NSLayoutConstraint *imageWidthConstraint = [NSLayoutConstraint constraintWithItem:webView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
     imageWidthConstraint.priority = UILayoutPriorityRequired;
     
-    NSLayoutConstraint *imageHeightConstraint = [NSLayoutConstraint constraintWithItem:webView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeWidth multiplier:1 constant:block.Height];
+    NSLayoutConstraint *imageHeightConstraint = [NSLayoutConstraint constraintWithItem:webView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeWidth multiplier:1 constant:block.height];
+    
     imageHeightConstraint.priority = UILayoutPriorityDefaultLow;
     
     webView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -332,24 +380,26 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [self.bannerBodyContent addSubview:webView];
     [self.bannerBodyContent addConstraint:imageWidthConstraint];
     [self.bannerBodyContent addConstraint:imageHeightConstraint];
+    
     return webView;
 }
 
 #pragma mark - creating a banner with HTML
 - (WKWebView*)composeHTML:(NSString*)content {
+    
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:self name:@"close"];
     config.userContentController = userController;
     
-    WKWebView *webBanner = [[WKWebView alloc] initWithFrame:self.bannerBodyContent.bounds configuration:config];
-    webBanner.scrollView.scrollEnabled = true;
-    webBanner.scrollView.bounces = false;
-    webBanner.allowsBackForwardNavigationGestures = false;
-    webBanner.contentMode = UIViewContentModeScaleToFill;
-    webBanner.navigationDelegate = self;
-    webBanner.layer.cornerRadius = 15.0;
-    [self.bannerBodyContent addSubview:webBanner];
+    _webBanner = [[WKWebView alloc] initWithFrame:self.bannerBodyContent.bounds configuration:config];
+    _webBanner.scrollView.scrollEnabled = true;
+    _webBanner.scrollView.bounces = false;
+    _webBanner.allowsBackForwardNavigationGestures = false;
+    _webBanner.contentMode = UIViewContentModeScaleToFill;
+    _webBanner.navigationDelegate = self;
+    _webBanner.layer.cornerRadius = 15.0;
+    [self.bannerBodyContent addSubview:_webBanner];
     
     if ([content containsString:@"</body></html>"]) {
         content = [content stringByReplacingOccurrencesOfString:@"</body></html>" withString:@""];
@@ -361,10 +411,10 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
-        [webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+        [self.webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
         
     });
-    return webBanner;
+    return _webBanner;
 }
 
 #pragma mark - UIWebView Delgate Method
@@ -381,16 +431,14 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             CGFloat height = [result floatValue];
             if (webView == self.webBanner) {
                 if (height > UIScreen.mainScreen.bounds.size.height) {
-                    self.bannerBody.frame = CGRectMake(20, 70 , self.bannerBody.frame.size.width, UIScreen.mainScreen.bounds.size.height - 140);
-                    self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
+                    self.htmlBannerBody.frame = CGRectMake(20, 70 , self.htmlBannerBody.frame.size.width, UIScreen.mainScreen.bounds.size.height - 140);
+                    self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.htmlBannerBody.frame.size.height - 40);
                     webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
-                }
-                else
-                {
+                } else {
                     CGFloat ScreenHeight = UIScreen.mainScreen.bounds.size.height;
                     CGFloat popupY = (ScreenHeight - height) / 2;
-                    self.bannerBody.frame = CGRectMake(20, popupY , self.bannerBody.frame.size.width, height + 40);
-                    self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
+                    self.htmlBannerBody.frame = CGRectMake(20, popupY , self.htmlBannerBody.frame.size.width, height + 40);
+                    self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.htmlBannerBody.frame.size.height - 40);
                     webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
                 }
             }
@@ -464,7 +512,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self fadeOut];
         [self jumpOut];
-        
         [self dismissViewControllerAnimated:NO completion:nil];
     });
 }

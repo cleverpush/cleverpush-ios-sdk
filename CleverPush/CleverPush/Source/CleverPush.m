@@ -724,7 +724,7 @@ static id isNil(id object) {
             } else {
                 if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
                     isEnabled = YES;
-                } else{
+                } else {
                     isEnabled = NO;
                 }
             }
