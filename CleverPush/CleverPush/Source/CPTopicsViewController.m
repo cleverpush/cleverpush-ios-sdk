@@ -327,8 +327,7 @@
     }];
     if (topicsDialogShowUnsubscribe == NO) {
         return 0;
-    }
-    else{
+    } else {
         return 44;
     }
 }
