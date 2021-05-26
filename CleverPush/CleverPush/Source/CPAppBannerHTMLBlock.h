@@ -7,10 +7,9 @@
 
 #pragma mark - Class Variables
 @property (nonatomic, strong) CPAppBannerAction* action;
-@property (nonatomic, strong) NSString *html;
+@property (nonatomic, strong) NSString *content;
 @property (nonatomic, strong) NSString *url;
-@property (nonatomic) int Height;
-
+@property (nonatomic) int height;
 @property (nonatomic) int scale;
 
 #pragma mark - Class Methods
