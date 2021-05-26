@@ -215,10 +215,9 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     button.adjustsImageWhenHighlighted = YES;
     [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     
-    if ([CleverPush fontFamilyExits:block.family]){
+    if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
         [button.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
-    }else{
-        NSLog(@"CleverPush: Font Family not found for button block");
+    } else {
         [button.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
     
@@ -254,11 +253,10 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     label.translatesAutoresizingMaskIntoConstraints = false;
     
-    if ([CleverPush fontFamilyExits:block.family]){
+    if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
-    }else{
-        NSLog(@"CleverPush: Font Family not found for Text block");
-        [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
+    } else {
+        [label setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
     
     switch (block.alignment) {
@@ -314,7 +312,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
         webView.scrollView.scrollEnabled = true;
         webView.scrollView.bounces = false;
-        webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
         webView.allowsBackForwardNavigationGestures = false;
         webView.contentMode = UIViewContentModeScaleToFill;
         webView.navigationDelegate = self;

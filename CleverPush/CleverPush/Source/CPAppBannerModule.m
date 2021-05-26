@@ -233,8 +233,6 @@ CPAppBannerActionBlock handleBannerOpened;
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
     
-    NSLog(@"CleverPush: sendBannerEvent: %@", event);
-    
     NSString* subscriptionId = nil;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
@@ -245,6 +243,8 @@ CPAppBannerActionBlock handleBannerOpened;
                              banner.channel, @"channelId",
                              subscriptionId, @"subscriptionId",
                              nil];
+    
+    NSLog(@"CleverPush: sendBannerEvent: %@ %@", event, dataDic);
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];

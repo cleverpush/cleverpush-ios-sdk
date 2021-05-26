@@ -166,6 +166,8 @@
 		29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF31E58B89900815CD6 /* UIKit.framework */; };
 		29D22E70252C8E7500977567 /* CPIntrinsicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */; };
 		29D22E71252C8E7500977567 /* CPIntrinsicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */; };
+		29D3518C265E8656009BC75C /* CPAppBannerHTMLBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = CB59D9ED2657C63B006ADEF9 /* CPAppBannerHTMLBlock.h */; };
+		29D35195265E8699009BC75C /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB59D9EE2657C63B006ADEF9 /* CPAppBannerHTMLBlock.m */; };
 		29D623E02535BE070020F893 /* CPIntrinsicTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29D22E6E252C8E6400977567 /* CPIntrinsicTableView.h */; };
 		29D71E772380742800C48ACA /* CPChatView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D71E762380742800C48ACA /* CPChatView.m */; };
 		29D71E792380743000C48ACA /* CPChatView.h in Headers */ = {isa = PBXBuildFile; fileRef = 29D71E75238073FE00C48ACA /* CPChatView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -674,6 +676,7 @@
 				29D9053725698BB6002D6F9E /* CPTranslate.h in Headers */,
 				295640432588230E00FE7611 /* CPAppBannerTriggerCondition.h in Headers */,
 				2906A088258554650078FD61 /* CPAppBannerController.h in Headers */,
+				29D3518C265E8656009BC75C /* CPAppBannerHTMLBlock.h in Headers */,
 				2906A11D258557660078FD61 /* CPAppBannerStatus.h in Headers */,
 				29DB578C23D75C9B0040E823 /* CPNotificationCategoryController.h in Headers */,
 				29DB95EF23FC3360008FC985 /* CleverPushSelectorHelpers.h in Headers */,
@@ -971,6 +974,7 @@
 				291FCE6D252B5F2E00F5185E /* DWAlertAction.m in Sources */,
 				297810E02573E4520083D1A6 /* CPAppBannerTextBlock.m in Sources */,
 				291FCEA6252B65D600F5185E /* DWAlertPresentationAnimationController.m in Sources */,
+				29D35195265E8699009BC75C /* CPAppBannerHTMLBlock.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

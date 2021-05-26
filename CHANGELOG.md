@@ -1,3 +1,8 @@
+# 1.8.0
+* New App Banner block type: HTML
+* Support custom fonts in App Banner
+* Open App Banner via Notification
+
 # 1.7.1
 * Fixed Notification Opened handler when SDK was initialized delayed
 * Improved App Banner Conditions
