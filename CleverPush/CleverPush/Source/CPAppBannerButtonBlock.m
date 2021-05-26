@@ -12,10 +12,14 @@
             self.text = [json objectForKey:@"text"];
         }
         
-        if ([json objectForKey:@"color"]&& ![[json objectForKey:@"color"] isEqual:@""]) {
+        if ([json objectForKey:@"color"] && ![[json objectForKey:@"color"] isEqual:@""]) {
             self.color = [json objectForKey:@"color"];
         } else {
             self.color = @"#000000";
+        }
+        
+        if ([json objectForKey:@"family"] && ![[json objectForKey:@"family"] isEqual:@""]) {
+            self.family = [json objectForKey:@"family"];
         }
         
         if ([json objectForKey:@"background"] && ![[json objectForKey:@"background"] isEqual:@""]) {

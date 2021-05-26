@@ -7,6 +7,7 @@
 
 @property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *color;
+@property (nonatomic, strong) NSString *family;
 @property (nonatomic, strong) NSString *background;
 @property (nonatomic) int size;
 @property (nonatomic) CPAppBannerAlignment alignment;
