@@ -215,9 +215,10 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     button.adjustsImageWhenHighlighted = YES;
     [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     
-    if ([CleverPush fontFamilyExits:block.family]){
+    if ([CleverPush fontFamilyExits:block.family]) {
         [button.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
-    }else{
+    }
+    else{
         NSLog(@"CleverPush: Font Family not found for button block");
         [button.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
@@ -254,11 +255,12 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [label setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     label.translatesAutoresizingMaskIntoConstraints = false;
     
-    if ([CleverPush fontFamilyExits:block.family]){
+    if ([CleverPush fontFamilyExits:block.family]) {
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
-    }else{
+    }
+    else{
         NSLog(@"CleverPush: Font Family not found for Text block");
-        [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
+        [label setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
     }
     
     switch (block.alignment) {
@@ -314,7 +316,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
         webView.scrollView.scrollEnabled = true;
         webView.scrollView.bounces = false;
-        webView.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
         webView.allowsBackForwardNavigationGestures = false;
         webView.contentMode = UIViewContentModeScaleToFill;
         webView.navigationDelegate = self;
@@ -373,7 +374,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 #pragma mark - UIWebView Delgate Method
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
-    if ([message.name isEqualToString:@"close"]){
+    if ([message.name isEqualToString:@"close"]) {
         [self onDismiss];
     }
 }
@@ -388,8 +389,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
                     self.bannerBodyContent.frame = CGRectMake(20, 20, self.bannerBodyContent.frame.size.width, self.bannerBody.frame.size.height - 40);
                     webView.frame = CGRectMake(0, 0, self.bannerBodyContent.frame.size.width, self.bannerBodyContent.frame.size.height);
                 }
-                else
-                {
+                else{
                     CGFloat ScreenHeight = UIScreen.mainScreen.bounds.size.height;
                     CGFloat popupY = (ScreenHeight - height) / 2;
                     self.bannerBody.frame = CGRectMake(20, popupY , self.bannerBody.frame.size.width, height + 40);
@@ -464,7 +464,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void){
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self fadeOut];
         [self jumpOut];
         

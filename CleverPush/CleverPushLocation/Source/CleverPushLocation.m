@@ -7,7 +7,7 @@
 CLLocationManager* locationManager;
 
 + (void)init {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
         [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -47,7 +47,7 @@ CLLocationManager* locationManager;
 }
 
 + (void)trackGeoFence:(NSString *)geoFenceId withState:(NSString *)state {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/geo-fence"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  [CleverPush getChannelId], @"channelId",

@@ -255,7 +255,7 @@ static id isNil(id object) {
     if (userInfo) {
         startFromNotification = YES;
         if (pendingOpenedResult && handleNotificationOpened) {
-                handleNotificationOpened(pendingOpenedResult);
+            handleNotificationOpened(pendingOpenedResult);
         }
     }
     
@@ -462,13 +462,9 @@ static id isNil(id object) {
                     [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
                     [userDefaults synchronize];
                     
-                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle
-                                                                                             message:@""
-                                                                                      preferredStyle:UIAlertControllerStyleAlert];
+                    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle message:@"" preferredStyle:UIAlertControllerStyleAlert];
                     
-                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:appReviewYes
-                                                                        style:UIAlertActionStyleDefault
-                                                                      handler:^(UIAlertAction * action) {
+                    UIAlertAction *actionYes = [UIAlertAction actionWithTitle:appReviewYes style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                         if (iosStoreId == nil || [iosStoreId isKindOfClass:[NSNull class]]) {
                             return;
                         }
@@ -506,18 +502,13 @@ static id isNil(id object) {
                                 }
                             }];
                             [alertFeedbackController addAction:actionFeedbackYes];
-                            
-                            UIAlertAction *actionFeedbackNo = [UIAlertAction actionWithTitle:appReviewNo
-                                                                                       style:UIAlertActionStyleDefault
-                                                                                     handler:nil];
+                            UIAlertAction *actionFeedbackNo = [UIAlertAction actionWithTitle:appReviewNo style:UIAlertActionStyleDefault handler:nil];
                             [alertFeedbackController addAction:actionFeedbackNo];
-                            
                             UIViewController* topViewController = [CleverPush topViewController];
                             [topViewController presentViewController:alertFeedbackController animated:YES completion:nil];
                         }
                     }];
                     [alertController addAction:actionNo];
-                    
                     UIViewController* topViewController = [CleverPush topViewController];
                     [topViewController presentViewController:alertController animated:YES completion:nil];
                 });
@@ -618,19 +609,15 @@ static id isNil(id object) {
             if (result != nil) {
                 channelId = [result objectForKey:@"channelId"];
                 NSLog(@"CleverPush: Detected Channel ID from Bundle Identifier: %@", channelId);
-                
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
                 [userDefaults setObject:nil forKey:@"CleverPush_SUBSCRIPTION_ID"];
                 [userDefaults synchronize];
-                
                 channelConfig = result;
             }
-            
             [self fireChannelConfigListeners];
         } onFailure:^(NSError* error) {
             NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error);
-            
             [self fireChannelConfigListeners];
         }];
     }
@@ -755,7 +742,6 @@ static id isNil(id object) {
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        
         [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
             if (subscriptionId == nil && channelId != nil && notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
                 [self setConfirmAlertShown];
@@ -817,7 +803,6 @@ static id isNil(id object) {
         [self ensureMainThreadSync:^{
             [[UIApplication sharedApplication] registerForRemoteNotifications];
         }];
-        
     } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
@@ -1017,10 +1002,13 @@ static id isNil(id object) {
     
     NSArray* topics = [self getSubscriptionTopics];
     if (topics != nil && [topics count] >= 0) {
+        
         [dataDic setObject:topics forKey:@"topics"];
         NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
         if (topicsVersion) {
             [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
+        } else {
+            [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
     }
     
@@ -1067,7 +1055,6 @@ static id isNil(id object) {
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        
         registrationInProgress = false;
     }];
 }
@@ -1204,7 +1191,7 @@ static id isNil(id object) {
     NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
     
     [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
-
+    
     
     if (autoClearBadge) {
         [self clearBadge:true];
@@ -1223,16 +1210,16 @@ static id isNil(id object) {
     }
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
-
+    
     if (!channelId) { // not init
         pendingOpenedResult = result;
     }
     if (!handleNotificationOpened) {
         return;
     }
-        
+    
     handleNotificationOpened(result);
-
+    
 }
 
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent {
@@ -2215,17 +2202,29 @@ static id isNil(id object) {
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
                 topicsController.delegate = channelTopicsPicker;
+                
+                [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
+                    if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
+                        topicsController.topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
+                    }
+                }];
+                
+                DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
+                    NSLog(@"%@", [topicsController getSelectedTopics]);
 
+                    if (topicsController.topicsDialogShowUnsubscribe) {
+                        if ([topicsController getDeselectValue] == YES) {
+                            [self setSubscriptionTopics:[topicsController getSelectedTopics]];
+                            [self unsubscribe];
+                        }else{
+                            NSLog(@"%@", [topicsController getSelectedTopics]);
+                            [self setSubscriptionTopics:[topicsController getSelectedTopics]];
+                            [self subscribe];
+                        }
 
-                DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"]
-                                                                   style:DWAlertActionStyleCancel
-                                                                 handler:^(DWAlertAction* action) {
-                    if (topicsController.deselectedAll == YES) {
-                        [self unsubscribe];
-                    } else {
-                        [self subscribe];
-                        NSLog(@"%@", [topicsController getSelectedTopics]);
+                    }else{
                         [self setSubscriptionTopics:[topicsController getSelectedTopics]];
+                        [self subscribe];
                     }
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
                     
@@ -2238,13 +2237,12 @@ static id isNil(id object) {
             });
         }];
     }];
-    
 }
+
 - (void)setContentHeight{
     [channelTopicsPicker.view setNeedsLayout];
     [channelTopicsPicker.view layoutIfNeeded];
 }
-
 
 + (void)showAppBanners {
     NSLog(@"CleverPush: showAppBanners does not have to be called, app banners are initialized automatically");
@@ -2400,10 +2398,10 @@ static id isNil(id object) {
     if (fontFamily == nil) {
         return NO;
     }
-
+    
     UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
     NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
-
+    
     return ([matches count] > 0);
 }
 

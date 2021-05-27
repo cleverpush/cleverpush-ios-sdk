@@ -80,7 +80,7 @@
     return allCategories;
 }
 
-- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(8.0)){
+- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(8.0)) {
     NSMutableArray* actionArray = [NSMutableArray new];
     
     UNNotificationAction* nextAction = [UNNotificationAction actionWithIdentifier:@"next"

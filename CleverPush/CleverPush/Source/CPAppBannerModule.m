@@ -213,7 +213,7 @@ CPAppBannerActionBlock handleBannerOpened;
     for (CPAppBanner* banner in activeBanners) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void){
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void) {
                     [CPAppBannerModule showBanner:banner];
                 });
             } else {
@@ -223,7 +223,7 @@ CPAppBannerActionBlock handleBannerOpened;
             }
         } else {
             double delay = [[NSDate date] timeIntervalSinceDate:banner.startAt] + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatchQueue, ^(void){
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatchQueue, ^(void) {
                 [CPAppBannerModule showBanner:banner];
             });
         }
@@ -274,7 +274,7 @@ CPAppBannerActionBlock handleBannerOpened;
 }
 
 + (void)showBanner:(CPAppBanner*)banner {
-    dispatch_async(dispatch_get_main_queue(), ^(void){
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         CPAppBannerController* bannerController = nil;
         if ([banner.contentType isEqualToString:@"html"]) {
             bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
@@ -282,7 +282,7 @@ CPAppBannerActionBlock handleBannerOpened;
             bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         }
         
-        __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
+        __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
             
             if (handleBannerOpened && action) {
@@ -303,7 +303,7 @@ CPAppBannerActionBlock handleBannerOpened;
         }
         
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                 [bannerController onDismiss];
             });
         }

@@ -13,7 +13,6 @@
         availableTopics = [NSMutableArray new];
         selectedTopics = [NSMutableArray arrayWithArray:userTopics];
         hasTopics = hasTopics_;
-        
         childTopics = [NSMutableDictionary new];
         parentTopics = [NSMutableArray new];
         for (CPChannelTopic *topic in topics) {
@@ -65,7 +64,14 @@
     
     tableView.delegate = self;
     tableView.dataSource = self;
-    _deselectedAll = NO;
+    
+    if (self.topicsDialogShowUnsubscribe == YES) {
+        if ([self getSelectedTopics].count == 0) {
+            [self updateDeselectFlag:YES];
+        } else {
+            [self updateDeselectFlag:NO];
+        }
+    }
     self.view = tableView;
 }
 
@@ -93,16 +99,14 @@
         tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
         
         [tableView reloadData];
-        
+
     }
 }
-
-- (void)viewDidAppear:(BOOL)animated {
-    [self manageHeightLayout];
+- (void)viewDidAppear:(BOOL)animated{
+    [self ManageHeightLayout];
 }
-
 #pragma mark - Deselect Everything while switching off the switch
-- (void)deselectEverything:(id)sender {
+- (void)DeselectEverything:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     
     if (switcher.on) {
@@ -111,19 +115,39 @@
             topic.defaultUnchecked = YES;
         }
         hasTopics = NO;
-        _deselectedAll = YES;
+        [self updateDeselectFlag:YES];
         [tableView reloadData];
-        [self manageHeightLayout];
+        [self ManageHeightLayout];
     } else {
-        _deselectedAll = NO;
+        if ([self getSelectedTopics].count == 0) {
+            [self updateDeselectFlag:NO];
+        }
+        else {
+            [self updateDeselectFlag:NO];
+        }
     }
 }
 
-- (void)manageHeightLayout {
+- (void)updateDeselectFlag:(BOOL)value{
+    [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+- (BOOL)getDeselectValue{
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
+        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
+            return NO;
+        } else {
+            return YES;
+        }
+    } else {
+        return NO;
+    }
+}
+
+- (void)ManageHeightLayout{
     id<ManageHeight> strongDelegate = self.delegate;
     [strongDelegate rearrangeHeight];
 }
-
 #pragma mark - Handle the switch event when toggle the switch or Select/Deselect table raw.
 - (void)switchChanged:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
@@ -144,10 +168,43 @@
                         BOOL contains = [selectedTopics containsObject:[topicone id]];
                         if (contains) {
                             NSString* topiconeId = [topicone id];
-                            
+
                             NSLog(@"%@", [topicone name]);
                             [selectedTopics removeObject:topiconeId];
-                            
+                            topicone.defaultUnchecked = YES;
+                        }
+                    }
+                }
+            }
+        } else if (switcher.on && contains) {
+            [selectedTopics removeObject:topicId];
+            for (CPChannelTopic *topicone in availableTopics) {
+                NSString* parentTopicId = [topicone parentTopic];
+                if (parentTopicId != nil) {
+                    if (topicId == parentTopicId) {
+                        BOOL contains = [selectedTopics containsObject:[topicone id]];
+                        if (contains) {
+                            NSString* topiconeId = [topicone id];
+
+                            NSLog(@"%@", [topicone name]);
+                            [selectedTopics removeObject:topiconeId];
+                            topicone.defaultUnchecked = YES;
+                        }
+                    }
+                }
+            }
+        } else if (!switcher.on && !contains) {
+            [selectedTopics removeObject:topicId];
+            for (CPChannelTopic *topicone in availableTopics) {
+                NSString* parentTopicId = [topicone parentTopic];
+                if (parentTopicId != nil) {
+                    if (topicId == parentTopicId) {
+                        BOOL contains = [selectedTopics containsObject:[topicone id]];
+                        if (contains) {
+                            NSString* topiconeId = [topicone id];
+
+                            NSLog(@"%@", [topicone name]);
+                            [selectedTopics removeObject:topiconeId];
                             topicone.defaultUnchecked = YES;
                         }
                     }
@@ -156,16 +213,21 @@
         }
         
         hasTopics = YES;
-        if ([selectedTopics count] > 0) {
-            _deselectedAll = NO;
+        if (self.topicsDialogShowUnsubscribe == YES) {
+            if ([selectedTopics count] == 0) {
+                [self updateDeselectFlag:YES];
+            } else {
+                [self updateDeselectFlag:NO];
+            }
         }
         [tableView reloadData];
-        [self manageHeightLayout];
+        [self ManageHeightLayout];
+
     }
 }
 
 #pragma mark - get the details of individual topic.
-- (CPChannelTopic*)getTopic:(int)row {
+- (NSDictionary*)getTopic:(int)row {
     int count = -1;
     for (CPChannelTopic *topic in availableTopics) {
         NSString* parentTopicId = [topic parentTopic];
@@ -198,7 +260,8 @@
     if (topic && [topic defaultUnchecked]) {
         defaultUnchecked = YES;
     }
-    BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
+
+    BOOL state = ([selectedTopics containsObject:[topic id]] );
     return state;
 }
 
@@ -216,23 +279,24 @@
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
     
     UISwitch* s = [[UISwitch alloc] init];
     CGSize switchSize = [s sizeThatFits:CGSizeZero];
     s.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
-    [s addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
+    [s addTarget:self action:@selector(DeselectEverything:) forControlEvents:UIControlEventValueChanged];
     s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [headerView addSubview:s];
     
-    if (_deselectedAll == YES) {
+    if ([self getDeselectValue] == YES) {
         s.on = YES;
     } else {
         s.on = NO;
     }
     
     UILabel* deselecteverything = [[UILabel alloc] init];
-    deselecteverything.text = [CPTranslate translate:@"deselectEverything"];
+    deselecteverything.text = [CPTranslate translate:@"deselecteverything"];
     deselecteverything.frame = CGRectMake(10.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (10 + switchSize.width), switchSize.height);
     [headerView addSubview:deselecteverything];
     
@@ -277,7 +341,7 @@
             labelFrame.size.width -= inset;
             labelFrame.origin.x += inset;
             s.on = [self defaultTopicState:topic];
-            
+
         }
         
         l.frame = labelFrame;
@@ -318,17 +382,11 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section{
-    __block BOOL topicsDialogShowUnsubscribe;
+
     
-    [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
-        if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
-            topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
-        }
-    }];
-    if (topicsDialogShowUnsubscribe == NO) {
+    if (self.topicsDialogShowUnsubscribe == NO) {
         return 0;
-    }
-    else{
+    } else {
         return 44;
     }
 }
