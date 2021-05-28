@@ -12,13 +12,13 @@
         self.HTMLContent = [json objectForKey:@"content"];
         self.contentType = [json objectForKey:@"contentType"];
         if ([[json objectForKey:@"type"] isEqual:@"top"]) {
-            self.status = CPAppBannerTypeTop;
+            self.type = CPAppBannerTypeTop;
         } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
-            self.status = CPAppBannerTypeFull;
+            self.type = CPAppBannerTypeFull;
         } else if ([[json objectForKey:@"type"] isEqual:@"bottom"]) {
-            self.status = CPAppBannerTypeBottom;
+            self.type = CPAppBannerTypeBottom;
         } else {
-            self.status = CPAppBannerTypeCenter;
+            self.type = CPAppBannerTypeCenter;
         }
         
         if ([[json objectForKey:@"status"] isEqual:@"draft"]) {
