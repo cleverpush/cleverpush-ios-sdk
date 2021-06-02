@@ -1,20 +1,3 @@
-//
-//  Created by Andrew Podkovyrin
-//  Copyright © 2019 Dash Core Group. All rights reserved.
-//
-//  Licensed under the MIT License (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  https://opensource.org/licenses/MIT
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 #import "DWActionsStackView.h"
 
 #import "DWAlertInternalConstants.h"
@@ -40,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.alignment = UIStackViewAlignmentFill;
         self.distribution = UIStackViewDistributionFillEqually;
         self.spacing = DWAlertViewSeparatorSize();
-
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(contentSizeCategoryDidChangeNotification:)
                                                      name:UIContentSizeCategoryDidChangeNotification
@@ -51,13 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addActionButton:(DWAlertViewActionBaseView *)button {
     NSAssert([button isKindOfClass:DWAlertViewActionBaseView.class], @"Invalid button type");
-
+    
     button.delegate = self;
     if (button.alertAction.style == DWAlertActionStyleCancel) {
         self.cancelButton = button;
     }
     [self addArrangedSubview:button];
-
+    
     [self updatePreferredAction];
     [self updateButtonsLayout];
 }
@@ -73,14 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeAllActions {
     [self resetHighlightedButton];
-
+    
     NSArray<DWAlertViewActionBaseView *> *actions = [self.arrangedSubviews copy];
     for (DWAlertViewActionBaseView *button in actions) {
         button.delegate = nil;
         [self removeArrangedSubview:button];
         [button removeFromSuperview];
     }
-
+    
     _preferredAction = nil;
     self.cancelButton = nil;
 }
@@ -92,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
         [self.delegate actionsStackView:self highlightActionAtRect:actionButton.frame];
         self.highlightedButton = actionButton;
     }
-
+    
     [self.feedbackGenerator prepare];
 }
 
@@ -138,8 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
             _feedbackGenerator = [[UISelectionFeedbackGenerator alloc] init];
         }
         return _feedbackGenerator;
-    }
-    else {
+    } else {
         return nil;
     }
 }
@@ -153,10 +135,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updatePreferredAction {
     if (!self.preferredAction) {
         self.cancelButton.preferred = YES;
-
+        
         return;
     }
-
+    
     for (DWAlertViewActionBaseView *button in self.arrangedSubviews) {
         button.preferred = (button.alertAction == self.preferredAction);
     }
@@ -167,8 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
     const NSUInteger buttonsCount = buttons.count;
     if (buttonsCount < 2) {
         self.axis = UILayoutConstraintAxisHorizontal;
-    }
-    else if (buttonsCount == 2) {
+    } else if (buttonsCount == 2) {
         BOOL shouldBeVertical = NO;
         // only 2 horizontal buttons are allowed
         const CGFloat actionWidth = DWAlertViewWidth / 2.0 - DWAlertViewSeparatorSize();
@@ -179,13 +160,12 @@ NS_ASSUME_NONNULL_BEGIN
                 break;
             }
         }
-
+        
         self.axis = shouldBeVertical ? UILayoutConstraintAxisVertical : UILayoutConstraintAxisHorizontal;
-    }
-    else {
+    } else {
         self.axis = UILayoutConstraintAxisVertical;
     }
-
+    
     DWAlertViewActionBaseView *cancelButton = self.cancelButton;
     if (cancelButton && buttons.count > 1) {
         if (self.axis == UILayoutConstraintAxisHorizontal) {
@@ -195,8 +175,7 @@ NS_ASSUME_NONNULL_BEGIN
                 [cancelButton removeFromSuperview];
                 [self insertArrangedSubview:cancelButton atIndex:0];
             }
-        }
-        else {
+        } else {
             // Cancel always last
             if (buttons.lastObject != cancelButton) {
                 [self removeArrangedSubview:cancelButton];
@@ -205,7 +184,7 @@ NS_ASSUME_NONNULL_BEGIN
             }
         }
     }
-
+    
     [self.delegate actionsStackViewDidUpdateLayout:self];
 }
 
@@ -213,7 +192,7 @@ NS_ASSUME_NONNULL_BEGIN
     for (DWAlertViewActionBaseView *button in self.arrangedSubviews) {
         [button updateForCurrentContentSizeCategory];
     }
-
+    
     [self updateButtonsLayout];
 }
 

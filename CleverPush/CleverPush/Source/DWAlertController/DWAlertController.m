@@ -1,20 +1,3 @@
-//
-//  Created by Andrew Podkovyrin
-//  Copyright © 2018 Dash Core Group. All rights reserved.
-//
-//  Licensed under the MIT License (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  https://opensource.org/licenses/MIT
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 #import "DWAlertController.h"
 
 #import "Private/DWAlertAction+DWProtected.h"
@@ -58,11 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _contentController = contentController;
-
+        
         self.modalPresentationStyle = UIModalPresentationCustom;
         self.transitioningDelegate = self;
         self.actions = @[];
-
+        
         [self displayViewController:contentController];
     }
     return self;
@@ -81,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
         alertView.translatesAutoresizingMaskIntoConstraints = NO;
         alertView.delegate = self;
         [self.view addSubview:alertView];
-
+        
         CGFloat maximumAllowedViewHeight = [self maximumAllowedAlertHeightWithKeyboard:0.0];
         [NSLayoutConstraint activateConstraints:@[
             [alertView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
@@ -96,39 +79,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
+    
     NSAssert(self.contentController, @"Alert must be configured with a content controller");
-
+    
     [self dw_startObservingKeyboardNotifications];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-
+    
     [self dw_stopObservingKeyboardNotifications];
     [self.view endEditing:YES];
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-
+    
     [self updateDimmedViewVisiblePath];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-
+    
     [coordinator
-        animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-            const CGFloat maximumAllowedViewHeight =
-                [self maximumAllowedAlertHeightWithKeyboard:self.dw_keyboardHeight];
-
-            self.alertViewHeightConstraint.constant = maximumAllowedViewHeight;
-            [self.alertView setNeedsLayout];
-            [self.alertView layoutIfNeeded];
-            [self.alertView resetActionsState];
-        }
-                        completion:nil];
+     animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        const CGFloat maximumAllowedViewHeight =
+        [self maximumAllowedAlertHeightWithKeyboard:self.dw_keyboardHeight];
+        
+        self.alertViewHeightConstraint.constant = maximumAllowedViewHeight;
+        [self.alertView setNeedsLayout];
+        [self.alertView layoutIfNeeded];
+        [self.alertView resetActionsState];
+    }
+     completion:nil];
 }
 
 #pragma mark - Public
@@ -136,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)performTransitionToContentController:(UIViewController *)controller animated:(BOOL)animated {
     NSParameterAssert(controller);
     NSAssert(self.contentController, @"Content view controller should exist");
-
+    
     [self performTransitionFromViewController:self.contentController
                              toViewController:controller
                                      animated:animated];
@@ -145,7 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addAction:(DWAlertAction *)action {
     NSParameterAssert(action);
-
+    
 #ifdef DEBUG
     if (action.style == DWAlertActionStyleCancel) {
         for (DWAlertAction *a in self.actions) {
@@ -155,20 +138,20 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
 #endif
-
+    
     NSMutableArray *mutableActions = [self.actions mutableCopy];
     [mutableActions addObject:action];
     self.actions = mutableActions;
-
+    
     [self.alertView addAction:action];
-
+    
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
 
 - (void)setupActions:(NSArray<DWAlertAction *> *)actions {
     NSParameterAssert(actions);
-
+    
 #ifdef DEBUG
     BOOL hasCancelAction = NO;
     for (DWAlertAction *a in actions) {
@@ -178,15 +161,15 @@ NS_ASSUME_NONNULL_BEGIN
         hasCancelAction = a.style == DWAlertActionStyleCancel;
     }
 #endif
-
+    
     [self.alertView removeAllActions];
-
+    
     self.actions = actions;
-
+    
     for (DWAlertAction *action in actions) {
         [self.alertView addAction:action];
     }
-
+    
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
 }
@@ -194,7 +177,7 @@ NS_ASSUME_NONNULL_BEGIN
     [self.alertView setNeedsLayout];
     [self.alertView layoutIfNeeded];
     [self.view layoutIfNeeded];
-
+    
 }
 - (nullable DWAlertAction *)preferredAction {
     return self.alertView.preferredAction;
@@ -322,7 +305,7 @@ NS_ASSUME_NONNULL_BEGIN
         CGFloat alertHeight = CGRectGetHeight(self.alertView.frame);
         CGFloat centeredAlertY = (viewHeight - alertHeight) / 2.0;
         CGFloat alertY = centeredAlertY + self.alertViewCenterYConstraint.constant;
-
+        
         CGRect rect = CGRectMake(CGRectGetMinX(self.alertView.frame),
                                  alertY,
                                  CGRectGetWidth(self.alertView.frame),
@@ -334,15 +317,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)displayViewController:(UIViewController *)controller {
     NSParameterAssert(controller);
-
+    
     [self addChildViewController:controller];
-
+    
     UIView *childView = controller.view;
     [self.alertView setupChildView:childView];
-
+    
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
-
+    
     [controller didMoveToParentViewController:self];
 }
 
@@ -351,34 +334,34 @@ NS_ASSUME_NONNULL_BEGIN
                                    animated:(BOOL)animated {
     UIView *toView = toViewController.view;
     UIView *fromView = fromViewController.view;
-
+    
     [fromViewController willMoveToParentViewController:nil];
     [self addChildViewController:toViewController];
-
+    
     [self.alertView setupChildView:toView];
-
+    
     toView.alpha = 0.0;
-
+    
     [UIView animateWithDuration:animated ? DWAlertInplaceTransitionAnimationDuration : 0.0
-        delay:0.0
-        usingSpringWithDamping:DWAlertInplaceTransitionAnimationDampingRatio
-        initialSpringVelocity:DWAlertInplaceTransitionAnimationInitialVelocity
-        options:DWAlertInplaceTransitionAnimationOptions
-        animations:^{
-            toView.alpha = 1.0;
-            fromView.alpha = 0.0;
-        }
-        completion:^(BOOL finished) {
-            [fromView removeFromSuperview];
-            [fromViewController removeFromParentViewController];
-            [toViewController didMoveToParentViewController:self];
-        }];
+                          delay:0.0
+         usingSpringWithDamping:DWAlertInplaceTransitionAnimationDampingRatio
+          initialSpringVelocity:DWAlertInplaceTransitionAnimationInitialVelocity
+                        options:DWAlertInplaceTransitionAnimationOptions
+                     animations:^{
+        toView.alpha = 1.0;
+        fromView.alpha = 0.0;
+    }
+                     completion:^(BOOL finished) {
+        [fromView removeFromSuperview];
+        [fromViewController removeFromParentViewController];
+        [toViewController didMoveToParentViewController:self];
+    }];
 }
 
 - (CGFloat)maximumAllowedAlertHeightWithKeyboard:(CGFloat)keyboardHeight {
     CGFloat minInset;
     if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+        UIWindow * window = [[UIApplication sharedApplication] delegate].window;
         UIEdgeInsets insets = window.safeAreaInsets;
         minInset = MAX(insets.top, insets.bottom);
     }
@@ -388,10 +371,10 @@ NS_ASSUME_NONNULL_BEGIN
         minInset = MAX(self.topLayoutGuide.length, self.bottomLayoutGuide.length);
 #pragma clang diagnostic pop
     }
-
+    
     CGFloat padding = DWAlertViewVerticalPadding(minInset, keyboardHeight > 0.0);
     CGFloat height = CGRectGetHeight([UIScreen mainScreen].bounds) - padding * 2.0 - keyboardHeight;
-
+    
     return height;
 }
 

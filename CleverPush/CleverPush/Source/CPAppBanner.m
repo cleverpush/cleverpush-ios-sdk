@@ -11,14 +11,15 @@
         self.name = [json objectForKey:@"name"];
         self.HTMLContent = [json objectForKey:@"content"];
         self.contentType = [json objectForKey:@"contentType"];
+        
         if ([[json objectForKey:@"type"] isEqual:@"top"]) {
-            self.status = CPAppBannerTypeTop;
+            self.type = CPAppBannerTypeTop;
         } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
-            self.status = CPAppBannerTypeFull;
+            self.type = CPAppBannerTypeFull;
         } else if ([[json objectForKey:@"type"] isEqual:@"bottom"]) {
-            self.status = CPAppBannerTypeBottom;
+            self.type = CPAppBannerTypeBottom;
         } else {
-            self.status = CPAppBannerTypeCenter;
+            self.type = CPAppBannerTypeCenter;
         }
         
         if ([[json objectForKey:@"status"] isEqual:@"draft"]) {
@@ -42,7 +43,11 @@
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson objectForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
-                }else {
+                }
+                else if ([[blockJson objectForKey:@"type"] isEqual:@"html"]) {
+                    block = [[CPAppBannerHTMLBlock alloc] initWithJson:blockJson];
+                }
+                else {
                     continue;
                 }
                 
@@ -62,9 +67,9 @@
         }
         
         if ([[json objectForKey:@"dismissType"] isEqual:@"timeout"]) {
-            self.status = CPAppBannerDismissTypeTimeout;
+            self.dismissType = CPAppBannerDismissTypeTimeout;
         } else if ([[json objectForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
-            self.status = CPAppBannerDismissTypeTillDismissed;
+            self.dismissType = CPAppBannerDismissTypeTillDismissed;
         }
         
         if ([json objectForKey:@"dismissTimeout"] != nil) {
@@ -103,5 +108,3 @@
 }
 
 @end
-
-

@@ -17,4 +17,3 @@
 - (void)parseJson:(nonnull NSDictionary*)json;
 
 @end
-

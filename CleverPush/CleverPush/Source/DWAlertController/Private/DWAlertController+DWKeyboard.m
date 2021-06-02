@@ -1,20 +1,3 @@
-//
-//  Created by Andrew Podkovyrin
-//  Copyright © 2015-2019 Andrew Podkovyrin. All rights reserved.
-//
-//  Licensed under the MIT License (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  https://opensource.org/licenses/MIT
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 #import "DWAlertController+DWKeyboard.h"
 
 #import <objc/runtime.h>
@@ -83,18 +66,15 @@ NS_ASSUME_NONNULL_BEGIN
     [self dw_keyboardWillShowOrHideWithHeight:keyboardHeight
                             animationDuration:animationDuration
                                animationCurve:animationCurve];
-
+#pragma clang diagnostic ignored "-Wdeprecated"
     [UIView beginAnimations:@"DWAlertController+Keyboard-Animation" context:NULL];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationDelegate:self];
-
-    [self dw_keyboardShowOrHideAnimationWithHeight:keyboardHeight
-                                 animationDuration:animationDuration
-                                    animationCurve:animationCurve];
-
+    [self dw_keyboardShowOrHideAnimationWithHeight:keyboardHeight animationDuration:animationDuration animationCurve:animationCurve];
     [UIView commitAnimations];
+#pragma clang diagnostic pop
 }
 
 @end

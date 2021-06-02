@@ -2,6 +2,7 @@
 #import "CPAppBannerButtonBlock.h"
 #import "CPAppBannerTextBlock.h"
 #import "CPAppBannerImageBlock.h"
+#import "CPAppBannerHTMLBlock.h"
 @implementation CPAppBannerBlock
 
 #pragma mark - wrapping the data of the Banner Block in to CPAppBannerBlock NSObject
@@ -14,6 +15,9 @@
             self.type = CPAppBannerBlockTypeText;
         } else if ([[json objectForKey:@"type"] isEqual:@"image"]) {
             self.type = CPAppBannerBlockTypeImage;
+        }
+        else if ([[json objectForKey:@"type"] isEqual:@"html"]) {
+            self.type = CPAppBannerBlockTypeHTML;
         }
     }
     return self;
@@ -29,6 +33,9 @@
             return [[CPAppBannerTextBlock alloc] initWithJson:json];
         case CPAppBannerBlockTypeImage:
             return [[CPAppBannerImageBlock alloc] initWithJson:json];
+        case CPAppBannerBlockTypeHTML:
+            return [[CPAppBannerHTMLBlock alloc] initWithJson:json];
+            break;
     }
 }
 

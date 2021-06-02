@@ -34,9 +34,7 @@
 #pragma mark - Generalised request method to call an API.
 - (NSMutableURLRequest*)requestWithMethod:(NSString*)method path:(NSString*)path {
     NSURL* url = [NSURL URLWithString:path relativeToURL:self.apiEndpoint];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData
-                                                            timeoutInterval:60.0];
-    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60.0];
     [request setHTTPMethod:method];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];

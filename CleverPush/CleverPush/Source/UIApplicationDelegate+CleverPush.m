@@ -61,6 +61,7 @@ static NSArray* delegateSubclasses = nil;
     return [[[UIDevice currentDevice] systemVersion] floatValue] >= version;
 }
 
+#pragma mark - Initialise and register local notification before iOS 10
 + (void)injectPreiOS10MethodsPhase1 {
     if ([self isIOSVersionGreaterOrEqual:10]) {
         return;
@@ -70,11 +71,12 @@ static NSArray* delegateSubclasses = nil;
                         @selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
     
     /*
-    injectToProperClass(@selector(cleverPushDidRegisterUserNotifications:settings:),
-                        @selector(application:didRegisterUserNotificationSettings:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+     injectToProperClass(@selector(cleverPushDidRegisterUserNotifications:settings:),
+     @selector(application:didRegisterUserNotificationSettings:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
      */
 }
 
+#pragma mark - Initialise and register remote notification before iOS 10
 + (void)injectPreiOS10MethodsPhase2 {
     if ([self isIOSVersionGreaterOrEqual:10]) {
         return;
@@ -106,14 +108,14 @@ static NSArray* delegateSubclasses = nil;
 }
 
 /*
-- (void)cleverPushDidRegisterUserNotifications:(UIApplication*)application settings:(UIUserNotificationSettings*)notificationSettings {
-    if ([CleverPush channelId])
-        [CleverPush updateNotificationTypes:notificationSettings.types];
-    
-    if ([self respondsToSelector:@selector(cleverPushDidRegisterUserNotifications:settings:)])
-        [self cleverPushDidRegisterUserNotifications:application settings:notificationSettings];
-}
-*/
+ - (void)cleverPushDidRegisterUserNotifications:(UIApplication*)application settings:(UIUserNotificationSettings*)notificationSettings {
+ if ([CleverPush channelId])
+ [CleverPush updateNotificationTypes:notificationSettings.types];
+ 
+ if ([self respondsToSelector:@selector(cleverPushDidRegisterUserNotifications:settings:)])
+ [self cleverPushDidRegisterUserNotifications:application settings:notificationSettings];
+ }
+ */
 
 - (void)cleverPushReceivedRemoteNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo {
     NSLog(@"CleverPush: cleverPushReceivedRemoteNotification");
@@ -125,12 +127,16 @@ static NSArray* delegateSubclasses = nil;
     if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]) {
         [self cleverPushReceivedRemoteNotification:application userInfo:userInfo];
     }
+    if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]
+        && ![[CleverPush valueForKey:@"startFromNotification"] boolValue]) {
+        [self cleverPushReceivedRemoteNotification:application userInfo:userInfo];
+    }
 }
 
 - (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {
     BOOL callExistingSelector = [self respondsToSelector:@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:)];
     BOOL startedBackgroundJob = false;
-
+    
     // NSLog(@"CleverPush: cleverPushReceivedSilentRemoteNotification %@", callExistingSelector);
     
     if ([CleverPush channelId]) {
@@ -160,7 +166,7 @@ static NSArray* delegateSubclasses = nil;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
 
-- (void)cleverPushLocalNotificationOpened:(UIApplication*)application handleActionWithIdentifier:(NSString*)identifier forLocalNotification:(UILocalNotification*)notification completionHandler:(void(^)()) completionHandler {
+- (void)cleverPushLocalNotificationOpened:(UIApplication*)application handleActionWithIdentifier:(NSString*)identifier forLocalNotification:(UILocalNotification*)notification completionHandler:(void(^)(void)) completionHandler {
     if ([CleverPush channelId]) {
         [CleverPush processLocalActionBasedNotification:notification actionIdentifier:identifier];
     }

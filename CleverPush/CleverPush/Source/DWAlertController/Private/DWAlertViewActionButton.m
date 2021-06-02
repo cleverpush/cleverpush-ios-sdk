@@ -1,20 +1,3 @@
-//
-//  Created by Andrew Podkovyrin
-//  Copyright © 2019 Dash Core Group. All rights reserved.
-//
-//  Licensed under the MIT License (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  https://opensource.org/licenses/MIT
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 #import "DWAlertViewActionButton.h"
 
 #import "DWAlertInternalConstants.h"
@@ -42,13 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
             return NO;
         }
     }
-
+    
     if ([category isEqualToString:UIContentSizeCategoryExtraSmall] ||
         [category isEqualToString:UIContentSizeCategorySmall] ||
         [category isEqualToString:UIContentSizeCategoryMedium]) {
         return NO;
     }
-
+    
     return YES;
 }
 
@@ -62,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (@available(iOS 10.0, *)) {
             const UIContentSizeCategory defaultCategory = UIContentSizeCategoryLarge;
             UITraitCollection *trait =
-                [UITraitCollection traitCollectionWithPreferredContentSizeCategory:defaultCategory];
+            [UITraitCollection traitCollectionWithPreferredContentSizeCategory:defaultCategory];
             return [UIFont preferredFontForTextStyle:textStyle compatibleWithTraitCollection:trait];
         }
         else {
@@ -104,12 +87,12 @@ static CGFloat const MinimumScaleFactor = 0.58;
         titleLabel.text = self.alertAction.title;
         [self addSubview:titleLabel];
         _titleLabel = titleLabel;
-
+        
         NSLayoutConstraint *topTitleContraint =
-            [titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor];
+        [titleLabel.topAnchor constraintEqualToAnchor:self.topAnchor];
         _topTitleContraint = topTitleContraint;
         NSLayoutConstraint *bottomTitleConstraint =
-            [titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor];
+        [titleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor];
         _bottomTitleConstraint = bottomTitleConstraint;
         [NSLayoutConstraint activateConstraints:@[
             topTitleContraint,
@@ -117,7 +100,7 @@ static CGFloat const MinimumScaleFactor = 0.58;
             bottomTitleConstraint,
             [titleLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor],
         ]];
-
+        
         [self updateEnabledState];
         [self updateTitlePadding];
     }
@@ -126,7 +109,7 @@ static CGFloat const MinimumScaleFactor = 0.58;
 
 - (void)setPreferred:(BOOL)preferred {
     [super setPreferred:preferred];
-
+    
     if (preferred) {
         self.titleLabel.font = [UIFont dw_alertPreferredTitleFont];
     }
@@ -137,7 +120,7 @@ static CGFloat const MinimumScaleFactor = 0.58;
 
 - (void)setNormalTintColor:(UIColor *)normalTintColor {
     [super setNormalTintColor:normalTintColor];
-
+    
     if (self.alertAction.style != DWAlertActionStyleDestructive) {
         self.titleLabel.highlightedTextColor = normalTintColor;
     }
@@ -145,13 +128,13 @@ static CGFloat const MinimumScaleFactor = 0.58;
 
 - (void)setDisabledTintColor:(UIColor *)disabledTintColor {
     [super setDisabledTintColor:disabledTintColor];
-
+    
     self.titleLabel.textColor = disabledTintColor;
 }
 
 - (void)setDestructiveTintColor:(UIColor *)destructiveTintColor {
     [super setDestructiveTintColor:destructiveTintColor];
-
+    
     if (self.alertAction.style == DWAlertActionStyleDestructive) {
         self.titleLabel.highlightedTextColor = destructiveTintColor;
     }
@@ -159,13 +142,13 @@ static CGFloat const MinimumScaleFactor = 0.58;
 
 - (void)updateForCurrentContentSizeCategory {
     self.preferred = self.preferred;
-
+    
     [self updateTitlePadding];
 }
 
 - (void)updateEnabledState {
     [super updateEnabledState];
-
+    
     self.titleLabel.highlighted = self.alertAction.enabled;
 }
 
@@ -174,7 +157,7 @@ static CGFloat const MinimumScaleFactor = 0.58;
 - (void)updateTitlePadding {
     NSParameterAssert(self.topTitleContraint);
     NSParameterAssert(self.bottomTitleConstraint);
-
+    
     const UIContentSizeCategory category = [UIApplication sharedApplication].preferredContentSizeCategory;
     const CGFloat padding = DWAlertViewActionButtonTitlePadding(category);
     self.topTitleContraint.constant = padding;

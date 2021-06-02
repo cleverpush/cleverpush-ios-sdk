@@ -1,20 +1,3 @@
-//
-//  Created by Andrew Podkovyrin
-//  Copyright © 2019 Dash Core Group. All rights reserved.
-//
-//  Licensed under the MIT License (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  https://opensource.org/licenses/MIT
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 #ifndef DWAlertInternalConstants_h
 #define DWAlertInternalConstants_h
 
@@ -47,9 +30,9 @@ static UIViewAnimationOptions const DWAlertInplaceTransitionAnimationOptions = U
 
 static BOOL DWAlertHasTopNotch(void) {
     if (@available(iOS 11.0, *)) {
-        return UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom > 0.0;
+        UIWindow * currentwindow = [[UIApplication sharedApplication] delegate].window;
+        return currentwindow.safeAreaInsets.bottom > 0.0;
     }
-
     return NO;
 }
 
@@ -77,7 +60,6 @@ static CGFloat DWAlertViewVerticalPadding(CGFloat minInset, BOOL keyboardVisible
             padding = 8.0;
         }
     }
-
     return MAX(padding, minInset);
 }
 
@@ -113,13 +95,13 @@ static CGFloat DWAlertViewActionButtonMinHeight(UIContentSizeCategory category) 
     else {
 #ifdef DEBUG
         const BOOL isKnownCategory =
-            [category isEqualToString:UIContentSizeCategoryExtraSmall] ||
-            [category isEqualToString:UIContentSizeCategorySmall] ||
-            [category isEqualToString:UIContentSizeCategoryMedium] ||
-            [category isEqualToString:UIContentSizeCategoryLarge];
+        [category isEqualToString:UIContentSizeCategoryExtraSmall] ||
+        [category isEqualToString:UIContentSizeCategorySmall] ||
+        [category isEqualToString:UIContentSizeCategoryMedium] ||
+        [category isEqualToString:UIContentSizeCategoryLarge];
         if (@available(iOS 10.0, *)) {
             NSCAssert([category isEqualToString:UIContentSizeCategoryUnspecified] ||
-                          isKnownCategory,
+                      isKnownCategory,
                       @"Unknown category");
         }
         else {
@@ -164,13 +146,13 @@ static CGFloat DWAlertViewActionButtonTitlePadding(UIContentSizeCategory categor
     else {
 #ifdef DEBUG
         const BOOL isKnownCategory =
-            [category isEqualToString:UIContentSizeCategoryExtraSmall] ||
-            [category isEqualToString:UIContentSizeCategorySmall] ||
-            [category isEqualToString:UIContentSizeCategoryMedium] ||
-            [category isEqualToString:UIContentSizeCategoryLarge];
+        [category isEqualToString:UIContentSizeCategoryExtraSmall] ||
+        [category isEqualToString:UIContentSizeCategorySmall] ||
+        [category isEqualToString:UIContentSizeCategoryMedium] ||
+        [category isEqualToString:UIContentSizeCategoryLarge];
         if (@available(iOS 10.0, *)) {
             NSCAssert([category isEqualToString:UIContentSizeCategoryUnspecified] ||
-                          isKnownCategory,
+                      isKnownCategory,
                       @"Unknown category");
         }
         else {
@@ -195,13 +177,13 @@ static DWAlertAppearanceMode DWAlertAppearanceModeForUIInterfaceStyle(UIUserInte
 }
 
 static UIColor* defaultSystemTintColor() {
-   static UIColor* systemTintColor = nil;
-   static dispatch_once_t onceToken;
-   dispatch_once(&onceToken, ^{
-      UIView* view = [[UIView alloc] init];
-      systemTintColor = view.tintColor;
-   });
-   return systemTintColor;
+    static UIColor* systemTintColor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        UIView* view = [[UIView alloc] init];
+        systemTintColor = view.tintColor;
+    });
+    return systemTintColor;
 }
 
 static UIColor *DWAlertViewNormalTextColor() {

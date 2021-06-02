@@ -18,6 +18,10 @@
             self.color = @"#000000";
         }
         
+        if ([json objectForKey:@"family"]&& ![[json objectForKey:@"family"] isEqual:@""]) {
+            self.family = [json objectForKey:@"family"];
+        }
+        
         if ([json objectForKey:@"background"] && ![[json objectForKey:@"background"] isEqual:@""]) {
             self.background = [json objectForKey:@"background"];
         } else {

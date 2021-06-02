@@ -1,6 +1,6 @@
 #import "CPChatView.h"
 #import "CleverPush.h"
-
+#import "CPUtils.h"
 @interface CPChatView()
 
 @end
@@ -32,7 +32,7 @@ NSString* lastSubscriptionId;
         WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
         WKUserContentController* userController = [[WKUserContentController alloc] init];
         
-        [userController addScriptMessageHandler:self name:0];
+        [userController addScriptMessageHandler:self name:@""];
         configuration.userContentController = userController;
         
         _webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
@@ -94,10 +94,10 @@ NSString* lastSubscriptionId;
         NSString* brandingColor;
         NSString* backgroundColor;
         if ([CleverPush getBrandingColor]) {
-            brandingColor = [self hexStringFromColor:[CleverPush getBrandingColor]];
+            brandingColor = [CPUtils hexStringFromColor:[CleverPush getBrandingColor]];
         }
         if ([CleverPush getChatBackgroundColor]) {
-            backgroundColor = [self hexStringFromColor:[CleverPush getChatBackgroundColor]];
+            backgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatBackgroundColor]];
         }
         
         if (!headerCodes) {
@@ -207,17 +207,6 @@ NSString* lastSubscriptionId;
             [self loadChat];
         }
     }
-}
-
-#pragma mark -  General function
-- (NSString *)hexStringFromColor:(UIColor *)color {
-    const CGFloat *components = CGColorGetComponents(color.CGColor);
-    
-    CGFloat r = components[0];
-    CGFloat g = components[1];
-    CGFloat b = components[2];
-    
-    return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
 }
 
 @end

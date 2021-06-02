@@ -41,8 +41,8 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPHandleSubscribedBlock)(NSString * result);
 
-typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult * result);
-typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult * result);
+typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* result);
+typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* result);
 
 typedef void (^CPResultSuccessBlock)(NSDictionary* result);
 typedef void (^CPFailureBlock)(NSError* error);
@@ -55,6 +55,7 @@ extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
 
+
 #pragma mark - Initialise with launch options
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
@@ -64,6 +65,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback delay:(NSString*)seconds;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
@@ -79,6 +81,10 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)enableDevelopmentMode;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
+
++ (BOOL)fontFamilyExits:(NSString*)fontFamily;
++ (void)disableAppBanners;
++ (void)enableAppBanners;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
@@ -92,6 +98,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)removeSubscriptionTag:(NSString*)tagId;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
 + (void)getAvailableTags:(void(^)(NSArray *))callback;
++ (void)getAppBanners:(void(^)(NSArray *))callback;
 + (void)getAvailableTopics:(void(^)(NSArray *))callback;
 + (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;
 + (void)setSubscriptionLanguage:(NSString*)language;
@@ -119,7 +126,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
-+ (void)updateBadge:(UNMutableNotificationContent*)replacementContent;
++ (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (void)delayCallback: (void(^)(void))callback forTotalSeconds: (double)delayInSeconds;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
@@ -132,6 +140,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getChannelId;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
++ (double)value;
 
 + (UIColor*)getBrandingColor;
 + (UIColor*)getChatBackgroundColor;
@@ -144,8 +153,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 
-+ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
-+ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
++ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"

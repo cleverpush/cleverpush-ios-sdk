@@ -200,6 +200,7 @@
 		29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */; };
 		29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */; };
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
+		CB79117D2667558F00253F9F /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */; };
 		CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
 		CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
@@ -363,6 +364,8 @@
 		29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushSelectorHelpers.h; sourceTree = "<group>"; };
 		29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+CleverPush.m"; sourceTree = "<group>"; };
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
+		CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerHTMLBlock.h; sourceTree = "<group>"; };
+		CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerHTMLBlock.m; sourceTree = "<group>"; };
 		CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWKWebKitView.h; sourceTree = "<group>"; };
 		CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWKWebKitView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -426,28 +429,28 @@
 		291FCD0C2525DC2800F5185E /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				291FCD0D2525DC2800F5185E /* DWAnimatableShapeLayer.h */,
-				291FCD0E2525DC2800F5185E /* DWAlertDismissalAnimationController.m */,
-				291FCD0F2525DC2800F5185E /* DWAlertPresentationAnimationController.m */,
-				291FCD102525DC2800F5185E /* DWAlertView.h */,
-				291FCD112525DC2800F5185E /* DWActionsStackView.m */,
-				291FCD122525DC2800F5185E /* DWAlertViewActionButton.m */,
-				291FCD132525DC2800F5185E /* DWAlertViewActionBaseView.m */,
-				291FCD142525DC2800F5185E /* DWAlertController+DWKeyboard.h */,
-				291FCD152525DC2800F5185E /* DWDimmingView.m */,
-				291FCD162525DC2800F5185E /* DWAlertPresentationController.h */,
-				291FCD172525DC2800F5185E /* DWAnimatableShapeLayer.m */,
-				291FCD182525DC2800F5185E /* DWAlertViewActionButton.h */,
 				291FCD192525DC2800F5185E /* DWActionsStackView.h */,
-				291FCD1A2525DC2800F5185E /* DWAlertView.m */,
-				291FCD1B2525DC2800F5185E /* DWAlertPresentationAnimationController.h */,
-				291FCD1C2525DC2800F5185E /* DWAlertDismissalAnimationController.h */,
-				291FCD1D2525DC2800F5185E /* DWAlertController+DWKeyboard.m */,
-				291FCD1E2525DC2800F5185E /* DWAlertViewActionBaseView.h */,
+				291FCD112525DC2800F5185E /* DWActionsStackView.m */,
 				291FCD1F2525DC2800F5185E /* DWAlertAction+DWProtected.h */,
-				291FCD202525DC2800F5185E /* DWAlertPresentationController.m */,
+				291FCD142525DC2800F5185E /* DWAlertController+DWKeyboard.h */,
+				291FCD1D2525DC2800F5185E /* DWAlertController+DWKeyboard.m */,
+				291FCD1C2525DC2800F5185E /* DWAlertDismissalAnimationController.h */,
+				291FCD0E2525DC2800F5185E /* DWAlertDismissalAnimationController.m */,
 				291FCD212525DC2800F5185E /* DWAlertInternalConstants.h */,
+				291FCD1B2525DC2800F5185E /* DWAlertPresentationAnimationController.h */,
+				291FCD0F2525DC2800F5185E /* DWAlertPresentationAnimationController.m */,
+				291FCD162525DC2800F5185E /* DWAlertPresentationController.h */,
+				291FCD202525DC2800F5185E /* DWAlertPresentationController.m */,
+				291FCD102525DC2800F5185E /* DWAlertView.h */,
+				291FCD1A2525DC2800F5185E /* DWAlertView.m */,
+				291FCD1E2525DC2800F5185E /* DWAlertViewActionBaseView.h */,
+				291FCD132525DC2800F5185E /* DWAlertViewActionBaseView.m */,
+				291FCD182525DC2800F5185E /* DWAlertViewActionButton.h */,
+				291FCD122525DC2800F5185E /* DWAlertViewActionButton.m */,
+				291FCD0D2525DC2800F5185E /* DWAnimatableShapeLayer.h */,
+				291FCD172525DC2800F5185E /* DWAnimatableShapeLayer.m */,
 				291FCD222525DC2800F5185E /* DWDimmingView.h */,
+				291FCD152525DC2800F5185E /* DWDimmingView.m */,
 			);
 			path = Private;
 			sourceTree = "<group>";
@@ -561,6 +564,8 @@
 				298676CB2572D00A0002E9F1 /* CPAppBannerFrequency.h */,
 				2986774E2572DFCB0002E9F1 /* CPAppBannerImageBlock.h */,
 				2986774F2572DFD30002E9F1 /* CPAppBannerImageBlock.m */,
+				CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */,
+				CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */,
 				2986766F2572CC340002E9F1 /* CPAppBannerModule.h */,
 				298676702572CC400002E9F1 /* CPAppBannerModule.m */,
 				298676E02572D0340002E9F1 /* CPAppBannerStatus.h */,
@@ -1019,6 +1024,7 @@
 				298677502572DFD30002E9F1 /* CPAppBannerImageBlock.m in Sources */,
 				298676B72572CFEF0002E9F1 /* CPAppBanner.m in Sources */,
 				2986775B2572DFE70002E9F1 /* CPAppBannerTextBlock.m in Sources */,
+				CB79117D2667558F00253F9F /* CPAppBannerHTMLBlock.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

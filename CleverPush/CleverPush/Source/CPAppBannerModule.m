@@ -60,10 +60,12 @@ dispatch_queue_t dispatchQueue = nil;
     }];
 }
 
-#pragma mark - Initialised and load the daya in to banner by creating banner and schedule banners
+
+#pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
 + (void)startup {
     [CPAppBannerModule createBanners:banners];
     [CPAppBannerModule scheduleBanners];
+    
 }
 
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
@@ -154,6 +156,9 @@ dispatch_queue_t dispatchQueue = nil;
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSArray *jsonBanners = [result objectForKey:@"banners"];
         if (jsonBanners != nil) {
+            NSLog(@"CleverPush banners %@", result);
+            NSLog(@"CleverPush JSON banners %@", jsonBanners);
+            
             banners = [NSMutableArray new];
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
@@ -245,7 +250,7 @@ dispatch_queue_t dispatchQueue = nil;
     for (CPAppBanner* banner in activeBanners) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void){
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void) {
                     [CPAppBannerModule showBanner:banner];
                 });
             } else {
@@ -255,7 +260,7 @@ dispatch_queue_t dispatchQueue = nil;
             }
         } else {
             double delay = [[NSDate date] timeIntervalSinceDate:banner.startAt] + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatchQueue, ^(void){
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatchQueue, ^(void) {
                 [CPAppBannerModule showBanner:banner];
             });
         }
@@ -264,12 +269,12 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 + (void)showBanner:(CPAppBanner*)banner {
-    dispatch_async(dispatch_get_main_queue(), ^(void){
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         
-        if ([banner.contentType isEqualToString:@"block"]){
+        if ([banner.contentType isEqualToString:@"block"]) {
             CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
             
-            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
+            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
                 [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
                 
                 if (handleBannerOpened && action) {
@@ -290,17 +295,16 @@ dispatch_queue_t dispatchQueue = nil;
             }
             
             if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                     [bannerController onDismiss];
                 });
             }
             
             [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
-        }
-        else{
+        } else {
             CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
             
-            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action){
+            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
                 [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
                 
                 if (handleBannerOpened && action) {
@@ -321,15 +325,16 @@ dispatch_queue_t dispatchQueue = nil;
             }
             
             if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void){
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                     [bannerController onDismiss];
                 });
             }
-            
             [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
         }
     });
 }
+
+
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {

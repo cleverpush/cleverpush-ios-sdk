@@ -28,26 +28,38 @@
 @synthesize pageControl;
 @synthesize carouselItems;
 
+#pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self setBackgroundColor];
 }
 
-- (void)setBackgroundColor {
-    self.view.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1.0];;
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    self.carousel = nil;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
     [self createAndConfigCarousel];
+}
+
+#pragma mark - Set view controller's background color
+- (void)setBackgroundColor {
+    self.view.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1.0];;
+}
+
+#pragma mark - Release memories of carousel
+- (void)dealloc {
+    carousel.delegate = nil;
+    carousel.dataSource = nil;
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 
+#pragma mark - Initialise carousel
 - (void)createAndConfigCarousel {
     carousel = [[CleverPushiCarousel alloc] initWithFrame:CGRectMake(kPaddingLeft, kPaddingTop, self.view.frame.size.width - (kPaddingLeft + kpaddingRight), self.view.frame.size.height - (kPaddingTop + kPaddingBottom))];
     carousel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -58,6 +70,7 @@
     [self.view addSubview:carousel];
 }
 
+#pragma mark - Initialise page indicator of carousel
 - (void)createPageIndicator:(NSUInteger)numberOfPages {
     UIPageControl *pc = [[UIPageControl alloc] init];
     pageControl = pc;
@@ -69,24 +82,16 @@
     [self.view addSubview:pageControl];
 }
 
-- (void)dealloc {
-    carousel.delegate = nil;
-    carousel.dataSource = nil;
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    self.carousel = nil;
-}
-
 - (BOOL)shouldAutorotate {
     return YES;
 }
 
+#pragma mark - Define the counts of the carousel
 - (NSInteger)numberOfItemsInCarousel:(__unused CleverPushiCarousel *)carousel {
     return (NSInteger)[self.items count];
 }
 
+#pragma mark - Define the content mode of image
 - (UIViewContentMode)setImageContentMode: (NSString *)mode {
     if ([mode isEqual: @"ScaleToFill"]) {
         return UIViewContentModeScaleToFill;
@@ -99,6 +104,7 @@
     }
 }
 
+#pragma mark - Initialise the and return view of the carousel
 - (UIView *)carousel:(CleverPushiCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(kPaddingLeft, kPaddingTop, self.view.frame.size.width - (kPaddingLeft + kpaddingRight), self.view.frame.size.height - (kPaddingTop + kPaddingBottom))];
     imageView.image = [items objectAtIndex:index];
@@ -109,6 +115,7 @@
     return view;
 }
 
+#pragma mark - Identify carousel notification and load in to the carousel
 - (void)cleverpushDidReceiveNotification:(UNNotification *)notification  API_AVAILABLE(ios(10.0)) {
     if ([notification.request.content.categoryIdentifier isEqualToString:@"carousel"]) {
         [self getImages:notification];
@@ -126,6 +133,7 @@
     }
 }
 
+#pragma mark - Set carousel theme
 - (void)setCarouselTheme:(NSString *)themeName {
     if (themeName == nil) {
         return;
@@ -133,7 +141,8 @@
     self.carousel.type = [self fetchCarouselThemeEnum:themeName];
 }
 
-- (void)getImages:(UNNotification *)notification API_AVAILABLE(ios(10.0)){
+#pragma mark - Get carousel images from the notification payload
+- (void)getImages:(UNNotification *)notification API_AVAILABLE(ios(10.0)) {
     NSArray <UNNotificationAttachment *> *attachments = notification.request.content.attachments;
     [self fetchAttachmentsToImageArray:attachments];
     NSDictionary* cpNotification = [notification.request.content.userInfo valueForKey:@"notification"];
@@ -148,21 +157,22 @@
         }
         [self.carouselItems enumerateObjectsUsingBlock:
          ^(NSDictionary *image, NSUInteger index, BOOL *stop) {
-             if (attachmentIDs.count < index + 1 || ![[attachmentIDs objectAtIndex:index] isEqualToString:[NSString stringWithFormat:@"media_%lu.jpg", (unsigned long)index]]) {
-                 NSURL *imageURL = [NSURL URLWithString:[image objectForKey:@"mediaUrl"]];
-                 NSData *imageData = nil;
-                 if (imageURL != nil && imageURL.absoluteString.length != 0) {
-                     imageData = [[NSData alloc] initWithContentsOfURL: imageURL];
-                     UIImage *image = [UIImage imageWithData:imageData];
-                     [images insertObject:image atIndex:index];
-                     [attachmentIDs insertObject:[NSString stringWithFormat:@"media_%lu.jpg", (unsigned long)index] atIndex:index];
-                 }
-             }
+            if (attachmentIDs.count < index + 1 || ![[attachmentIDs objectAtIndex:index] isEqualToString:[NSString stringWithFormat:@"media_%lu.jpg", (unsigned long)index]]) {
+                NSURL *imageURL = [NSURL URLWithString:[image objectForKey:@"mediaUrl"]];
+                NSData *imageData = nil;
+                if (imageURL != nil && imageURL.absoluteString.length != 0) {
+                    imageData = [[NSData alloc] initWithContentsOfURL: imageURL];
+                    UIImage *image = [UIImage imageWithData:imageData];
+                    [images insertObject:image atIndex:index];
+                    [attachmentIDs insertObject:[NSString stringWithFormat:@"media_%lu.jpg", (unsigned long)index] atIndex:index];
+                }
+            }
         }];
         self.items = images;
     }
 }
 
+#pragma mark - Get the array of attachments
 - (void)fetchAttachmentsToImageArray:(NSArray *)attachments {
     NSMutableArray *itemsArray = [[NSMutableArray alloc]init];
     if (@available(iOS 10.0, *)) {
@@ -178,6 +188,7 @@
     self.items = itemsArray;
 }
 
+#pragma mark - Action identifier to on dynamic next/previous button
 - (void)cleverpushDidReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(UNNotificationContentExtensionResponseOption))completion API_AVAILABLE(ios(10.0)) {
     if ([response.actionIdentifier isEqualToString:@"next"]) {
         [carousel scrollToItemAtIndex:carousel.currentItemIndex + 1 animated:YES];
@@ -195,6 +206,7 @@
     return CATransform3DTranslate(transform, 0.0f, 0.0f, offset * self.carousel.itemWidth);
 }
 
+#pragma mark - Carousel enumeration
 - (CGFloat)carousel:(__unused CleverPushiCarousel *)icarousel valueForOption:(iCarouselOption)option withDefault:(CGFloat)value {
     switch (option)
     {
@@ -231,11 +243,12 @@
     }
 }
 
-
+#pragma mark - Trigger event when index is going to change of carousel
 - (void)carouselCurrentItemIndexDidChange:(CleverPushiCarousel *)icarousel {
     pageControl.currentPage = icarousel.currentItemIndex;
 }
 
+#pragma mark - Get the theme of the carousel
 - (iCarouselType)fetchCarouselThemeEnum:(NSString *)themeName {
     if ([themeName isEqualToString:@"linear"]) {
         return iCarouselTypeLinear;

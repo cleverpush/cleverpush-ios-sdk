@@ -8,8 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (CPNotificationCategoryController *)sharedInstance;
 - (NSString *)registerNotificationCategoryForNotificationId:(NSString *)notificationId;
-- (NSMutableSet<UNNotificationCategory*>*)existingCategories;
-- (UNNotificationCategory *)carouselCategory;
+- (NSMutableSet<UNNotificationCategory*>*)existingCategories API_AVAILABLE(ios(10.0));
+- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(10.0));
 
 @end
 

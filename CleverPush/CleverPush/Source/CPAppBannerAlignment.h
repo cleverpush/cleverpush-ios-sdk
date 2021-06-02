@@ -5,4 +5,3 @@ typedef NS_ENUM(NSInteger, CPAppBannerAlignment) {
     CPAppBannerAlignmentCenter,
     CPAppBannerAlignmentRight
 };
-

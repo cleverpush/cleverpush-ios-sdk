@@ -10,6 +10,8 @@
 #import "CPAppBannerImageBlock.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerType.h"
+#import "CPAppBannerHTMLBlock.h"
+
 @interface CPAppBanner : NSObject
 
 @property (nonatomic) CPAppBannerType type;
@@ -35,4 +37,3 @@
 - (id)initWithJson:(NSDictionary*)json;
 
 @end
-

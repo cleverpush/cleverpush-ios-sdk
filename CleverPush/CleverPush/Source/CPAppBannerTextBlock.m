@@ -17,7 +17,9 @@
         if ([json objectForKey:@"color"]) {
             self.color = [json objectForKey:@"color"];
         }
-        
+        if ([json objectForKey:@"family"]) {
+            self.family = [json objectForKey:@"family"];
+        }
         self.size = 18;
         if ([json objectForKey:@"size"]) {
             self.size = [[json objectForKey:@"size"] intValue];
@@ -34,4 +36,3 @@
 }
 
 @end
-

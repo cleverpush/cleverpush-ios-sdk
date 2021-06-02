@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
-
+#import <objc/runtime.h>
 #import "CPUtils.h"
-
+#import <UIKit/UIKit.h>
+#pragma mark - Custom delegate of download
 @interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
     NSError* error;
     NSURLResponse* response;
@@ -18,10 +19,12 @@
 @implementation DirectDownloadDelegate
 @synthesize error, response, done;
 
+#pragma mark - Recieve data and write
 -(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     [outputHandle writeData:data];
 }
 
+#pragma mark - Recieve data task and response
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)aResponse completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
     response = aResponse;
     long long expectedLength = response.expectedContentLength;
@@ -32,6 +35,7 @@
     completionHandler(NSURLSessionResponseAllow);
 }
 
+#pragma mark - error call back
 -(void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
     error = anError;
     done = YES;
@@ -39,12 +43,14 @@
     [outputHandle closeFile];
 }
 
+#pragma mark - completion call back
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)anError {
     done = YES;
     error = anError;
     [outputHandle closeFile];
 }
 
+#pragma mark - Initialised file path
 - (id)initWithFilePath:(NSString*)path {
     if (self = [super init]) {
         if ([[NSFileManager defaultManager] fileExistsAtPath:path])
@@ -57,9 +63,11 @@
 }
 @end
 
+#pragma mark - custom delegate of direct download from URL and write to local file
 @interface NSURLSession (DirectDownload)
 + (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error;
 @end
+
 
 @implementation NSURLSession (DirectDownload)
 
@@ -93,7 +101,7 @@
 @end
 
 @implementation CPUtils
-
+#pragma mark - Generate random string for uniquing
 + (NSString*)randomStringWithLength:(int)length {
     NSString* letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     NSMutableString* randomString = [[NSMutableString alloc] initWithCapacity:length];
@@ -105,6 +113,25 @@
     return randomString;
 }
 
+#pragma mark - dictionary with properties of object.
++ (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    
+    unsigned count;
+    objc_property_t *properties = class_copyPropertyList([obj class], &count);
+    
+    for (int i = 0; i < count; i++) {
+        NSString *key = [NSString stringWithUTF8String:property_getName(properties[i])];
+        [dict setObject:[obj valueForKey:key] forKey:key];
+    }
+    
+    free(properties);
+    
+    return [NSDictionary dictionaryWithDictionary:dict];
+}
+
+#pragma mark - Defined extensions of media files
 + (NSString*)downloadMedia:(NSString*)urlString {
     NSURL* url = [NSURL URLWithString:urlString];
     NSString* extension = url.pathExtension;
@@ -135,17 +162,17 @@
         }
         
         /*
-        NSArray* cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
-        NSMutableArray* appendedCache;
-        if (cachedFiles) {
-            appendedCache = [[NSMutableArray alloc] initWithArray:cachedFiles];
-            [appendedCache addObject:name];
-        } else {
-            appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
-        }
-        
-        [[NSUserDefaults standardUserDefaults] setObject:appendedCache forKey:@"CACHED_MEDIA"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+         NSArray* cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
+         NSMutableArray* appendedCache;
+         if (cachedFiles) {
+         appendedCache = [[NSMutableArray alloc] initWithArray:cachedFiles];
+         [appendedCache addObject:name];
+         } else {
+         appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
+         }
+         
+         [[NSUserDefaults standardUserDefaults] setObject:appendedCache forKey:@"CACHED_MEDIA"];
+         [[NSUserDefaults standardUserDefaults] synchronize];
          */
         
         return name;
@@ -155,4 +182,40 @@
     }
 }
 
+#pragma mark - daysBetweenDate(instance method and class method)
++ (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
+    NSDate *fromDate;
+    NSDate *toDate;
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&fromDate interval:NULL forDate:fromDateTime];
+    [calendar rangeOfUnit:NSCalendarUnitDay startDate:&toDate interval:NULL forDate:toDateTime];
+    NSDateComponents *difference = [calendar components:NSCalendarUnitDay fromDate:fromDate toDate:toDate options:0];
+    return [difference day];
+}
+
+#pragma mark -  General function to get the color from hex string
++ (NSString *)hexStringFromColor:(UIColor *)color {
+    const CGFloat *components = CGColorGetComponents(color.CGColor);
+    
+    CGFloat r = components[0];
+    CGFloat g = components[1];
+    CGFloat b = components[2];
+    
+    return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
+}
+
++ (BOOL)isPortrait
+{
+    UIWindow *firstWindow = [[[UIApplication sharedApplication] windows] firstObject];
+    if (firstWindow == nil) { return NO; }
+    
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *windowScene = firstWindow.windowScene;
+        if (windowScene == nil) { return NO; }
+        
+        return UIInterfaceOrientationIsPortrait(windowScene.interfaceOrientation);
+    } else {
+        return (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication.statusBarOrientation));
+    }
+}
 @end

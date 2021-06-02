@@ -1,35 +1,3 @@
-//
-//  iCarousel.m
-//
-//  Version 1.8.2
-//
-//  Created by Nick Lockwood on 01/04/2011.
-//  Copyright 2011 Charcoal Design
-//
-//  Distributed under the permissive zlib License
-//  Get the latest version from here:
-//
-//  https://github.com/nicklockwood/iCarousel
-//
-//  This software is provided 'as-is', without any express or implied
-//  warranty.  In no event will the authors be held liable for any damages
-//  arising from the use of this software.
-//
-//  Permission is granted to anyone to use this software for any purpose,
-//  including commercial applications, and to alter it and redistribute it
-//  freely, subject to the following restrictions:
-//
-//  1. The origin of this software must not be misrepresented; you must not
-//  claim that you wrote the original software. If you use this software
-//  in a product, an acknowledgment in the product documentation would be
-//  appreciated but is not required.
-//
-//  2. Altered source versions must be plainly marked as such, and must not be
-//  misrepresented as being the original software.
-//
-//  3. This notice may not be removed or altered from any source distribution.
-//
-
 #import "CPiCarousel.h"
 #import <objc/message.h>
 #include <stdint.h>
@@ -134,7 +102,6 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
 
 #pragma mark -
 #pragma mark Initialisation
-
 - (void)setUp
 {
     _decelerationRate = 0.95;
@@ -152,7 +119,6 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     _centerItemWhenSelected = YES;
     
     _contentView = [[UIView alloc] initWithFrame:self.bounds];
-    
     
 #ifdef ICAROUSEL_IOS
     
@@ -471,7 +437,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     fadeMax = [self valueForOption:iCarouselOptionFadeMax withDefault:fadeMax];
     fadeRange = [self valueForOption:iCarouselOptionFadeRange withDefault:fadeRange];
     fadeMinAlpha = [self valueForOption:iCarouselOptionFadeMinAlpha withDefault:fadeMinAlpha];
-
+    
 #ifdef ICAROUSEL_MACOS
     
     if (_vertical)
@@ -505,7 +471,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     CATransform3D transform = CATransform3DIdentity;
     transform.m34 = _perspective;
     transform = CATransform3DTranslate(transform, -_viewpointOffset.width, -_viewpointOffset.height, 0.0);
-
+    
     //perform transform
     switch (_type)
     {
@@ -611,7 +577,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
             CGFloat tilt = [self valueForOption:iCarouselOptionTilt withDefault:0.9f];
             CGFloat spacing = [self valueForOption:iCarouselOptionSpacing withDefault:0.25];
             CGFloat clampedOffset = MAX(-1.0, MIN(1.0, offset));
-
+            
             if (_type == iCarouselTypeCoverFlow2)
             {
                 if (_toggle > 0.0)
@@ -791,10 +757,10 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     UIView *containerView = [[UIView alloc] initWithFrame:frame];
     
 #ifdef ICAROUSEL_MACOS
-
+    
     //clipping works differently on Mac OS
     [containerView setBoundsSize:view.frame.size];
-
+    
 #endif
     
     //set view frame
@@ -815,7 +781,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     
     //update alpha
     view.superview.layer.opacity = [self alphaForItemWithOffset:offset];
-
+    
 #ifdef ICAROUSEL_IOS
     
     //center view
@@ -824,28 +790,28 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     
     //enable/disable interaction
     view.superview.userInteractionEnabled = (!_centerItemWhenSelected || index == self.currentItemIndex);
-  
+    
     //account for retina
     view.superview.layer.rasterizationScale = [UIScreen mainScreen].scale;
-
+    
     [view layoutIfNeeded];
-
+    
 #else
     
     //center view
     [view.superview setFrameOrigin:NSMakePoint(self.bounds.size.width/2.0 + _contentOffset.width,
                                                self.bounds.size.height/2.0 + _contentOffset.height)];
     view.superview.layer.anchorPoint = CGPointMake(0.5, 0.5);
-  
+    
     //account for retina
     view.superview.layer.rasterizationScale = view.window.screen.backingScaleFactor;
-
+    
 #endif
     
     //special-case logic for iCarouselTypeCoverFlow2
     CGFloat clampedOffset = MAX(-1.0, MIN(1.0, offset));
     if (_decelerating || (_scrolling && !_dragging && !_didDrag) || (_autoscroll && !_dragging) ||
-       (!_wrapEnabled && (_scrollOffset < 0 || _scrollOffset >= _numberOfItems - 1)))
+        (!_wrapEnabled && (_scrollOffset < 0 || _scrollOffset >= _numberOfItems - 1)))
     {
         if (offset > 0)
         {
@@ -859,7 +825,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     
     //calculate transform
     CATransform3D transform = [self transformForItemViewWithOffset:offset];
-  
+    
     //transform view
     view.superview.layer.transform = transform;
     
@@ -1016,7 +982,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     _numberOfVisibleItems = MIN(MAX_VISIBLE_ITEMS, _numberOfVisibleItems);
     _numberOfVisibleItems = [self valueForOption:iCarouselOptionVisibleItems withDefault:_numberOfVisibleItems];
     _numberOfVisibleItems = MAX(0, MIN(_numberOfVisibleItems, _numberOfItems + _numberOfPlaceholdersToShow));
-
+    
 }
 
 - (NSInteger)circularCarouselItemCount
@@ -1059,7 +1025,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     {
         return;
     }
-
+    
     //update wrap
     switch (_type)
     {
@@ -1123,7 +1089,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
         }
     }
     _offsetMultiplier = [self valueForOption:iCarouselOptionOffsetMultiplier withDefault:_offsetMultiplier];
-
+    
     //align
     if (!_scrolling && !_decelerating && !_autoscroll)
     {
@@ -1350,7 +1316,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     _numberOfVisibleItems = 0;
     _numberOfItems = [_dataSource numberOfItemsInCarousel:self];
     _numberOfPlaceholders = [_dataSource numberOfPlaceholdersInCarousel:self];
-
+    
     //reset view pools
     self.itemViews = [NSMutableDictionary dictionary];
     self.itemViewPool = [NSMutableSet set];
@@ -1509,7 +1475,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     {
         
 #ifdef ICAROUSEL_IOS
-        
+#pragma clang diagnostic ignored "-Wdeprecated"
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.1];
         [UIView setAnimationDelegate:itemView.superview];
@@ -1530,6 +1496,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
         _scrollOffset = self.currentItemIndex;
         [self didScroll];
         [UIView commitAnimations];
+#pragma clang diagnostic pop
         
 #else
         [NSAnimationContext beginGrouping];
@@ -1590,7 +1557,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
     
     if (animated)
     {
-
+        
 #ifdef ICAROUSEL_IOS
         
         [UIView beginAnimations:nil context:nil];
@@ -1612,7 +1579,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
         [CATransaction commit];
         [NSAnimationContext endGrouping];
 #endif
-    
+        
     }
     else
     {
@@ -1662,11 +1629,11 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
                                             repeats:YES];
         
         [[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
-
+        
 #ifdef ICAROUSEL_IOS
         
         [[NSRunLoop mainRunLoop] addTimer:_timer forMode:UITrackingRunLoopMode];
-
+        
 #endif
         
     }
@@ -1918,7 +1885,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
         [_delegate carouselCurrentItemIndexDidChange:self];
         [self popAnimationState];
     }
-
+    
     //update previous index
     _previousScrollOffset = _scrollOffset;
     _previousItemIndex = self.currentItemIndex;
@@ -2101,12 +2068,12 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
                 _scrolling = NO;
                 _decelerating = NO;
                 _previousTranslation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
-
+                
 #if USING_CHAMELEON
-
+                
                 _previousTranslation = -_previousTranslation;
 #endif
-
+                
                 [_delegate carouselWillBeginDragging:self];
                 break;
             }
@@ -2163,13 +2130,13 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
             {
                 CGFloat translation = _vertical? [panGesture translationInView:self].y: [panGesture translationInView:self].x;
                 CGFloat velocity = _vertical? [panGesture velocityInView:self].y: [panGesture velocityInView:self].x;
-
+                
 #if USING_CHAMELEON
-
+                
                 translation = -translation;
                 velocity = -velocity;
 #endif
-
+                
                 CGFloat factor = 1.0;
                 if (!_wrapEnabled && _bounces)
                 {
@@ -2271,7 +2238,7 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, CleverPushiCar
         [self pushAnimationState:YES];
         [_delegate carouselDidEndDragging:self willDecelerate:_decelerating];
         [self popAnimationState];
-
+        
         if (!_decelerating && !_autoscroll)
         {
             if ([self shouldScroll])

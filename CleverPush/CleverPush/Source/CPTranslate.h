@@ -3,6 +3,7 @@
 
 @interface CPTranslate : NSObject
 
+#pragma mark - Class Methods
 + (NSString*)translate:(NSString*)message;
 
 @end

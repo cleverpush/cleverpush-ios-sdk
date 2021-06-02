@@ -4,8 +4,10 @@
 #import "CleverPush.h"
 
 @interface CleverPushUNUserNotificationCenter : NSObject
-+ (void)injectSelectors;
-@end
 
+#pragma mark - Initialise UNUserNotificationCenter
++ (void)injectSelectors;
+
+@end
 
 #endif /* UNUserNotificationCenter_CleverPush_h */
