@@ -6,23 +6,24 @@
 
 @implementation CPTranslate
 
+#pragma mark - Localise static strings
 + (NSString*)translate:(NSString*)message {
     NSString *defaultLang = @"en";
     NSDictionary *messages = @{
         @"en": @{
+                @"deselectEverything": @"Deselect everything",
                 @"subscribedTopics": @"Subscribed Topics",
-                @"save": @"Save",
-                @"deselectEverything": @"Deselect everything"
+                @"save": @"Save"
         },
         @"de": @{
+                @"deselectEverything": @"Alles abwählen",
                 @"subscribedTopics": @"Abonnierte Themen",
-                @"save": @"Speichern",
-                @"deselectEverything": @"Alles abwählen"
+                @"save": @"Speichern"
         },
     };
     
     NSString *language = [[[NSLocale preferredLanguages] firstObject] substringToIndex:2];
-
+    
     NSDictionary *dict = [messages objectForKey:language];
     if (!dict) {
         dict = [messages objectForKey:defaultLang];

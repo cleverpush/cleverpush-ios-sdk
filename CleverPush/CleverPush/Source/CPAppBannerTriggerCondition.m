@@ -2,6 +2,7 @@
 
 @implementation CPAppBannerTriggerCondition
 
+#pragma mark - wrapping the data of the banner trigger condition in to CPAppBannerTriggerCondition NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self && json && ![json isKindOfClass:[NSNull class]]) {
@@ -41,4 +42,3 @@
 }
 
 @end
-

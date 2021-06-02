@@ -12,4 +12,3 @@
 - (CPAppBannerBlock*)create:(NSDictionary*)json;
 
 @end
-

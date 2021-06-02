@@ -1,5 +1,6 @@
 #ifndef CleverPushSelectorHelpers_h
 #define CleverPushSelectorHelpers_h
+#pragma mark - Protocol Helpers.
 
 BOOL checkIfInstanceOverridesSelector(Class instance, SEL selector);
 Class getClassWithProtocolInHierarchy(Class searchClass, Protocol* protocolToFind);

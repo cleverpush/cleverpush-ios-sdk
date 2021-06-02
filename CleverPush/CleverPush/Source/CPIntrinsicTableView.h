@@ -3,4 +3,3 @@
 @interface CPIntrinsicTableView : UITableView
 
 @end
-

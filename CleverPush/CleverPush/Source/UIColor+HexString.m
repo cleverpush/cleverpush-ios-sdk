@@ -2,6 +2,7 @@
 
 @implementation UIColor(HexString)
 
+#pragma mark - Initialised UIColor by hex string
 + (UIColor *) colorWithHexString: (NSString *) hexString {
     if (![hexString isKindOfClass:[NSString class]]) {
         return [UIColor blackColor];
@@ -41,6 +42,7 @@
     return [UIColor colorWithRed: red green: green blue: blue alpha: alpha];
 }
 
+#pragma mark - Initialised UIColor at specific range of the string
 + (CGFloat) colorComponentFrom: (NSString *) string start: (NSUInteger) start length: (NSUInteger) length {
     NSString *substring = [string substringWithRange: NSMakeRange(start, length)];
     NSString *fullHex = length == 2 ? substring : [NSString stringWithFormat: @"%@%@", substring, substring];

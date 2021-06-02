@@ -1,36 +1,3 @@
-//
-//  iCarousel.h
-//
-//  Version 1.8.2
-//
-//  Created by Nick Lockwood on 01/04/2011.
-//  Copyright 2011 Charcoal Design
-//
-//  Distributed under the permissive zlib License
-//  Get the latest version from here:
-//
-//  https://github.com/nicklockwood/iCarousel
-//
-//  This software is provided 'as-is', without any express or implied
-//  warranty.  In no event will the authors be held liable for any damages
-//  arising from the use of this software.
-//
-//  Permission is granted to anyone to use this software for any purpose,
-//  including commercial applications, and to alter it and redistribute it
-//  freely, subject to the following restrictions:
-//
-//  1. The origin of this software must not be misrepresented; you must not
-//  claim that you wrote the original software. If you use this software
-//  in a product, an acknowledgment in the product documentation would be
-//  appreciated but is not required.
-//
-//  2. Altered source versions must be plainly marked as such, and must not be
-//  misrepresented as being the original software.
-//
-//  3. This notice may not be removed or altered from any source distribution.
-//
-
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-pragmas"
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -109,38 +76,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, weak_delegate) IBOutlet __nullable id<iCarouselDataSource> dataSource;
 @property (nonatomic, weak_delegate) IBOutlet __nullable id<iCarouselDelegate> delegate;
+
 @property (nonatomic, assign) iCarouselType type;
-@property (nonatomic, assign) CGFloat perspective;
-@property (nonatomic, assign) CGFloat decelerationRate;
-@property (nonatomic, assign) CGFloat scrollSpeed;
-@property (nonatomic, assign) CGFloat bounceDistance;
+
 @property (nonatomic, assign, getter = isScrollEnabled) BOOL scrollEnabled;
 @property (nonatomic, assign, getter = isPagingEnabled) BOOL pagingEnabled;
 @property (nonatomic, assign, getter = isVertical) BOOL vertical;
 @property (nonatomic, readonly, getter = isWrapEnabled) BOOL wrapEnabled;
+@property (nonatomic, readonly, getter = isDragging) BOOL dragging;
+@property (nonatomic, readonly, getter = isDecelerating) BOOL decelerating;
+@property (nonatomic, readonly, getter = isScrolling) BOOL scrolling;
+@property (nonatomic, readonly, getter = isScrolling) BOOL scrollingTest;
+
 @property (nonatomic, assign) BOOL bounces;
-@property (nonatomic, assign) CGFloat scrollOffset;
-@property (nonatomic, readonly) CGFloat offsetMultiplier;
-@property (nonatomic, assign) CGSize contentOffset;
-@property (nonatomic, assign) CGSize viewpointOffset;
-@property (nonatomic, readonly) NSInteger numberOfItems;
-@property (nonatomic, readonly) NSInteger numberOfPlaceholders;
-@property (nonatomic, assign) NSInteger currentItemIndex;
-@property (nonatomic, strong, readonly) UIView * __nullable currentItemView;
-@property (nonatomic, strong, readonly) NSArray *indexesForVisibleItems;
-@property (nonatomic, readonly) NSInteger numberOfVisibleItems;
-@property (nonatomic, strong, readonly) NSArray *visibleItemViews;
-@property (nonatomic, readonly) CGFloat itemWidth;
-@property (nonatomic, strong, readonly) UIView *contentView;
-@property (nonatomic, readonly) CGFloat toggle;
-@property (nonatomic, assign) CGFloat autoscroll;
 @property (nonatomic, assign) BOOL stopAtItemBoundary;
 @property (nonatomic, assign) BOOL scrollToItemBoundary;
 @property (nonatomic, assign) BOOL ignorePerpendicularSwipes;
 @property (nonatomic, assign) BOOL centerItemWhenSelected;
-@property (nonatomic, readonly, getter = isDragging) BOOL dragging;
-@property (nonatomic, readonly, getter = isDecelerating) BOOL decelerating;
-@property (nonatomic, readonly, getter = isScrolling) BOOL scrolling;
+
+@property (nonatomic, assign) CGFloat perspective;
+@property (nonatomic, assign) CGFloat decelerationRate;
+@property (nonatomic, assign) CGFloat scrollSpeed;
+@property (nonatomic, assign) CGFloat bounceDistance;
+@property (nonatomic, assign) CGFloat scrollOffset;
+@property (nonatomic, assign) CGFloat autoscroll;
+@property (nonatomic, readonly) CGFloat offsetMultiplier;
+@property (nonatomic, readonly) CGFloat itemWidth;
+@property (nonatomic, readonly) CGFloat toggle;
+
+@property (nonatomic, assign) NSInteger currentItemIndex;
+@property (nonatomic, readonly) NSInteger numberOfItems;
+@property (nonatomic, readonly) NSInteger numberOfPlaceholders;
+@property (nonatomic, readonly) NSInteger numberOfVisibleItems;
+
+@property (nonatomic, assign) CGSize contentOffset;
+@property (nonatomic, assign) CGSize viewpointOffset;
+
+@property (nonatomic, strong, readonly) UIView * __nullable currentItemView;
+@property (nonatomic, strong, readonly) UIView *contentView;
+
+@property (nonatomic, strong, readonly) NSArray *indexesForVisibleItems;
+@property (nonatomic, strong, readonly) NSArray *visibleItemViews;
 
 - (void)scrollByOffset:(CGFloat)offset duration:(NSTimeInterval)duration;
 - (void)scrollToOffset:(CGFloat)offset duration:(NSTimeInterval)duration;
@@ -148,11 +124,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)scrollToItemAtIndex:(NSInteger)index duration:(NSTimeInterval)duration;
 - (void)scrollToItemAtIndex:(NSInteger)index animated:(BOOL)animated;
 
+- (CGFloat)offsetForItemAtIndex:(NSInteger)index;
+- (nullable UIView *)itemViewAtPoint:(CGPoint)point;
 - (nullable UIView *)itemViewAtIndex:(NSInteger)index;
 - (NSInteger)indexOfItemView:(UIView *)view;
 - (NSInteger)indexOfItemViewOrSubview:(UIView *)view;
-- (CGFloat)offsetForItemAtIndex:(NSInteger)index;
-- (nullable UIView *)itemViewAtPoint:(CGPoint)point;
 
 - (void)removeItemAtIndex:(NSInteger)index animated:(BOOL)animated;
 - (void)insertItemAtIndex:(NSInteger)index animated:(BOOL)animated;

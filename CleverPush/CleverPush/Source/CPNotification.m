@@ -1,29 +1,25 @@
 #import "CPNotification.h"
 
 @implementation CPNotification
-
+#pragma mark - Initialise notifications by NSDictionary
 + (instancetype)initWithJson:(nonnull NSDictionary*)json {
     if (!json) {
         return nil;
     }
-    
     CPNotification *cpNotification = [CPNotification new];
-    
     [cpNotification parseJson:json];
     return cpNotification;
 }
 
+#pragma mark - Parse json and set the data to the object variables
 - (void)parseJson:(NSDictionary*)json {
     _id = [json objectForKey:@"_id"];
-    
     _title = [json objectForKey:@"title"];
     _text = [json objectForKey:@"text"];
     _tag = [json objectForKey:@"tag"];
     _url = [json objectForKey:@"url"];
-    
     _iconUrl = [json objectForKey:@"iconUrl"];
     _mediaUrl = [json objectForKey:@"mediaUrl"];
-    
     _soundFilename = [json objectForKey:@"soundFilename"];
     
     NSArray* actions = [json objectForKey:@"actions"];
@@ -64,11 +60,6 @@
         _expiresAt = [formatter dateFromString:[json objectForKey:@"expiresAt"]];
     }
     
-    _silent = NO;
-    if ([json objectForKey:@"silent"] && [json valueForKey:@"silent"] != nil && ![[json valueForKey:@"silent"] isKindOfClass:[NSNull class]]) {
-        _silent = [[json objectForKey:@"silent"] boolValue];
-    }
-    
     _chatNotification = NO;
     if ([json objectForKey:@"chatNotification"] && [json valueForKey:@"chatNotification"] != nil && ![[json valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]]) {
         _chatNotification = [[json objectForKey:@"chatNotification"] boolValue];
@@ -84,5 +75,3 @@
 }
 
 @end
-
-

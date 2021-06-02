@@ -2,6 +2,7 @@
 
 @implementation CPAppBannerAction
 
+#pragma mark - wrapping the data of the bannerAction in to CPAppBannerAction NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self && json && ![json isKindOfClass:[NSNull class]]) {
@@ -30,5 +31,3 @@
 }
 
 @end
-
-

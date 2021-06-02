@@ -41,8 +41,8 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPHandleSubscribedBlock)(NSString * result);
 
-typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult * result);
-typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult * result);
+typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* result);
+typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* result);
 
 typedef void (^CPResultSuccessBlock)(NSDictionary* result);
 typedef void (^CPFailureBlock)(NSError* error);
@@ -54,6 +54,9 @@ extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 @interface CleverPush : NSObject
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
+
+
+#pragma mark - Initialise with launch options
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
@@ -68,17 +71,19 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
-   handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
+
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
 + (void)enableDevelopmentMode;
-+ (BOOL)isDevelopmentModeEnabled;
-+ (NSString*)channelId;
-+ (BOOL)isSubscribed;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
+
++ (BOOL)fontFamilyExits:(NSString*)fontFamily;
++ (void)disableAppBanners;
++ (void)enableAppBanners;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
@@ -86,48 +91,29 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
-+ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
-+ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
-+ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-+ (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
-#pragma clang diagnostic pop
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTag:(NSString*)tagId;
 + (void)removeSubscriptionTag:(NSString*)tagId;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
-+ (NSArray*)getAvailableTags __attribute__((deprecated));
 + (void)getAvailableTags:(void(^)(NSArray *))callback;
-+ (NSArray*)getAvailableTopics __attribute__((deprecated));
++ (void)getAppBanners:(void(^)(NSArray *))callback;
 + (void)getAvailableTopics:(void(^)(NSArray *))callback;
-+ (NSDictionary*)getAvailableAttributes __attribute__((deprecated));
 + (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;
-+ (NSArray*)getSubscriptionTags;
-+ (BOOL)hasSubscriptionTag:(NSString*)tagId;
-+ (NSDictionary*)getSubscriptionAttributes;
-+ (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
 + (void)setSubscriptionLanguage:(NSString*)language;
 + (void)setSubscriptionCountry:(NSString*)country;
 + (void)setTopicsDialogWindow:(UIWindow *)window;
-+ (NSMutableArray*)getSubscriptionTopics;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)setBrandingColor:(UIColor *)color;
-+ (UIColor*)getBrandingColor;
 + (void)setChatBackgroundColor:(UIColor *)color;
-+ (UIColor*)getChatBackgroundColor;
 + (void)setAutoClearBadge:(BOOL)autoClear;
 + (void)setIncrementBadge:(BOOL)increment;
 + (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
 + (void)showTopicsDialog:(UIWindow *)targetWindow;
 + (void)reLayoutAppBanner;
-+ (NSArray*)getNotifications;
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback;
-+ (NSString*)getSubscriptionId;
 + (void)getSubscriptionId:(void(^)(NSString *))callback;
-+ (NSString*)getChannelId;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
 + (void)trackPageView:(NSString*)url;
@@ -139,12 +125,42 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
++ (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
+
++ (NSArray*)getAvailableTags __attribute__((deprecated));
++ (NSArray*)getAvailableTopics __attribute__((deprecated));
++ (NSArray*)getSubscriptionTags;
++ (NSArray*)getNotifications;
++ (NSMutableArray*)getSubscriptionTopics;
+
++ (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
++ (NSString*)getSubscriptionId;
++ (NSString*)getChannelId;
 + (NSString*)getApiEndpoint;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent;
 + (BOOL)fontFamilyExits:(NSString*)fontFamily;
 + (void)disableAppBanners;
 + (void)enableAppBanners;
++ (NSString*)channelId;
++ (double)value;
+
++ (UIColor*)getBrandingColor;
++ (UIColor*)getChatBackgroundColor;
+
++ (NSDictionary*)getAvailableAttributes __attribute__((deprecated));
++ (NSDictionary*)getSubscriptionAttributes;
+
++ (BOOL)isDevelopmentModeEnabled;
++ (BOOL)isSubscribed;
++ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
++ (BOOL)hasSubscriptionTag:(NSString*)tagId;
+
++ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
++ (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
+#pragma clang diagnostic pop
 
 @end
-
-

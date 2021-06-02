@@ -11,6 +11,7 @@
         self.name = [json objectForKey:@"name"];
         self.HTMLContent = [json objectForKey:@"content"];
         self.contentType = [json objectForKey:@"contentType"];
+        
         if ([[json objectForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
         } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
@@ -66,9 +67,9 @@
         }
         
         if ([[json objectForKey:@"dismissType"] isEqual:@"timeout"]) {
-            self.status = CPAppBannerDismissTypeTimeout;
+            self.dismissType = CPAppBannerDismissTypeTimeout;
         } else if ([[json objectForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
-            self.status = CPAppBannerDismissTypeTillDismissed;
+            self.dismissType = CPAppBannerDismissTypeTillDismissed;
         }
         
         if ([json objectForKey:@"dismissTimeout"] != nil) {

@@ -15,7 +15,7 @@
         if ([json objectForKey:@"height"] && [[json objectForKey:@"height"] intValue]) {
             self.height = [[json objectForKey:@"height"] intValue];
         }
-
+        
         self.action = [[CPAppBannerAction alloc] initWithJson:[json objectForKey:@"action"]];
     }
     return self;

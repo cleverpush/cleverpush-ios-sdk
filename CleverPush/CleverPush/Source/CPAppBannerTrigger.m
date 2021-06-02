@@ -2,6 +2,8 @@
 
 @implementation CPAppBannerTrigger
 
+#pragma mark - wrapping the data of the trigger conditions to CPAppBannerTrigger NSObject
+
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self && json && ![json isKindOfClass:[NSNull class]]) {

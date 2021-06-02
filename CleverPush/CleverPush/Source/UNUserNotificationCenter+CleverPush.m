@@ -20,18 +20,21 @@ static NSArray* delegateUNSubclasses = nil;
 
 __weak static id previousDelegate;
 
+#pragma mark - Initialise UNUserNotificationCenter
 + (void)injectSelectors {
-    injectToProperClass(@selector(setCleverPushUNDelegate:), @selector(setDelegate:), @[], [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
-    
-    injectToProperClass(@selector(cleverPushRequestAuthorizationWithOptions:completionHandler:),
-                        @selector(requestAuthorizationWithOptions:completionHandler:), @[],
-                        [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
-    injectToProperClass(@selector(cleverPushGetNotificationSettingsWithCompletionHandler:),
-                        @selector(getNotificationSettingsWithCompletionHandler:), @[],
-                        [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+    if (@available(iOS 10.0, *)) {
+        injectToProperClass(@selector(setCleverPushUNDelegate:), @selector(setDelegate:), @[], [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+        injectToProperClass(@selector(cleverPushRequestAuthorizationWithOptions:completionHandler:),
+                            @selector(requestAuthorizationWithOptions:completionHandler:), @[],
+                            [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+        injectToProperClass(@selector(cleverPushGetNotificationSettingsWithCompletionHandler:),
+                            @selector(getNotificationSettingsWithCompletionHandler:), @[],
+                            [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+        
+    }
 }
 
-- (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler {
+- (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler  API_AVAILABLE(ios(10.0)) {
     
     id wrapperBlock = ^(BOOL granted, NSError* error) {
         completionHandler(granted, error);
@@ -40,7 +43,7 @@ __weak static id previousDelegate;
     [self cleverPushRequestAuthorizationWithOptions:options completionHandler:wrapperBlock];
 }
 
-- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler {
+- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler  API_AVAILABLE(ios(10.0)) {
     id wrapperBlock = ^(UNNotificationSettings* settings) {
         completionHandler(settings);
     };
@@ -69,8 +72,8 @@ __weak static id previousDelegate;
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
-willPresentNotification:(UNNotification *)notification
-withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+                 willPresentNotification:(UNNotification *)notification
+                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler  API_AVAILABLE(ios(10.0)) {
     NSUInteger completionHandlerOptions = 7;
     
     NSLog(@"CleverPush cleverPushUserNotificationCenter willPresentNotification");
@@ -91,46 +94,51 @@ withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))compl
     }
     
     completionHandler(completionHandlerOptions);
+    
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
-didReceiveNotificationResponse:(UNNotificationResponse *)response
-withCompletionHandler:(void(^)())completionHandler {
+          didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler  API_AVAILABLE(ios(10.0)) {
     NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
     
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
         [CleverPush updateBadge:nil];
         return;
     }
-    
+
     [CleverPush handleNotificationOpened:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive actionIdentifier:response.actionIdentifier];
     
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
+        
         [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
+        
     } else if (![CleverPushUNUserNotificationCenter isDismissEvent:response]) {
+        
         BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
         NSString* userText = isTextReply ? [response valueForKey:@"userText"] : nil;
+        
         [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:response.notification
-                                                               isTextReply:isTextReply
-                                                          actionIdentifier:response.actionIdentifier
-                                                                  userText:userText
-                                                   fromPresentNotification:false
-                                                     withCompletionHandler:completionHandler];
+                                                                isTextReply:isTextReply
+                                                           actionIdentifier:response.actionIdentifier
+                                                                   userText:userText
+                                                    fromPresentNotification:false
+                                                      withCompletionHandler:completionHandler];
     } else {
+        
         completionHandler();
     }
 }
 
-+ (BOOL)isDismissEvent:(UNNotificationResponse *)response {
++ (BOOL)isDismissEvent:(UNNotificationResponse *)response  API_AVAILABLE(ios(10.0)) {
     return [@"com.apple.UNNotificationDismissActionIdentifier" isEqual:response.actionIdentifier];
 }
 
 + (void)callLegacyAppDeletegateSelector:(UNNotification *)notification
-        isTextReply:(BOOL)isTextReply
-        actionIdentifier:(NSString*)actionIdentifier
-        userText:(NSString*)userText
-        fromPresentNotification:(BOOL)fromPresentNotification
-        withCompletionHandler:(void(^)())completionHandler {
+                            isTextReply:(BOOL)isTextReply
+                       actionIdentifier:(NSString*)actionIdentifier
+                               userText:(NSString*)userText
+                fromPresentNotification:(BOOL)fromPresentNotification
+                  withCompletionHandler:(void(^)(void))completionHandler  API_AVAILABLE(ios(10.0)) {
     UIApplication *sharedApp = [UIApplication sharedApplication];
     
     BOOL isCustomAction = actionIdentifier && ![@"com.apple.UNNotificationDefaultActionIdentifier" isEqualToString:actionIdentifier];
@@ -139,30 +147,30 @@ withCompletionHandler:(void(^)())completionHandler {
     if (isRemote) {
         NSDictionary* remoteUserInfo = notification.request.content.userInfo;
         
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wdeprecated"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
         if (isTextReply &&
             [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:withResponseInfo:completionHandler:)]) {
             NSDictionary* responseInfo = @{UIUserNotificationActionResponseTypedTextKey: userText};
             [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forRemoteNotification:remoteUserInfo withResponseInfo:responseInfo completionHandler:^() {
-             completionHandler();
-             }];
+                completionHandler();
+            }];
         } else if (isCustomAction &&
-                 [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:completionHandler:)]) {
+                   [sharedApp.delegate respondsToSelector:@selector(application:handleActionWithIdentifier:forRemoteNotification:completionHandler:)]) {
             [sharedApp.delegate application:sharedApp handleActionWithIdentifier:actionIdentifier forRemoteNotification:remoteUserInfo completionHandler:^() {
-             completionHandler();
-             }];
+                completionHandler();
+            }];
         } else if ([sharedApp.delegate respondsToSelector:@selector(application:didReceiveRemoteNotification:fetchCompletionHandler:)] &&
-                 (!fromPresentNotification ||
-                  ![[notification.request.trigger valueForKey:@"_isContentAvailable"] boolValue])) {
-                     [sharedApp.delegate application:sharedApp didReceiveRemoteNotification:remoteUserInfo fetchCompletionHandler:^(UIBackgroundFetchResult result) {
-                      completionHandler();
-                      }];
-                 }
+                   (!fromPresentNotification ||
+                    ![[notification.request.trigger valueForKey:@"_isContentAvailable"] boolValue])) {
+            [sharedApp.delegate application:sharedApp didReceiveRemoteNotification:remoteUserInfo fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+                completionHandler();
+            }];
+        }
         else {
             completionHandler();
         }
-        #pragma clang diagnostic pop
+#pragma clang diagnostic pop
     } else {
         completionHandler();
     }

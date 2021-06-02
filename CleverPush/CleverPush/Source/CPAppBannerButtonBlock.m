@@ -1,7 +1,7 @@
 #import "CPAppBannerButtonBlock.h"
 
 @implementation CPAppBannerButtonBlock
-
+#pragma mark - wrapping the data of the Banner Button Block in to CPAppBannerButtonBlock NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
@@ -18,7 +18,7 @@
             self.color = @"#000000";
         }
         
-        if ([json objectForKey:@"family"] && ![[json objectForKey:@"family"] isEqual:@""]) {
+        if ([json objectForKey:@"family"]&& ![[json objectForKey:@"family"] isEqual:@""]) {
             self.family = [json objectForKey:@"family"];
         }
         
@@ -51,5 +51,3 @@
 }
 
 @end
-
-

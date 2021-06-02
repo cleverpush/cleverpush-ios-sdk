@@ -2,6 +2,7 @@
 
 @implementation CPAppBannerImageBlock
 
+#pragma mark - wrapping the data of the Banner Image Block in to CPAppBannerImageBlock NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {

@@ -6,6 +6,7 @@
 
 @implementation CPNotificationCategoryController
 
+#pragma mark - Instance class of the Notification
 + (CPNotificationCategoryController *)sharedInstance {
     static CPNotificationCategoryController *sharedInstance = nil;
     static dispatch_once_t once;
@@ -15,6 +16,7 @@
     return sharedInstance;
 }
 
+#pragma mark - Store Notification Id's to the UserDefaults
 - (void)saveCategoryId:(NSString *)categoryId {
     NSMutableArray<NSString *> *mutableExisting = [self.existingRegisteredCategoryIds mutableCopy];
     
@@ -31,6 +33,7 @@
     [userDefaults synchronize];
 }
 
+#pragma mark - Check the existance of the notification's categories stores in to UserDefault or not
 - (NSArray<NSString *> *)existingRegisteredCategoryIds {
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
     if ([userDefaults objectForKey:@"CleverPush_NOTIFICATION_CATEGORIES"] != nil) {
@@ -39,24 +42,26 @@
     return [NSArray new];
 }
 
+#pragma mark - eliminate the existance of the notification's categories stores in to UserDefault or not
 - (void)pruneCategories:(NSMutableArray <NSString *> *)currentCategories {
     NSMutableSet<NSString *> *categoriesToRemove = [NSMutableSet new];
     
     for (int i = (int)currentCategories.count - MAX_CATEGORIES_SIZE; i >= 0; i--) {
         [categoriesToRemove addObject:currentCategories[i]];
     }
-    
-    NSMutableSet<UNNotificationCategory*>* existingCategories = self.existingCategories;
-    
-    NSMutableSet<UNNotificationCategory *> *newCategories = [NSMutableSet new];
-    
-    for (UNNotificationCategory *category in existingCategories)
-        if (![categoriesToRemove containsObject:category.identifier])
-            [newCategories addObject:category];
-    
-    [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:newCategories];
+    if (@available(iOS 10.0, *)) {
+        NSMutableSet<UNNotificationCategory*>* existingCategories = self.existingCategories;
+        
+        NSMutableSet<UNNotificationCategory *> *newCategories = [NSMutableSet new];
+        
+        for (UNNotificationCategory *category in existingCategories)
+            if (![categoriesToRemove containsObject:category.identifier])
+                [newCategories addObject:category];
+        [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:newCategories];
+    }
 }
 
+#pragma mark - Register notification category
 - (NSString *)registerNotificationCategoryForNotificationId:(NSString *)notificationId {
     NSString* categoryId = CATEGORY_FORMAT_STRING(notificationId ?: NSUUID.UUID.UUIDString);
     
@@ -65,6 +70,7 @@
     return categoryId;
 }
 
+#pragma mark - Get existing categories
 - (NSMutableSet<UNNotificationCategory*>*)existingCategories {
     __block NSMutableSet* allCategories;
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -80,22 +86,23 @@
     return allCategories;
 }
 
-- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(8.0)){
+#pragma mark - Carousel category
+- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(10.0)) {
     NSMutableArray* actionArray = [NSMutableArray new];
     
     UNNotificationAction* nextAction = [UNNotificationAction actionWithIdentifier:@"next"
-      title:@"▶▶"
-    options:UNNotificationActionOptionForeground];
+                                                                            title:@"▶▶"
+                                                                          options:UNNotificationActionOptionForeground];
     [actionArray addObject:nextAction];
     
     UNNotificationAction* previousAction = [UNNotificationAction actionWithIdentifier:@"previous"
-                                                      title:@"◀◀" options:UNNotificationActionOptionForeground];
+                                                                                title:@"◀◀" options:UNNotificationActionOptionForeground];
     [actionArray addObject:previousAction];
     
     UNNotificationCategory* category = [UNNotificationCategory categoryWithIdentifier:@"carousel"
-              actions:actionArray
-    intentIdentifiers:@[]
-              options:UNNotificationCategoryOptionCustomDismissAction];
+                                                                              actions:actionArray
+                                                                    intentIdentifiers:@[]
+                                                                              options:UNNotificationCategoryOptionCustomDismissAction];
     
     return category;
 }

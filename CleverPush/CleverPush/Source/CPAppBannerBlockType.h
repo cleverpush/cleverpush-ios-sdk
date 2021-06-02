@@ -6,4 +6,3 @@ typedef NS_ENUM(NSInteger, CPAppBannerBlockType) {
     CPAppBannerBlockTypeButton,
     CPAppBannerBlockTypeHTML
 };
-

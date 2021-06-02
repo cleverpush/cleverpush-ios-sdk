@@ -5,10 +5,12 @@
 
 @interface CPAppBannerImageBlock : CPAppBannerBlock
 
+#pragma mark - Class Variables
+@property (nonatomic, strong) CPAppBannerAction* action;
 @property (nonatomic, strong) NSString *imageUrl;
 @property (nonatomic) int scale;
-@property (nonatomic, strong) CPAppBannerAction* action;
 
+#pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;
 
 @end
