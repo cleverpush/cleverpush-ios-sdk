@@ -1,3 +1,6 @@
+# 1.9.0
+* Optimised & Refactored SDK code
+
 # 1.8.0
 * New App Banner block type: HTML
 * Support custom fonts in App Banner

@@ -29,5 +29,7 @@
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)initSession;
 + (void)triggerEvent:(NSString *)key value:(NSString *)value;
++ (void)disableBanners;
++ (void)enableBanners;
 
 @end

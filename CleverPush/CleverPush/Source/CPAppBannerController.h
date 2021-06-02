@@ -21,6 +21,7 @@
 #import "CleverPush.h"
 #import "CPWKWebKitView.h"
 #import "CPAppBannerHTMLBlock.h"
+#import "CPUtils.h"
 
 @interface CPAppBannerController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 

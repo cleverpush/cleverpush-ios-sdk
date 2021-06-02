@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
-#import "CPUtils.h"
 #import <UIKit/UIKit.h>
+#import "CPUtils.h"
+
 #pragma mark - Custom delegate of download
 @interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
     NSError* error;
@@ -204,18 +205,26 @@
     return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
 }
 
-+ (BOOL)isPortrait
++ (BOOL)fontFamilyExists:(NSString*)fontFamily
 {
-    UIWindow *firstWindow = [[[UIApplication sharedApplication] windows] firstObject];
-    if (firstWindow == nil) { return NO; }
-    
-    if (@available(iOS 13.0, *)) {
-        UIWindowScene *windowScene = firstWindow.windowScene;
-        if (windowScene == nil) { return NO; }
-        
-        return UIInterfaceOrientationIsPortrait(windowScene.interfaceOrientation);
-    } else {
-        return (UIInterfaceOrientationIsPortrait(UIApplication.sharedApplication.statusBarOrientation));
+    if (fontFamily == nil) {
+        return NO;
     }
+
+    UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
+    NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
+
+    return ([matches count] > 0);
 }
+
++ (BOOL)isEmpty:(id)thing
+{
+    return thing == nil
+    || [thing isKindOfClass:[NSNull class]]
+    || ([thing respondsToSelector:@selector(length)]
+        && [(NSData *)thing length] == 0)
+    || ([thing respondsToSelector:@selector(count)]
+        && [(NSArray *)thing count] == 0);
+}
+
 @end

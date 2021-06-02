@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.8.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.9.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -90,7 +90,6 @@ NSArray* appBanners;
 NSArray* channelTopics;
 
 NSMutableArray* pendingChannelConfigListeners;
-NSMutableArray* pendingAppBannersListeners;
 NSMutableArray* pendingSubscriptionListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 
@@ -109,7 +108,6 @@ CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
-NSMutableArray<CPAppBanner*> *pendingBanners;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
 
@@ -120,7 +118,7 @@ BOOL developmentMode = NO;
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
 BOOL hasTrackingConsentCalled = NO;
-BOOL handleSubscribedCalled = false;
+BOOL handleSubscribedCalled = NO;
 
 int sessionVisits;
 long sessionStartedTimestamp;
@@ -169,7 +167,7 @@ static id isNil(id object) {
     return val;
 }
 
-#pragma mark - methods to initialise CHANNEL
+#pragma mark - methods to initialize SDK
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId {
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
 }
@@ -233,7 +231,7 @@ static id isNil(id object) {
     return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
 }
 
-#pragma mark - Common function to initialise CHANNEL and sync data to NSUserDefaults
+#pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions
                   channelId:(NSString*)newChannelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
@@ -247,7 +245,6 @@ static id isNil(id object) {
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
     channelConfig = nil;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
-    pendingAppBannersListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
@@ -373,7 +370,7 @@ static id isNil(id object) {
         } else {
             if (handleSubscribed && !handleSubscribedCalled) {
                 handleSubscribed(subscriptionId);
-                handleSubscribedCalled = true;
+                handleSubscribedCalled = YES;
             }
             if (handleSubscribedInternal) {
                 handleSubscribedInternal(subscriptionId);
@@ -415,7 +412,7 @@ static id isNil(id object) {
     });
 }
 
-#pragma mark - Initialised Appreviews.
+#pragma mark - Initialised AppReviews.
 + (void)initAppReview {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -607,7 +604,6 @@ static id isNil(id object) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (result != nil) {
-                NSLog(@"%@", result);
                 channelConfig = result;
             }
             [self fireChannelConfigListeners];
@@ -637,10 +633,6 @@ static id isNil(id object) {
             [self fireChannelConfigListeners];
         }];
     }
-}
-
-+ (NSString*)getChannelId {
-    return channelId;
 }
 
 #pragma mark - getSubscriptionId.
@@ -871,7 +863,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    handleSubscribedCalled = false;
+    handleSubscribedCalled = NO;
     subscriptionId = nil;
     
     //   [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
@@ -1073,7 +1065,7 @@ static id isNil(id object) {
             
             if (handleSubscribed && !handleSubscribedCalled) {
                 handleSubscribed(subscriptionId);
-                handleSubscribedCalled = true;
+                handleSubscribedCalled = YES;
             }
             if (handleSubscribedInternal) {
                 handleSubscribedInternal(subscriptionId);
@@ -1184,7 +1176,7 @@ static id isNil(id object) {
     
     NSString* notificationId = [notification valueForKey:@"_id"];
     
-    if (isEmpty(notificationId) || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
+    if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
     lastNotificationReceivedId = notificationId;
@@ -1214,7 +1206,7 @@ static id isNil(id object) {
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
     
-    if (isEmpty(notificationId) || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
+    if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
     lastNotificationOpenedId = notificationId;
@@ -1444,7 +1436,7 @@ static id isNil(id object) {
     NSError* jsonError = nil;
     NSMutableDictionary* innerJson;
     
-    if (data != nil && !isEmpty(data)) {
+    if (data != nil && ![CPUtils isEmpty:data]) {
         innerJson = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&jsonError];
         if (jsonError) {
             if (failureBlock != nil)
@@ -1763,54 +1755,6 @@ static id isNil(id object) {
     }
     
     return notifications;
-}
-
-+ (void)getAppBanners:(void(^)(NSArray *))callback {
-    if (appBanners) {
-        callback(appBanners);
-        return;
-    }
-    
-    [pendingAppBannersListeners addObject:callback];
-    if (pendingAppBannersRequest) {
-        return;
-    }
-    pendingAppBannersRequest = YES;
-    
-    if (channelId != NULL) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:[NSString stringWithFormat:@"channel/%@/app-banners", channelId]];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
-            if (result != nil) {
-                appBanners = [result valueForKey:@"banners"];
-            }
-            [self fireAppBannersListeners];
-        } onFailure:^(NSError* error) {
-            NSLog(@"CleverPush Error: Failed getting the app banners %@", error);
-            [self fireAppBannersListeners];
-        }];
-    } else {
-        [self fireAppBannersListeners];
-    }
-}
-
-+ (void)fireAppBannersListeners {
-    pendingAppBannersRequest = NO;
-    
-    if (appBanners != nil) {
-        NSLog(@"CleverPush banners %@", appBanners);
-        pendingBanners = [NSMutableArray new];
-        for (NSDictionary* json in appBanners) {
-            [pendingBanners addObject:[[CPAppBanner alloc] initWithJson:json]];
-        }
-        
-        for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingAppBannersListeners) {
-            if (listener && pendingBanners) {
-                __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
-                callbackBlock(pendingBanners);
-            }
-        }
-    }
-    pendingAppBannersListeners = [NSMutableArray new];
 }
 
 + (void)trackEvent:(NSString*)eventName {
@@ -2211,14 +2155,11 @@ static id isNil(id object) {
                 }];
                 
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
-                    NSLog(@"%@", [topicsController getSelectedTopics]);
-                    
                     if (topicsController.topicsDialogShowUnsubscribe) {
                         if ([topicsController getDeselectValue] == YES) {
                             [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                             [self unsubscribe];
                         } else {
-                            NSLog(@"%@", [topicsController getSelectedTopics]);
                             [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                             [self subscribe];
                         }
@@ -2307,18 +2248,7 @@ static id isNil(id object) {
     return apiEndpoint;
 }
 
-+ (void)showAppBanners {
-    NSLog(@"CleverPush: showAppBanners does not have to be called, app banners are initialized automatically");
-}
-
-+ (void)showAppBanners:(void(^)(NSString *))urlOpenedCallback {
-    [CleverPush showAppBanners];
-}
-
-+ (void)reLayoutAppBanner {
-    NSLog(@"CleverPush: reLayoutAppBanner is deprecated");
-}
-
+#pragma mark - App Banner methods
 + (void)showAppBanner:(NSString *)bannerId {
     [self showAppBanner:bannerId notificationId:nil];
 }
@@ -2327,7 +2257,6 @@ static id isNil(id object) {
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
-
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value {
     [CPAppBannerModule triggerEvent:key value:value];
 }
@@ -2335,6 +2264,15 @@ static id isNil(id object) {
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
+
++ (void)disableAppBanners {
+    [CPAppBannerModule disableBanners];
+}
+
++ (void)enableAppBanners {
+    [CPAppBannerModule enableBanners];
+}
+
 
 #pragma mark - recieved notifications from the Extension.
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
@@ -2463,41 +2401,6 @@ static id isNil(id object) {
     }
     
     return singleInstance;
-}
-
-+ (BOOL)fontFamilyExits:(NSString*)fontFamily
-{
-    if (fontFamily == nil) {
-        return NO;
-    }
-
-    UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
-    NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
-
-    return ([matches count] > 0);
-}
-
-+ (void)disableAppBanners{
-    [self getAppBanners:^(NSArray* AppBanners_) {}];
-}
-
-+ (void)enableAppBanners{
-    if (pendingBanners) {
-        if ([pendingBanners count] > 0) {
-            for (CPAppBanner* bannerPending in pendingBanners) {
-                [self showAppBanner:bannerPending.id];
-            }
-        }
-    }
-}
-
-static inline BOOL isEmpty(id thing) {
-    return thing == nil
-    || [thing isKindOfClass:[NSNull class]]
-    || ([thing respondsToSelector:@selector(length)]
-        && [(NSData *)thing length] == 0)
-    || ([thing respondsToSelector:@selector(count)]
-        && [(NSArray *)thing count] == 0);
 }
 
 @end

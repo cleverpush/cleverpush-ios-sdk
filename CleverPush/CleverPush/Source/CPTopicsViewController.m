@@ -105,7 +105,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated{
-    [self ManageHeightLayout];
+    [self manageHeightLayout];
 }
 
 #pragma mark - Deselect Everything while switching off the switch
@@ -120,7 +120,7 @@
         hasTopics = NO;
         [self updateDeselectFlag:YES];
         [tableView reloadData];
-        [self ManageHeightLayout];
+        [self manageHeightLayout];
     } else {
         if ([self getSelectedTopics].count == 0) {
             [self updateDeselectFlag:NO];
@@ -151,7 +151,7 @@
 }
 
 #pragma mark - manage height of the DWAlertView
-- (void)ManageHeightLayout{
+- (void)manageHeightLayout{
     id<ManageHeight> strongDelegate = self.delegate;
     [strongDelegate rearrangeHeight];
 }
@@ -177,7 +177,6 @@
                         if (contains) {
                             NSString* topiconeId = [topicone id];
                             
-                            NSLog(@"%@", [topicone name]);
                             [selectedTopics removeObject:topiconeId];
                             topicone.defaultUnchecked = YES;
                         }
@@ -194,7 +193,6 @@
                         if (contains) {
                             NSString* topiconeId = [topicone id];
                             
-                            NSLog(@"%@", [topicone name]);
                             [selectedTopics removeObject:topiconeId];
                             topicone.defaultUnchecked = YES;
                         }
@@ -211,7 +209,6 @@
                         if (contains) {
                             NSString* topiconeId = [topicone id];
                             
-                            NSLog(@"%@", [topicone name]);
                             [selectedTopics removeObject:topiconeId];
                             topicone.defaultUnchecked = YES;
                         }
@@ -229,8 +226,7 @@
             }
         }
         [tableView reloadData];
-        [self ManageHeightLayout];
-        
+        [self manageHeightLayout];
     }
 }
 

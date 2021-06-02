@@ -64,7 +64,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         NSLayoutConstraint *bottomY = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1 constant: -50];
         NSLayoutConstraint *viewHeight = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
         
-        
         [self.view addConstraint:viewHeight];
         [self.view addConstraint:viewWidth];
         [self.view addConstraint:viewCenterX];
@@ -75,8 +74,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
             [self.view addConstraint:viewCenterY];
         } else if (self.data.type == CPAppBannerTypeBottom) {
             [self.view addConstraint:bottomY];
-        }
-        else {
+        } else {
             [self.view addConstraint:viewCenterY];
         }
 
@@ -253,7 +251,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [button setTitle:block.text forState:UIControlStateNormal];
     [button setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
     
-    if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
+    if (block.family && [block.family length] > 0 && [CPUtils fontFamilyExists:block.family]) {
         [button.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
     } else {
         [button.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
@@ -299,7 +297,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     label.numberOfLines = 0;
     label.textColor = [UIColor colorWithHexString:block.color];
     
-    if (block.family && [block.family length] > 0 && [CleverPush fontFamilyExits:block.family]) {
+    if (block.family && [block.family length] > 0 && [CPUtils fontFamilyExists:block.family]) {
         [label setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
     } else {
         [label setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
@@ -448,7 +446,6 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         }];
     }];
 }
-
 
 #pragma mark - Managed Layout constraints
 - (void)activateItemConstrants:(UIView*)view prevView:(UIView*)prevView parentConstraint:(ParentConstraint )parentConstraint {

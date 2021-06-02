@@ -10,12 +10,14 @@
 NSString *ShownAppBannersDefaultsKey = @"CleverPush_SHOWN_APP_BANNERS";
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
+NSMutableArray<CPAppBanner*> *pendingBanners;
 NSMutableArray* pendingBannerListeners;
 NSMutableDictionary *events;
 CPAppBannerActionBlock handleBannerOpened;
 
 BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
+BOOL bannersDisabled = NO;
 
 long MIN_SESSION_LENGTH = 30 * 60 * 1000L;
 long lastSessionTimestamp;
@@ -109,11 +111,6 @@ dispatch_queue_t dispatchQueue = nil;
     }
     
     if ([activeBanners count] > 0) {
-        /*
-         for (CPAppBanner* banner : activeBanners) {
-         popup.dismiss();
-         }
-         */
         activeBanners = [NSMutableArray new];
     }
     
@@ -146,7 +143,6 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 + (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    NSLog(@"CleverPush: getBanners");
     [CPAppBannerModule getBanners:channelId completion:callback notificationId:nil];
 }
 
@@ -168,15 +164,10 @@ dispatch_queue_t dispatchQueue = nil;
         bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
     }
     
-    NSLog(@"CleverPush: loading banners: %@", bannersPath);
-    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSArray *jsonBanners = [result objectForKey:@"banners"];
         if (jsonBanners != nil) {
-            NSLog(@"CleverPush banners %@", result);
-            NSLog(@"CleverPush JSON banners %@", jsonBanners);
-            
             banners = [NSMutableArray new];
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
@@ -266,6 +257,14 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - manage the schedule to display the banner at a specific time
 + (void)scheduleBanners {
+    if (bannersDisabled) {
+        for (CPAppBanner* banner in activeBanners) {
+            [pendingBanners addObject:banner];
+        }
+        [activeBanners removeObjectsInArray:pendingBanners];
+        return;
+    }
+    
     for (CPAppBanner* banner in activeBanners) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
@@ -289,71 +288,42 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        
+        CPAppBannerController* bannerController;
+
         if ([banner.contentType isEqualToString:@"block"]) {
-            CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
-            
-            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-                [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
-                
-                if (handleBannerOpened && action) {
-                    handleBannerOpened(action);
-                }
-                
-                if (action && [action.type isEqualToString:@"subscribe"]) {
-                    [CleverPush subscribe];
-                }
-            };
-            [bannerController setActionCallback:callbackBlock];
-            
-            UIViewController* topController = [CPAppBannerController topViewController];
-            [topController presentViewController:bannerController animated:NO completion:nil];
-            
-            if (banner.frequency == CPAppBannerFrequencyOnce) {
-                [CPAppBannerModule setBannerIsShown:banner.id];
-            }
-            
-            if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
-                    [bannerController onDismiss];
-                });
-            }
-            
-            [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
+            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         } else {
-            CPAppBannerController* bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
-            
-            __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-                [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
-                
-                if (handleBannerOpened && action) {
-                    handleBannerOpened(action);
-                }
-                
-                if (action && [action.type isEqualToString:@"subscribe"]) {
-                    [CleverPush subscribe];
-                }
-            };
-            [bannerController setActionCallback:callbackBlock];
-            
-            UIViewController* topController = [CPAppBannerController topViewController];
-            [topController presentViewController:bannerController animated:NO completion:nil];
-            
-            if (banner.frequency == CPAppBannerFrequencyOnce) {
-                [CPAppBannerModule setBannerIsShown:banner.id];
-            }
-            
-            if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
-                    [bannerController onDismiss];
-                });
-            }
-            [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
+            bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
         }
+
+        __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
+            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
+            
+            if (handleBannerOpened && action) {
+                handleBannerOpened(action);
+            }
+            
+            if (action && [action.type isEqualToString:@"subscribe"]) {
+                [CleverPush subscribe];
+            }
+        };
+        [bannerController setActionCallback:callbackBlock];
+        
+        UIViewController* topController = [CPAppBannerController topViewController];
+        [topController presentViewController:bannerController animated:NO completion:nil];
+        
+        if (banner.frequency == CPAppBannerFrequencyOnce) {
+            [CPAppBannerModule setBannerIsShown:banner.id];
+        }
+        
+        if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
+                [bannerController onDismiss];
+            });
+        }
+        [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
     });
 }
-
-
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
@@ -375,6 +345,22 @@ dispatch_queue_t dispatchQueue = nil;
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
+}
+
+#pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)
+
++ (void)disableBanners {
+    bannersDisabled = YES;
+    pendingBanners = [[NSMutableArray alloc] init];
+}
+
++ (void)enableBanners {
+    bannersDisabled = NO;
+    if (pendingBanners && [pendingBanners count] > 0) {
+        [activeBanners addObjectsFromArray:pendingBanners];
+        pendingBanners = nil;
+        [CPAppBannerModule scheduleBanners];
+    }
 }
 
 @end

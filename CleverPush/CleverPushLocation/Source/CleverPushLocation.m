@@ -52,7 +52,7 @@ CLLocationManager* locationManager;
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/geo-fence"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [CleverPush getChannelId], @"channelId",
+                                 [CleverPush channelId], @"channelId",
                                  geoFenceId, @"geoFenceId",
                                  state, @"state",
                                  [CleverPush getSubscriptionId], @"subscriptionId",
