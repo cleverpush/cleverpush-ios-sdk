@@ -121,6 +121,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (UIViewController*)topViewController;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
 + (NSArray*)getAvailableTopics __attribute__((deprecated));

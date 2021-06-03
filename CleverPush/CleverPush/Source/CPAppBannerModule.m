@@ -290,10 +290,10 @@ dispatch_queue_t dispatchQueue = nil;
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         CPAppBannerController* bannerController;
 
-        if ([banner.contentType isEqualToString:@"block"]) {
-            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
-        } else {
+        if ([banner.contentType isEqualToString:@"html"]) {
             bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
+        } else {
+            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         }
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
@@ -309,7 +309,7 @@ dispatch_queue_t dispatchQueue = nil;
         };
         [bannerController setActionCallback:callbackBlock];
         
-        UIViewController* topController = [CPAppBannerController topViewController];
+        UIViewController* topController = [CleverPush topViewController];
         [topController presentViewController:bannerController animated:NO completion:nil];
         
         if (banner.frequency == CPAppBannerFrequencyOnce) {

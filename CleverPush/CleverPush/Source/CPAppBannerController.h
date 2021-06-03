@@ -40,6 +40,5 @@
 - (id)initWithHTMLBanner:(CPAppBanner*)banner;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)onDismiss;
-+ (UIViewController*)topViewController;
 
 @end

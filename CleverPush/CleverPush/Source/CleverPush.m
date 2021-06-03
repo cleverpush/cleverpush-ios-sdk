@@ -308,8 +308,7 @@ static id isNil(id object) {
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
 + (UIViewController*)topViewController {
-    UIWindow * currentwindow = [[UIApplication sharedApplication] delegate].window;
-    return [self topViewControllerWithRootViewController:currentwindow.rootViewController];
+  return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
 
 + (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
@@ -1462,6 +1461,7 @@ static id isNil(id object) {
             failureBlock([NSError errorWithDomain:@"CleverPushError" code:statusCode userInfo:nil]);
     }
 }
+
 + (void)addSubscriptionTag:(NSString*)tagId {
     NSLog(@"CleverPush: addSubscriptionTag: %@", tagId);
     
@@ -2157,7 +2157,6 @@ static id isNil(id object) {
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
                     if (topicsController.topicsDialogShowUnsubscribe) {
                         if ([topicsController getDeselectValue] == YES) {
-                            [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                             [self unsubscribe];
                         } else {
                             [self setSubscriptionTopics:[topicsController getSelectedTopics]];

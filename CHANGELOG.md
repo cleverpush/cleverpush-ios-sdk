@@ -1,5 +1,8 @@
 # 1.9.0
 * Optimised & Refactored SDK code
+* Improved App Banner Positions (Top, Center, Bottom)
+* Improved "Uncheck all topics" behaviour
+* Added methods for enabling an disabling App Banners
 
 # 1.8.0
 * New App Banner block type: HTML

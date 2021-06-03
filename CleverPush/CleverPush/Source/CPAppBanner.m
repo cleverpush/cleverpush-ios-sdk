@@ -43,11 +43,9 @@
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson objectForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
-                }
-                else if ([[blockJson objectForKey:@"type"] isEqual:@"html"]) {
+                } else if ([[blockJson objectForKey:@"type"] isEqual:@"html"]) {
                     block = [[CPAppBannerHTMLBlock alloc] initWithJson:blockJson];
-                }
-                else {
+                } else {
                     continue;
                 }
                 
