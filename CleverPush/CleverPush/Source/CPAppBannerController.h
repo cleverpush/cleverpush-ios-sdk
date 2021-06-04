@@ -34,6 +34,7 @@
 @property (nonatomic, strong) IBOutlet WKWebView *webBanner;
 @property (nonatomic, strong) IBOutlet WKWebView *webBlock;
 @property (nonatomic, strong) IBOutlet UIView *htmlBannerBody;
+@property (nonatomic, strong) IBOutlet UIImageView *backGroundImage;
 
 #pragma mark - Class Methods
 - (id)initWithBanner:(CPAppBanner*)banner;

@@ -34,15 +34,31 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         [self.bannerBody setTranslatesAutoresizingMaskIntoConstraints:NO];
         [self.bannerBody setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
         [self.view addSubview:self.bannerBody];
+        
+        self.backGroundImage = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 373, 400)];
+        [self.backGroundImage setContentMode:UIViewContentModeScaleToFill];
+        [self.backGroundImage setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+        [self.backGroundImage setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [self.backGroundImage setTranslatesAutoresizingMaskIntoConstraints:NO];
 
         self.bannerBodyContent = [[UIView alloc] initWithFrame:CGRectMake(15, 15, 343, 370)];
         [self.bannerBodyContent setContentMode:UIViewContentModeScaleToFill];
         [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
         [self.bannerBodyContent setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         [self.bannerBodyContent setTranslatesAutoresizingMaskIntoConstraints:NO];
-        [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-        [self.bannerBody addSubview:self.bannerBodyContent];
 
+        if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
+            [self.bannerBody addSubview:self.backGroundImage];
+            NSLayoutConstraint *backGroundHeight = [NSLayoutConstraint constraintWithItem:self.backGroundImage attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
+            NSLayoutConstraint *backGroundWidth = [NSLayoutConstraint constraintWithItem:self.backGroundImage attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0];
+            [self.bannerBody addConstraint:backGroundHeight];
+            [self.bannerBody addConstraint:backGroundWidth];
+            [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+        } else {
+            [self.bannerBodyContent setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        }
+        [self.bannerBody addSubview:self.bannerBodyContent];
+        
         NSLayoutConstraint *bannerBodyTop = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.bannerBody attribute:NSLayoutAttributeTop multiplier:1 constant:15];
         NSLayoutConstraint *bannerBodyBottom = [NSLayoutConstraint constraintWithItem:self.bannerBody attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeBottom multiplier:1 constant:15];
         NSLayoutConstraint *bannerBodyX  = [NSLayoutConstraint constraintWithItem:self.bannerBodyContent attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationLessThanOrEqual toItem:self.bannerBody attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
