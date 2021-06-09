@@ -13,14 +13,31 @@
 
 #pragma mark - Parse json and set the data to the object variables
 - (void)parseJson:(NSDictionary*)json {
-    _id = [json objectForKey:@"_id"];
-    _title = [json objectForKey:@"title"];
-    _text = [json objectForKey:@"text"];
-    _tag = [json objectForKey:@"tag"];
-    _url = [json objectForKey:@"url"];
-    _iconUrl = [json objectForKey:@"iconUrl"];
-    _mediaUrl = [json objectForKey:@"mediaUrl"];
-    _soundFilename = [json objectForKey:@"soundFilename"];
+    
+    if ([json objectForKey:@"_id"] != nil && ![[json objectForKey:@"_id"] isKindOfClass:[NSNull class]]) {
+        self.id = [json objectForKey:@"_id"];
+    }
+    if ([json objectForKey:@"title"] != nil && ![[json objectForKey:@"title"] isKindOfClass:[NSNull class]]) {
+        self.title = [json objectForKey:@"title"];
+    }
+    if ([json objectForKey:@"text"] != nil && ![[json objectForKey:@"text"] isKindOfClass:[NSNull class]]) {
+        self.text = [json objectForKey:@"text"];
+    }
+    if ([json objectForKey:@"tag"] != nil && ![[json objectForKey:@"tag"] isKindOfClass:[NSNull class]]) {
+        self.tag = [json objectForKey:@"tag"];
+    }
+    if ([json objectForKey:@"url"] != nil && ![[json objectForKey:@"url"] isKindOfClass:[NSNull class]]) {
+        self.url = [json objectForKey:@"url"];
+    }
+    if ([json objectForKey:@"iconUrl"] != nil && ![[json objectForKey:@"iconUrl"] isKindOfClass:[NSNull class]]) {
+        self.iconUrl = [json objectForKey:@"iconUrl"];
+    }
+    if ([json objectForKey:@"mediaUrl"] != nil && ![[json objectForKey:@"mediaUrl"] isKindOfClass:[NSNull class]]) {
+        self.mediaUrl = [json objectForKey:@"mediaUrl"];
+    }
+    if ([json objectForKey:@"soundFilename"] != nil && ![[json objectForKey:@"soundFilename"] isKindOfClass:[NSNull class]]) {
+        self.soundFilename = [json objectForKey:@"soundFilename"];
+    }
     
     NSArray* actions = [json objectForKey:@"actions"];
     if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {
@@ -46,7 +63,7 @@
             
             [actionArray addObject:action];
         }];
-        _actions = actionArray;
+        self.actions = actionArray;
     }
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
@@ -54,29 +71,23 @@
     [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
     
     if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
-        _createdAt = [formatter dateFromString:[json objectForKey:@"createdAt"]];
+        self.createdAt = [formatter dateFromString:[json objectForKey:@"createdAt"]];
     }
     if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]]) {
-        _expiresAt = [formatter dateFromString:[json objectForKey:@"expiresAt"]];
+        self.expiresAt = [formatter dateFromString:[json objectForKey:@"expiresAt"]];
     }
     
-    _silent = NO;
-    if ([json objectForKey:@"silent"] && [json valueForKey:@"silent"] != nil && ![[json valueForKey:@"silent"] isKindOfClass:[NSNull class]]) {
-        _silent = [[json objectForKey:@"silent"] boolValue];
-    }
-    
-    _chatNotification = NO;
+    self.chatNotification = NO;
     if ([json objectForKey:@"chatNotification"] && [json valueForKey:@"chatNotification"] != nil && ![[json valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]]) {
-        _chatNotification = [[json objectForKey:@"chatNotification"] boolValue];
+        self.chatNotification = [[json objectForKey:@"chatNotification"] boolValue];
     }
     
-    _carouselEnabled = NO;
+    self.carouselEnabled = NO;
     if ([json objectForKey:@"carouselEnabled"] && [json valueForKey:@"carouselEnabled"] != nil && ![[json valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]]) {
-        _carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
+        self.carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
     }
-    _carouselItems = [json objectForKey:@"carouselItems"];
-    
-    _customData = [json objectForKey:@"customData"];
+    self.carouselItems = [json objectForKey:@"carouselItems"];
+    self.customData = [json objectForKey:@"customData"];
 }
 
 @end
