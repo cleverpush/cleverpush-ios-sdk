@@ -1204,47 +1204,41 @@ static id isNil(id object) {
     
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
-    
+    NSString* action = actionIdentifier;
+    lastNotificationOpenedId = notificationId;
+    if (@available(iOS 10.0, *)) {
+        [self updateBadge:nil];
+    }
     if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
-    lastNotificationOpenedId = notificationId;
-    
-    NSString* action = actionIdentifier;
-    
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
     }
-    NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
-    
-    [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
-
-    
     if (autoClearBadge) {
         [self clearBadge:true];
     }
-    
-    [self updateBadge:nil];
-    
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
-        
         if (currentChatView != nil) {
             [currentChatView loadChat];
         }
     }
-    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification valueForKey:@"appBanner"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"appBanner"] boolValue]) {
+    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
         [self showAppBanner:[notification valueForKey:@"appBanner"] notificationId:notificationId];
     }
+    NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
+    
+    [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
-
+    
     if (!channelId) { // not init
         pendingOpenedResult = result;
     }
     if (!handleNotificationOpened) {
         return;
     }
-        
+
     handleNotificationOpened(result);
 }
 
