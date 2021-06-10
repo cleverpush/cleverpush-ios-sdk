@@ -1,3 +1,6 @@
+# 1.9.1
+* Optimised App Banners
+
 # 1.9.0
 * Optimised & Refactored SDK code
 * Improved App Banner Positions (Top, Center, Bottom)

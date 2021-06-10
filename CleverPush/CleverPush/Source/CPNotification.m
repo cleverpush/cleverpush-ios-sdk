@@ -38,6 +38,9 @@
     if ([json objectForKey:@"soundFilename"] != nil && ![[json objectForKey:@"soundFilename"] isKindOfClass:[NSNull class]]) {
         self.soundFilename = [json objectForKey:@"soundFilename"];
     }
+    if ([json objectForKey:@"appBanner"] != nil && ![[json objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
+        self.appBanner = [json objectForKey:@"appBanner"];
+    }
     
     NSArray* actions = [json objectForKey:@"actions"];
     if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {

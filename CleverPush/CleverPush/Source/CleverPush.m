@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.9.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.9.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1204,13 +1204,12 @@ static id isNil(id object) {
     
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
+    NSString* action = actionIdentifier;
     
     if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
     lastNotificationOpenedId = notificationId;
-    
-    NSString* action = actionIdentifier;
     
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
@@ -1232,7 +1231,7 @@ static id isNil(id object) {
             [currentChatView loadChat];
         }
     }
-    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification valueForKey:@"appBanner"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"appBanner"] boolValue]) {
+    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
         [self showAppBanner:[notification valueForKey:@"appBanner"] notificationId:notificationId];
     }
     
