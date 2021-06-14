@@ -58,7 +58,7 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - Show banners by channel-id and banner-id
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
     [CPAppBannerModule loadBannersDisabled];
-    [CPAppBannerModule getBanners:channelId completion:^(NSMutableArray<CPAppBanner *> *banners) {
+    [CPAppBannerModule getBanners:channelId bannerId:bannerId notificationId:notificationId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
                 if (bannersDisabled) {
@@ -70,9 +70,8 @@ dispatch_queue_t dispatchQueue = nil;
                 break;
             }
         }
-    } notificationId:notificationId];
+    }];
 }
-
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
 + (void)startup {
@@ -150,11 +149,11 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 + (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [CPAppBannerModule getBanners:channelId completion:callback notificationId:nil];
+    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil completion:callback];
 }
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
-+ (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback notificationId:(NSString*)notificationId {
++ (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
     [pendingBannerListeners addObject:callback];
     if (pendingBannerRequest) {
         return;
@@ -179,14 +178,22 @@ dispatch_queue_t dispatchQueue = nil;
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
             }
-            
-            pendingBannerRequest = NO;
-            for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingBannerListeners) {
-                if (listener && banners) {
-                    __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
-                    callbackBlock(banners);
+            if (notificationId != nil) {
+                for (CPAppBanner* banner in banners) {
+                    if ([banner.id isEqualToString:bannerId]) {
+                        [CPAppBannerModule showBanner:banner];
+                        break;
+                    }
+                }
+            } else {
+                for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingBannerListeners) {
+                    if (listener && banners) {
+                        __weak void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
+                        callbackBlock(banners);
+                    }
                 }
             }
+            pendingBannerRequest = NO;
             pendingBannerListeners = [NSMutableArray new];
         }
     } onFailure:^(NSError* error) {
@@ -296,13 +303,13 @@ dispatch_queue_t dispatchQueue = nil;
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         CPAppBannerController* bannerController;
-
+        
         if ([banner.contentType isEqualToString:@"html"]) {
             bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
         } else {
             bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
         }
-
+        
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
             
