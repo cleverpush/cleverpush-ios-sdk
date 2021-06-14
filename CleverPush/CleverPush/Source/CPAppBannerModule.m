@@ -57,9 +57,15 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Show banners by channel-id and banner-id
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
+    [CPAppBannerModule loadBannersDisabled];
     [CPAppBannerModule getBanners:channelId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
+                if (bannersDisabled) {
+                    [pendingBanners addObject:banner];
+                    break;
+                }
+                
                 [CPAppBannerModule showBanner:banner];
                 break;
             }
@@ -70,6 +76,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
 + (void)startup {
+    [CPAppBannerModule loadBannersDisabled];
     [CPAppBannerModule createBanners:banners];
     [CPAppBannerModule scheduleBanners];
     
@@ -349,13 +356,26 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)
 
++ (void)loadBannersDisabled {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    bannersDisabled = [userDefaults boolForKey:@"CleverPush_APP_BANNERS_DISABLED"];
+}
+
++ (void)saveBannersDisabled {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setBool:bannersDisabled forKey:@"CleverPush_APP_BANNERS_DISABLED"];
+    [userDefaults synchronize];
+}
+
 + (void)disableBanners {
     bannersDisabled = YES;
+    [CPAppBannerModule saveBannersDisabled];
     pendingBanners = [[NSMutableArray alloc] init];
 }
 
 + (void)enableBanners {
     bannersDisabled = NO;
+    [CPAppBannerModule saveBannersDisabled];
     if (pendingBanners && [pendingBanners count] > 0) {
         [activeBanners addObjectsFromArray:pendingBanners];
         pendingBanners = nil;

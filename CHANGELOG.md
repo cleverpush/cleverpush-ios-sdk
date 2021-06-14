@@ -1,3 +1,6 @@
+# 1.9.2
+* Optimised App Banners
+
 # 1.9.1
 * Optimised App Banners
 
