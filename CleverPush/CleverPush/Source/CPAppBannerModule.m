@@ -15,6 +15,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableDictionary *events;
 CPAppBannerActionBlock handleBannerOpened;
 
+BOOL initialized = NO;
 BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
 BOOL bannersDisabled = NO;
@@ -57,7 +58,6 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Show banners by channel-id and banner-id
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule loadBannersDisabled];
     [CPAppBannerModule getBanners:channelId bannerId:bannerId notificationId:notificationId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
@@ -65,7 +65,6 @@ dispatch_queue_t dispatchQueue = nil;
                     [pendingBanners addObject:banner];
                     break;
                 }
-                
                 [CPAppBannerModule showBanner:banner];
                 break;
             }
@@ -75,10 +74,8 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
 + (void)startup {
-    [CPAppBannerModule loadBannersDisabled];
     [CPAppBannerModule createBanners:banners];
     [CPAppBannerModule scheduleBanners];
-    
 }
 
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
@@ -130,21 +127,30 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 #pragma mark - Initialised a banner with channel
-+ (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam {
-    pendingBannerListeners = [[NSMutableArray alloc] init];
-    activeBanners = [NSMutableArray new];
-    dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
++ (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification {
+    if (initialized) {
+        return;
+    }
     
+    dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
+    pendingBannerListeners = [NSMutableArray new];
+    activeBanners = [NSMutableArray new];
+    pendingBanners = [NSMutableArray new];
     events = [NSMutableDictionary new];
+    [CPAppBannerModule loadBannersDisabled];
     
     showDrafts = showDraftsParam;
     sessions = [CPAppBannerModule getSessions];
     
-    dispatch_sync(dispatchQueue, ^{
-        [CPAppBannerModule getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
-            [CPAppBannerModule startup];
-        }];
-    });
+    initialized = YES;
+    
+    if (!fromNotification) {
+        dispatch_sync(dispatchQueue, ^{
+            [CPAppBannerModule getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
+                [CPAppBannerModule startup];
+            }];
+        });
+    }
 }
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
@@ -154,11 +160,13 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 + (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [pendingBannerListeners addObject:callback];
-    if (pendingBannerRequest) {
-        return;
+    if (notificationId == nil) {
+        [pendingBannerListeners addObject:callback];
+        if (pendingBannerRequest) {
+            return;
+        }
+        pendingBannerRequest = YES;
     }
-    pendingBannerRequest = YES;
     
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
     
@@ -178,21 +186,18 @@ dispatch_queue_t dispatchQueue = nil;
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
             }
-            if (notificationId != nil) {
-                for (CPAppBanner* banner in banners) {
-                    if ([banner.id isEqualToString:bannerId]) {
-                        [CPAppBannerModule showBanner:banner];
-                        break;
-                    }
-                }
+            
+            if (notificationId && callback) {
+                callback(banners);
             } else {
                 for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingBannerListeners) {
                     if (listener && banners) {
-                        __weak void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
+                        __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
                         callbackBlock(banners);
                     }
                 }
             }
+            
             pendingBannerRequest = NO;
             pendingBannerListeners = [NSMutableArray new];
         }
@@ -377,7 +382,6 @@ dispatch_queue_t dispatchQueue = nil;
 + (void)disableBanners {
     bannersDisabled = YES;
     [CPAppBannerModule saveBannersDisabled];
-    pendingBanners = [[NSMutableArray alloc] init];
 }
 
 + (void)enableBanners {
@@ -385,7 +389,8 @@ dispatch_queue_t dispatchQueue = nil;
     [CPAppBannerModule saveBannersDisabled];
     if (pendingBanners && [pendingBanners count] > 0) {
         [activeBanners addObjectsFromArray:pendingBanners];
-        pendingBanners = nil;
+        pendingBanners = [[NSMutableArray alloc] init];
+        
         [CPAppBannerModule scheduleBanners];
     }
 }

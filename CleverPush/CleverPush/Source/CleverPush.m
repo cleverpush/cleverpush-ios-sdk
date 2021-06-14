@@ -406,7 +406,7 @@ static id isNil(id object) {
         [self showPendingTopicsDialog];
         [self initAppReview];
         
-        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode];
+        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:NO];
         [CPAppBannerModule initSession];
     });
 }
@@ -1232,7 +1232,7 @@ static id isNil(id object) {
         }
     }
     if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
-        [self showAppBanner:[notification valueForKey:@"appBanner"] notificationId:notificationId];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload valueForKeyPath:@"channel._id"] notificationId:notificationId];
     }
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
@@ -2252,6 +2252,12 @@ static id isNil(id object) {
 }
 
 + (void)showAppBanner:(NSString *)bannerId notificationId:(NSString*)notificationId {
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
+}
+
++ (void)showAppBanner:(NSString *)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
+    BOOL fromNotification = notificationId != nil;
+    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:fromNotification];
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
