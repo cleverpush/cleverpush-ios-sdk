@@ -1,3 +1,6 @@
+# 1.9.3
+* Added ability to specify `normalTintColor` which is being used by Topics Dialog Alert
+
 # 1.9.2
 * Optimised App Banners
 

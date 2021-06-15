@@ -103,6 +103,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setTopicsDialogWindow:(UIWindow *)window;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;
 + (void)setBrandingColor:(UIColor *)color;
++ (void)setNormalTintColor:(UIColor *)color;
 + (void)setChatBackgroundColor:(UIColor *)color;
 + (void)setAutoClearBadge:(BOOL)autoClear;
 + (void)setIncrementBadge:(BOOL)increment;

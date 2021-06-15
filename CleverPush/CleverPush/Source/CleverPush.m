@@ -97,6 +97,7 @@ NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
 WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
+UIColor* normalTintColor = nil;
 UIColor* chatBackgroundColor;
 UIWindow* topicsDialogWindow;
 
@@ -2146,6 +2147,9 @@ static id isNil(id object) {
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
                 topicsController.delegate = channelTopicsPicker;
+                if (normalTintColor != nil) {
+                    channelTopicsPicker.normalTintColor = normalTintColor;
+                }
                 
                 [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                     if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
@@ -2209,6 +2213,10 @@ static id isNil(id object) {
 #pragma mark - variable updates and call backs
 + (void)setBrandingColor:(UIColor *)color {
     brandingColor = color;
+}
+
++ (void)setNormalTintColor:(UIColor *)color {
+    normalTintColor = color;
 }
 
 + (void)setTopicsDialogWindow:(UIWindow *)window {
