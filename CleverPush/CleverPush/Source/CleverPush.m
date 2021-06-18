@@ -102,6 +102,7 @@ UIColor* chatBackgroundColor;
 UIWindow* topicsDialogWindow;
 
 CPChatView* currentChatView;
+CPStoryView* currentStoryView;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
 CPFailureBlock cpTokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
@@ -1753,8 +1754,17 @@ static id isNil(id object) {
     if (!notifications) {
         return [[NSArray alloc] init];
     }
-    
     return notifications;
+}
+
+#pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
++ (NSArray*)getSeenStories {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* seenStories = [userDefaults arrayForKey:@"CleverPush_SEEN_STORIES"];
+    if (!seenStories) {
+        return [[NSArray alloc] init];
+    }
+    return seenStories;
 }
 
 + (void)trackEvent:(NSString*)eventName {
@@ -2237,6 +2247,13 @@ static id isNil(id object) {
 
 + (UIColor*)getChatBackgroundColor {
     return chatBackgroundColor;
+}
+
++ (void)addStoryView:(CPStoryView*)storyView {
+    if (currentStoryView != nil) {
+        [currentStoryView removeFromSuperview];
+    }
+    currentStoryView = storyView;
 }
 
 + (void)addChatView:(CPChatView*)chatView {
