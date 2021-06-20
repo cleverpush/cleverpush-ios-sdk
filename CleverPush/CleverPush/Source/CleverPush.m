@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.9.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.10.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1555,6 +1555,94 @@ static id isNil(id object) {
             } onFailure:nil];
         });
     }];
+}
+
+#pragma mark - Push subscription array attribute value.
++ (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
+    [self waitForTrackingConsent:^{
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/attribute/push-value"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     value, @"value",
+                                     [self getSubscriptionId], @"subscriptionId",
+                                     nil];
+            
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+                if (!subscriptionAttributes) {
+                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                }
+                
+                NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                if (!arrayValue) {
+                    arrayValue = [NSMutableArray new];
+                } else {
+                    arrayValue = [arrayValue mutableCopy];
+                }
+                [arrayValue addObject:value];
+                
+                [subscriptionAttributes setValue:arrayValue forKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+                [userDefaults synchronize];
+            } onFailure:nil];
+        });
+    }];
+}
+
+#pragma mark - Pull subscription array attribute value.
++ (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
+    [self waitForTrackingConsent:^{
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/attribute/pull-value"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     value, @"value",
+                                     [self getSubscriptionId], @"subscriptionId",
+                                     nil];
+            
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+                if (!subscriptionAttributes) {
+                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                }
+                
+                NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                if (!arrayValue) {
+                    arrayValue = [NSMutableArray new];
+                } else {
+                    arrayValue = [arrayValue mutableCopy];
+                }
+                [arrayValue removeObject:value];
+                
+                [subscriptionAttributes setValue:arrayValue forKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+                [userDefaults synchronize];
+            } onFailure:nil];
+        });
+    }];
+}
+
+#pragma mark - Check if subscription array attribute has a value.
++ (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+    if (!subscriptionAttributes) {
+        return NO;
+    }
+    NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+    if (!arrayValue) {
+        return NO;
+    }
+    return [arrayValue containsObject:value];
 }
 
 #pragma mark - Retrieving all the available tags from the channelConfig
