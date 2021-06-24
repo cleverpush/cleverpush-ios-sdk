@@ -48,15 +48,26 @@
     [indicator startAnimating];
     
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+    WKUserContentController* userController = [[WKUserContentController alloc]init];
+    [userController addScriptMessageHandler:self name:@"previous"];
+    [userController addScriptMessageHandler:self name:@"next"];
+    configuration.userContentController = userController;
+
     CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
     webview.allowsBackForwardNavigationGestures = false;
     webview.contentMode = UIViewContentModeScaleToFill;
+    webview.scrollView.backgroundColor = UIColor.blackColor;
+    
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
-    NSURL *url = [NSURL URLWithString:customURL];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    [webview loadRequest:request withCompletionHandler:^(WKWebView *webView, NSError *error) {
+    
+    CGFloat frameHeight;
+    frameHeight = [CPUtils frameHeightWithoutSafeArea];
+    
+    NSString *content = [NSString stringWithFormat:@"<!DOCTYPE html><html><head><script async src=\"https://cdn.ampproject.org/v0.js\"></script><script async custom-element=\"amp-story-player\" src=\"https://cdn.ampproject.org/v0/amp-story-player-0.1.js\"></script></head><body><amp-story-player layout=\"fixed\" width=\"%f\" height=\"%f\"><a href=\"%@\">\"%@\"</a></amp-story-player><script>var player = document.querySelector('amp-story-player');player.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});player.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});</script></body></html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
+    
+    [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error){
         if (error) {
             [indicator stopAnimating];
         } else {
@@ -84,8 +95,8 @@
         [closeButton setTitle:@"X" forState:UIControlStateNormal];
         [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
-    [closeButton addTarget:self action:@selector(closeTapped:) forControlEvents:UIControlEventTouchUpInside];
-    
+    [closeButton addTarget:self action:@selector(closeTapped:)
+          forControlEvents:UIControlEventTouchUpInside];
     [webview addSubview:closeButton];
     indicator.center = webview.center;
     [webview addSubview:indicator];
@@ -93,8 +104,16 @@
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
     swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
     [webview addGestureRecognizer:swipeDown];
-
+    
     return view;
+}
+
+- (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+    if ([message.name isEqualToString:@"previous"]){
+        [self previous];
+    } else {
+        [self next];
+    }
 }
 
 - (void)carouselCurrentItemIndexDidChange:(CleverPushiCarousel *)carousel {
@@ -138,6 +157,22 @@
 
 - (void)closeTapped:(UIButton *)button {
     [self onDismiss];
+}
+
+- (void)next{
+    if (self.storyIndex == self.stories.count - 1)  {
+        self.carousel.currentItemIndex = 0;
+    } else if (self.storyIndex >= 0) {
+        self.carousel.currentItemIndex = self.storyIndex + 1;
+    }
+}
+
+- (void)previous{
+    if (self.storyIndex == 0)  {
+        self.carousel.currentItemIndex = 0;
+    } else if (self.storyIndex >= 0) {
+        self.carousel.currentItemIndex = self.storyIndex - 1;
+    }
 }
 
 @end

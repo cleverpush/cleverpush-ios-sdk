@@ -7,6 +7,7 @@ typedef void(^ __nullable WebViewFinishLoadBlock)(WKWebView *, NSError *);
 @property(nonatomic, copy) WebViewFinishLoadBlock webViewFinishLoadBlock;
 
 - (void)loadRequest:(NSURLRequest *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
+- (void)loadHTML:(NSString *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
 
 @end
 NS_ASSUME_NONNULL_END

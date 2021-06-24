@@ -10,5 +10,6 @@
 + (NSString *)hexStringFromColor:(UIColor *)color;
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
 + (BOOL)isEmpty:(id)thing;
++ (CGFloat)frameHeightWithoutSafeArea;
 
 @end

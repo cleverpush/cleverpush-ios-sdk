@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)reloadReadStories:(NSArray *)array;
 @end
 
-@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate>
+@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>
 
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
 @property (nonatomic, assign) NSInteger storyIndex;
