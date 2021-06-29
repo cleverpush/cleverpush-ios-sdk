@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <SafariServices/SafariServices.h>
+#import "CleverPush.h"
 
 @interface CPUtils : NSObject
 
@@ -10,5 +12,5 @@
 + (NSString *)hexStringFromColor:(UIColor *)color;
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
 + (BOOL)isEmpty:(id)thing;
-
++ (void)openSafari:(NSURL*)URL;
 @end
