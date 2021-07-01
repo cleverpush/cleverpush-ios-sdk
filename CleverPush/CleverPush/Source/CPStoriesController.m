@@ -52,14 +52,15 @@
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
     configuration.userContentController = userController;
-
+    configuration.allowsInlineMediaPlayback = YES;
+    
     CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
     webview.allowsBackForwardNavigationGestures = false;
     webview.contentMode = UIViewContentModeScaleToFill;
     webview.scrollView.backgroundColor = UIColor.blackColor;
-    
+
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
     
     CGFloat frameHeight;
@@ -108,14 +109,6 @@
     return view;
 }
 
-- (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
-    if ([message.name isEqualToString:@"previous"]){
-        [self previous];
-    } else {
-        [self next];
-    }
-}
-
 - (void)carouselCurrentItemIndexDidChange:(CleverPushiCarousel *)carousel {
     if (![self.readStories containsObject:self.stories[carousel.currentItemIndex].id]) {
         [self.readStories addObject:self.stories[carousel.currentItemIndex].id];
@@ -133,6 +126,32 @@
     return value;
 }
 
+- (void)next {
+    if (self.storyIndex == self.stories.count - 1)  {
+        self.carousel.currentItemIndex = 0;
+    } else if (self.storyIndex >= 0) {
+        [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
+    }
+}
+
+- (void)previous {
+    if (self.storyIndex == 0)  {
+        self.carousel.currentItemIndex = 0;
+    } else if (self.storyIndex >= 0) {
+        [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
+    }
+}
+
+#pragma mark Synced JS with Native bridge.
+- (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+    if ([message.name isEqualToString:@"previous"]){
+        [self previous];
+    } else {
+        [self next];
+    }
+}
+
+#pragma mark Device orientation
 - (BOOL) shouldAutorotate {
     return NO;
 }
@@ -155,24 +174,9 @@
     });
 }
 
+#pragma mark - Dismiss by tapping on the X button.
 - (void)closeTapped:(UIButton *)button {
     [self onDismiss];
-}
-
-- (void)next{
-    if (self.storyIndex == self.stories.count - 1)  {
-        self.carousel.currentItemIndex = 0;
-    } else if (self.storyIndex >= 0) {
-        self.carousel.currentItemIndex = self.storyIndex + 1;
-    }
-}
-
-- (void)previous{
-    if (self.storyIndex == 0)  {
-        self.carousel.currentItemIndex = 0;
-    } else if (self.storyIndex >= 0) {
-        self.carousel.currentItemIndex = self.storyIndex - 1;
-    }
 }
 
 @end

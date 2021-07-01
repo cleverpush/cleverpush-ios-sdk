@@ -9,27 +9,58 @@
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor family:(NSString *)family borderColor:(UIColor *)borderColor widgetStoryId:(NSString *)id {
     self = [super initWithFrame:frame];
     if (self) {
-        [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget) {
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                self.backgroundColor = backgroundColor;
-                self.ringBorderColor = borderColor;
-                self.textColor = textColor;
-                self.fontStyle = family;
-                UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
-                layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-                self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0) collectionViewLayout:layout];
-                [self.storyCollection registerClass:[CPStoryCell class] forCellWithReuseIdentifier:@"CPStoryCell"];
-                self.storyCollection.backgroundColor = UIColor.clearColor;
-                self.storyCollection.directionalLockEnabled = YES;
-                [self.storyCollection setDataSource:self];
-                [self.storyCollection setDelegate:self];
-                [self addSubview:self.storyCollection];
-                self.widget = Widget.widgets;
-                self.stories = Widget.stories;
-                [self reloadReadStories:CleverPush.getSeenStories];
-                [CleverPush addStoryView:self];
-            });
-        }];
+        if (id != nil && id.length != 0){
+            [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget){
+                dispatch_async(dispatch_get_main_queue(), ^(void){
+                    if (backgroundColor != nil) {
+                        self.backgroundColor = backgroundColor;
+                    } else {
+                        self.backgroundColor = UIColor.whiteColor;
+                    }
+                    
+                    if (borderColor != nil) {
+                        self.ringBorderColor = borderColor;
+                    } else {
+                        self.ringBorderColor = UIColor.darkGrayColor;
+                    }
+                    
+                    if (textColor != nil) {
+                        self.textColor = textColor;
+                    } else {
+                        self.textColor = UIColor.blackColor;
+                    }
+                    
+                    if (family != nil && family.length != 0) {
+                        self.fontStyle = family;
+                    } else {
+                        self.fontStyle = @"AppleSDGothicNeo-Regular";
+                    }
+                    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+                    layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+                    self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0) collectionViewLayout:layout];
+                    [self.storyCollection registerClass:[CPStoryCell class] forCellWithReuseIdentifier:@"CPStoryCell"];
+                    self.storyCollection.backgroundColor = UIColor.clearColor;
+                    self.storyCollection.directionalLockEnabled = YES;
+                    [self.storyCollection setDataSource:self];
+                    [self.storyCollection setDelegate:self];
+                    [self addSubview:self.storyCollection];
+                    self.widget = Widget.widgets;
+                    self.stories = Widget.stories;
+                    [self reloadReadStories:CleverPush.getSeenStories];
+                    [CleverPush addStoryView:self];
+                });
+            }];
+        } else {
+            self.emptyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
+            UILabel *emptyString = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
+            self.emptyView.backgroundColor = backgroundColor;
+            emptyString.text = [CPTranslate translate:@"emptyString"];
+            [emptyString setFont:[UIFont fontWithName:@"AppleSDGothicNeo-Bold" size:(CGFloat)(17.0)]];
+            emptyString.textAlignment = NSTextAlignmentCenter;
+            [self.emptyView addSubview:emptyString];
+            [self addSubview:self.emptyView];
+            [CleverPush addStoryView:self];
+        }
     }
     return self;
 }
