@@ -2374,8 +2374,8 @@ static id isNil(id object) {
 }
 
 + (BOOL)popupVisible {
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_POPUP_VISIBILITY"] != nil) {
-        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_POPUP_VISIBILITY"]) {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_APP_BANNER_VISIBLE"] != nil) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_APP_BANNER_VISIBLE"]) {
             return NO;
         } else {
             return YES;

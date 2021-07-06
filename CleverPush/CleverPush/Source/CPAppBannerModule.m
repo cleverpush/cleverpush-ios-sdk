@@ -346,7 +346,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 + (void)presentAppBanner:(CPAppBannerController*)controller banner:(CPAppBanner*)banner {
     if (!CleverPush.popupVisible) {
-        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_POPUP_VISIBILITY"];
+        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         UIViewController* topController = [CleverPush topViewController];
         [topController presentViewController:controller animated:NO completion:nil];
