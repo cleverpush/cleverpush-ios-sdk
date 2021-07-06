@@ -506,6 +506,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self fadeOut];
         [self jumpOut];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         [self dismissViewControllerAnimated:NO completion:nil];
     });
 }
