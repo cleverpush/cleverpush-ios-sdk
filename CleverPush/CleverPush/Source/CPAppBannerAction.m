@@ -26,6 +26,11 @@
         if ([json objectForKey:@"dismiss"]) {
             self.dismiss = [[json objectForKey:@"dismiss"] boolValue];
         }
+        
+        self.openInWebview = NO;
+        if ([json objectForKey:@"openInWebview"] != nil && ![[json objectForKey:@"openInWebview"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"openInWebview"] boolValue]) {
+            self.openInWebview = YES;
+        }
     }
     return self;
 }
