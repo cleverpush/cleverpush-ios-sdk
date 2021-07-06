@@ -206,6 +206,10 @@ dispatch_queue_t dispatchQueue = nil;
     }];
 }
 
++ (BOOL)stopAtAllowed:(CPAppBanner*)banner {
+    return [banner.stopAt compare:[NSDate date]] == NSOrderedDescending;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 + (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
@@ -217,7 +221,7 @@ dispatch_queue_t dispatchQueue = nil;
             continue;
         }
         
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
+        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && ![self stopAtAllowed:banner]) {
             continue;
         }
         
@@ -333,7 +337,7 @@ dispatch_queue_t dispatchQueue = nil;
         }
         
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
-            if ([banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
+            if ([self stopAtAllowed:banner]) {
                 [CPAppBannerModule presentAppBanner:bannerController banner:banner];
             } else {
                 NSLog(@"CleverPush: Banner display date has been elapsed");

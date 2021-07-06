@@ -1,3 +1,7 @@
+# 1.10.1
+* App Banners: prevent showing multiple banners at the same time
+* App Banners: Validate "stopAt" field for banners triggered manually or by notification
+
 # 1.10.0
 * Added `pushSubscriptionAttribute`, `pullSubscriptionAttribute` and `hasSubscriptionAttributeValue` methods for array attributes
 

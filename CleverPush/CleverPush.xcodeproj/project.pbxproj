@@ -204,6 +204,7 @@
 		29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */; };
 		29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */; };
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
+		29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */; };
 		CB79117D2667558F00253F9F /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */; };
 		CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
 		CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -368,6 +369,7 @@
 		29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushSelectorHelpers.h; sourceTree = "<group>"; };
 		29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+CleverPush.m"; sourceTree = "<group>"; };
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
+		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
 		CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerHTMLBlock.h; sourceTree = "<group>"; };
 		CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerHTMLBlock.m; sourceTree = "<group>"; };
 		CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWKWebKitView.h; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
 				2913D82D25141324002BA52C /* WebKit.framework in Frameworks */,
@@ -505,6 +508,7 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */,
 				291FCDF72525ED2C00F5185E /* CleverPush.framework */,
 				2913D83425141344002BA52C /* SystemConfiguration.framework */,
 				2913D8322514133E002BA52C /* CoreLocation.framework */,

@@ -7,6 +7,7 @@
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *type;
 @property (nonatomic) BOOL dismiss;
+@property (nonatomic) BOOL openInWebview;
 
 - (id)initWithJson:(NSDictionary*)json;
 
