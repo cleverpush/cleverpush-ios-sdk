@@ -217,7 +217,7 @@ dispatch_queue_t dispatchQueue = nil;
             continue;
         }
         
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedAscending) {
+        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
             continue;
         }
         
@@ -327,21 +327,38 @@ dispatch_queue_t dispatchQueue = nil;
             }
         };
         [bannerController setActionCallback:callbackBlock];
-        
-        UIViewController* topController = [CleverPush topViewController];
-        [topController presentViewController:bannerController animated:NO completion:nil];
-        
+                
         if (banner.frequency == CPAppBannerFrequencyOnce) {
             [CPAppBannerModule setBannerIsShown:banner.id];
         }
         
+        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
+            if ([banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
+                [CPAppBannerModule presentAppBanner:bannerController banner:banner];
+            } else {
+                NSLog(@"CleverPush: Banner display date has been elapsed");
+            }
+        } else {
+            [CPAppBannerModule presentAppBanner:bannerController banner:banner];
+        }
+    });
+}
+
++ (void)presentAppBanner:(CPAppBannerController*)controller banner:(CPAppBanner*)banner {
+    if (!CleverPush.popupVisible) {
+        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_POPUP_VISIBILITY"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        UIViewController* topController = [CleverPush topViewController];
+        [topController presentViewController:controller animated:NO completion:nil];
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
-                [bannerController onDismiss];
+                [controller onDismiss];
             });
         }
         [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
-    });
+    } else {
+        NSLog(@"CleverPush: You can not present two banners at the same time");
+    }
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")

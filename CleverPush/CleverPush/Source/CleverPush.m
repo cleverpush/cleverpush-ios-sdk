@@ -2373,6 +2373,18 @@ static id isNil(id object) {
     [CPAppBannerModule enableBanners];
 }
 
++ (BOOL)popupVisible {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_POPUP_VISIBILITY"] != nil) {
+        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_POPUP_VISIBILITY"]) {
+            return NO;
+        } else {
+            return YES;
+        }
+    } else {
+        return NO;
+    }
+}
+
 
 #pragma mark - recieved notifications from the Extension.
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
