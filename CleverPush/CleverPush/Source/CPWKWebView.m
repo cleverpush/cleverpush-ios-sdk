@@ -37,5 +37,20 @@
     }
 }
 
-@end
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(nonnull WKNavigationAction *)navigationAction decisionHandler:(nonnull void (^)(WKNavigationActionPolicy))decisionHandler {
+    if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
+        if (navigationAction.request.URL) {
+            NSLog(@"%@", navigationAction.request.URL.host);
+            if ([[UIApplication sharedApplication] canOpenURL:navigationAction.request.URL]) {
+                [CPUtils openSafari:navigationAction.request.URL];
+                decisionHandler(WKNavigationActionPolicyCancel);
+            } else {
+                decisionHandler(WKNavigationActionPolicyAllow);
+            }
+        }
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }
+}
 
+@end

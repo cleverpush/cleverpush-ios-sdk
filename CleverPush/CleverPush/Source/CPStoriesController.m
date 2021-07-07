@@ -33,6 +33,7 @@
     self.carousel.pagingEnabled = YES;
     self.carousel.bounces = NO;
     self.carousel.currentItemIndex = self.storyIndex;
+    self.carousel.backgroundColor = [UIColor blackColor];
     [self.view addSubview:self.carousel];
 }
 
@@ -60,6 +61,10 @@
     webview.allowsBackForwardNavigationGestures = false;
     webview.contentMode = UIViewContentModeScaleToFill;
     webview.scrollView.backgroundColor = UIColor.blackColor;
+    webview.scrollView.hidden = YES;
+    webview.backgroundColor = [UIColor clearColor];
+    webview.scrollView.backgroundColor = [UIColor clearColor];
+    webview.opaque = false;
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
     
@@ -71,8 +76,10 @@
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error){
         if (error) {
             [indicator stopAnimating];
+            webview.scrollView.hidden = NO;
         } else {
             [indicator stopAnimating];
+            webview.scrollView.hidden = NO;
         }
     }];
     view = webview;
@@ -121,14 +128,14 @@
 - (CGFloat)carousel:(CleverPushiCarousel *)carousel valueForOption:(iCarouselOption)option withDefault:(CGFloat)value {
     if (option == iCarouselOptionSpacing)
     {
-        return value * 1.01;
+        return value * 1.0;
     }
     return value;
 }
 
 - (void)next {
-    if (self.storyIndex == self.stories.count - 1)  {
-        self.carousel.currentItemIndex = 0;
+    if (self.storyIndex == self.stories.count - 1) {
+        [self onDismiss];
     } else if (self.storyIndex >= 0) {
         [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
     }

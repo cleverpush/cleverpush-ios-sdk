@@ -6,7 +6,7 @@
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
-- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor family:(NSString *)family borderColor:(UIColor *)borderColor widgetStoryId:(NSString *)id {
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyWidgetId:(NSString *)id {
     self = [super initWithFrame:frame];
     if (self) {
         if (id != nil && id.length != 0){
@@ -30,8 +30,8 @@
                         self.textColor = UIColor.blackColor;
                     }
                     
-                    if (family != nil && family.length != 0) {
-                        self.fontStyle = family;
+                    if (fontFamily != nil && fontFamily.length != 0) {
+                        self.fontStyle = fontFamily;
                     } else {
                         self.fontStyle = @"AppleSDGothicNeo-Regular";
                     }
@@ -54,7 +54,7 @@
             self.emptyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
             UILabel *emptyString = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
             self.emptyView.backgroundColor = backgroundColor;
-            emptyString.text = [CPTranslate translate:@"emptyString"];
+            emptyString.text = @"Please enter a valid story ID.";
             [emptyString setFont:[UIFont fontWithName:@"AppleSDGothicNeo-Bold" size:(CGFloat)(17.0)]];
             emptyString.textAlignment = NSTextAlignmentCenter;
             [self.emptyView addSubview:emptyString];
@@ -125,6 +125,18 @@
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(0, 10, 0, 10);
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    CPStoryCell *cell = (CPStoryCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    cell.image.alpha = 0.5;
+    cell.outerRing.alpha = 0.5;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    CPStoryCell *cell = (CPStoryCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    cell.image.alpha = 1.0;
+    cell.outerRing.alpha = 1.0;
 }
 
 -(void)reloadReadStories:(NSArray *)array {

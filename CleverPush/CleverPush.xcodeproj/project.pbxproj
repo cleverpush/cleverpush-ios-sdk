@@ -215,7 +215,7 @@
 		CBA989872679D529003DE995 /* CPStoriesController.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989862679D529003DE995 /* CPStoriesController.m */; };
 		CBA9898A2679D543003DE995 /* CPWidgetModule.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989892679D543003DE995 /* CPWidgetModule.m */; };
 		CBA9898D2679D553003DE995 /* CPWidgetsStories.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898C2679D553003DE995 /* CPWidgetsStories.m */; };
-		CBA989902679D560003DE995 /* CPWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898F2679D560003DE995 /* CPWidget.m */; };
+		CBA989902679D560003DE995 /* CPStoryWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898F2679D560003DE995 /* CPStoryWidget.m */; };
 		CBA989932679D56E003DE995 /* CPStory.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989922679D56E003DE995 /* CPStory.m */; };
 		CBA989962679D57B003DE995 /* CPStoryContentMeta.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989952679D57B003DE995 /* CPStoryContentMeta.m */; };
 		CBA989992679D58C003DE995 /* CPStoryContent.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989982679D58C003DE995 /* CPStoryContent.m */; };
@@ -227,8 +227,8 @@
 		CBA989A52679D628003DE995 /* CPWidgetModule.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989892679D543003DE995 /* CPWidgetModule.m */; };
 		CBA989A62679D62A003DE995 /* CPWidgetsStories.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA9898B2679D553003DE995 /* CPWidgetsStories.h */; };
 		CBA989A72679D62D003DE995 /* CPWidgetsStories.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898C2679D553003DE995 /* CPWidgetsStories.m */; };
-		CBA989A82679D630003DE995 /* CPWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA9898E2679D560003DE995 /* CPWidget.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CBA989A92679D632003DE995 /* CPWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898F2679D560003DE995 /* CPWidget.m */; };
+		CBA989A82679D630003DE995 /* CPStoryWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA9898E2679D560003DE995 /* CPStoryWidget.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CBA989A92679D632003DE995 /* CPStoryWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA9898F2679D560003DE995 /* CPStoryWidget.m */; };
 		CBA989AA2679D634003DE995 /* CPStory.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA989912679D56E003DE995 /* CPStory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CBA989AB2679D637003DE995 /* CPStory.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989922679D56E003DE995 /* CPStory.m */; };
 		CBA989AC2679D63A003DE995 /* CPStoryContentMeta.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA989942679D57B003DE995 /* CPStoryContentMeta.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -417,8 +417,8 @@
 		CBA989892679D543003DE995 /* CPWidgetModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWidgetModule.m; sourceTree = "<group>"; };
 		CBA9898B2679D553003DE995 /* CPWidgetsStories.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWidgetsStories.h; sourceTree = "<group>"; };
 		CBA9898C2679D553003DE995 /* CPWidgetsStories.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWidgetsStories.m; sourceTree = "<group>"; };
-		CBA9898E2679D560003DE995 /* CPWidget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWidget.h; sourceTree = "<group>"; };
-		CBA9898F2679D560003DE995 /* CPWidget.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWidget.m; sourceTree = "<group>"; };
+		CBA9898E2679D560003DE995 /* CPStoryWidget.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryWidget.h; sourceTree = "<group>"; };
+		CBA9898F2679D560003DE995 /* CPStoryWidget.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryWidget.m; sourceTree = "<group>"; };
 		CBA989912679D56E003DE995 /* CPStory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStory.h; sourceTree = "<group>"; };
 		CBA989922679D56E003DE995 /* CPStory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStory.m; sourceTree = "<group>"; };
 		CBA989942679D57B003DE995 /* CPStoryContentMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryContentMeta.h; sourceTree = "<group>"; };
@@ -693,8 +693,8 @@
 				CBA989892679D543003DE995 /* CPWidgetModule.m */,
 				CBA9898B2679D553003DE995 /* CPWidgetsStories.h */,
 				CBA9898C2679D553003DE995 /* CPWidgetsStories.m */,
-				CBA9898E2679D560003DE995 /* CPWidget.h */,
-				CBA9898F2679D560003DE995 /* CPWidget.m */,
+				CBA9898E2679D560003DE995 /* CPStoryWidget.h */,
+				CBA9898F2679D560003DE995 /* CPStoryWidget.m */,
 				CBA989912679D56E003DE995 /* CPStory.h */,
 				CBA989922679D56E003DE995 /* CPStory.m */,
 				CBA989942679D57B003DE995 /* CPStoryContentMeta.h */,
@@ -789,7 +789,7 @@
 				29D623E02535BE070020F893 /* CPIntrinsicTableView.h in Headers */,
 				CBA989AA2679D634003DE995 /* CPStory.h in Headers */,
 				CBA989B02679D645003DE995 /* CPStoryContentPreview.h in Headers */,
-				CBA989A82679D630003DE995 /* CPWidget.h in Headers */,
+				CBA989A82679D630003DE995 /* CPStoryWidget.h in Headers */,
 				298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
 				CBA989A22679D61F003DE995 /* CPStoriesController.h in Headers */,
@@ -1058,7 +1058,7 @@
 				29D22E70252C8E7500977567 /* CPIntrinsicTableView.m in Sources */,
 				2906A1EA25855B510078FD61 /* CPAppBannerAction.m in Sources */,
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
-				CBA989A92679D632003DE995 /* CPWidget.m in Sources */,
+				CBA989A92679D632003DE995 /* CPStoryWidget.m in Sources */,
 				CBA989AF2679D642003DE995 /* CPStoryContent.m in Sources */,
 				291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
@@ -1108,7 +1108,7 @@
 				CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */,
 				296068AC25744C89002159D0 /* CPAppBannerAction.m in Sources */,
 				2986772A2572DFAC0002E9F1 /* CPAppBannerBackground.m in Sources */,
-				CBA989902679D560003DE995 /* CPWidget.m in Sources */,
+				CBA989902679D560003DE995 /* CPStoryWidget.m in Sources */,
 				CB8129EF267B6F3B002B8A3D /* CPWKWebView.m in Sources */,
 				2986771F2572DF940002E9F1 /* CPAppBannerBlock.m in Sources */,
 				291FCD2A2525DC2800F5185E /* DWAlertViewActionBaseView.m in Sources */,

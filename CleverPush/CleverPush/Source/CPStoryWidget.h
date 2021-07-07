@@ -5,7 +5,7 @@
 #import "CPWidgetDisplay.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@interface CPWidget : NSObject
+@interface CPStoryWidget : NSObject
 
 @property (nonatomic) CPWidgetVariant variant;
 @property (nonatomic) CPWidgetPosition position;

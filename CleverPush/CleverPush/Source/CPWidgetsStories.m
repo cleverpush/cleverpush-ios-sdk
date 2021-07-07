@@ -12,7 +12,7 @@
             }
         }
         if ([json objectForKey:@"widget"] != nil && ![[json objectForKey:@"widget"] isKindOfClass:[NSNull class]]) {
-            self.widgets = [[CPWidget alloc] initWithJson:[json objectForKey:@"widget"]];
+            self.widgets = [[CPStoryWidget alloc] initWithJson:[json objectForKey:@"widget"]];
         }
     }
     return self;

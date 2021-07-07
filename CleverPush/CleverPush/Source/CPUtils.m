@@ -205,8 +205,7 @@
     return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
 }
 
-+ (BOOL)fontFamilyExists:(NSString*)fontFamily
-{
++ (BOOL)fontFamilyExists:(NSString*)fontFamily {
     if (fontFamily == nil) {
         return NO;
     }
@@ -217,8 +216,7 @@
     return ([matches count] > 0);
 }
 
-+ (BOOL)isEmpty:(id)thing
-{
++ (BOOL)isEmpty:(id)thing {
     return thing == nil
     || [thing isKindOfClass:[NSNull class]]
     || ([thing respondsToSelector:@selector(length)]
@@ -227,15 +225,25 @@
         && [(NSArray *)thing count] == 0);
 }
 
-+ (CGFloat)frameHeightWithoutSafeArea{
++ (CGFloat)frameHeightWithoutSafeArea {
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
         CGFloat topPadding = window.safeAreaInsets.top;
         CGFloat bottomPadding = window.safeAreaInsets.bottom;
         CGFloat height = UIScreen.mainScreen.bounds.size.height - (topPadding + bottomPadding);
         return height;
-    }else{
+    } else {
         return UIScreen.mainScreen.bounds.size.height;
+    }
+}
+
++ (void)openSafari:(NSURL*)URL {
+    if (URL) {
+        if ([SFSafariViewController class] != nil) {
+            SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
+            safariController.modalPresentationStyle = UIModalPresentationPageSheet;
+            [CleverPush.topViewController presentViewController:safariController animated:YES completion:nil];
+        }
     }
 }
 

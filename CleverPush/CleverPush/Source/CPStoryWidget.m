@@ -1,7 +1,7 @@
-#import "CPWidget.h"
+#import "CPStoryWidget.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@implementation CPWidget
+@implementation CPStoryWidget
 #pragma mark - wrapping the data of the Widget in to CPWidget NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];

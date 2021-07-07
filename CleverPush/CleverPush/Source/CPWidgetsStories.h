@@ -1,11 +1,11 @@
 #import <Foundation/Foundation.h>
-#import "CPWidget.h"
+#import "CPStoryWidget.h"
 #import "CPStory.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @interface CPWidgetsStories : NSObject
 
-@property (nonatomic, strong) CPWidget *widgets;
+@property (nonatomic, strong) CPStoryWidget *widgets;
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
 
 - (id)initWithJson:(NSDictionary*)json;
