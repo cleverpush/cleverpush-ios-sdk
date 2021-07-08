@@ -1473,7 +1473,7 @@ static id isNil(id object) {
         }];
     }
     dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        if(callback){
+        if (callback) {
             callback([self getSubscriptionTags]);
         }
     });
@@ -1488,7 +1488,7 @@ static id isNil(id object) {
         }];
     }
     dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        if(callback){
+        if (callback) {
             callback([self getSubscriptionTags]);
         }
     });
@@ -1501,7 +1501,7 @@ static id isNil(id object) {
         subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
         
         if ([subscriptionTags containsObject:tagId]) {
-            if(callback){
+            if (callback) {
                 callback(tagId);
             }
             return;
@@ -1530,7 +1530,7 @@ static id isNil(id object) {
                 [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
                 [userDefaults synchronize];
                 
-                if(callback){
+                if (callback) {
                     callback(tagId);
                 }
                 
@@ -1565,7 +1565,7 @@ static id isNil(id object) {
                 [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
                 [userDefaults synchronize];
                 
-                if(callback){
+                if (callback) {
                     callback(tagId);
                 }
                 
