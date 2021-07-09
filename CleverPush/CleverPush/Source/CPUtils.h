@@ -13,4 +13,5 @@
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
 + (BOOL)isEmpty:(id)thing;
 + (void)openSafari:(NSURL*)URL;
++ (void)openSafari:(NSURL*)URL dismiss:(UIViewController*)controller;
 @end

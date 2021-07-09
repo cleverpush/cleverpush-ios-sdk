@@ -236,4 +236,21 @@
         }
     }
 }
+
++ (void)openSafari:(NSURL*)URL dismiss:(UIViewController*)controller {
+    [controller dismissViewControllerAnimated:YES completion:^{
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            if (URL) {
+                if ([SFSafariViewController class] != nil) {
+                    SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
+                    safariController.modalPresentationStyle = UIModalPresentationPageSheet;
+                    [CleverPush.topViewController presentViewController:safariController animated:YES completion:nil];
+                }
+            }
+        });
+    }];
+}
+
 @end

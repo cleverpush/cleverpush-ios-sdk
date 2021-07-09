@@ -263,12 +263,12 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     [button handleControlEvent:UIControlEventTouchUpInside withBlock:^{
         self.actionCallback(block.action);
-        if (block.action.openInWebview) {
+        if (block.action.dismiss && block.action.openInWebview) {
+            [CPUtils openSafari:block.action.url dismiss:self];
+        } else if (!block.action.dismiss && block.action.openInWebview) {
             [CPUtils openSafari:block.action.url];
-        } else {
-            if (block.action.dismiss) {
-                [self onDismiss];
-            }
+        } else if (block.action.dismiss && !block.action.openInWebview) {
+            [self onDismiss];
         }
     }];
     
@@ -331,13 +331,43 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     imageWidthCenterConstraint.priority = UILayoutPriorityRequired;
     
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
-    
+    imageView.userInteractionEnabled = YES;;
+    UITapGestureRecognizer *tapGesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapGesture:)];
+    tapGesture1.numberOfTapsRequired = 1;
+    [imageView addGestureRecognizer:tapGesture1];
+    NSUInteger index = 0;
+    for(CPAppBanner *dataBlock in self.data.blocks)
+    {
+        if (dataBlock.type == CPAppBannerBlockTypeImage) {
+            CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)dataBlock;
+            if (block.action.openInWebview) {
+                imageView.tag = index;
+            }
+        }
+        index++;
+    }
     [self.bannerBodyContent addSubview:imageView];
     [self.bannerBodyContent addConstraint:imageWidthConstraint];
     [self.bannerBodyContent addConstraint:imageHeightConstraint];
     [self.bannerBodyContent addConstraint:imageWidthCenterConstraint];
     
     return imageView;
+}
+
+- (void)tapGesture:(UITapGestureRecognizer*)sender {
+    if (sender.view.tag >= 0) {
+        if (sender.view.tag < self.data.blocks.count) {
+            CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[sender.view.tag];
+            self.actionCallback(block.action);
+            if (block.action.dismiss && block.action.openInWebview) {
+                [CPUtils openSafari:block.action.url dismiss:self];
+            } else if (!block.action.dismiss && block.action.openInWebview) {
+                [CPUtils openSafari:block.action.url];
+            } else if (block.action.dismiss && !block.action.openInWebview) {
+                [self onDismiss];
+            }
+        }
+    }
 }
 
 #pragma mark - creating a blocks of a HTML
