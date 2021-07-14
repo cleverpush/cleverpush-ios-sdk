@@ -1464,11 +1464,19 @@ static id isNil(id object) {
     }
 }
 
++ (void)addSubscriptionTags:(NSArray*)tagIds {
+    [self addSubscriptionTags:tagIds callBack:nil];
+}
+
++ (void)removeSubscriptionTags:(NSArray*)tagIds {
+    [self removeSubscriptionTags:tagIds callBack:nil];
+}
+
 + (void)addSubscriptionTags:(NSArray*)tagIds callBack:(void(^)(NSArray *))callback {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
-        [self addSubscriptionTag:tagId callback:^(NSString *tagId) {
+        [self addSubscriptionTag:tagId callBack:^(NSString *tagId) {
             dispatch_group_leave(group);
         }];
     }
@@ -1483,7 +1491,7 @@ static id isNil(id object) {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
-        [self removeSubscriptionTag:tagId callback:^(NSString *tagId) {
+        [self removeSubscriptionTag:tagId callBack:^(NSString *tagId) {
             dispatch_group_leave(group);
         }];
     }
@@ -1493,8 +1501,15 @@ static id isNil(id object) {
         }
     });
 }
++ (void)removeSubscriptionTag:(NSString*)tagId {
+    [self removeSubscriptionTag:tagId callBack:nil];
+}
 
-+ (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
++ (void)addSubscriptionTag:(NSString*)tagId {
+    [self addSubscriptionTag:tagId callBack:nil];
+}
+
++ (void)addSubscriptionTag:(NSString*)tagId callBack:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
         
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -1540,7 +1555,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Remove subscription tag by calling api. subscription/untag
-+ (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
++ (void)removeSubscriptionTag:(NSString*)tagId callBack:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
@@ -2047,11 +2062,11 @@ static id isNil(id object) {
                                 dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(autoAssignSeconds * NSEC_PER_SEC));
                                 dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
                                     if ([currentPageUrl isEqualToString:urlStr]) {
-                                        [self addSubscriptionTag:tagId callback:nil];
+                                        [self addSubscriptionTag:tagId callBack:nil];
                                     }
                                 });
                             } else {
-                                [self addSubscriptionTag:tagId callback:nil];
+                                [self addSubscriptionTag:tagId callBack:nil];
                             }
                         } else {
                             if (autoAssignDays > 0) {
