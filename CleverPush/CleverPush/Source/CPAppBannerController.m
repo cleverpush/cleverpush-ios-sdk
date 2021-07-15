@@ -262,14 +262,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     button.adjustsImageWhenHighlighted = YES;
     [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     [button handleControlEvent:UIControlEventTouchUpInside withBlock:^{
-        self.actionCallback(block.action);
-        if (block.action.dismiss && block.action.openInWebview) {
-            [CPUtils openSafari:block.action.url dismiss:self];
-        } else if (!block.action.dismiss && block.action.openInWebview) {
-            [CPUtils openSafari:block.action.url];
-        } else if (block.action.dismiss && !block.action.openInWebview) {
-            [self onDismiss];
-        }
+        [self blockAction:block.action];
     }];
     
     [self.bannerBodyContent addSubview:button];
@@ -327,14 +320,14 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     imageHeightConstraint.priority = UILayoutPriorityDefaultLow;
     
     NSLayoutConstraint *imageWidthCenterConstraint = [NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.bannerBodyContent attribute:NSLayoutAttributeCenterX multiplier:1 constant:0];
-    
     imageWidthCenterConstraint.priority = UILayoutPriorityRequired;
-    
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
     imageView.userInteractionEnabled = YES;;
-    UITapGestureRecognizer *tapGesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapGesture:)];
-    tapGesture1.numberOfTapsRequired = 1;
-    [imageView addGestureRecognizer:tapGesture1];
+    
+    UITapGestureRecognizer *imageTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapGestureListener:)];
+    imageTapGestureRecognizer.numberOfTapsRequired = 1;
+    [imageView addGestureRecognizer:imageTapGestureRecognizer];
+    
     NSUInteger index = 0;
     for(CPAppBanner *dataBlock in self.data.blocks)
     {
@@ -346,6 +339,7 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
         }
         index++;
     }
+    
     [self.bannerBodyContent addSubview:imageView];
     [self.bannerBodyContent addConstraint:imageWidthConstraint];
     [self.bannerBodyContent addConstraint:imageHeightConstraint];
@@ -354,19 +348,25 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     return imageView;
 }
 
-- (void)tapGesture:(UITapGestureRecognizer*)sender {
+#pragma mark - executed this event when clicked on image.
+- (void)tapGestureListener:(UITapGestureRecognizer*)sender {
     if (sender.view.tag >= 0) {
         if (sender.view.tag < self.data.blocks.count) {
             CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[sender.view.tag];
-            self.actionCallback(block.action);
-            if (block.action.dismiss && block.action.openInWebview) {
-                [CPUtils openSafari:block.action.url dismiss:self];
-            } else if (!block.action.dismiss && block.action.openInWebview) {
-                [CPUtils openSafari:block.action.url];
-            } else if (block.action.dismiss && !block.action.openInWebview) {
-                [self onDismiss];
-            }
+            [self blockAction:block.action];
         }
+    }
+}
+
+#pragma mark - get the callback of the UIButton & UIImage
+- (void)blockAction:(CPAppBannerAction*)action {
+    self.actionCallback(action);
+    if (action.dismiss && action.openInWebview) {
+        [CPUtils openSafari:action.url dismissViewController:self];
+    } else if (!action.dismiss && action.openInWebview) {
+        [CPUtils openSafari:action.url];
+    } else if (action.dismiss && !action.openInWebview) {
+        [self onDismiss];
     }
 }
 

@@ -237,7 +237,7 @@
     }
 }
 
-+ (void)openSafari:(NSURL*)URL dismiss:(UIViewController*)controller {
++ (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller {
     [controller dismissViewControllerAnimated:YES completion:^{
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
