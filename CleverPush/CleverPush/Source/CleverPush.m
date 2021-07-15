@@ -1465,18 +1465,18 @@ static id isNil(id object) {
 }
 
 + (void)addSubscriptionTags:(NSArray*)tagIds {
-    [self addSubscriptionTags:tagIds callBack:nil];
+    [self addSubscriptionTags:tagIds callback:nil];
 }
 
 + (void)removeSubscriptionTags:(NSArray*)tagIds {
-    [self removeSubscriptionTags:tagIds callBack:nil];
+    [self removeSubscriptionTags:tagIds callback:nil];
 }
 
-+ (void)addSubscriptionTags:(NSArray*)tagIds callBack:(void(^)(NSArray *))callback {
++ (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
-        [self addSubscriptionTag:tagId callBack:^(NSString *tagId) {
+        [self addSubscriptionTag:tagId callback:^(NSString *tagId) {
             dispatch_group_leave(group);
         }];
     }
@@ -1487,11 +1487,11 @@ static id isNil(id object) {
     });
 }
 
-+ (void)removeSubscriptionTags:(NSArray*)tagIds callBack:(void(^)(NSArray *))callback{
++ (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback{
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
-        [self removeSubscriptionTag:tagId callBack:^(NSString *tagId) {
+        [self removeSubscriptionTag:tagId callback:^(NSString *tagId) {
             dispatch_group_leave(group);
         }];
     }
@@ -1502,14 +1502,14 @@ static id isNil(id object) {
     });
 }
 + (void)removeSubscriptionTag:(NSString*)tagId {
-    [self removeSubscriptionTag:tagId callBack:nil];
+    [self removeSubscriptionTag:tagId callback:nil];
 }
 
 + (void)addSubscriptionTag:(NSString*)tagId {
-    [self addSubscriptionTag:tagId callBack:nil];
+    [self addSubscriptionTag:tagId callback:nil];
 }
 
-+ (void)addSubscriptionTag:(NSString*)tagId callBack:(void (^)(NSString *))callback {
++ (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
         
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -2062,11 +2062,11 @@ static id isNil(id object) {
                                 dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(autoAssignSeconds * NSEC_PER_SEC));
                                 dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
                                     if ([currentPageUrl isEqualToString:urlStr]) {
-                                        [self addSubscriptionTag:tagId callBack:nil];
+                                        [self addSubscriptionTag:tagId callback:nil];
                                     }
                                 });
                             } else {
-                                [self addSubscriptionTag:tagId callBack:nil];
+                                [self addSubscriptionTag:tagId callback:nil];
                             }
                         } else {
                             if (autoAssignDays > 0) {
