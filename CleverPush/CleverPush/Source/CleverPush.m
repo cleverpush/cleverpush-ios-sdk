@@ -1555,7 +1555,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Remove subscription tag by calling api. subscription/untag
-+ (void)removeSubscriptionTag:(NSString*)tagId callBack:(void (^)(NSString *))callback {
++ (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
