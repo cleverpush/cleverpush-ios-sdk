@@ -1221,7 +1221,6 @@ static id isNil(id object) {
     
     [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
     
-    
     if (autoClearBadge) {
         [self clearBadge:true];
     }
@@ -1501,6 +1500,7 @@ static id isNil(id object) {
         }
     });
 }
+
 + (void)removeSubscriptionTag:(NSString*)tagId {
     [self removeSubscriptionTag:tagId callback:nil];
 }
