@@ -115,8 +115,7 @@
 }
 
 #pragma mark - dictionary with properties of object.
-+ (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj
-{
++ (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     
     unsigned count;
@@ -205,17 +204,19 @@
     return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
 }
 
+#pragma mark -  Check the font family has been exist in the UIBundle or not.
 + (BOOL)fontFamilyExists:(NSString*)fontFamily {
     if (fontFamily == nil) {
         return NO;
     }
-
+    
     UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
     NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
-
+    
     return ([matches count] > 0);
 }
 
+#pragma mark -  Check the empty.
 + (BOOL)isEmpty:(id)thing {
     return thing == nil
     || [thing isKindOfClass:[NSNull class]]
@@ -225,6 +226,18 @@
         && [(NSArray *)thing count] == 0);
 }
 
+#pragma mark -  Openup given URL in a SFSafariViewController.
++ (void)openSafari:(NSURL*)URL {
+    if (URL) {
+        if ([SFSafariViewController class] != nil) {
+            SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
+            safariController.modalPresentationStyle = UIModalPresentationPageSheet;
+            [CleverPush.topViewController presentViewController:safariController animated:YES completion:nil];
+        }
+    }
+}
+
+#pragma mark -  Frame height without safeArea.
 + (CGFloat)frameHeightWithoutSafeArea {
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
@@ -237,14 +250,5 @@
     }
 }
 
-+ (void)openSafari:(NSURL*)URL {
-    if (URL) {
-        if ([SFSafariViewController class] != nil) {
-            SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
-            safariController.modalPresentationStyle = UIModalPresentationPageSheet;
-            [CleverPush.topViewController presentViewController:safariController animated:YES completion:nil];
-        }
-    }
-}
-
 @end
+
