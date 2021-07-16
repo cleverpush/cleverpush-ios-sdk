@@ -1,3 +1,6 @@
+# 1.10.0
+* Added `pushSubscriptionAttribute`, `pullSubscriptionAttribute` and `hasSubscriptionAttributeValue` methods for array attributes
+
 # 1.9.3
 * Added ability to specify `normalTintColor` which is being used by Topics Dialog Alert
 

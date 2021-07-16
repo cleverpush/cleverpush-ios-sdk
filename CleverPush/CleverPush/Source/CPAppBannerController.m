@@ -263,9 +263,12 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
     [button handleControlEvent:UIControlEventTouchUpInside withBlock:^{
         self.actionCallback(block.action);
-
-        if (block.action.dismiss) {
-            [self onDismiss];
+        if (block.action.openInWebview) {
+            [CPUtils openSafari:block.action.url];
+        } else {
+            if (block.action.dismiss) {
+                [self onDismiss];
+            }
         }
     }];
     
@@ -506,6 +509,8 @@ typedef NS_ENUM(NSInteger, ParentConstraint) {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self fadeOut];
         [self jumpOut];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         [self dismissViewControllerAnimated:NO completion:nil];
     });
 }

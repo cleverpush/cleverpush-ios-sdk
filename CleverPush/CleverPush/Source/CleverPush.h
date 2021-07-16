@@ -84,6 +84,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (void)disableAppBanners;
 + (void)enableAppBanners;
++ (BOOL)popupVisible;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^)(BOOL))callback;
 + (void)syncSubscription;
@@ -96,6 +97,9 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)addSubscriptionTag:(NSString*)tagId;
 + (void)removeSubscriptionTag:(NSString*)tagId;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
++ (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
++ (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
++ (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
 + (void)getAvailableTags:(void(^)(NSArray *))callback;
 + (void)getAvailableTopics:(void(^)(NSArray *))callback;
 + (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;

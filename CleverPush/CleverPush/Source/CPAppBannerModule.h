@@ -28,6 +28,7 @@
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
++ (void)presentAppBanner:(UIViewController*)controller banner:(CPAppBanner*)banner;
 + (void)initSession;
 + (void)triggerEvent:(NSString *)key value:(NSString *)value;
 + (void)disableBanners;

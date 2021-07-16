@@ -249,6 +249,4 @@
         return UIScreen.mainScreen.bounds.size.height;
     }
 }
-
 @end
-
