@@ -1,3 +1,6 @@
+# 1.11.0
+* Added `addSubscriptionTags` and `removeSubscriptionTags` methods
+
 # 1.10.1
 * App Banners: prevent showing multiple banners at the same time
 * App Banners: Validate "stopAt" field for banners triggered manually or by notification
