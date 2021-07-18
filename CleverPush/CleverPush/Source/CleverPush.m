@@ -92,6 +92,7 @@ NSArray* channelTopics;
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
 NSMutableArray* pendingTrackingConsentListeners;
+NSMutableArray* subscriptionTags;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -249,6 +250,7 @@ static id isNil(id object) {
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
+    subscriptionTags = [[NSMutableArray alloc] init];
     
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo)
@@ -309,7 +311,7 @@ static id isNil(id object) {
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
 + (UIViewController*)topViewController {
-  return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
 
 + (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
@@ -1218,7 +1220,6 @@ static id isNil(id object) {
     NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
     
     [CleverPush setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
-
     
     if (autoClearBadge) {
         [self clearBadge:true];
@@ -1237,14 +1238,14 @@ static id isNil(id object) {
     }
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
-
+    
     if (!channelId) { // not init
         pendingOpenedResult = result;
     }
     if (!handleNotificationOpened) {
         return;
     }
-        
+    
     handleNotificationOpened(result);
 }
 
@@ -1462,21 +1463,66 @@ static id isNil(id object) {
     }
 }
 
++ (void)addSubscriptionTags:(NSArray*)tagIds {
+    [self addSubscriptionTags:tagIds callback:nil];
+}
+
++ (void)removeSubscriptionTags:(NSArray*)tagIds {
+    [self removeSubscriptionTags:tagIds callback:nil];
+}
+
++ (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback {
+    dispatch_group_t group = dispatch_group_create();
+    for (NSString* tagId in tagIds) {
+        dispatch_group_enter(group);
+        [self addSubscriptionTag:tagId callback:^(NSString *tagId) {
+            dispatch_group_leave(group);
+        }];
+    }
+    dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if (callback) {
+            callback([self getSubscriptionTags]);
+        }
+    });
+}
+
++ (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback{
+    dispatch_group_t group = dispatch_group_create();
+    for (NSString* tagId in tagIds) {
+        dispatch_group_enter(group);
+        [self removeSubscriptionTag:tagId callback:^(NSString *tagId) {
+            dispatch_group_leave(group);
+        }];
+    }
+    dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        if (callback) {
+            callback([self getSubscriptionTags]);
+        }
+    });
+}
+
++ (void)removeSubscriptionTag:(NSString*)tagId {
+    [self removeSubscriptionTag:tagId callback:nil];
+}
+
 + (void)addSubscriptionTag:(NSString*)tagId {
-    NSLog(@"CleverPush: addSubscriptionTag: %@", tagId);
-    
+    [self addSubscriptionTag:tagId callback:nil];
+}
+
++ (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
-        NSLog(@"CleverPush: addSubscriptionTag 2: %@", tagId);
         
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        __block NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
         
         if ([subscriptionTags containsObject:tagId]) {
-            NSLog(@"CleverPush: addSubscriptionTag - already has tag, skipping API call");
+            if (callback) {
+                callback(tagId);
+            }
             return;
         }
         
-        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -1495,17 +1541,23 @@ static id isNil(id object) {
                 if (![subscriptionTags containsObject:tagId]) {
                     [subscriptionTags addObject:tagId];
                 }
+                
                 [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
                 [userDefaults synchronize];
+                
+                if (callback) {
+                    callback(tagId);
+                }
+                
             } onFailure:nil];
         });
     }];
 }
 
 #pragma mark - Remove subscription tag by calling api. subscription/untag
-+ (void)removeSubscriptionTag:(NSString*)tagId {
++ (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
-        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -1516,14 +1568,22 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableArray* subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+                subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+                
                 if (!subscriptionTags) {
                     subscriptionTags = [[NSMutableArray alloc] init];
                 }
                 [subscriptionTags removeObject:tagId];
+                
                 [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
                 [userDefaults synchronize];
+                
+                if (callback) {
+                    callback(tagId);
+                }
+                
             } onFailure:nil];
         });
     }];
@@ -2002,11 +2062,11 @@ static id isNil(id object) {
                                 dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(autoAssignSeconds * NSEC_PER_SEC));
                                 dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
                                     if ([currentPageUrl isEqualToString:urlStr]) {
-                                        [self addSubscriptionTag:tagId];
+                                        [self addSubscriptionTag:tagId callback:nil];
                                     }
                                 });
                             } else {
-                                [self addSubscriptionTag:tagId];
+                                [self addSubscriptionTag:tagId callback:nil];
                             }
                         } else {
                             if (autoAssignDays > 0) {
