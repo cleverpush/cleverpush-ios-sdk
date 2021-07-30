@@ -2290,8 +2290,20 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
+                NSArray* topics = [self getSubscriptionTopics];
+                if (!topics || [topics count] == 0) {
+                    NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+                    for (id channelTopic in channelTopics) {
+                        if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+                            [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                        }
+                    }
+                    if ([selectedTopicIds count] > 0) {
+                        [self setSubscriptionTopics:selectedTopicIds];
+                    }
+                }
                 
+                CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
                 topicsController.delegate = channelTopicsPicker;

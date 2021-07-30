@@ -264,8 +264,7 @@
     if (topic && [topic defaultUnchecked]) {
         defaultUnchecked = YES;
     }
-    
-    BOOL state = ([selectedTopics containsObject:[topic id]] );
+    BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
     return state;
 }
 
