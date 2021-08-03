@@ -2291,7 +2291,7 @@ static id isNil(id object) {
             
             dispatch_async(dispatch_get_main_queue(), ^{
                
-                if ([self selectedTopics]) {
+                if ([self hasSelectedTopics]) {
                     NSMutableArray* selectedTopicIds = [self getDefaultCheckedTopicsId];
                     if ([selectedTopicIds count] > 0) {
                         [self setSubscriptionTopics:selectedTopicIds];
@@ -2338,14 +2338,10 @@ static id isNil(id object) {
     }];
 }
 
-#pragma mark - get the topics id if it is already exist in the userdefault
-+ (BOOL)selectedTopics{
+#pragma mark - check the topics if it is already exist in the userdefault or not
++ (BOOL)hasSelectedTopics{
     NSArray* topics = [self getSubscriptionTopics];
-    if (!topics || [topics count] == 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return (!topics || [topics count] == 0);
 }
 
 #pragma mark - get the default checked topics from the console.
