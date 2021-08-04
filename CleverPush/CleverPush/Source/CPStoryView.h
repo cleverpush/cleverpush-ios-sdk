@@ -3,7 +3,6 @@
 #import "CPStoryWidget.h"
 #import "CPStory.h"
 #import "UIImageView+CleverPush.h"
-#import "CPTranslate.h"
 
 @interface CPStoryView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
