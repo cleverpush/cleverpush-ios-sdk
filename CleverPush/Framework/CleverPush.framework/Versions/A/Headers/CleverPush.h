@@ -9,6 +9,7 @@
 #endif
 
 #import "CPChatView.h"
+#import "CPStoryView.h"
 #import "CPNotificationViewController.h"
 #import "CleverPushHTTPClient.h"
 #import "CPAppBannerAction.h"
@@ -132,12 +133,15 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (void)addStoryView:(CPStoryView*)storyView;
 + (UIViewController*)topViewController;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
 + (NSArray*)getSubscriptionTags;
 + (NSArray*)getNotifications;
++ (NSArray*)getSeenStories;
+
 + (NSMutableArray*)getSubscriptionTopics;
 
 + (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
