@@ -2307,8 +2307,15 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
+               
+                if ([self hasSelectedTopics]) {
+                    NSMutableArray* selectedTopicIds = [self getDefaultCheckedTopicsId];
+                    if ([selectedTopicIds count] > 0) {
+                        [self setSubscriptionTopics:selectedTopicIds];
+                    }
+                }
+
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
-                
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
                 topicsController.delegate = channelTopicsPicker;
@@ -2346,7 +2353,23 @@ static id isNil(id object) {
             });
         }];
     }];
-    
+}
+
+#pragma mark - check the topics if it is already exist in the userdefault or not
++ (BOOL)hasSelectedTopics{
+    NSArray* topics = [self getSubscriptionTopics];
+    return (!topics || [topics count] == 0);
+}
+
+#pragma mark - get the default checked topics from the console.
++ (NSMutableArray*)getDefaultCheckedTopicsId{
+    NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+    for (id channelTopic in channelTopics) {
+        if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+            [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+        }
+    }
+    return selectedTopicIds;
 }
 
 #pragma mark - Badge count increment
