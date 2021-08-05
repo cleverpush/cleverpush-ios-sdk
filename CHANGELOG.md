@@ -1,5 +1,5 @@
 # 1.12.0
-* Refactor topic dialog
+* Refactor topics dialog
 * App Banners: Image callback support
 * New Feature: Stories
 
