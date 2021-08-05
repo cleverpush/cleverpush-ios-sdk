@@ -20,9 +20,6 @@
 #pragma mark - Class Methods
 - (id)initWithAvailableTopics:(NSArray*)topics selectedTopics:(NSArray*)userTopics hasSubscriptionTopics:(BOOL)hasTopics;
 - (NSMutableArray*)getSelectedTopics;
-- (void)updateDeselectFlag:(BOOL)value;
-- (BOOL)getDeselectValue;
-
 @end
 
 #pragma mark - Custom delegate method

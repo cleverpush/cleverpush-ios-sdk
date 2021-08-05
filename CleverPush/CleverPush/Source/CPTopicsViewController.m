@@ -68,9 +68,9 @@
     
     if (self.topicsDialogShowUnsubscribe == YES) {
         if ([self getSelectedTopics].count == 0) {
-            [self updateDeselectFlag:YES];
+            [CleverPush updateDeselectFlag:YES];
         } else {
-            [self updateDeselectFlag:NO];
+            [CleverPush updateDeselectFlag:NO];
         }
     }
     self.view = tableView;
@@ -99,8 +99,14 @@
         // add some padding
         tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
         
+        if (self.topicsDialogShowUnsubscribe == YES) {
+            if ([self getSelectedTopics].count == 0) {
+                [CleverPush updateDeselectFlag:YES];
+            } else {
+                [CleverPush updateDeselectFlag:NO];
+            }
+        }
         [tableView reloadData];
-        
     }
 }
 
@@ -118,35 +124,16 @@
             topic.defaultUnchecked = YES;
         }
         hasTopics = NO;
-        [self updateDeselectFlag:YES];
+        [CleverPush updateDeselectFlag:YES];
         [tableView reloadData];
         [self manageHeightLayout];
     } else {
         if ([self getSelectedTopics].count == 0) {
-            [self updateDeselectFlag:NO];
+            [CleverPush updateDeselectFlag:NO];
         }
         else {
-            [self updateDeselectFlag:NO];
+            [CleverPush updateDeselectFlag:NO];
         }
-    }
-}
-
-#pragma mark - update UserDefaults while toggled deselect switch
-- (void)updateDeselectFlag:(BOOL)value{
-    [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-#pragma mark - retrieve Deselect value from UserDefaults
-- (BOOL)getDeselectValue{
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
-        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
-            return NO;
-        } else {
-            return YES;
-        }
-    } else {
-        return NO;
     }
 }
 
@@ -220,9 +207,9 @@
         hasTopics = YES;
         if (self.topicsDialogShowUnsubscribe == YES) {
             if ([selectedTopics count] == 0) {
-                [self updateDeselectFlag:YES];
+                [CleverPush updateDeselectFlag:YES];
             } else {
-                [self updateDeselectFlag:NO];
+                [CleverPush updateDeselectFlag:NO];
             }
         }
         [tableView reloadData];
@@ -260,12 +247,24 @@
 
 #pragma mark - get the default state of the current topic.
 - (BOOL)defaultTopicState:(CPChannelTopic*)topic {
+    if (self.topicsDialogShowUnsubscribe == YES) {
+        if ([CleverPush getDeselectValue] == YES) {
+            return false;
+        } else {
+            return [self topicState:topic];
+        }
+    } else {
+        return [self topicState:topic];
+    }
+}
+    
+- (BOOL)topicState:(CPChannelTopic*)topic {
     BOOL defaultUnchecked = NO;
     if (topic && [topic defaultUnchecked]) {
         defaultUnchecked = YES;
     }
-    BOOL state = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
-    return state;
+    BOOL selectedState = (([selectedTopics count] == 0 && !hasTopics && !defaultUnchecked) || [selectedTopics containsObject:[topic id]]);
+    return selectedState;
 }
 
 #pragma mark - Delegate & DataSource List of the subscription.
@@ -292,7 +291,7 @@
     s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [headerView addSubview:s];
     
-    if ([self getDeselectValue] == YES) {
+    if ([CleverPush getDeselectValue] == YES) {
         s.on = YES;
     } else {
         s.on = NO;
