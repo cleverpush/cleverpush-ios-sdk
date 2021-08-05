@@ -1,3 +1,8 @@
+# 1.12.0
+* Refactor topic dialog
+* App Banners: Image callback support
+* New Feature: Stories
+
 # 1.11.0
 * Added `addSubscriptionTags` and `removeSubscriptionTags` methods
 
