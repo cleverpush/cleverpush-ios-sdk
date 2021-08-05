@@ -2307,14 +2307,6 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-               
-                if ([self hasSelectedTopics]) {
-                    NSMutableArray* selectedTopicIds = [self getDefaultCheckedTopicsId];
-                    if ([selectedTopicIds count] > 0) {
-                        [self setSubscriptionTopics:selectedTopicIds];
-                    }
-                }
-
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
@@ -2322,22 +2314,19 @@ static id isNil(id object) {
                 if (normalTintColor != nil) {
                     channelTopicsPicker.normalTintColor = normalTintColor;
                 }
-                
-                [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
-                    if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
-                        topicsController.topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
-                    }
-                }];
+                if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
+                    topicsController.topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
+                }
                 
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
                     if (topicsController.topicsDialogShowUnsubscribe) {
-                        if ([topicsController getDeselectValue] == YES) {
+                        if ([self getDeselectValue] == YES) {
+                            [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                             [self unsubscribe];
                         } else {
                             [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                             [self subscribe];
                         }
-                        
                     } else {
                         [self setSubscriptionTopics:[topicsController getSelectedTopics]];
                         [self subscribe];
@@ -2355,21 +2344,23 @@ static id isNil(id object) {
     }];
 }
 
-#pragma mark - check the topics if it is already exist in the userdefault or not
-+ (BOOL)hasSelectedTopics{
-    NSArray* topics = [self getSubscriptionTopics];
-    return (!topics || [topics count] == 0);
+#pragma mark - update UserDefaults while toggled deselect switch
++ (void)updateDeselectFlag:(BOOL)value{
+    [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - get the default checked topics from the console.
-+ (NSMutableArray*)getDefaultCheckedTopicsId{
-    NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
-    for (id channelTopic in channelTopics) {
-        if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
-            [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+#pragma mark - retrieve Deselect value from UserDefaults
++ (BOOL)getDeselectValue{
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
+        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
+            return NO;
+        } else {
+            return YES;
         }
+    } else {
+        return NO;
     }
-    return selectedTopicIds;
 }
 
 #pragma mark - Badge count increment
