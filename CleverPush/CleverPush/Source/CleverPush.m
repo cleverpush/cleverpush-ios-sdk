@@ -1251,6 +1251,10 @@ static id isNil(id object) {
         pendingOpenedResult = result;
     }
     if (!handleNotificationOpened) {
+        if (notification != nil && [notification valueForKey:@"url"] != nil && [[notification valueForKey:@"url"] length] != 0 && ![[notification valueForKey:@"url"] isKindOfClass:[NSNull class]]) {
+            NSURL *url = [NSURL URLWithString:[notification valueForKey:@"url"]];
+            [CPUtils openSafari:url];
+        }
         return;
     }
     
