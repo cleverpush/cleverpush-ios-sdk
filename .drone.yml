@@ -4,7 +4,7 @@ name: default
 
 steps:
 - name: Deploy Cocoa Pod
-  image: renovate/cocoapods
+  image: gaetan/cocoapods
   pull: if-not-exists
   commands:
   - pod trunk push CleverPush.podspec
