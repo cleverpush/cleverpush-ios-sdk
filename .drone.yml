@@ -1,0 +1,19 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+- name: Deploy Cocoa Pod
+  image: renovate/cocoapods
+  pull: if-not-exists
+  commands:
+  - pod trunk push CleverPush.podspec
+
+trigger:
+  branch:
+  - CP-1965_ci-deployment
+
+#trigger:
+#  ref:
+#  - refs/head/master
+#  - refs/tag/*
