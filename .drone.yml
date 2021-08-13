@@ -8,6 +8,9 @@ steps:
   pull: if-not-exists
   commands:
   - pod trunk push CleverPush.podspec
+  environment:
+    COCOA_TRUNK_TOKEN:
+      from_secret: COCOA_TRUNK_TOKEN
 
 trigger:
   branch:
