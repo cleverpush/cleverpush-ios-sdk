@@ -9,8 +9,8 @@ steps:
   commands:
   - pod trunk push CleverPush.podspec
   environment:
-    COCOA_TRUNK_TOKEN:
-      from_secret: COCOA_TRUNK_TOKEN
+    COCOAPODS_TRUNK_TOKEN:
+      from_secret: COCOAPODS_TRUNK_TOKEN
 
 trigger:
   branch:
