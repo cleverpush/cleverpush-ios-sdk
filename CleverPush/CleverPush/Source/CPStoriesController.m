@@ -12,6 +12,7 @@
         return;
     }
     [self ConfigureCPCarousel];
+    [self initialisePanGesture];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -21,6 +22,63 @@
 - (void)dealloc {
     self.carousel.delegate = nil;
     self.carousel.dataSource = nil;
+}
+
+#pragma mark - Initialise Pan Gesture for dismiss with animation
+- (void)initialisePanGesture {
+    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureAction:)];
+    [self.view addGestureRecognizer:panRecognizer];
+}
+
+#pragma mark - Gesture action
+- (void)panGestureAction:(UIPanGestureRecognizer*)panGesture {
+    CGPoint translation = [panGesture translationInView:panGesture.view.superview];
+    CGFloat topSideRestrction = CGRectGetMinX(self.view.frame);
+    CGFloat viewCurrentOrginYValue = self.view.frame.origin.y;
+    
+    if (panGesture.state == UIGestureRecognizerStateBegan || panGesture.state == UIGestureRecognizerStateChanged){
+        [self setFrameRect:CGPointMake(0, translation.y)];
+        viewCurrentOrginYValue = self.view.frame.origin.y;
+        
+        if (viewCurrentOrginYValue <= topSideRestrction) {
+            [self setInitialOffset];
+        }
+        
+    } else if (panGesture.state == UIGestureRecognizerStateEnded) {
+        CGPoint velocity = [panGesture velocityInView:panGesture.view];
+        
+        if (velocity.y >= [[UIScreen mainScreen] bounds].size.height * 60 / 100 ) {
+            [self dismissWithAnimation];
+        } else {
+            [UIView animateWithDuration:0.2 animations:^{
+                [self setInitialOffset];
+            }];
+        }
+    }
+}
+
+#pragma mark - get the frame of origin Y and dismiss
+- (void)dismissWithAnimation {
+    [UIView animateWithDuration:0.2 animations:^{
+        [self setFrameRect:CGPointMake(0, self.view.frame.origin.y)];
+    }completion:^(BOOL finished) {
+        if (finished) {
+            [self onDismiss];
+        }
+    }];
+}
+
+#pragma mark - set the frame based on the transition point
+- (void)setFrameRect:(CGPoint)point {
+    CGRect rect = self.view.frame;
+    rect.origin = point;
+    self.view.frame = rect;
+}
+
+#pragma mark - set the default frame
+- (void)setInitialOffset {
+    CGRect screenBound = [[UIScreen mainScreen] bounds];
+    self.view.frame = CGRectMake(screenBound.origin.x, screenBound.origin.y, screenBound.size.width, screenBound.size.height);
 }
 
 #pragma mark - Configure Stories Carousel
@@ -54,7 +112,8 @@
     [userController addScriptMessageHandler:self name:@"next"];
     configuration.userContentController = userController;
     configuration.allowsInlineMediaPlayback = YES;
-    
+    [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
+
     CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
@@ -73,6 +132,7 @@
     
     NSString *content = [NSString stringWithFormat:@"<!DOCTYPE html><html><head><script async src=\"https://cdn.ampproject.org/v0.js\"></script><script async custom-element=\"amp-story-player\" src=\"https://cdn.ampproject.org/v0/amp-story-player-0.1.js\"></script></head><body><amp-story-player layout=\"fixed\" width=\"%f\" height=\"%f\"><a href=\"%@\">\"%@\"</a></amp-story-player><script>var player = document.querySelector('amp-story-player');player.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});player.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});</script></body></html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
     
+    view = webview;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error){
         if (error) {
             [indicator stopAnimating];
@@ -82,7 +142,6 @@
             webview.scrollView.hidden = NO;
         }
     }];
-    view = webview;
     
     UIButton *closeButton = [[UIButton alloc]init];
     if (@available(iOS 11.0, *)) {
@@ -137,7 +196,9 @@
     if (self.storyIndex == self.stories.count - 1) {
         [self onDismiss];
     } else if (self.storyIndex >= 0) {
-        [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
+        });
     }
 }
 
@@ -145,7 +206,9 @@
     if (self.storyIndex == 0)  {
         self.carousel.currentItemIndex = 0;
     } else if (self.storyIndex >= 0) {
-        [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
+        dispatch_async(dispatch_get_main_queue(), ^(void){
+            [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
+        });
     }
 }
 
@@ -175,6 +238,9 @@
 }
 
 - (void)onDismiss {
+    self.carousel = self.carousel;
+    self.carousel.delegate = nil;
+    self.carousel.dataSource = nil;
     [delegate reloadReadStories:self.readStories];
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self dismissViewControllerAnimated:YES completion:nil];
