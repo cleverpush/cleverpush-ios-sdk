@@ -2319,10 +2319,8 @@ static id isNil(id object) {
                 }
                 
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
-                    if (
-                        topicsController.topicsDialogShowUnsubscribe
-                        && [self getDeselectValue] == YES
-                    ) {
+                    if (topicsController.topicsDialogShowUnsubscribe
+                        && [self getDeselectValue] == YES) {
                         [self unsubscribe];
                     } else {
                         [self setSubscriptionTopics:[topicsController getSelectedTopics]];
