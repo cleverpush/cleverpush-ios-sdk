@@ -66,13 +66,6 @@
     tableView.delegate = self;
     tableView.dataSource = self;
     
-    if (self.topicsDialogShowUnsubscribe == YES) {
-        if ([self getSelectedTopics].count == 0) {
-            [CleverPush updateDeselectFlag:YES];
-        } else {
-            [CleverPush updateDeselectFlag:NO];
-        }
-    }
     self.view = tableView;
 }
 
@@ -95,6 +88,7 @@
         
         tableView.tableHeaderView = [[UIView alloc] initWithFrame:titleLabel.frame];
         [tableView.tableHeaderView addSubview:titleLabel];
+        
         tableView.scrollEnabled = NO;
         // add some padding
         tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
@@ -108,7 +102,6 @@
         }
         [tableView reloadData];
         [self manageHeightLayout];
-
     }
 }
 
