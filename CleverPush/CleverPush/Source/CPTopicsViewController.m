@@ -107,11 +107,9 @@
             }
         }
         [tableView reloadData];
-    }
-}
+        [self manageHeightLayout];
 
-- (void)viewDidAppear:(BOOL)animated{
-    [self manageHeightLayout];
+    }
 }
 
 #pragma mark - Deselect Everything while switching off the switch
@@ -390,6 +388,10 @@
     } else {
         return 44;
     }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForFooterInSection:(NSInteger)section {
+    return 0;
 }
 
 @end
