@@ -362,6 +362,12 @@ static id isNil(id object) {
     
     if (autoRegister) {
         [self subscribe];
+    } else {
+        if (![self isSubscribed]) {
+            [self getChannelConfig:^(NSDictionary* channelConfig) {
+                [self initialisedTopicDialogData:channelConfig];
+            }];
+        }
     }
     
     if (subscriptionId != nil) {
@@ -390,6 +396,25 @@ static id isNil(id object) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
+}
+
++ (void)initialisedTopicDialogData:(NSDictionary*)Config {
+    NSArray* channelTopics = [Config valueForKey:@"channelTopics"];
+    if (channelTopics != nil && [channelTopics count] > 0) {
+        NSArray* topics = [self getSubscriptionTopics];
+        
+        if (!topics || [topics count] == 0) {
+            NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
+            for (id channelTopic in channelTopics) {
+                if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
+                    [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                }
+            }
+            if ([selectedTopicIds count] > 0) {
+                [self setSubscriptionTopics:selectedTopicIds];
+            }
+        }
+    }
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application goint to terminate.
@@ -788,28 +813,13 @@ static id isNil(id object) {
                             
                             [self getChannelConfig:^(NSDictionary* channelConfig) {
                                 if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                                    NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
-                                    if (channelTopics != nil && [channelTopics count] > 0) {
-                                        NSArray* topics = [self getSubscriptionTopics];
-                                        
-                                        if (!topics || [topics count] == 0) {
-                                            NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
-                                            for (id channelTopic in channelTopics) {
-                                                if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
-                                                    [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
-                                                }
-                                            }
-                                            if ([selectedTopicIds count] > 0) {
-                                                [self setSubscriptionTopics:selectedTopicIds];
-                                            }
-                                        }
-                                        
-                                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                        [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
-                                        [userDefaults synchronize];
-                                        
-                                        [self showPendingTopicsDialog];
+                                    if (![self isSubscribed]) {
+                                        [self initialisedTopicDialogData:channelConfig];
                                     }
+                                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                    [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+                                    [userDefaults synchronize];
+                                    [self showPendingTopicsDialog];
                                 }
                             }];
                             

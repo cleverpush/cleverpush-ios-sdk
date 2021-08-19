@@ -6,42 +6,115 @@
 
 @implementation CPTopicsViewController
 
+
+#pragma mark - Controller Life Cycle
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self initialisedTableView];
+}
+
+#pragma mark - initialised CPIntrinsicTableView
+- (void)initialisedTableView {
+    tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    tableView.backgroundColor = UIColor.clearColor;
+    tableView.userInteractionEnabled = YES;
+    tableView.rowHeight = UITableViewAutomaticDimension;
+    tableView.estimatedRowHeight = UITableViewAutomaticDimension;
+    tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.001)];
+    tableView.delegate = self;
+    tableView.dataSource = self;
+    self.view = tableView;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!tableView.tableHeaderView) {
+        [self tableHeaderTitle];
+        [self updateDeselectState];
+        [self reloadTableView];
+    }
+}
+
+#pragma mark - Update Deselect flag based on the selected topics
+- (void)updateDeselectState {
+    if (self.topicsDialogShowUnsubscribe == YES) {
+        if ([self getSelectedTopics].count == 0) {
+            [CleverPush updateDeselectFlag:YES];
+        } else {
+            [CleverPush updateDeselectFlag:NO];
+        }
+    }
+}
+
+#pragma mark - Set the table header title
+- (void)tableHeaderTitle {
+    int labelPaddingBottom = 15;
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    titleLabel.numberOfLines = 0;
+    [titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
+    titleLabel.text = self.title;
+    [titleLabel sizeToFit];
+    titleLabel.frame = CGRectMake(0, 0, tableView.frame.size.width, titleLabel.frame.size.height);
+    tableView.tableHeaderView = [[UIView alloc] initWithFrame:titleLabel.frame];
+    [tableView.tableHeaderView addSubview:titleLabel];
+    tableView.scrollEnabled = NO;
+    CGRect headerFrame = tableView.tableHeaderView.frame;
+    tableView.tableHeaderView.frame = CGRectMake(headerFrame.origin.x, headerFrame.origin.y, headerFrame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
+}
+
+#pragma mark - Reload Table view and manage popup height via custom delegate with the help of manageHeightLayout
+- (void)reloadTableView {
+    [tableView reloadData];
+    [self manageHeightLayout];
+}
+
 #pragma mark - Get all the available topics with selected topics
 - (id)initWithAvailableTopics:(NSArray*)topics selectedTopics:(NSArray*)userTopics hasSubscriptionTopics:(BOOL)hasTopics_ {
     self = [super init];
     if (self) {
         availableTopics = [NSMutableArray new];
         selectedTopics = [NSMutableArray arrayWithArray:userTopics];
-        hasTopics = hasTopics_;
-        
         childTopics = [NSMutableDictionary new];
         parentTopics = [NSMutableArray new];
-        for (CPChannelTopic *topic in topics) {
-            NSString* parentTopicId = [topic parentTopic];
-            if (!parentTopicId) {
-                [parentTopics addObject:topic];
-            } else {
-                NSMutableArray *childArray = [childTopics objectForKey:parentTopicId];
-                if (!childArray) {
-                    childArray = [NSMutableArray new];
-                }
-                [childArray addObject:topic];
-                [childTopics setValue:childArray forKey:parentTopicId];
-            }
-        }
-        
-        for (CPChannelTopic *topic in parentTopics) {
-            NSString* parentTopicId = [topic id];
-            [availableTopics addObject:topic];
-            NSMutableArray *childArray = [childTopics objectForKey:parentTopicId];
-            if (childArray) {
-                for (NSDictionary *childTopic in childArray) {
-                    [availableTopics addObject:childTopic];
-                }
+        hasTopics = hasTopics_;
+        [self bifurcateParentChildTopics:topics];
+        [self getAvailableTopics];
+    }
+    return self;
+}
+
+#pragma mark - Get the available topics
+- (void)getAvailableTopics {
+    for (CPChannelTopic *topic in parentTopics) {
+        NSString* parentTopicId = [topic id];
+        [availableTopics addObject:topic];
+        NSMutableArray *childArray = [childTopics objectForKey:parentTopicId];
+        if (childArray) {
+            for (NSDictionary *childTopic in childArray) {
+                [availableTopics addObject:childTopic];
             }
         }
     }
-    return self;
+}
+
+#pragma mark - Bifurcate Parent & Child topics
+- (void)bifurcateParentChildTopics:(NSArray*)topics {
+    for (CPChannelTopic *topic in topics) {
+        NSString* parentTopicId = [topic parentTopic];
+        if (!parentTopicId) {
+            [parentTopics addObject:topic];
+        } else {
+            NSMutableArray *childArray = [childTopics objectForKey:parentTopicId];
+            if (!childArray) {
+                childArray = [NSMutableArray new];
+            }
+            [childArray addObject:topic];
+            [childTopics setValue:childArray forKey:parentTopicId];
+        }
+    }
 }
 
 #pragma mark - Get all the selected topics
@@ -49,66 +122,9 @@
     return selectedTopics;
 }
 
-#pragma mark - Controller Life Cycle
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
-    tableView.translatesAutoresizingMaskIntoConstraints = NO;
-    tableView.backgroundColor = UIColor.clearColor;
-    
-    tableView.userInteractionEnabled = YES;
-    tableView.rowHeight = UITableViewAutomaticDimension;
-    tableView.estimatedRowHeight = UITableViewAutomaticDimension;
-    
-    tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.001)];
-    
-    tableView.delegate = self;
-    tableView.dataSource = self;
-    
-    self.view = tableView;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    if (!tableView.tableHeaderView) {
-        int labelPaddingBottom = 15;
-        
-        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
-        titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        
-        titleLabel.numberOfLines = 0;
-        [titleLabel setLineBreakMode:NSLineBreakByWordWrapping];
-        
-        titleLabel.text = self.title;
-        [titleLabel sizeToFit];
-        titleLabel.frame = CGRectMake(0, 0, tableView.frame.size.width, titleLabel.frame.size.height);
-        
-        tableView.tableHeaderView = [[UIView alloc] initWithFrame:titleLabel.frame];
-        [tableView.tableHeaderView addSubview:titleLabel];
-        
-        tableView.scrollEnabled = NO;
-        // add some padding
-        tableView.tableHeaderView.frame = CGRectMake(tableView.tableHeaderView.frame.origin.x, tableView.tableHeaderView.frame.origin.y, tableView.tableHeaderView.frame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
-        
-        if (self.topicsDialogShowUnsubscribe == YES) {
-            if ([self getSelectedTopics].count == 0) {
-                [CleverPush updateDeselectFlag:YES];
-            } else {
-                [CleverPush updateDeselectFlag:NO];
-            }
-        }
-        [tableView reloadData];
-        [self manageHeightLayout];
-    }
-}
-
 #pragma mark - Deselect Everything while switching off the switch
 - (void)deselectEverything:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
-    
     if (switcher.on) {
         [selectedTopics removeAllObjects];
         for (CPChannelTopic *topic in availableTopics) {
@@ -116,15 +132,9 @@
         }
         hasTopics = NO;
         [CleverPush updateDeselectFlag:YES];
-        [tableView reloadData];
-        [self manageHeightLayout];
+        [self reloadTableView];
     } else {
-        if ([self getSelectedTopics].count == 0) {
-            [CleverPush updateDeselectFlag:NO];
-        }
-        else {
-            [CleverPush updateDeselectFlag:NO];
-        }
+        [CleverPush updateDeselectFlag:NO];
     }
 }
 
@@ -144,58 +154,11 @@
         BOOL contains = [selectedTopics containsObject:topicId];
         if (switcher.on && !contains) {
             [selectedTopics addObject:topicId];
-            
-        } else if (!switcher.on && contains) {
-            [selectedTopics removeObject:topicId];
-            for (CPChannelTopic *topicone in availableTopics) {
-                NSString* parentTopicId = [topicone parentTopic];
-                if (parentTopicId != nil) {
-                    if (topicId == parentTopicId) {
-                        BOOL contains = [selectedTopics containsObject:[topicone id]];
-                        if (contains) {
-                            NSString* topiconeId = [topicone id];
-                            
-                            [selectedTopics removeObject:topiconeId];
-                            topicone.defaultUnchecked = YES;
-                        }
-                    }
-                }
-            }
-        } else if (switcher.on && contains) {
-            [selectedTopics removeObject:topicId];
-            for (CPChannelTopic *topicone in availableTopics) {
-                NSString* parentTopicId = [topicone parentTopic];
-                if (parentTopicId != nil) {
-                    if (topicId == parentTopicId) {
-                        BOOL contains = [selectedTopics containsObject:[topicone id]];
-                        if (contains) {
-                            NSString* topiconeId = [topicone id];
-                            
-                            [selectedTopics removeObject:topiconeId];
-                            topicone.defaultUnchecked = YES;
-                        }
-                    }
-                }
-            }
-        } else if (!switcher.on && !contains) {
-            [selectedTopics removeObject:topicId];
-            for (CPChannelTopic *topicone in availableTopics) {
-                NSString* parentTopicId = [topicone parentTopic];
-                if (parentTopicId != nil) {
-                    if (topicId == parentTopicId) {
-                        BOOL contains = [selectedTopics containsObject:[topicone id]];
-                        if (contains) {
-                            NSString* topiconeId = [topicone id];
-                            
-                            [selectedTopics removeObject:topiconeId];
-                            topicone.defaultUnchecked = YES;
-                        }
-                    }
-                }
-            }
+        } else if ((!switcher.on && contains) || (switcher.on && contains) || (!switcher.on && !contains)) {
+            [self setDefaultState:topicId];
         }
-        
         hasTopics = YES;
+        
         if (self.topicsDialogShowUnsubscribe == YES) {
             if ([selectedTopics count] == 0) {
                 [CleverPush updateDeselectFlag:YES];
@@ -203,8 +166,25 @@
                 [CleverPush updateDeselectFlag:NO];
             }
         }
-        [tableView reloadData];
-        [self manageHeightLayout];
+        [self reloadTableView];
+    }
+}
+
+#pragma mark - set the state of the topic checked/unchecked and if the topic has parent topics, unchecked child too with that parent topics
+- (void)setDefaultState:(NSString*)topicId {
+    [selectedTopics removeObject:topicId];
+    for (CPChannelTopic *topicone in availableTopics) {
+        NSString* parentTopicId = [topicone parentTopic];
+        if (parentTopicId != nil) {
+            if (topicId == parentTopicId) {
+                BOOL contains = [selectedTopics containsObject:[topicone id]];
+                if (contains) {
+                    NSString* topiconeId = [topicone id];
+                    [selectedTopics removeObject:topiconeId];
+                    topicone.defaultUnchecked = YES;
+                }
+            }
+        }
     }
 }
 
@@ -248,7 +228,8 @@
         return [self topicState:topic];
     }
 }
-    
+
+#pragma mark - default topic state
 - (BOOL)topicState:(CPChannelTopic*)topic {
     BOOL defaultUnchecked = NO;
     if (topic && [topic defaultUnchecked]) {
@@ -275,17 +256,17 @@
     
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
     
-    UISwitch* s = [[UISwitch alloc] init];
-    CGSize switchSize = [s sizeThatFits:CGSizeZero];
-    s.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
-    [s addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
-    s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-    [headerView addSubview:s];
+    UISwitch* deselectSwitch = [[UISwitch alloc] init];
+    CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
+    [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
+    deselectSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    [headerView addSubview:deselectSwitch];
     
     if ([CleverPush getDeselectValue] == YES) {
-        s.on = YES;
+        deselectSwitch.on = YES;
     } else {
-        s.on = NO;
+        deselectSwitch.on = NO;
     }
     
     UILabel* deselectEverything = [[UILabel alloc] init];
@@ -310,22 +291,22 @@
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.backgroundColor = UIColor.clearColor;
-        UISwitch* s = [[UISwitch alloc] init];
-        CGSize switchSize = [s sizeThatFits:CGSizeZero];
-        s.frame = CGRectMake(cell.contentView.bounds.size.width - switchSize.width - 5.0f,
-                             (cell.contentView.bounds.size.height - switchSize.height) / 2.0f,
-                             switchSize.width,
-                             switchSize.height);
-        s.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-        s.tag = topicIndex + 1;
-        s.on = [self defaultTopicState:topic];
+        UISwitch* topicSwitch = [[UISwitch alloc] init];
+        CGSize switchSize = [topicSwitch sizeThatFits:CGSizeZero];
+        topicSwitch.frame = CGRectMake(cell.contentView.bounds.size.width - switchSize.width - 5.0f,
+                                       (cell.contentView.bounds.size.height - switchSize.height) / 2.0f,
+                                       switchSize.width,
+                                       switchSize.height);
+        topicSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+        topicSwitch.tag = topicIndex + 1;
+        topicSwitch.on = [self defaultTopicState:topic];
         
-        [s addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
-        [cell.contentView addSubview:s];
+        [topicSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+        [cell.contentView addSubview:topicSwitch];
         
-        UILabel* l = [[UILabel alloc] init];
+        UILabel* topicTitle = [[UILabel alloc] init];
         
-        l.text = @"";
+        topicTitle.text = @"";
         CGRect labelFrame = CGRectInset(cell.contentView.bounds, 10.0f, 8.0f);
         labelFrame.size.width = cell.contentView.bounds.size.width / 2.0f;
         
@@ -333,15 +314,14 @@
             float inset = 30.0f;
             labelFrame.size.width -= inset;
             labelFrame.origin.x += inset;
-            s.on = [self defaultTopicState:topic];
-            
+            topicSwitch.on = [self defaultTopicState:topic];
         }
         
-        l.frame = labelFrame;
-        l.tag = 200;
-        l.backgroundColor = [UIColor clearColor];
-        cell.accessibilityLabel = l.text;
-        [cell.contentView addSubview:l];
+        topicTitle.frame = labelFrame;
+        topicTitle.tag = 200;
+        topicTitle.backgroundColor = [UIColor clearColor];
+        cell.accessibilityLabel = topicTitle.text;
+        [cell.contentView addSubview:topicTitle];
     }
     
     UISwitch *switcher = (UISwitch*)[cell.contentView viewWithTag:(topicIndex + 1)];
@@ -374,8 +354,7 @@
     return UITableViewAutomaticDimension;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section{
-    
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section {
     if (self.topicsDialogShowUnsubscribe == NO) {
         return 0;
     } else {
