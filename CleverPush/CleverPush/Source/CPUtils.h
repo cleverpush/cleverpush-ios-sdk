@@ -15,4 +15,5 @@
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
++ (NSString*)deviceName;
 @end
