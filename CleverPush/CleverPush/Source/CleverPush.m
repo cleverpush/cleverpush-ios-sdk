@@ -510,7 +510,7 @@ static id isNil(id object) {
                                 NSString *recipients = [NSString stringWithFormat:@"mailto:%@?subject=%@", appReviewEmail,appName];
                                 NSString *body = [NSString stringWithFormat:@"&body=%@", bodyData];
                                 NSString *email = [NSString stringWithFormat:@"%@%@", recipients, body];
-                                email = [email stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];;
+                                email = [email stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
                                 
                                 if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
                                     if (@available(iOS 10.0, *)) {
