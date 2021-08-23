@@ -504,12 +504,19 @@ static id isNil(id object) {
                             UIAlertController *alertFeedbackController = [UIAlertController alertControllerWithTitle:appReviewFeedbackTitle message:@"" preferredStyle:UIAlertControllerStyleAlert];
                             
                             UIAlertAction *actionFeedbackYes = [UIAlertAction actionWithTitle:appReviewYes style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                NSString *emailUrl = [NSString stringWithFormat:@"mailto:%@?subject=App+Feedback", appReviewEmail];
+                                NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+                                NSString* model = [CPUtils deviceName];
+                                NSString *bodyData = [NSString stringWithFormat:@"• OS: %@ • OS Version: %@ • Manufacturer: %@ • Device: %@ • Model: %@", UIDevice.currentDevice.systemName, UIDevice.currentDevice.systemVersion, @"Apple", UIDevice.currentDevice.systemName, model];
+                                NSString *recipients = [NSString stringWithFormat:@"mailto:%@?subject=%@", appReviewEmail,appName];
+                                NSString *body = [NSString stringWithFormat:@"&body=%@", bodyData];
+                                NSString *email = [NSString stringWithFormat:@"%@%@", recipients, body];
+                                email = [email stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+                                
                                 if ([[UIDevice currentDevice].systemVersion floatValue] >= 10.0) {
                                     if (@available(iOS 10.0, *)) {
-                                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl] options:@{} completionHandler:^(BOOL success) {
+                                        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:email] options:@{} completionHandler:^(BOOL success) {
                                             if (!success) {
-                                                NSLog(@"CleverPush: failed to open mail app: %@", emailUrl);
+                                                NSLog(@"CleverPush: failed to open mail app: %@", email);
                                             }
                                         }];
                                     } else {
@@ -518,7 +525,7 @@ static id isNil(id object) {
                                 } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-                                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:emailUrl]];
+                                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:email]];
 #pragma clang diagnostic pop
                                 }
                             }];
