@@ -362,12 +362,6 @@ static id isNil(id object) {
     
     if (autoRegister) {
         [self subscribe];
-    } else {
-        if (![self isSubscribed]) {
-            [self getChannelConfig:^(NSDictionary* channelConfig) {
-                [self initialisedTopicDialogData:channelConfig];
-            }];
-        }
     }
     
     if (subscriptionId != nil) {
@@ -398,8 +392,8 @@ static id isNil(id object) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
 }
 
-+ (void)initialisedTopicDialogData:(NSDictionary*)Config {
-    NSArray* channelTopics = [Config valueForKey:@"channelTopics"];
++ (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend{
+    NSArray* channelTopics = [config valueForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         NSArray* topics = [self getSubscriptionTopics];
         
@@ -411,10 +405,28 @@ static id isNil(id object) {
                 }
             }
             if ([selectedTopicIds count] > 0) {
-                [self setSubscriptionTopics:selectedTopicIds];
+                if (syncToBackend) {
+                    [self setSubscriptionTopics:selectedTopicIds];
+                } else {
+                    [self setDefaultCheckedTopics:selectedTopicIds];
+                }
             }
         }
     }
+}
+
+#pragma mark - update the user defaults value of selected Topics Dialog.
++ (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    if (!topicsVersion) {
+        topicsVersion = 1;
+    } else {
+        topicsVersion += 1;
+    }
+    [userDefaults setObject:topics forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    [userDefaults setInteger:topicsVersion forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    [userDefaults synchronize];
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application goint to terminate.
@@ -814,7 +826,7 @@ static id isNil(id object) {
                             [self getChannelConfig:^(NSDictionary* channelConfig) {
                                 if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
                                     if (![self isSubscribed]) {
-                                        [self initialisedTopicDialogData:channelConfig];
+                                        [self initTopicsDialogData:channelConfig syncToBackend:YES];
                                     }
                                     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                                     [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
@@ -1894,19 +1906,7 @@ static id isNil(id object) {
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 + (void)setSubscriptionTopics:(NSMutableArray *)topics {
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
-    if (!topicsVersion) {
-        topicsVersion = 1;
-    } else {
-        topicsVersion += 1;
-    }
-    
-    [userDefaults setObject:topics forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
-    [userDefaults setInteger:topicsVersion forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
-    [userDefaults synchronize];
-    
+    [self setDefaultCheckedTopics:topics];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
     });
@@ -2317,6 +2317,11 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
+                if (!autoRegister) {
+                    if (![self isSubscribed]) {
+                        [self initTopicsDialogData:channelConfig syncToBackend:NO];
+                    }
+                }
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
