@@ -1,3 +1,7 @@
+# 1.12.1
+* Fixed topics dialog with autoRegister: false
+* Optimized app review feedback email
+
 # 1.12.0
 * Refactor topics dialog
 * App Banners: Image callback support
