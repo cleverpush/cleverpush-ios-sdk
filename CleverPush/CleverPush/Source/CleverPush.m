@@ -2317,10 +2317,8 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (!autoRegister) {
-                    if (![self isSubscribed]) {
-                        [self initTopicsDialogData:channelConfig syncToBackend:NO];
-                    }
+                if (!autoRegister && ![self isSubscribed]) {
+                    [self initTopicsDialogData:channelConfig syncToBackend:NO];
                 }
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
