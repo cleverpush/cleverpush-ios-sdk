@@ -1,3 +1,6 @@
+# 1.12.2
+* Fixed Chat subscribeCallback
+
 # 1.12.1
 * Fixed topics dialog with autoRegister: false
 * Optimized app review feedback email
