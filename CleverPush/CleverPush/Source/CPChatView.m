@@ -32,7 +32,7 @@ NSString* lastSubscriptionId;
         WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
         WKUserContentController* userController = [[WKUserContentController alloc] init];
         
-        [userController addScriptMessageHandler:self name:@""];
+        [userController addScriptMessageHandler:self name:@"chat"];
         configuration.userContentController = userController;
         
         _webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
