@@ -3,9 +3,9 @@
 #import "CPIntrinsicTableView.h"
 #import "CPChannelTopic.h"
 #import "CPTranslate.h"
+#import "CPTopicDialogCell.h"
 
 @implementation CPTopicsViewController
-
 
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
@@ -18,6 +18,8 @@
     tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     tableView.translatesAutoresizingMaskIntoConstraints = NO;
     tableView.backgroundColor = UIColor.clearColor;
+    UINib *nib = [UINib nibWithNibName:@"CPTopicDialogCell" bundle:nil];
+    [tableView registerNib:nib forCellReuseIdentifier:@"CPTopicDialogCell"];
     tableView.userInteractionEnabled = YES;
     tableView.rowHeight = UITableViewAutomaticDimension;
     tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -278,59 +280,34 @@
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
+    
+    CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
+    cell.backgroundColor = UIColor.clearColor;
+    NSArray *nibs = [[NSBundle mainBundle]loadNibNamed:@"CPTopicDialogCell" owner:self options:nil];
+    if(cell == nil)
+        cell = nibs[0];
     int row = (int)indexPath.row;
     CPChannelTopic *topic = [self getTopic:row];
     
     NSString* topicId = [topic id];
     int topicIndex = [self getTopicIndex:topicId];
     
-    NSString* cellIdentifier = [NSString stringWithFormat:@"switchCell-%@", topicId];
+    cell.operatableSwitch.tag = topicIndex + 1;
+    cell.operatableSwitch.on = [self defaultTopicState:topic] ? YES : NO;
     
-    // NSLog(@"cellForRowAtIndexPath: %@ %d", cellIdentifier, topicIndex);
-    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        cell.backgroundColor = UIColor.clearColor;
-        UISwitch* topicSwitch = [[UISwitch alloc] init];
-        CGSize switchSize = [topicSwitch sizeThatFits:CGSizeZero];
-        topicSwitch.frame = CGRectMake(cell.contentView.bounds.size.width - switchSize.width - 5.0f,
-                                       (cell.contentView.bounds.size.height - switchSize.height) / 2.0f,
-                                       switchSize.width,
-                                       switchSize.height);
-        topicSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
-        topicSwitch.tag = topicIndex + 1;
-        topicSwitch.on = [self defaultTopicState:topic];
-        
-        [topicSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
-        [cell.contentView addSubview:topicSwitch];
-        
-        UILabel* topicTitle = [[UILabel alloc] init];
-        
-        topicTitle.text = @"";
-        CGRect labelFrame = CGRectInset(cell.contentView.bounds, 10.0f, 8.0f);
-        labelFrame.size.width = cell.contentView.bounds.size.width / 2.0f;
-        
-        if ([topic parentTopic]) {
-            float inset = 30.0f;
-            labelFrame.size.width -= inset;
-            labelFrame.origin.x += inset;
-            topicSwitch.on = [self defaultTopicState:topic];
-        }
-        
-        topicTitle.frame = labelFrame;
-        topicTitle.tag = 200;
-        topicTitle.backgroundColor = [UIColor clearColor];
-        cell.accessibilityLabel = topicTitle.text;
-        [cell.contentView addSubview:topicTitle];
+    [cell.operatableSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+    if ([topic parentTopic]) {
+        float inset = 30.0;
+        cell.leadingConstraints.constant = inset;
+        cell.operatableSwitch.on = [self defaultTopicState:topic];
+    } else {
+        float inset = 05.0;
+        cell.leadingConstraints.constant = inset;
     }
-    
-    UISwitch *switcher = (UISwitch*)[cell.contentView viewWithTag:(topicIndex + 1)];
-    UILabel *nameLabel = (UILabel*)[cell.contentView viewWithTag:200];
-    
-    nameLabel.text = [topic name];
-    
-    switcher.on = [self defaultTopicState:topic] ? YES : NO;
-    
+    cell.titleText.text = [topic name];
+    cell.titleText.tag = 200;
+    cell.titleText.backgroundColor = [UIColor clearColor];
+    cell.accessibilityLabel = cell.titleText.text;
     return cell;
 }
 
