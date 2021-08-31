@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="CPTopicDialogCell" id="jB0-hP-w81" customClass="CPTopicDialogCell">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="jB0-hP-w81" id="pqY-iv-Sfg">
+                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bNE-1t-IPl">
+                        <rect key="frame" x="355" y="6.5" width="51" height="31"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="31" id="bbz-CP-x2q"/>
+                            <constraint firstAttribute="width" constant="49" id="cKf-R4-qZj"/>
+                        </constraints>
+                    </switch>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X8f-s1-fsz">
+                        <rect key="frame" x="5" y="10" width="340" height="24"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="X8f-s1-fsz" firstAttribute="top" secondItem="pqY-iv-Sfg" secondAttribute="top" constant="10" id="97d-Rp-t0T"/>
+                    <constraint firstItem="bNE-1t-IPl" firstAttribute="leading" secondItem="X8f-s1-fsz" secondAttribute="trailing" constant="10" id="D6y-ON-8H3"/>
+                    <constraint firstAttribute="bottom" secondItem="X8f-s1-fsz" secondAttribute="bottom" constant="10" id="KWO-DB-L6a"/>
+                    <constraint firstItem="X8f-s1-fsz" firstAttribute="leading" secondItem="pqY-iv-Sfg" secondAttribute="leading" constant="5" id="WRP-9s-Pjy"/>
+                    <constraint firstItem="bNE-1t-IPl" firstAttribute="centerY" secondItem="pqY-iv-Sfg" secondAttribute="centerY" id="ckw-os-GVz"/>
+                    <constraint firstAttribute="trailing" secondItem="bNE-1t-IPl" secondAttribute="trailing" constant="10" id="jxv-M1-NvP"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="leadingConstraints" destination="WRP-9s-Pjy" id="KRb-5c-zzK"/>
+                <outlet property="operatableSwitch" destination="bNE-1t-IPl" id="HeJ-G4-14I"/>
+                <outlet property="titleText" destination="X8f-s1-fsz" id="iGo-ou-1kO"/>
+            </connections>
+            <point key="canvasLocation" x="-262" y="7"/>
+        </tableViewCell>
+    </objects>
+</document>
