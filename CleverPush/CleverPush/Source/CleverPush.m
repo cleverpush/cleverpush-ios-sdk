@@ -2314,6 +2314,7 @@ static id isNil(id object) {
         channelTopics = channelTopics_;
         if ([channelTopics count] == 0) {
             NSLog(@"CleverPush: showTopicsDialog: No topics found. Create some first in the CleverPush channel settings.");
+            return;
         }
         
         [self getChannelConfig:^(NSDictionary* channelConfig) {
