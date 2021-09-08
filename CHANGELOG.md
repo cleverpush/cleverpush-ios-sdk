@@ -1,3 +1,6 @@
+# 1.12.3
+* Fixed Topics Dialog showing when no topics available
+
 # 1.12.2
 * Fixed Chat subscribeCallback
 
