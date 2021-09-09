@@ -194,6 +194,19 @@
     return [difference day];
 }
 
+#pragma mark - Update last check out time of topic dialog
++ (void)updateLastCheckedTime {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_LAST_CHECKED_TIME"];
+    [userDefaults synchronize];
+}
+
+#pragma mark - Get the last check out time of topic dialog
++ (NSDate*)getLastCheckedTime {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    return [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] ? [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] : [NSDate date];
+}
+
 #pragma mark -  General function to get the color from hex string
 + (NSString *)hexStringFromColor:(UIColor *)color {
     const CGFloat *components = CGColorGetComponents(color.CGColor);

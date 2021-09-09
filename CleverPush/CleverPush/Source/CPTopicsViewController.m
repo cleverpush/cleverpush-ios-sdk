@@ -13,6 +13,14 @@
     [self initialisedTableView];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [self reloadTableView];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [CPUtils updateLastCheckedTime];
+}
+
 #pragma mark - initialised CPIntrinsicTableView
 - (void)initialisedTableView {
     tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
@@ -33,8 +41,6 @@
     [super viewWillAppear:animated];
     if (!tableView.tableHeaderView) {
         [self tableHeaderTitle];
-        [self updateDeselectState];
-        [self reloadTableView];
     }
 }
 
@@ -47,6 +53,7 @@
             [CleverPush updateDeselectFlag:NO];
         }
     }
+    [self reloadTableView];
 }
 
 #pragma mark - Set the table header title
@@ -65,6 +72,7 @@
     tableView.scrollEnabled = NO;
     CGRect headerFrame = tableView.tableHeaderView.frame;
     tableView.tableHeaderView.frame = CGRectMake(headerFrame.origin.x, headerFrame.origin.y, headerFrame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
+    [self updateDeselectState];
 }
 
 #pragma mark - Reload Table view and manage popup height via custom delegate with the help of manageHeightLayout
@@ -260,9 +268,8 @@
     
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + 5.0), (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
     [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
-    deselectSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [headerView addSubview:deselectSwitch];
     
     if ([CleverPush getDeselectValue] == YES) {
@@ -272,8 +279,10 @@
     }
     
     UILabel* deselectEverything = [[UILabel alloc] init];
-    deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
-    deselectEverything.frame = CGRectMake(10.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (10 + switchSize.width), switchSize.height);
+    deselectEverything.text = @"Deselect Everything";
+    deselectEverything.frame = CGRectMake(5.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (switchSize.width + 5.0), switchSize.height);
+    deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
+    
     [headerView addSubview:deselectEverything];
     
     return headerView;
@@ -282,7 +291,7 @@
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     
     CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
-    cell.backgroundColor = UIColor.clearColor;
+    cell.backgroundColor = [UIColor clearColor];
     NSArray *nibs = [[NSBundle mainBundle]loadNibNamed:@"CPTopicDialogCell" owner:self options:nil];
     if(cell == nil)
         cell = nibs[0];
@@ -304,6 +313,16 @@
         float inset = 05.0;
         cell.leadingConstraints.constant = inset;
     }
+    NSDate *addedCacheDelay = [[topic createdAt] dateByAddingTimeInterval:+60*60];
+    NSComparisonResult result;
+    result = [addedCacheDelay compare:[CPUtils getLastCheckedTime]];
+    
+    if (self.topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
+        cell.topicHighlighter.hidden = NO;
+    } else {
+        cell.topicHighlighter.hidden = YES;
+    }
+    
     cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
