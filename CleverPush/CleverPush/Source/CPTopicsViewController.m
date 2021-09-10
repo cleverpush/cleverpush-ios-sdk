@@ -5,12 +5,25 @@
 #import "CPTranslate.h"
 #import "CPTopicDialogCell.h"
 
+static CGFloat const CPTopicHeight = 44;
+static CGFloat const CPTopicCellLeading = 5.0;
+static CGFloat const CPTopicHeightDivider = 2.0f;
+static CGFloat const CPConstraints = 30.0;
+
 @implementation CPTopicsViewController
 
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initialisedTableView];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [self reloadTableView];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [CPUtils updateLastCheckedTime];
 }
 
 #pragma mark - initialised CPIntrinsicTableView
@@ -33,8 +46,6 @@
     [super viewWillAppear:animated];
     if (!tableView.tableHeaderView) {
         [self tableHeaderTitle];
-        [self updateDeselectState];
-        [self reloadTableView];
     }
 }
 
@@ -47,12 +58,13 @@
             [CleverPush updateDeselectFlag:NO];
         }
     }
+    [self reloadTableView];
 }
 
 #pragma mark - Set the table header title
 - (void)tableHeaderTitle {
     int labelPaddingBottom = 15;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, CPConstraints)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     titleLabel.numberOfLines = 0;
@@ -65,6 +77,7 @@
     tableView.scrollEnabled = NO;
     CGRect headerFrame = tableView.tableHeaderView.frame;
     tableView.tableHeaderView.frame = CGRectMake(headerFrame.origin.x, headerFrame.origin.y, headerFrame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
+    [self updateDeselectState];
 }
 
 #pragma mark - Reload Table view and manage popup height via custom delegate with the help of manageHeightLayout
@@ -256,13 +269,19 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, CPTopicHeight)];
     
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - switchSize.width - 5.0f, (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, switchSize.width, switchSize.height);
+    
+    if ([CleverPush getNormalTintColor]) {
+        deselectSwitch.onTintColor = [CleverPush getNormalTintColor];
+    } else {
+        deselectSwitch.onTintColor = [UIColor systemGreenColor];
+    }
+    
     [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
-    deselectSwitch.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     [headerView addSubview:deselectSwitch];
     
     if ([CleverPush getDeselectValue] == YES) {
@@ -273,7 +292,8 @@
     
     UILabel* deselectEverything = [[UILabel alloc] init];
     deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
-    deselectEverything.frame = CGRectMake(10.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (10 + switchSize.width), switchSize.height);
+    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
+    deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
     [headerView addSubview:deselectEverything];
     
     return headerView;
@@ -282,7 +302,7 @@
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     
     CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
-    cell.backgroundColor = UIColor.clearColor;
+    cell.backgroundColor = [UIColor clearColor];
     NSArray *nibs = [[NSBundle mainBundle]loadNibNamed:@"CPTopicDialogCell" owner:self options:nil];
     if(cell == nil)
         cell = nibs[0];
@@ -294,16 +314,35 @@
     
     cell.operatableSwitch.tag = topicIndex + 1;
     cell.operatableSwitch.on = [self defaultTopicState:topic] ? YES : NO;
-    
     [cell.operatableSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+    if ([CleverPush getNormalTintColor]) {
+        cell.operatableSwitch.onTintColor = [CleverPush getNormalTintColor];
+    } else {
+        cell.operatableSwitch.onTintColor = [UIColor systemGreenColor];
+    }
     if ([topic parentTopic]) {
-        float inset = 30.0;
+        float inset = CPConstraints;
         cell.leadingConstraints.constant = inset;
         cell.operatableSwitch.on = [self defaultTopicState:topic];
     } else {
-        float inset = 05.0;
+        float inset = CPTopicCellLeading;
         cell.leadingConstraints.constant = inset;
     }
+    NSDate *addedCacheDelay = [[topic createdAt] dateByAddingTimeInterval:+60*60];
+    NSComparisonResult result;
+    result = [addedCacheDelay compare:[CPUtils getLastCheckedTime]];
+    
+    if (self.topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
+        cell.topicHighlighter.hidden = NO;
+        if ([CleverPush getBrandingColor]) {
+            cell.topicHighlighter.textColor = [CleverPush getBrandingColor];
+        } else {
+            cell.topicHighlighter.textColor = [UIColor systemBlueColor];
+        }
+    } else {
+        cell.topicHighlighter.hidden = YES;
+    }
+    
     cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
@@ -335,7 +374,7 @@
     if (self.topicsDialogShowUnsubscribe == NO) {
         return 0;
     } else {
-        return 44;
+        return CPTopicHeight;
     }
 }
 

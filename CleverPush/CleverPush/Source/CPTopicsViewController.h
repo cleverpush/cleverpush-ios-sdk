@@ -16,6 +16,7 @@
 #pragma mark - Class Variables
 @property (nonatomic, assign) BOOL topicsDialogShowUnsubscribe;
 @property (nonatomic, weak) id<ManageHeight> delegate;
+@property (nonatomic, assign) BOOL topicsDialogShowWhenNewAdded;
 
 #pragma mark - Class Methods
 - (id)initWithAvailableTopics:(NSArray*)topics selectedTopics:(NSArray*)userTopics hasSubscriptionTopics:(BOOL)hasTopics;

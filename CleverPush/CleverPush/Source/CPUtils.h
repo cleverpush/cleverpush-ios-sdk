@@ -9,6 +9,8 @@
 + (NSString*)downloadMedia:(NSString*)urlString;
 + (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj;
 + (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime;
++ (void)updateLastCheckedTime;
++ (NSDate*)getLastCheckedTime;
 + (NSString *)hexStringFromColor:(UIColor *)color;
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
 + (BOOL)isEmpty:(id)thing;

@@ -2339,6 +2339,10 @@ static id isNil(id object) {
                     topicsController.topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
                 }
                 
+                if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowWhenNewAdded"]) {
+                    topicsController.topicsDialogShowWhenNewAdded = [[channelConfig valueForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
+                }
+                
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
                     if (topicsController.topicsDialogShowUnsubscribe
                         && [self getDeselectValue] == YES) {
@@ -2412,6 +2416,10 @@ static id isNil(id object) {
 
 + (void)setNormalTintColor:(UIColor *)color {
     normalTintColor = color;
+}
+
++ (UIColor*)getNormalTintColor {
+    return normalTintColor;
 }
 
 + (void)setTopicsDialogWindow:(UIWindow *)window {
