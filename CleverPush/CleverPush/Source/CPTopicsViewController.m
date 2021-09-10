@@ -5,6 +5,11 @@
 #import "CPTranslate.h"
 #import "CPTopicDialogCell.h"
 
+static CGFloat const CPTopicHeight = 44;
+static CGFloat const CPTopicCellLeading = 5.0;
+static CGFloat const CPTopicHeightDevisor = 2.0f;
+static CGFloat const CPConstrains = 30.0;
+
 @implementation CPTopicsViewController
 
 #pragma mark - Controller Life Cycle
@@ -59,7 +64,7 @@
 #pragma mark - Set the table header title
 - (void)tableHeaderTitle {
     int labelPaddingBottom = 15;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 30)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, CPConstrains)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     titleLabel.numberOfLines = 0;
@@ -264,11 +269,11 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, 44)];
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, CPTopicHeight)];
     
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + 5.0), (44 - switchSize.height) / 2.0f, switchSize.width, switchSize.height);
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, switchSize.width, switchSize.height);
     [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
     [headerView addSubview:deselectSwitch];
     
@@ -279,8 +284,8 @@
     }
     
     UILabel* deselectEverything = [[UILabel alloc] init];
-    deselectEverything.text = @"Deselect Everything";
-    deselectEverything.frame = CGRectMake(5.0, (44 - switchSize.height) / 2.0f, tableView.bounds.size.width - (switchSize.width + 5.0), switchSize.height);
+    deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
+    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
     deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
     
     [headerView addSubview:deselectEverything];
@@ -306,11 +311,11 @@
     
     [cell.operatableSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
     if ([topic parentTopic]) {
-        float inset = 30.0;
+        float inset = CPConstrains;
         cell.leadingConstraints.constant = inset;
         cell.operatableSwitch.on = [self defaultTopicState:topic];
     } else {
-        float inset = 05.0;
+        float inset = CPTopicCellLeading;
         cell.leadingConstraints.constant = inset;
     }
     NSDate *addedCacheDelay = [[topic createdAt] dateByAddingTimeInterval:+60*60];
@@ -319,6 +324,11 @@
     
     if (self.topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
         cell.topicHighlighter.hidden = NO;
+        if ([CleverPush getBrandingColor]) {
+            cell.topicHighlighter.textColor = [CleverPush getBrandingColor];
+        } else {
+            cell.topicHighlighter.textColor = [UIColor systemBlueColor];
+        }
     } else {
         cell.topicHighlighter.hidden = YES;
     }
@@ -354,7 +364,7 @@
     if (self.topicsDialogShowUnsubscribe == NO) {
         return 0;
     } else {
-        return 44;
+        return CPTopicHeight;
     }
 }
 
