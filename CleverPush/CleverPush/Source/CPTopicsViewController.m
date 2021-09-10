@@ -7,8 +7,8 @@
 
 static CGFloat const CPTopicHeight = 44;
 static CGFloat const CPTopicCellLeading = 5.0;
-static CGFloat const CPTopicHeightDevisor = 2.0f;
-static CGFloat const CPConstrains = 30.0;
+static CGFloat const CPTopicHeightDivider = 2.0f;
+static CGFloat const CPConstraints = 30.0;
 
 @implementation CPTopicsViewController
 
@@ -64,7 +64,7 @@ static CGFloat const CPConstrains = 30.0;
 #pragma mark - Set the table header title
 - (void)tableHeaderTitle {
     int labelPaddingBottom = 15;
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, CPConstrains)];
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, CPConstraints)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     titleLabel.numberOfLines = 0;
@@ -273,7 +273,7 @@ static CGFloat const CPConstrains = 30.0;
     
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, switchSize.width, switchSize.height);
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, switchSize.width, switchSize.height);
     
     if ([CleverPush getNormalTintColor]) {
         deselectSwitch.onTintColor = [CleverPush getNormalTintColor];
@@ -292,7 +292,7 @@ static CGFloat const CPConstrains = 30.0;
     
     UILabel* deselectEverything = [[UILabel alloc] init];
     deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
-    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
+    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
     deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
     [headerView addSubview:deselectEverything];
     
@@ -321,7 +321,7 @@ static CGFloat const CPConstrains = 30.0;
         cell.operatableSwitch.onTintColor = [UIColor systemGreenColor];
     }
     if ([topic parentTopic]) {
-        float inset = CPConstrains;
+        float inset = CPConstraints;
         cell.leadingConstraints.constant = inset;
         cell.operatableSwitch.on = [self defaultTopicState:topic];
     } else {
