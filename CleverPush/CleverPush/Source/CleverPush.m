@@ -2418,6 +2418,10 @@ static id isNil(id object) {
     normalTintColor = color;
 }
 
++ (UIColor*)getNormalTintColor {
+    return normalTintColor;
+}
+
 + (void)setTopicsDialogWindow:(UIWindow *)window {
     topicsDialogWindow = window;
 }

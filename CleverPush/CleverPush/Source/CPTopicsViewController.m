@@ -274,6 +274,13 @@ static CGFloat const CPConstrains = 30.0;
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
     deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, switchSize.width, switchSize.height);
+    
+    if ([CleverPush getNormalTintColor]) {
+        deselectSwitch.onTintColor = [CleverPush getNormalTintColor];
+    } else {
+        deselectSwitch.onTintColor = [UIColor systemGreenColor];
+    }
+    
     [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
     [headerView addSubview:deselectSwitch];
     
@@ -287,7 +294,6 @@ static CGFloat const CPConstrains = 30.0;
     deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
     deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDevisor, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
     deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
-    
     [headerView addSubview:deselectEverything];
     
     return headerView;
@@ -308,8 +314,12 @@ static CGFloat const CPConstrains = 30.0;
     
     cell.operatableSwitch.tag = topicIndex + 1;
     cell.operatableSwitch.on = [self defaultTopicState:topic] ? YES : NO;
-    
     [cell.operatableSwitch addTarget:self action:@selector(switchChanged:) forControlEvents:UIControlEventValueChanged];
+    if ([CleverPush getNormalTintColor]) {
+        cell.operatableSwitch.onTintColor = [CleverPush getNormalTintColor];
+    } else {
+        cell.operatableSwitch.onTintColor = [UIColor systemGreenColor];
+    }
     if ([topic parentTopic]) {
         float inset = CPConstrains;
         cell.leadingConstraints.constant = inset;
