@@ -120,6 +120,7 @@ BOOL channelTopicsPickerVisible = NO;
 BOOL developmentMode = NO;
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
+BOOL hasWebViewOpened = NO;
 BOOL hasTrackingConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
 
@@ -1251,9 +1252,11 @@ static id isNil(id object) {
         pendingOpenedResult = result;
     }
     if (!handleNotificationOpened) {
-        if (notification != nil && [notification valueForKey:@"url"] != nil && [[notification valueForKey:@"url"] length] != 0 && ![[notification valueForKey:@"url"] isKindOfClass:[NSNull class]]) {
-            NSURL *url = [NSURL URLWithString:[notification valueForKey:@"url"]];
-            [CPUtils openSafari:url];
+        if (hasWebViewOpened) {
+            if (notification != nil && [notification valueForKey:@"url"] != nil && [[notification valueForKey:@"url"] length] != 0 && ![[notification valueForKey:@"url"] isKindOfClass:[NSNull class]]) {
+                NSURL *url = [NSURL URLWithString:[notification valueForKey:@"url"]];
+                [CPUtils openSafari:url];
+            }
         }
         return;
     }
@@ -2349,6 +2352,11 @@ static id isNil(id object) {
 + (void)updateDeselectFlag:(BOOL)value{
     [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - update the hasWebViewOpened value based on the user's Boolean argument.
++ (void)setWebViewOpenedEnabled:(BOOL)opened {
+    hasWebViewOpened = opened;
 }
 
 #pragma mark - retrieve Deselect value from UserDefaults
