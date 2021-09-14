@@ -7,7 +7,6 @@ Pod::Spec.new do |s|
     s.author                  = { "CleverPush" => "support@cleverpush.com" }
     s.ios.deployment_target   = "9.0"
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
-    s.source_files            = 'CleverPush/Source/.{h,m}'
     s.resources               = ['CleverPush/Source/CPTopicDialogCell.xib']
     s.platform                = :ios
     s.requires_arc            = true
