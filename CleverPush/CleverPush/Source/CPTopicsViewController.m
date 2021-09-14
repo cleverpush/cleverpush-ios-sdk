@@ -26,13 +26,24 @@ static CGFloat const CPConstraints = 30.0;
     [CPUtils updateLastCheckedTime];
 }
 
+- (NSBundle*)getCPAssetBundle{
+    NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
+    NSString* path = [resourcePath
+    stringByAppendingPathComponent:@"CPAssetBundle.bundle"];
+    return [NSBundle bundleWithPath:path];
+}
+
 #pragma mark - initialised CPIntrinsicTableView
 - (void)initialisedTableView {
     tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     tableView.translatesAutoresizingMaskIntoConstraints = NO;
     tableView.backgroundColor = UIColor.clearColor;
-    UINib *nib = [UINib nibWithNibName:@"CPTopicDialogCell" bundle:nil];
-    [tableView registerNib:nib forCellReuseIdentifier:@"CPTopicDialogCell"];
+    NSBundle *bundle = [self getCPAssetBundle];
+    if(bundle)
+    {
+        UINib *nib = [UINib nibWithNibName:@"CPTopicDialogCell" bundle:bundle];
+        [tableView registerNib:nib forCellReuseIdentifier:@"CPTopicDialogCell"];
+    }
     tableView.userInteractionEnabled = YES;
     tableView.rowHeight = UITableViewAutomaticDimension;
     tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -303,7 +314,13 @@ static CGFloat const CPConstraints = 30.0;
     
     CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
     cell.backgroundColor = [UIColor clearColor];
-    NSArray *nibs = [[NSBundle mainBundle]loadNibNamed:@"CPTopicDialogCell" owner:self options:nil];
+    NSBundle *bundle = [self getCPAssetBundle];
+    NSArray *nibs = [[NSArray alloc]init];
+    if(bundle) {
+        nibs = [[bundle loadNibNamed:@"CPTopicDialogCell" owner:self options:nil] lastObject];
+    } else {
+        nibs = [[[NSBundle mainBundle] loadNibNamed:@"CPTopicDialogCell" owner:nil options:nil] lastObject];
+    }
     if(cell == nil)
         cell = nibs[0];
     int row = (int)indexPath.row;
