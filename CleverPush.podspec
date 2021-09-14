@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
     s.author                  = { "CleverPush" => "support@cleverpush.com" }
     s.ios.deployment_target   = "9.0"
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
-    s.resources               = ['CleverPush/Source/CPTopicDialogCell.xib']
+    s.resources               = "CPAssetBundle.bundle/**/*.{png,jpeg,jpg,storyboard,xib,xcassets,plist}"
     s.platform                = :ios
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices"
