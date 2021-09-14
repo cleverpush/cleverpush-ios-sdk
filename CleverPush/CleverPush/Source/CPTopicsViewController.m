@@ -26,7 +26,7 @@ static CGFloat const CPConstraints = 30.0;
     [CPUtils updateLastCheckedTime];
 }
 
-+ (NSBundle *)getAssetsBundle {
+- (NSBundle *)getAssetsBundle {
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSBundle *sourceBundle = [NSBundle bundleForClass:[self class]];
 
@@ -35,12 +35,6 @@ static CGFloat const CPConstraints = 30.0;
     bundle = bundle ? : [NSBundle bundleWithPath:[sourceBundle pathForResource:@"CleverPushResources"
                                                                         ofType:@"bundle"]];
     return bundle ? : sourceBundle;
-}
-
-- (NSBundle*)getAssetsBundle {
-    NSBundle *bundle = [NSBundle bundleForClass:self.classForCoder];
-    NSURL *bundleURL = [[bundle resourceURL] URLByAppendingPathComponent:@"CleverPush.bundle"];
-    return [NSBundle bundleWithURL:bundleURL];
 }
 
 #pragma mark - initialised CPIntrinsicTableView
