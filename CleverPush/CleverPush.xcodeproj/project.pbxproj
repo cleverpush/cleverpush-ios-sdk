@@ -213,6 +213,8 @@
 		CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
 		CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
+		CB913BBA26F08803000BB09B /* CPTopicDialogCell.xib in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */; };
+		CB913BBB26F0880D000BB09B /* CPTopicDialogCell.xib in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */; };
 		CBA1906926DE5909001B8F39 /* CPTopicDialogCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */; };
 		CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
 		CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
@@ -1047,6 +1049,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB913BBA26F08803000BB09B /* CPTopicDialogCell.xib in Sources */,
 				CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
@@ -1114,6 +1117,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB913BBB26F0880D000BB09B /* CPTopicDialogCell.xib in Sources */,
 				291FCD262525DC2800F5185E /* DWAlertDismissalAnimationController.m in Sources */,
 				298F4FC125002D6700F086D3 /* CPUtils.m in Sources */,
 				29DB960123FC3763008FC985 /* CleverPush.m in Sources */,
