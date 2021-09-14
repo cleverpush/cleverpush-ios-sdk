@@ -1,3 +1,6 @@
+# 1.12.5
+* Updated font family in topics dialog
+
 # 1.12.4
 * Fixed nib file missing in resources
 
