@@ -306,7 +306,7 @@ static CGFloat const CPConstraints = 30.0;
     UILabel* deselectEverything = [[UILabel alloc] init];
     deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
     deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
-    deselectEverything.font = [UIFont fontWithName:@"AvenirNext-Medium" size:15.0];
+    [deselectEverything setFont:[UIFont systemFontOfSize:(CGFloat)(15.0) weight:UIFontWeightRegular]];
     [headerView addSubview:deselectEverything];
     
     return headerView;
