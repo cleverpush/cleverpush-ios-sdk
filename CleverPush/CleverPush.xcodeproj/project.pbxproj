@@ -249,8 +249,6 @@
 		CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989B72679D68A003DE995 /* CPStoryView.m */; };
 		CBA989BE2679D6A9003DE995 /* CPStoryCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA989B92679D6A1003DE995 /* CPStoryCell.h */; };
 		CBA989BF2679D6AC003DE995 /* CPStoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989BA2679D6A1003DE995 /* CPStoryCell.m */; };
-		CBEE797F26F0B9B900908006 /* CPAssetBundle.bundle in Sources */ = {isa = PBXBuildFile; fileRef = CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */; };
-		CBEE798026F0B9C400908006 /* CPAssetBundle.bundle in Sources */ = {isa = PBXBuildFile; fileRef = CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -383,6 +381,7 @@
 		29C1BAF51E58BAB800815CD6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29D22E6E252C8E6400977567 /* CPIntrinsicTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIntrinsicTableView.h; sourceTree = "<group>"; };
 		29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPIntrinsicTableView.m; sourceTree = "<group>"; };
+		29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPTopicDialogCell.xib; sourceTree = "<group>"; };
 		29D71E75238073FE00C48ACA /* CPChatView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChatView.h; sourceTree = "<group>"; };
 		29D71E762380742800C48ACA /* CPChatView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChatView.m; sourceTree = "<group>"; };
 		29D71E7E23807E1700C48ACA /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -443,7 +442,6 @@
 		CBA989B72679D68A003DE995 /* CPStoryView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryView.m; sourceTree = "<group>"; };
 		CBA989B92679D6A1003DE995 /* CPStoryCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryCell.h; sourceTree = "<group>"; };
 		CBA989BA2679D6A1003DE995 /* CPStoryCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryCell.m; sourceTree = "<group>"; };
-		CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CPAssetBundle.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -618,7 +616,7 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */,
+				29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
@@ -1049,7 +1047,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBEE797F26F0B9B900908006 /* CPAssetBundle.bundle in Sources */,
 				CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
@@ -1117,7 +1114,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CBEE798026F0B9C400908006 /* CPAssetBundle.bundle in Sources */,
 				291FCD262525DC2800F5185E /* DWAlertDismissalAnimationController.m in Sources */,
 				298F4FC125002D6700F086D3 /* CPUtils.m in Sources */,
 				29DB960123FC3763008FC985 /* CleverPush.m in Sources */,

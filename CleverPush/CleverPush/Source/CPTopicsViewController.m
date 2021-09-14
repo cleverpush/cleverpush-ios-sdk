@@ -26,10 +26,10 @@ static CGFloat const CPConstraints = 30.0;
     [CPUtils updateLastCheckedTime];
 }
 
-- (NSBundle*)getCPAssetBundle{
+- (NSBundle*)getAssetsBundle {
     NSString *resourcePath = [[NSBundle mainBundle] resourcePath];
     NSString* path = [resourcePath
-    stringByAppendingPathComponent:@"CPAssetBundle.bundle"];
+    stringByAppendingPathComponent:@"CleverPush.bundle"];
     return [NSBundle bundleWithPath:path];
 }
 
@@ -38,9 +38,8 @@ static CGFloat const CPConstraints = 30.0;
     tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     tableView.translatesAutoresizingMaskIntoConstraints = NO;
     tableView.backgroundColor = UIColor.clearColor;
-    NSBundle *bundle = [self getCPAssetBundle];
-    if(bundle)
-    {
+    NSBundle *bundle = [self getAssetsBundle];
+    if (bundle) {
         UINib *nib = [UINib nibWithNibName:@"CPTopicDialogCell" bundle:bundle];
         [tableView registerNib:nib forCellReuseIdentifier:@"CPTopicDialogCell"];
     }
@@ -279,7 +278,6 @@ static CGFloat const CPConstraints = 30.0;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, CPTopicHeight)];
     
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
@@ -311,18 +309,18 @@ static CGFloat const CPConstraints = 30.0;
 }
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
-    
     CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
     cell.backgroundColor = [UIColor clearColor];
-    NSBundle *bundle = [self getCPAssetBundle];
+    NSBundle *bundle = [self getAssetsBundle];
     NSArray *nibs = [[NSArray alloc]init];
-    if(bundle) {
+    if (bundle) {
         nibs = [[bundle loadNibNamed:@"CPTopicDialogCell" owner:self options:nil] lastObject];
     } else {
         nibs = [[[NSBundle mainBundle] loadNibNamed:@"CPTopicDialogCell" owner:nil options:nil] lastObject];
     }
-    if(cell == nil)
+    if (cell == nil) {
         cell = nibs[0];
+    }
     int row = (int)indexPath.row;
     CPChannelTopic *topic = [self getTopic:row];
     
