@@ -30,7 +30,8 @@ static CGFloat const CPConstraints = 30.0;
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSBundle *sourceBundle = [NSBundle bundleForClass:[self class]];
 
-    bundle = bundle ? : [NSBundle bundleWithPath:[mainBundle pathForResource:@"CleverPushResources"
+    NSBundle *bundle = [NSBundle bundleWithPath:[mainBundle pathForResource:@"CleverPushResources"
+                                                                     ofType:@"bundle"]];
     bundle = bundle ? : [NSBundle bundleWithPath:[sourceBundle pathForResource:@"CleverPushResources"
                                                                         ofType:@"bundle"]];
     return bundle ? : sourceBundle;
