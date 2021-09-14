@@ -7,10 +7,10 @@ Pod::Spec.new do |s|
     s.author                  = { "CleverPush" => "support@cleverpush.com" }
     s.ios.deployment_target   = "9.0"
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
-    s.resource_bundle         = { "CleverPushResources" => "CleverPush/Resources/*" }
     s.platform                = :ios
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices"
+    s.ios.resource_bundle     = { "CleverPushResources" => "CleverPush/Resources/*" }
     s.ios.vendored_frameworks = "CleverPush/Framework/CleverPush.framework"
     s.pod_target_xcconfig     = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
     s.user_target_xcconfig    = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
