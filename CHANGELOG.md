@@ -1,3 +1,6 @@
+# 1.12.4
+* Fixed nib file missing in resources
+
 # 1.12.3
 * Fixed Topics Dialog showing when no topics available
 
