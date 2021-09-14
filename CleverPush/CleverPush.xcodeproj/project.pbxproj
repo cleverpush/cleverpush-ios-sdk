@@ -558,6 +558,7 @@
 		297B4E201E58A16600BAF990 /* CleverPush */ = {
 			isa = PBXGroup;
 			children = (
+				29D3354C26F0C39E0058EF16 /* Resources */,
 				29DB960023FC3574008FC985 /* Source */,
 				29C1BAF51E58BAB800815CD6 /* Info.plist */,
 			);
@@ -595,6 +596,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		29D3354C26F0C39E0058EF16 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		29DB95CF23FC3203008FC985 /* CleverPush */ = {
 			isa = PBXGroup;
 			children = (
@@ -616,7 +625,6 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
