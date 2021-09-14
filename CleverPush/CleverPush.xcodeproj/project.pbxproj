@@ -213,8 +213,6 @@
 		CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
 		CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
-		CB913BBA26F08803000BB09B /* CPTopicDialogCell.xib in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */; };
-		CB913BBB26F0880D000BB09B /* CPTopicDialogCell.xib in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */; };
 		CBA1906926DE5909001B8F39 /* CPTopicDialogCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */; };
 		CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
 		CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
@@ -251,6 +249,8 @@
 		CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989B72679D68A003DE995 /* CPStoryView.m */; };
 		CBA989BE2679D6A9003DE995 /* CPStoryCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA989B92679D6A1003DE995 /* CPStoryCell.h */; };
 		CBA989BF2679D6AC003DE995 /* CPStoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989BA2679D6A1003DE995 /* CPStoryCell.m */; };
+		CBEE797F26F0B9B900908006 /* CPAssetBundle.bundle in Sources */ = {isa = PBXBuildFile; fileRef = CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */; };
+		CBEE798026F0B9C400908006 /* CPAssetBundle.bundle in Sources */ = {isa = PBXBuildFile; fileRef = CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -420,7 +420,6 @@
 		CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWKWebKitView.m; sourceTree = "<group>"; };
 		CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTopicDialogCell.h; sourceTree = "<group>"; };
 		CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTopicDialogCell.m; sourceTree = "<group>"; };
-		CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPTopicDialogCell.xib; sourceTree = "<group>"; };
 		CBA989852679D529003DE995 /* CPStoriesController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoriesController.h; sourceTree = "<group>"; };
 		CBA989862679D529003DE995 /* CPStoriesController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoriesController.m; sourceTree = "<group>"; };
 		CBA989882679D543003DE995 /* CPWidgetModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWidgetModule.h; sourceTree = "<group>"; };
@@ -444,6 +443,7 @@
 		CBA989B72679D68A003DE995 /* CPStoryView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryView.m; sourceTree = "<group>"; };
 		CBA989B92679D6A1003DE995 /* CPStoryCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryCell.h; sourceTree = "<group>"; };
 		CBA989BA2679D6A1003DE995 /* CPStoryCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryCell.m; sourceTree = "<group>"; };
+		CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = CPAssetBundle.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -618,6 +618,7 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				CBEE797E26F0B9AB00908006 /* CPAssetBundle.bundle */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
@@ -726,7 +727,6 @@
 				CB8129EE267B6F3B002B8A3D /* CPWKWebView.m */,
 				CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */,
 				CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */,
-				CBA1906826DE5909001B8F39 /* CPTopicDialogCell.xib */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -1049,7 +1049,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB913BBA26F08803000BB09B /* CPTopicDialogCell.xib in Sources */,
+				CBEE797F26F0B9B900908006 /* CPAssetBundle.bundle in Sources */,
 				CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
@@ -1117,7 +1117,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CB913BBB26F0880D000BB09B /* CPTopicDialogCell.xib in Sources */,
+				CBEE798026F0B9C400908006 /* CPAssetBundle.bundle in Sources */,
 				291FCD262525DC2800F5185E /* DWAlertDismissalAnimationController.m in Sources */,
 				298F4FC125002D6700F086D3 /* CPUtils.m in Sources */,
 				29DB960123FC3763008FC985 /* CleverPush.m in Sources */,
