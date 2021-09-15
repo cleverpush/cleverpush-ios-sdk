@@ -451,7 +451,7 @@ static id isNil(id object) {
 #pragma mark - Initialised Features.
 + (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self showPendingTopicsDialog];
+        [self showTopicDialogOnNewAdded];
         [self initAppReview];
         
         [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:NO];
@@ -2307,6 +2307,18 @@ static id isNil(id object) {
         [self showTopicsDialog:topicsDialogWindow];
     }
     [self showTopicsDialog:[self keyWindow]];
+}
+
++ (void)showTopicDialogOnNewAdded {
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        NSInteger seconds = [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
+        if ([CPUtils newTopicAdded:channelConfig] && (seconds == 0 || seconds > 3600)) {
+            [self showTopicsDialog];
+            [CPUtils updateLastTimeAutomaticallyShowed];
+        } else {
+            [self showPendingTopicsDialog];
+        }
+    }];
 }
 
 + (void)showTopicsDialog:(UIWindow *)targetWindow {

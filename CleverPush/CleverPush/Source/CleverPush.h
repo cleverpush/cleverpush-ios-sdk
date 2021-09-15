@@ -121,6 +121,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setIncrementBadge:(BOOL)increment;
 + (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
++ (void)showTopicDialogOnNewAdded;
 + (void)showTopicsDialog:(UIWindow *)targetWindow;
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback;
 + (void)getSubscriptionId:(void(^)(NSString *))callback;

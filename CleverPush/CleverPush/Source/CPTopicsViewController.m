@@ -19,7 +19,7 @@ static CGFloat const CPConstraints = 30.0;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [CPUtils updateLastCheckedTime];
+    [CPUtils updateLastTopicCheckedTime];
 }
 
 - (NSBundle *)getAssetsBundle {
@@ -341,7 +341,7 @@ static CGFloat const CPConstraints = 30.0;
     }
     NSDate *addedCacheDelay = [[topic createdAt] dateByAddingTimeInterval:+60*60];
     NSComparisonResult result;
-    result = [addedCacheDelay compare:[CPUtils getLastCheckedTime]];
+    result = [addedCacheDelay compare:[CPUtils getLastTopicCheckedTime]];
     
     if (self.topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
         cell.topicHighlighter.hidden = NO;

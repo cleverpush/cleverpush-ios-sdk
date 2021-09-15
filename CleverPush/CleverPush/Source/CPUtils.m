@@ -3,6 +3,8 @@
 #import <UIKit/UIKit.h>
 #import "CPUtils.h"
 #import <sys/utsname.h>
+static BOOL existanceOfNewTopic = NO;
+static BOOL topicsDialogShowWhenNewAdded = NO;
 
 #pragma mark - Custom delegate of download
 @interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
@@ -195,14 +197,14 @@
 }
 
 #pragma mark - Update last check out time of topic dialog
-+ (void)updateLastCheckedTime {
++ (void)updateLastTopicCheckedTime {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:[NSDate date] forKey:@"CleverPush_LAST_CHECKED_TIME"];
     [userDefaults synchronize];
 }
 
 #pragma mark - Get the last check out time of topic dialog
-+ (NSDate*)getLastCheckedTime {
++ (NSDate*)getLastTopicCheckedTime {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     return [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] ? [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] : [NSDate date];
 }
@@ -264,6 +266,7 @@
     }
 }
 
+#pragma mark -  Open safari and dismiss on a specific controller.
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller {
     [controller dismissViewControllerAnimated:YES completion:^{
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
@@ -280,8 +283,8 @@
     }];
 }
 
-+ (NSString*)deviceName
-{
+#pragma mark -  get the device name based on their model names.
++ (NSString*)deviceName {
     struct utsname systemInfo;
     uname(&systemInfo);
     NSString* code = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
@@ -426,5 +429,56 @@
         }
     }
     return deviceName;
+}
+
+#pragma mark -  get the seconds between two dates.
++ (NSInteger)secondsBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime {
+    NSTimeInterval secondsBetween = [toDateTime timeIntervalSinceDate:fromDateTime];
+    return secondsBetween;
+}
+
+#pragma mark -  update the last checked date & time of automatically displayed dilog
++ (void)updateLastTimeAutomaticallyShowed {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"];
+    [userDefaults synchronize];
+}
+
+#pragma mark -  get the last checked date & time of automatically displayed dilog
++ (NSDate*)getLastTimeAutomaticallyShowed {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    return [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"] ? [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"] : [NSDate date];
+}
+
+#pragma mark - check the existance of new topic in the channel configuration.
++ (BOOL)newTopicAdded:(NSDictionary*)config {
+    if (config != nil && [config valueForKey:@"topicsDialogShowWhenNewAdded"]) {
+        topicsDialogShowWhenNewAdded = [[config valueForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
+    }
+    
+    NSArray* channelTopics = [config valueForKey:@"channelTopics"];
+    if (channelTopics != nil && [channelTopics count] > 0) {
+        for (id channelTopic in channelTopics) {
+            if (channelTopic != nil && ([channelTopic valueForKey:@"createdAt"] == nil || [[channelTopic valueForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
+                NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic valueForKey:@"createdAt"]];
+                NSDate *addedCacheDelay = [createdAt dateByAddingTimeInterval:+60*60];
+                NSComparisonResult result;
+                result = [addedCacheDelay compare:[CPUtils getLastTopicCheckedTime]];
+                if (topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
+                    existanceOfNewTopic = YES;
+                }
+            }
+        }
+    }
+    return existanceOfNewTopic;
+}
+
+#pragma mark - convert UTC date in to local date.
++ (NSDate*)getLocalDateTimeFromUTC:(NSString*)dateString {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
+    NSDate *localDate = [formatter dateFromString:dateString];
+    return localDate;
 }
 @end
