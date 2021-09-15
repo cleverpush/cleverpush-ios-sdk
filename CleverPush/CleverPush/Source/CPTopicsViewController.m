@@ -18,10 +18,6 @@ static CGFloat const CPConstraints = 30.0;
     [self initialisedTableView];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [self reloadTableView];
-}
-
 - (void)viewWillDisappear:(BOOL)animated {
     [CPUtils updateLastCheckedTime];
 }
@@ -50,9 +46,6 @@ static CGFloat const CPConstraints = 30.0;
     tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.001)];
     tableView.delegate = self;
     tableView.dataSource = self;
-    [tableView setNeedsLayout];
-    [tableView layoutIfNeeded];
-    tableView.contentInset = UIEdgeInsetsMake(20, 0, 0, 0) ;
     self.view = tableView;
 }
 
@@ -382,6 +375,10 @@ static CGFloat const CPConstraints = 30.0;
     [switcher setOn:!switcher.on animated:YES];
     
     [self switchChanged:switcher];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewAutomaticDimension;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
