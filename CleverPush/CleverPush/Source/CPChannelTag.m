@@ -23,13 +23,9 @@
     _autoAssignSessions = [json objectForKey:@"autoAssignSessions"];
     _autoAssignSeconds = [json objectForKey:@"autoAssignSeconds"];
     _autoAssignDays = [json objectForKey:@"autoAssignDays"];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-    
+        
     if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
-        _createdAt = [formatter dateFromString:[json objectForKey:@"createdAt"]];
+        _createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     }
 }
 

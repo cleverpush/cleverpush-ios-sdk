@@ -5,6 +5,8 @@
 #import <sys/utsname.h>
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
+NSString * const dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark - Custom delegate of download
 @interface DirectDownloadDelegate : NSObject <NSURLSessionDataDelegate> {
@@ -476,8 +478,8 @@ static BOOL topicsDialogShowWhenNewAdded = NO;
 #pragma mark - convert UTC date in to local date.
 + (NSDate*)getLocalDateTimeFromUTC:(NSString*)dateString {
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
+    [formatter setDateFormat:dateFormat];
+    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:localeIdentifier]];
     NSDate *localDate = [formatter dateFromString:dateString];
     return localDate;
 }

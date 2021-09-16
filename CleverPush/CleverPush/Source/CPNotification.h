@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-
 @interface CPNotification : NSObject
 NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Class Variables

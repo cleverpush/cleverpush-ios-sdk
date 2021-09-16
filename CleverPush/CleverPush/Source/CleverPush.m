@@ -73,9 +73,10 @@ static BOOL autoClearBadge = YES;
 static BOOL incrementBadge = NO;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
+static const int secDifferenceAtVeryFirstTime = 0;
+static const int validationSeconds = 3600 ;
 
 static NSString* channelId;
-
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSDictionary* channelConfig;
@@ -2311,14 +2312,22 @@ static id isNil(id object) {
 
 + (void)showTopicDialogOnNewAdded {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
-        NSInteger seconds = [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
-        if ([CPUtils newTopicAdded:channelConfig] && (seconds == 0 || seconds > 3600)) {
+        if ([self hasNewTopicAfterOneHour:channelConfig initialDifference:secDifferenceAtVeryFirstTime displayDialogDifference:validationSeconds]) {
             [self showTopicsDialog];
             [CPUtils updateLastTimeAutomaticallyShowed];
         } else {
             [self showPendingTopicsDialog];
         }
     }];
+}
+
++ (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter {
+    NSInteger secondsAfterLastCheck = [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
+    if ([CPUtils newTopicAdded:config] && (secondsAfterLastCheck == initialDifference || secondsAfterLastCheck > displayAfter)) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 + (void)showTopicsDialog:(UIWindow *)targetWindow {

@@ -1,5 +1,5 @@
 #import "CPStoryWidget.h"
-
+#import "CPUtils.h"
 NS_ASSUME_NONNULL_BEGIN
 @implementation CPStoryWidget
 #pragma mark - wrapping the data of the Widget in to CPWidget NSObject
@@ -25,13 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
         if ([json objectForKey:@"margin"] != nil && ![[json objectForKey:@"margin"] isKindOfClass:[NSNull class]]) {
             self.margin = [json objectForKey:@"margin"];
         }
-        
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-        [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-        
+                
         if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
-            self.createdAt = [formatter dateFromString:[json objectForKey:@"createdAt"]];
+            self.createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
         }
         
         if ([[json objectForKey:@"variant"] isEqual:@"bubbles"]) {
