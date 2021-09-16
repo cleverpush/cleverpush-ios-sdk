@@ -331,6 +331,10 @@
                               @"iPhone13,2": @"iPhone 12",
                               @"iPhone13,3": @"iPhone 12 Pro",
                               @"iPhone13,4": @"iPhone 12 Pro Max",
+                              @"iPhone14,2": @"iPhone 13 Pro",
+                              @"iPhone14,3": @"iPhone 13 Pro Max",
+                              @"iPhone14,4": @"iPhone 13 mini",
+                              @"iPhone14,5": @"iPhone 13",
                               //iPods
                               @"iPod1,1": @"1st Gen iPod",
                               @"iPod2,1": @"2nd Gen iPod",
@@ -409,7 +413,11 @@
                               @"iPad13,8": @"iPad Pro 12.9 inch 5th Gen",
                               @"iPad13,9": @"iPad Pro 12.9 inch 5th Gen",
                               @"iPad13,10": @"iPad Pro 12.9 inch 5th Gen",
-                              @"iPad13,11": @"iPad Pro 12.9 inch 5th Gen"
+                              @"iPad13,11": @"iPad Pro 12.9 inch 5th Gen",
+                              @"iPad12,1": @"iPad (9th generation) Wi-Fi",
+                              @"iPad12,2": @"iPad (9th generation) Wi-Fi + Cellular",
+                              @"iPad14,1": @"iPad mini (6th generation) Wi-Fi",
+                              @"iPad14,2": @"iPad mini (6th generation) Wi-Fi + Cellular"
         };
     }
 
