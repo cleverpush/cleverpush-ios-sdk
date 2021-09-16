@@ -53,15 +53,11 @@
             }
         }
         
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-        [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-        
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
-            self.startAt = [formatter dateFromString:[json objectForKey:@"startAt"]];
+            self.startAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"startAt"]];
         }
         if ([[json objectForKey:@"stopAt"] isKindOfClass:[NSString class]]) {
-            self.stopAt = [formatter dateFromString:[json objectForKey:@"stopAt"]];
+            self.stopAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"stopAt"]];
         }
         
         if ([[json objectForKey:@"dismissType"] isEqual:@"timeout"]) {
