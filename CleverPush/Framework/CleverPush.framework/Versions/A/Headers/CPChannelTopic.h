@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-
+#import "CPUtils.h"
 @interface CPChannelTopic : NSObject
 #pragma mark - Class Variables
 @property (readonly, nullable) NSString *id;

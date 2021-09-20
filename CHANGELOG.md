@@ -1,3 +1,6 @@
+# 1.13.0
+* Added feature to automatically show topics dialog again after new topics have been added. This can optionally be enabled in the CleverPush backend under Channels -> Topics -> Show topics dialog again after new topics have been added.
+
 # 1.12.6
 * Updated height calculation in topics dialog
 

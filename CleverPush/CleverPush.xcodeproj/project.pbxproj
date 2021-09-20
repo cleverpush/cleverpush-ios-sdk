@@ -162,7 +162,7 @@
 		298677902572E60B0002E9F1 /* CPAppBannerModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 298676702572CC400002E9F1 /* CPAppBannerModule.m */; };
 		298677B125732B8B0002E9F1 /* CPAppBanner.m in Sources */ = {isa = PBXBuildFile; fileRef = 298676B62572CFEF0002E9F1 /* CPAppBanner.m */; };
 		298F4FC125002D6700F086D3 /* CPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 298F4FC025002D6700F086D3 /* CPUtils.m */; };
-		298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 298F4FC225002DA400F086D3 /* CPUtils.h */; };
+		298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 298F4FC225002DA400F086D3 /* CPUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 298F4FC225002DA400F086D3 /* CPUtils.h */; };
 		298F4FC525002F1F00F086D3 /* CPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 298F4FC025002D6700F086D3 /* CPUtils.m */; };
 		29AD0C5326682A8E009E10D0 /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */; };
