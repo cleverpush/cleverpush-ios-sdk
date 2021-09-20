@@ -1,3 +1,6 @@
+# 1.12.6
+* Updated height calculation in topics dialog
+
 # 1.12.5
 * Updated font family in topics dialog
 

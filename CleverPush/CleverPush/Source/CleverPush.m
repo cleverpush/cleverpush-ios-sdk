@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.12.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.13.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -307,7 +307,6 @@ static id isNil(id object) {
     }
     
     return self;
-    
 }
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
