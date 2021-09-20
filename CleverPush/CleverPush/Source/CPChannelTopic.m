@@ -26,13 +26,9 @@
     if ([json objectForKey:@"defaultUnchecked"] != nil && ![[json objectForKey:@"defaultUnchecked"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"defaultUnchecked"] boolValue]) {
         _defaultUnchecked = YES;
     }
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"]];
-    
+        
     if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
-        _createdAt = [formatter dateFromString:[json objectForKey:@"createdAt"]];
+        _createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     }
 }
 

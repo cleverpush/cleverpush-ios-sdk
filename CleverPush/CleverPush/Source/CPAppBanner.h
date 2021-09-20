@@ -11,6 +11,7 @@
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerType.h"
 #import "CPAppBannerHTMLBlock.h"
+#import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
 

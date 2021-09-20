@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-
+#import "CPUtils.h"
 @interface CPChannelTag : NSObject
 
 #pragma mark - Class Variables

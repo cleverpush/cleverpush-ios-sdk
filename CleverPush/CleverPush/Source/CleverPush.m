@@ -73,9 +73,10 @@ static BOOL autoClearBadge = YES;
 static BOOL incrementBadge = NO;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
+static const int secDifferenceAtVeryFirstTime = 0;
+static const int validationSeconds = 3600 ;
 
 static NSString* channelId;
-
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSDictionary* channelConfig;
@@ -450,7 +451,7 @@ static id isNil(id object) {
 #pragma mark - Initialised Features.
 + (void)initFeatures {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self showPendingTopicsDialog];
+        [self showTopicDialogOnNewAdded];
         [self initAppReview];
         
         [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:NO];
@@ -2306,6 +2307,26 @@ static id isNil(id object) {
         [self showTopicsDialog:topicsDialogWindow];
     }
     [self showTopicsDialog:[self keyWindow]];
+}
+
++ (void)showTopicDialogOnNewAdded {
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if ([self hasNewTopicAfterOneHour:channelConfig initialDifference:secDifferenceAtVeryFirstTime displayDialogDifference:validationSeconds]) {
+            [self showTopicsDialog];
+            [CPUtils updateLastTimeAutomaticallyShowed];
+        } else {
+            [self showPendingTopicsDialog];
+        }
+    }];
+}
+
++ (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter {
+    NSInteger secondsAfterLastCheck = [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
+    if ([CPUtils newTopicAdded:config] && (secondsAfterLastCheck == initialDifference || secondsAfterLastCheck > displayAfter)) {
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 + (void)showTopicsDialog:(UIWindow *)targetWindow {
