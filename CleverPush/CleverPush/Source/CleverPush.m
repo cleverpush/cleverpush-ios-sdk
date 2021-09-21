@@ -361,7 +361,7 @@ static id isNil(id object) {
         registeredWithApple = deviceToken != nil;
     }
     
-    if (autoRegister) {
+    if (autoRegister && [self getUnsubscribeStatus]) {
         [self subscribe];
     }
     
@@ -893,6 +893,25 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - update the userdefault value for key @"UNSUBSCRIBED" with the dynamic argument named status.
++ (void)setUnsubscribeStatus:(BOOL)status {
+    [[NSUserDefaults standardUserDefaults] setBool:status forKey:@"UNSUBSCRIBED"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - get the userdefault value for key @"UNSUBSCRIBED" and prevent subscribe based on the boolean flag.
++ (BOOL)getUnsubscribeStatus {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"UNSUBSCRIBED"] != nil) {
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"UNSUBSCRIBED"]) {
+            return YES;
+        } else {
+            return NO;
+        }
+    } else {
+        return YES;
+    }
+}
+
 #pragma mark - Clear the previous channel data from the NSUserDefaults on a fresh login and session expired.
 + (void)clearSubscriptionData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
@@ -933,6 +952,7 @@ static id isNil(id object) {
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            [self setUnsubscribeStatus:NO];
             [self clearSubscriptionData];
             callback(YES);
         } onFailure:^(NSError* error) {
@@ -1081,7 +1101,8 @@ static id isNil(id object) {
     
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
-        
+        [self setUnsubscribeStatus:YES];
+
         // NSLog(@"CleverPush: syncSubscription Result %@", results);
         
         if ([results valueForKey:@"topics"] != nil) {
