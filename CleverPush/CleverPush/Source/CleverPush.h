@@ -137,6 +137,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 + (void)addStoryView:(CPStoryView*)storyView;
 + (void)updateDeselectFlag:(BOOL)value;
++ (void)setOpenWebViewEnabled:(BOOL)opened;
 + (UIViewController*)topViewController;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
