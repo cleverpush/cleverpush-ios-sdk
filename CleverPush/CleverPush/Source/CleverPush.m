@@ -2354,7 +2354,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - Automatically a SFWebViewController on notification click when no Notification Opened Handler has been provided.
+#pragma mark - Automatically a SafariViewController on notification click when no Notification Opened Handler has been provided.
 + (void)setOpenWebViewEnabled:(BOOL)opened {
     hasWebViewOpened = opened;
 }
