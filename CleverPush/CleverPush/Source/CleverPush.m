@@ -2354,8 +2354,8 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - update the hasWebViewOpened value based on the user's Boolean argument.
-+ (void)setWebViewOpenedEnabled:(BOOL)opened {
+#pragma mark - Automatically a SFWebViewController on notification click when no Notification Opened Handler has been provided.
++ (void)setOpenWebViewEnabled:(BOOL)opened {
     hasWebViewOpened = opened;
 }
 
