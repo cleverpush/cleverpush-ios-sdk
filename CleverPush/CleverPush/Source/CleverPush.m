@@ -361,7 +361,7 @@ static id isNil(id object) {
         registeredWithApple = deviceToken != nil;
     }
     
-    if (autoRegister) {
+    if (autoRegister && ![self getUnsubscribeStatus]) {
         [self subscribe];
     }
     
@@ -893,6 +893,17 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - update the userdefault value for key @"UNSUBSCRIBED" with the dynamic argument named status.
++ (void)setUnsubscribeStatus:(BOOL)status {
+    [[NSUserDefaults standardUserDefaults] setBool:status forKey:@"CleverPush_UNSUBSCRIBED"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - get the userdefault value for key @"UNSUBSCRIBED" and prevent subscribe based on the boolean flag.
++ (BOOL)getUnsubscribeStatus {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_UNSUBSCRIBED"];
+}
+
 #pragma mark - Clear the previous channel data from the NSUserDefaults on a fresh login and session expired.
 + (void)clearSubscriptionData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
@@ -933,6 +944,7 @@ static id isNil(id object) {
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            [self setUnsubscribeStatus:YES];
             [self clearSubscriptionData];
             callback(YES);
         } onFailure:^(NSError* error) {
@@ -1081,7 +1093,8 @@ static id isNil(id object) {
     
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
-        
+        [self setUnsubscribeStatus:NO];
+
         // NSLog(@"CleverPush: syncSubscription Result %@", results);
         
         if ([results valueForKey:@"topics"] != nil) {
