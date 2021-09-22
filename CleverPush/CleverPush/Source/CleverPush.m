@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.13.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.13.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -393,7 +393,8 @@ static id isNil(id object) {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
 }
 
-+ (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend{
++ (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend {
+    NSLog(@"initTopicsDialogData");
     NSArray* channelTopics = [config valueForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         NSArray* topics = [self getSubscriptionTopics];
@@ -418,6 +419,7 @@ static id isNil(id object) {
 
 #pragma mark - update the user defaults value of selected Topics Dialog.
 + (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
+    NSLog(@"setDefaultCheckedTopics %@", topics);
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
     if (!topicsVersion) {
@@ -810,6 +812,10 @@ static id isNil(id object) {
 }
 
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
+    [self subscribe:subscribedBlock skipTopicsDialog:NO];
+}
+
++ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     if (@available(iOS 10.0, *)) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
@@ -836,10 +842,13 @@ static id isNil(id object) {
                                     if (![self isSubscribed]) {
                                         [self initTopicsDialogData:channelConfig syncToBackend:YES];
                                     }
-                                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                    [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
-                                    [userDefaults synchronize];
-                                    [self showPendingTopicsDialog];
+                                    
+                                    if (!skipTopicsDialog) {
+                                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                        [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+                                        [userDefaults synchronize];
+                                        [self showPendingTopicsDialog];
+                                    }
                                 }
                             }];
                             
@@ -1093,10 +1102,10 @@ static id isNil(id object) {
     
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         registrationInProgress = false;
-        [self setUnsubscribeStatus:NO];
 
-        // NSLog(@"CleverPush: syncSubscription Result %@", results);
-        
+        [self setUnsubscribeStatus:NO];
+        [self updateDeselectFlag:NO];
+
         if ([results valueForKey:@"topics"] != nil) {
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
             [userDefaults setObject:[results valueForKey:@"topics"] forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
@@ -2365,9 +2374,10 @@ static id isNil(id object) {
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (!autoRegister && ![self isSubscribed]) {
+                if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:NO];
                 }
+
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
@@ -2388,11 +2398,18 @@ static id isNil(id object) {
                         && [self getDeselectValue] == YES) {
                         [self unsubscribe];
                     } else {
-                        [self setSubscriptionTopics:[topicsController getSelectedTopics]];
-                        [self subscribe];
+                        [self setDefaultCheckedTopics:[topicsController getSelectedTopics]];
+                        
+                        
+                        if (![self isSubscribed]) {
+                        
+                            [self subscribe:nil skipTopicsDialog:YES];
+                        } else {
+                            [self syncSubscription];
+                        }
+                        
                     }
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
-                    
                 }];
                 [channelTopicsPicker addAction:okAction];
                 
@@ -2405,7 +2422,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - update UserDefaults while toggled deselect switch
-+ (void)updateDeselectFlag:(BOOL)value{
++ (void)updateDeselectFlag:(BOOL)value {
     [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -2416,9 +2433,9 @@ static id isNil(id object) {
 }
 
 #pragma mark - retrieve Deselect value from UserDefaults
-+ (BOOL)getDeselectValue{
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
-        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
++ (BOOL)getDeselectValue {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
             return NO;
         } else {
             return YES;

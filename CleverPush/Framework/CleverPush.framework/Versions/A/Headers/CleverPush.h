@@ -137,6 +137,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 + (void)addStoryView:(CPStoryView*)storyView;
 + (void)updateDeselectFlag:(BOOL)value;
++ (void)setOpenWebViewEnabled:(BOOL)opened;
++ (void)setUnsubscribeStatus:(BOOL)status;
 + (UIViewController*)topViewController;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
@@ -162,6 +164,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 + (BOOL)getDeselectValue;
++ (BOOL)getUnsubscribeStatus;
 
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 + (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

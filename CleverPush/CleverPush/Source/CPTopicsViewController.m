@@ -57,15 +57,26 @@ static CGFloat const CPConstraints = 30.0;
 }
 
 #pragma mark - Update Deselect flag based on the selected topics
-- (void)updateDeselectState {
+- (void)updateInitialDeselectState {
     if (self.topicsDialogShowUnsubscribe == YES) {
         if ([self getSelectedTopics].count == 0) {
             [CleverPush updateDeselectFlag:YES];
-        } else {
+        } else if (![CleverPush getDeselectValue]) {
             [CleverPush updateDeselectFlag:NO];
+        } else {
+            [self setAllTopicsUnchecked];
         }
     }
     [self reloadTableView];
+}
+
+#pragma mark - Sets all topics to be unchecked
+- (void)setAllTopicsUnchecked {
+    [selectedTopics removeAllObjects];
+    for (CPChannelTopic *topic in availableTopics) {
+        topic.defaultUnchecked = YES;
+    }
+    hasTopics = NO;
 }
 
 #pragma mark - Set the table header title
@@ -84,7 +95,7 @@ static CGFloat const CPConstraints = 30.0;
     tableView.scrollEnabled = NO;
     CGRect headerFrame = tableView.tableHeaderView.frame;
     tableView.tableHeaderView.frame = CGRectMake(headerFrame.origin.x, headerFrame.origin.y, headerFrame.size.width, tableView.tableHeaderView.frame.size.height + labelPaddingBottom);
-    [self updateDeselectState];
+    [self updateInitialDeselectState];
 }
 
 #pragma mark - Reload Table view and manage popup height via custom delegate with the help of manageHeightLayout
@@ -148,11 +159,7 @@ static CGFloat const CPConstraints = 30.0;
 - (void)deselectEverything:(id)sender {
     UISwitch* switcher = (UISwitch*)sender;
     if (switcher.on) {
-        [selectedTopics removeAllObjects];
-        for (CPChannelTopic *topic in availableTopics) {
-            topic.defaultUnchecked = YES;
-        }
-        hasTopics = NO;
+        [self setAllTopicsUnchecked];
         [CleverPush updateDeselectFlag:YES];
         [self reloadTableView];
     } else {
