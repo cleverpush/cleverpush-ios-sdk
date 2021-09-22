@@ -1,3 +1,6 @@
+# 1.13.1
+* Improved 'autoRegister: true' behaviour when user has unsubscribed.
+
 # 1.13.0
 * Added feature to automatically show topics dialog again after new topics have been added. This can optionally be enabled in the CleverPush backend under Channels -> Topics -> Show topics dialog again after new topics have been added.
 
