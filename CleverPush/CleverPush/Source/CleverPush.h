@@ -145,6 +145,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
 + (NSArray*)getSubscriptionTags;
 + (NSArray*)getNotifications;
++ (NSArray*)getNotifications:(BOOL)combineWithApi;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
 

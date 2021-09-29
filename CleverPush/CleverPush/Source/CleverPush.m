@@ -1958,6 +1958,60 @@ static id isNil(id object) {
     return notifications;
 }
 
+#pragma mark - Retrieving notifications based on the flag remote/local
++ (NSArray*)getNotifications:(BOOL)combineWithApi {
+    if (combineWithApi) {
+        NSString *combinedURL = [self createDynamicURLForNotification];
+        NSMutableArray* combinedArray = [[self getNotifications] mutableCopy];
+        NSMutableArray *remoteNotifications = [self getRemoteNotifications:combinedURL];
+        return [combinedArray arrayByAddingObjectsFromArray:remoteNotifications];
+    } else {
+        return [self getNotifications];
+    }
+}
+
+#pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
++ (NSString *)createDynamicURLForNotification {
+    NSString *baseURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/received-notifications?", channelId];
+    if ([self hasSubscriptionTopics]) {
+        NSMutableArray* dynamicQueryParameters = [self urlQueryParameter];
+        NSString* appendableQueryParameters = [dynamicQueryParameters componentsJoinedByString:@""];
+        NSString *concatenatedURL = [NSString stringWithFormat:@"%@%@", baseURL, appendableQueryParameters];
+        return concatenatedURL;
+    } else {
+        return baseURL;
+    }
+}
+
+#pragma mark - Appending the topicId's as a query parameter.
++ (NSMutableArray*)urlQueryParameter {
+    NSMutableArray* subscriptionTopics = [self getSubscriptionTopics];
+    NSMutableArray* dynamicQueryParameter = [NSMutableArray new];
+    [subscriptionTopics enumerateObjectsUsingBlock: ^(id topic, NSUInteger index, BOOL *stop) {
+        NSString *queryParameter = [NSString stringWithFormat: @"topics[]=%@&", topic];
+        [dynamicQueryParameter addObject:queryParameter];
+    }];
+    return dynamicQueryParameter;
+}
+
+#pragma mark - Get the Notifications based on the topic dialog Id's.
++ (NSMutableArray *)getRemoteNotifications:(NSString*)url {
+    __block NSMutableArray* notiications = nil;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:url];
+    [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
+        if (result != nil) {
+            notiications = [result valueForKey:@"notifications"];
+            dispatch_semaphore_signal(sema);
+        }
+    } onFailure:^(NSError* error) {
+        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return notiications;
+}
+
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
 + (NSArray*)getSeenStories {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
