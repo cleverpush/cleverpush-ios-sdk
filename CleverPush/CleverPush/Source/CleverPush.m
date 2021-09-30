@@ -2014,7 +2014,7 @@ static id isNil(id object) {
     NSArray *keysArray = [array valueForKey:key];
     NSSet *noDuplicateKeys = [[NSSet alloc]initWithArray:keysArray];
     for (NSString *currentKey in noDuplicateKeys) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",key ,currentKey];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", key, currentKey];
         NSArray *allObjectsWithKey = [array filteredArrayUsingPredicate:predicate];
         [newArray addObject:[allObjectsWithKey firstObject]];
     }
