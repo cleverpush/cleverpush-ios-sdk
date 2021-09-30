@@ -1959,32 +1959,46 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local
-+ (NSArray*)getNotifications:(BOOL)combineWithApi {
++ (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
+    NSMutableArray* localNotifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
         NSString *combinedURL = [self createDynamicURLForNotification];
-        NSMutableArray* combinedArray = [[self getNotifications] mutableCopy];
-        NSMutableArray *remoteNotifications = [self getRemoteNotifications:combinedURL];
-        return [combinedArray arrayByAddingObjectsFromArray:remoteNotifications];
+        [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray *remoteNotifications) {
+            if ([remoteNotifications count] > 0) {
+                NSArray *mergedNotification = [localNotifications arrayByAddingObjectsFromArray:remoteNotifications];
+                NSArray *eliminateRedundancy = [self removeDuplicateEntriesFromArray:mergedNotification basedOnKey:@"_id"];
+                NSArray *grouped = [self groupArrayOfObjectByDates:eliminateRedundancy basedOnKey:@"createdAt"];
+                if (callback) {
+                    callback([self convertObjectToCPNotification:grouped]);
+                }
+            } else {
+                if (callback) {
+                    callback([self convertObjectToCPNotification:localNotifications]);
+                }
+            }
+        }];
     } else {
-        return [self getNotifications];
+        if (callback) {
+            callback([self convertObjectToCPNotification:localNotifications]);
+        }
     }
 }
 
 #pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
 + (NSString *)createDynamicURLForNotification {
-    NSString *baseURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/received-notifications?", channelId];
+    NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?", channelId];
     if ([self hasSubscriptionTopics]) {
-        NSMutableArray* dynamicQueryParameters = [self urlQueryParameter];
+        NSMutableArray* dynamicQueryParameters = [self getReceivedNotificationsQueryParameters];
         NSString* appendableQueryParameters = [dynamicQueryParameters componentsJoinedByString:@""];
-        NSString *concatenatedURL = [NSString stringWithFormat:@"%@%@", baseURL, appendableQueryParameters];
+        NSString *concatenatedURL = [NSString stringWithFormat:@"%@%@", path, appendableQueryParameters];
         return concatenatedURL;
     } else {
-        return baseURL;
+        return path;
     }
 }
 
 #pragma mark - Appending the topicId's as a query parameter.
-+ (NSMutableArray*)urlQueryParameter {
++ (NSMutableArray*)getReceivedNotificationsQueryParameters {
     NSMutableArray* subscriptionTopics = [self getSubscriptionTopics];
     NSMutableArray* dynamicQueryParameter = [NSMutableArray new];
     [subscriptionTopics enumerateObjectsUsingBlock: ^(id topic, NSUInteger index, BOOL *stop) {
@@ -1994,22 +2008,52 @@ static id isNil(id object) {
     return dynamicQueryParameter;
 }
 
+#pragma mark - Remove duplicate entries from array.
++ (NSArray *)removeDuplicateEntriesFromArray:(NSArray *)array basedOnKey:(NSString *)key {
+    NSMutableArray *newArray = [NSMutableArray new];
+    NSArray *keysArray = [array valueForKey:key];
+    NSSet *noDuplicateKeys = [[NSSet alloc]initWithArray:keysArray];
+    for (NSString *currentKey in noDuplicateKeys) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@",key ,currentKey];
+        NSArray *allObjectsWithKey = [array filteredArrayUsingPredicate:predicate];
+        [newArray addObject:[allObjectsWithKey firstObject]];
+    }
+    return [newArray copy];
+}
+
+#pragma mark - Group array of object by dates.
++(NSArray*)groupArrayOfObjectByDates:(NSArray*)notifications basedOnKey:(NSString *)key {
+    NSSortDescriptor *dateDescriptor = [NSSortDescriptor sortDescriptorWithKey:key ascending:YES];
+    NSArray *sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
+    NSArray *sortedEventArray = [notifications sortedArrayUsingDescriptors:sortDescriptors];
+    return sortedEventArray;
+}
+
+#pragma mark - converting objects to CPNotification.
++ (NSMutableArray*)convertObjectToCPNotification:(NSArray*)notifications {
+    NSMutableArray* CPNotificationResult = [NSMutableArray new];
+    [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL *stop) {
+        CPNotification *notification = [[CPNotification alloc] init];
+        notification = [CPNotification initWithJson:objNotification];
+        [CPNotificationResult addObject:notification];
+    }];
+    return CPNotificationResult;
+}
+
 #pragma mark - Get the Notifications based on the topic dialog Id's.
-+ (NSMutableArray *)getRemoteNotifications:(NSString*)url {
-    __block NSMutableArray* notiications = nil;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:url];
++ (void)getReceivedNotificationsFromApi:(NSString*)path callback:(void(^)(NSArray *))callback {
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:path];
     [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
-            notiications = [result valueForKey:@"notifications"];
-            dispatch_semaphore_signal(sema);
+            if (callback) {
+                if ([result objectForKey:@"notifications"] && [result valueForKey:@"notifications"] != nil && ![[result valueForKey:@"notifications"] isKindOfClass:[NSNull class]]) {
+                    callback([result valueForKey:@"notifications"]);
+                }
+            }
         }
     } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+        NSLog(@"CleverPush Error: Failed getting the notifications %@", error);
     }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    return notiications;
 }
 
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
