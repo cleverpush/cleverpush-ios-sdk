@@ -1,3 +1,6 @@
+# 1.13.2
+* Added new getNotifications(true, callback) method which can combine notifications from local storage and from the API
+
 # 1.13.1
 * Improved 'autoRegister: true' behaviour when user has unsubscribed.
 
