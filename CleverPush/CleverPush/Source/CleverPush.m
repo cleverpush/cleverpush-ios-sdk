@@ -1955,7 +1955,7 @@ static id isNil(id object) {
     if (!notifications) {
         return [[NSArray alloc] init];
     }
-    return notifications;
+    return [self convertObjectToCPNotification:notifications];
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local
