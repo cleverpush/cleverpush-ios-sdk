@@ -1,5 +1,5 @@
 # 1.13.3
-* Improved getNotifications method
+* Improved `externalId` field mapping in `CPChannelTopic`
 
 # 1.13.2
 * Added new getNotifications(true, callback) method which can combine notifications from local storage and from the API

@@ -2498,7 +2498,6 @@ static id isNil(id object) {
                     } else {
                         [self setDefaultCheckedTopics:[topicsController getSelectedTopics]];
                         
-                        
                         if (![self isSubscribed]) {
                         
                             [self subscribe:nil skipTopicsDialog:YES];

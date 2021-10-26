@@ -19,14 +19,18 @@
     _parentTopic = [json objectForKey:@"parentTopic"];
     _sort = [json objectForKey:@"sort"];
     _fcmBroadcastTopic = [json objectForKey:@"fcmBroadcastTopic"];
-    _externalId = [json objectForKey:@"externalId"];
+
+    if ([json objectForKey:@"externalId"] != nil && ![[json objectForKey:@"externalId"] isKindOfClass:[NSNull class]]) {
+        _externalId = [NSString stringWithFormat:@"%@", [json objectForKey:@"externalId"]];
+    }
+
     _customData = [json objectForKey:@"customData"];
+
     _defaultUnchecked = NO;
-    
     if ([json objectForKey:@"defaultUnchecked"] != nil && ![[json objectForKey:@"defaultUnchecked"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"defaultUnchecked"] boolValue]) {
         _defaultUnchecked = YES;
     }
-        
+
     if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
         _createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     }
