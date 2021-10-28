@@ -1935,7 +1935,7 @@ static id isNil(id object) {
 
 #pragma mark - check the topicId exists in the subscriptionTopics or not
 + (BOOL)hasSubscriptionTopic:(NSString*)topicId {
-    return [[self getSubscriptionTopics] containsObject:tagId];
+    return [[self getSubscriptionTopics] containsObject:topicId];
 }
 
 #pragma mark - Check if the any topic is exists in the NSUserDefaults or not
