@@ -164,6 +164,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)isSubscribed;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
++ (BOOL)hasSubscriptionTopic:(NSString*)topicId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
 

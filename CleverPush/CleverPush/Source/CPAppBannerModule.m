@@ -210,6 +210,62 @@ dispatch_queue_t dispatchQueue = nil;
     return [banner.stopAt compare:[NSDate date]] == NSOrderedDescending;
 }
 
++ (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
+    BOOL allowed = YES;
+    
+    if (allowed && banner.tags && [banner.tags count] > 0) {
+        allowed = NO;
+        for (NSString *tag in banner.tags) {
+            if ([CleverPush hasSubscriptionTag:tag]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+    
+    if (allowed && banner.excludeTags && [banner.excludeTags count] > 0) {
+        for (NSString *tag in banner.excludeTags) {
+            if ([CleverPush hasSubscriptionTag:tag]) {
+                allowed = NO;
+                break;
+            }
+        }
+    }
+    
+    if (allowed && banner.topics && [banner.topics count] > 0) {
+        allowed = NO;
+        for (NSString *topic in banner.topics) {
+            if ([CleverPush hasSubscriptionTopic:topic]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+    
+    if (allowed && banner.excludeTopics && [banner.excludeTopics count] > 0) {
+        for (NSString *topic in banner.excludeTopics) {
+            if ([CleverPush hasSubscriptionTopic:topic]) {
+                allowed = NO;
+                break;
+            }
+        }
+    }
+    
+    if (allowed && banner.attributes && [banner.attributes count] > 0) {
+        allowed = NO;
+        for (NSDictionary *attribute in banner.attributes) {
+            NSString *attributeId = [attribute objectForKey:@"id"];
+            NSString *attributeValue = [attribute objectForKey:@"value"];
+            if ([CleverPush hasSubscriptionAttributeValue:attributeId value:attributeValue]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+    
+    return allowed;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 + (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
@@ -222,6 +278,10 @@ dispatch_queue_t dispatchQueue = nil;
         }
         
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && ![self stopAtAllowed:banner]) {
+            continue;
+        }
+        
+        if (![self bannerTargetingAllowed:banner]) {
             continue;
         }
         
@@ -328,6 +388,34 @@ dispatch_queue_t dispatchQueue = nil;
             
             if (action && [action.type isEqualToString:@"subscribe"]) {
                 [CleverPush subscribe];
+            }
+            
+            if (action && [action.type isEqualToString:@"addTags"]) {
+                [CleverPush addSubscriptionTags:action.tags];
+            }
+            if (action && [action.type isEqualToString:@"removeTags"]) {
+                [CleverPush removeSubscriptionTags:action.tags];
+            }
+            if (action && [action.type isEqualToString:@"addTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if (![topics containsObject:topic]) {
+                        [topics addObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+            if (action && [action.type isEqualToString:@"removeTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if ([topics containsObject:topic]) {
+                        [topics removeObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+            if (action && [action.type isEqualToString:@"setAttribute"]) {
+                [CleverPush setSubscriptionAttribute:action.attributeId value:action.attributeValue];
             }
         };
         [bannerController setActionCallback:callbackBlock];

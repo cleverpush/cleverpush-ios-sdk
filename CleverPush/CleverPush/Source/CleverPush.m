@@ -1933,6 +1933,11 @@ static id isNil(id object) {
     return subscriptionTopics;
 }
 
+#pragma mark - check the topicId exists in the subscriptionTopics or not
++ (BOOL)hasSubscriptionTopic:(NSString*)topicId {
+    return [[self getSubscriptionTopics] containsObject:tagId];
+}
+
 #pragma mark - Check if the any topic is exists in the NSUserDefaults or not
 + (BOOL)hasSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];

@@ -35,6 +35,12 @@
 @property (nonatomic) int dismissTimeout;
 @property (nonatomic) int delaySeconds;
 
+@property (nonatomic, strong) NSArray *tags;
+@property (nonatomic, strong) NSArray *topics;
+@property (nonatomic, strong) NSArray *excludeTags;
+@property (nonatomic, strong) NSArray *excludeTopics;
+@property (nonatomic, strong) NSArray *attributes;
+
 - (id)initWithJson:(NSDictionary*)json;
 
 @end

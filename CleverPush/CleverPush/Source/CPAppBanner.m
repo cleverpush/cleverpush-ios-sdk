@@ -97,6 +97,22 @@
         } else {
             self.triggerType = CPAppBannerTriggerTypeAppOpen;
         }
+        
+        if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {
+            self.tags = [json objectForKey:@"tags"];
+        }
+        if ([json objectForKey:@"excludeTags"] && [[json objectForKey:@"excludeTags"] isKindOfClass:[NSArray class]]) {
+            self.excludeTags = [json objectForKey:@"excludeTags"];
+        }
+        if ([json objectForKey:@"topics"] && [[json objectForKey:@"topics"] isKindOfClass:[NSArray class]]) {
+            self.topics = [json objectForKey:@"topics"];
+        }
+        if ([json objectForKey:@"excludeTopics"] && [[json objectForKey:@"excludeTopics"] isKindOfClass:[NSArray class]]) {
+            self.excludeTopics = [json objectForKey:@"excludeTopics"];
+        }
+        if ([json objectForKey:@"attributes"] && [[json objectForKey:@"attributes"] isKindOfClass:[NSArray class]]) {
+            self.attributes = [json objectForKey:@"attributes"];
+        }
     }
     return self;
 }
