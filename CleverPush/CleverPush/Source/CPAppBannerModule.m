@@ -373,8 +373,8 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        CPAppBannerViewController* appBannerViewController;
-        appBannerViewController = [[CPAppBannerViewController alloc] init];
+        CPAppBannerViewController* appBannerViewController = [[CPAppBannerViewController alloc] init];
+
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
             
