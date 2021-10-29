@@ -20,7 +20,7 @@
     [self.tblCPBanner addObserver:self forKeyPath:@"contentSize" options:0 context:NULL];
 }
 
-- (void)DynamicHeight:(CGSize)value {
+- (void)dynamicHeight:(CGSize)value {
     [self.delegate manageTableHeightDelegate:value];
 }
 
@@ -36,7 +36,7 @@
             self.tblCPBanner.frame = frame;
         }
     }
-    [self DynamicHeight:frame.size];
+    [self dynamicHeight:frame.size];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -154,9 +154,9 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeHTML) {
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
-        return  block.height;
+        return block.height;
     } else {
-        return  UITableViewAutomaticDimension;
+        return UITableViewAutomaticDimension;
     }
 }
 
@@ -179,7 +179,7 @@
 
 - (void)onDismiss {
     dispatch_async(dispatch_get_main_queue(), ^(void){
-        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_POPUP_VISIBILITY"];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.controller dismissViewControllerAnimated:NO completion:nil];
     });
