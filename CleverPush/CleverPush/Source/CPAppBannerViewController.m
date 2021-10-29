@@ -83,7 +83,7 @@
     [self.pageControl setNumberOfPages:self.data.screens.count];
 }
 
-- (void)ManageTableHeightDelegate:(CGSize)value {
+- (void)manageTableHeightDelegate:(CGSize)value {
     if (value.height > UIScreen.mainScreen.bounds.size.height) {
         self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
     } else {
@@ -135,7 +135,7 @@
     return cell;
 }
 
-- (void)NavigateToNextPage {
+- (void)navigateToNextPage {
     NSIndexPath *nextItem = [NSIndexPath indexPathForItem:self.index + 1 inSection:0];
     if (nextItem.row < self.data.screens.count) {
         [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
