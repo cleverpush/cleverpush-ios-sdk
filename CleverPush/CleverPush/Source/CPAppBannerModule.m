@@ -206,6 +206,11 @@ dispatch_queue_t dispatchQueue = nil;
     }];
 }
 
+#pragma mark - check the banner stop date is allowed or not.
++ (BOOL)stopAtAllowed:(CPAppBanner*)banner {
+    return [banner.stopAt compare:[NSDate date]] == NSOrderedDescending;
+}
+
 #pragma mark - check the banner triggering allowed or not.
 + (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
     BOOL allowed = YES;
@@ -269,6 +274,7 @@ dispatch_queue_t dispatchQueue = nil;
         if (banner.status == CPAppBannerStatusDraft && !showDrafts) {
             continue;
         }
+
         if (![self bannerTargetingAllowed:banner]) {
             continue;
         }
@@ -277,7 +283,7 @@ dispatch_queue_t dispatchQueue = nil;
             continue;
         }
         
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
+        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && ![self stopAtAllowed:banner]) {
             continue;
         }
         
@@ -415,7 +421,7 @@ dispatch_queue_t dispatchQueue = nil;
         }
         
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
-            if ([banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
+            if ([self stopAtAllowed:banner]) {
                 [self presentAppBanner:appBannerViewController banner:banner];
             } else {
                 NSLog(@"CleverPush: Banner display date has been elapsed");
@@ -431,7 +437,7 @@ dispatch_queue_t dispatchQueue = nil;
     UIViewController* topController = [CleverPush topViewController];
     
     if (!CleverPush.popupVisible) {
-        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_POPUP_VISIBILITY"];
+        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         appBannerViewController.data = banner;
