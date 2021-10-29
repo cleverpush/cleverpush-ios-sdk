@@ -1880,6 +1880,7 @@ static id isNil(id object) {
 + (BOOL)hasSubscriptionTag:(NSString*)tagId {
     return [[self getSubscriptionTags] containsObject:tagId];
 }
+
 #pragma mark - check the topicId exists in the subscriptionTopics or not
 + (BOOL)hasSubscriptionTopic:(NSString*)topicId {
     return [[self getSubscriptionTopics] containsObject:topicId];
