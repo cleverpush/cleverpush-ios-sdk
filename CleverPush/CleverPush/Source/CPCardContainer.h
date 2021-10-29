@@ -4,11 +4,11 @@
 #import "CPAppBanner.h"
 
 @protocol HeightDelegate <NSObject>
-- (void)ManageTableHeightDelegate:(CGSize)value;
+- (void)manageTableHeightDelegate:(CGSize)value;
 @end
 
 @protocol NavigateNextPage <NSObject>
-- (void)NavigateToNextPage;
+- (void)navigateToNextPage;
 @end
 
 @interface CPCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
