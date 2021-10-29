@@ -59,18 +59,18 @@
         
         if ([json objectForKey:@"screens"] != nil) {
             for (NSDictionary *screensJson in [json objectForKey:@"screens"]) {
-                CPAppBannerCarouselBlock* screensblock;
-                screensblock = [[CPAppBannerCarouselBlock alloc] initWithJson:screensJson];
-                [self.screens addObject:screensblock];
+                CPAppBannerCarouselBlock* screensBlock;
+                screensBlock = [[CPAppBannerCarouselBlock alloc] initWithJson:screensJson];
+                [self.screens addObject:screensBlock];
             }
         }
         
-        if ([json objectForKey:@"carouselEnabled"] == false) {
+        if ([json objectForKey:@"carouselEnabled"] != true) {
             CPAppBannerCarouselBlock* screensblock;
-            screensblock = [[CPAppBannerCarouselBlock alloc]init];
-            screensblock.id = 0;
-            screensblock.blocks = self.blocks;
-            [self.screens addObject:screensblock];
+            screensBlock = [[CPAppBannerCarouselBlock alloc]init];
+            screensBlock.id = 0;
+            screensBlock.blocks = self.blocks;
+            [self.screens addObject:screensBlock];
         }
         
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
