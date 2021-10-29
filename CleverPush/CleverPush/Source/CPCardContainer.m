@@ -90,7 +90,7 @@
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
-            [self callBackofAction:block.action from:YES];
+            [self actionCallback:block.action from:YES];
         }];
         return cell;
     } else if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -147,7 +147,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.data.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
-        [self callBackofAction:block.action from:NO];
+        [self actionCallback:block.action from:NO];
     }
 }
 
@@ -160,9 +160,9 @@
     }
 }
 
-- (void)callBackofAction:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
+- (void)actionCallback:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
     self.actionCallback(action);
-     if (action.dismiss && action.openInWebview) {
+    if (action.dismiss && action.openInWebview) {
         [CPUtils openSafari:action.url dismissViewController:self.controller];
     } else if (!action.dismiss && action.openInWebview) {
         [CPUtils openSafari:action.url];
@@ -172,7 +172,7 @@
         if (!buttonBlock || !self.data.carouselEnabled) {
             [CPUtils openSafari:action.url];
         } else {
-            [self.changePage NavigateToNextPage];
+            [self.changePage navigateToNextPage];
         }
     }
 }
