@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CPAppBannerViewController">
+            <connections>
+                <outlet property="backGroundImage" destination="Cyo-o7-W9S" id="Cld-1g-rfg"/>
+                <outlet property="bannerContainer" destination="MUU-Pe-ICL" id="I1X-cs-xcx"/>
+                <outlet property="bottomConstraint" destination="rre-Iy-Udo" id="Gew-Pl-SYb"/>
+                <outlet property="cardCollectionView" destination="52o-O1-DCC" id="3gg-md-igj"/>
+                <outlet property="centerYConstraint" destination="kl1-98-T4C" id="y7f-nU-0C1"/>
+                <outlet property="pageControl" destination="kLE-T5-04L" id="i1H-so-3gC"/>
+                <outlet property="popupHeight" destination="51d-Zu-Lus" id="WMD-UR-882"/>
+                <outlet property="topConstraint" destination="9ng-cm-mdZ" id="WRR-wc-SX0"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="nJc-Zy-lIx"/>
+                <outlet property="webBanner" destination="UcH-Vj-ipE" id="yrb-Jj-faw"/>
+                <outlet property="webBannerHeight" destination="nws-37-hH1" id="PCB-m4-9J5"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT" userLabel="Banner">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MUU-Pe-ICL">
+                    <rect key="frame" x="25" y="44" width="364" height="818"/>
+                    <subviews>
+                        <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Cyo-o7-W9S">
+                            <rect key="frame" x="0.0" y="0.0" width="364" height="818"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </imageView>
+                        <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="52o-O1-DCC">
+                            <rect key="frame" x="0.0" y="0.0" width="364" height="778"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="YZ7-Ii-f51">
+                                <size key="itemSize" width="128" height="128"/>
+                                <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            </collectionViewFlowLayout>
+                        </collectionView>
+                        <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UcH-Vj-ipE">
+                            <rect key="frame" x="0.0" y="384" width="364" height="50"/>
+                            <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="nws-37-hH1"/>
+                            </constraints>
+                            <wkWebViewConfiguration key="configuration">
+                                <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                <wkPreferences key="preferences"/>
+                            </wkWebViewConfiguration>
+                        </wkWebView>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="52o-O1-DCC" secondAttribute="bottom" constant="40" id="1gj-3x-Pud"/>
+                        <constraint firstAttribute="height" constant="818" id="51d-Zu-Lus"/>
+                        <constraint firstItem="52o-O1-DCC" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="8B1-Uq-FKe"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="IWI-hq-0LQ"/>
+                        <constraint firstItem="Cyo-o7-W9S" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="K4c-lt-Kl9"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="centerY" secondItem="MUU-Pe-ICL" secondAttribute="centerY" id="LUU-Jc-f2D"/>
+                        <constraint firstAttribute="bottom" secondItem="Cyo-o7-W9S" secondAttribute="bottom" id="Ujm-e8-B9M"/>
+                        <constraint firstAttribute="trailing" secondItem="52o-O1-DCC" secondAttribute="trailing" id="Ylj-4d-ZDH"/>
+                        <constraint firstAttribute="trailing" secondItem="UcH-Vj-ipE" secondAttribute="trailing" id="aYq-zC-F17"/>
+                        <constraint firstAttribute="trailing" secondItem="Cyo-o7-W9S" secondAttribute="trailing" id="faf-RT-z4x"/>
+                        <constraint firstItem="52o-O1-DCC" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" id="oiP-I0-WrN"/>
+                        <constraint firstItem="Cyo-o7-W9S" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" id="rMf-dl-tIP"/>
+                    </constraints>
+                </view>
+                <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="kLE-T5-04L">
+                    <rect key="frame" x="129" y="826" width="156" height="26"/>
+                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                    <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="26" id="0o2-JD-FsU"/>
+                    </constraints>
+                    <color key="pageIndicatorTintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="currentPageIndicatorTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="13"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </pageControl>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <gestureRecognizers/>
+            <constraints>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="kLE-T5-04L" secondAttribute="bottom" constant="10" id="6vf-0v-Rab"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" identifier="topNotch" id="9ng-cm-mdZ"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="25" id="TS0-sf-eSN"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="25" id="aPi-J1-MG0"/>
+                <constraint firstItem="kLE-T5-04L" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="d4Q-Hy-89c"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="centerY" secondItem="Q5M-cg-NOt" secondAttribute="centerY" identifier="centerY" id="kl1-98-T4C"/>
+                <constraint firstAttribute="bottom" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="34" identifier="bottomNotch" id="rre-Iy-Udo"/>
+            </constraints>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="ffL-Fv-IMB" appends="YES" id="fFb-ZC-OQY"/>
+            </connections>
+            <point key="canvasLocation" x="-435" y="42"/>
+        </view>
+        <tapGestureRecognizer id="ffL-Fv-IMB">
+            <connections>
+                <action selector="tapGestureAction:" destination="-1" id="fhc-tI-ncU"/>
+            </connections>
+        </tapGestureRecognizer>
+    </objects>
+    <resources>
+        <systemColor name="systemGray4Color">
+            <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

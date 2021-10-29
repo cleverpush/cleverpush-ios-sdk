@@ -15,7 +15,7 @@
 #import "CPAppBannerAction.h"
 #import "UIColor+HexString.h"
 #import "UIImageView+CleverPush.h"
-#import "CPAppBannerController.h"
+#import "CPAppBannerViewController.h"
 #import "CleverPush.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerCondition.h"

@@ -12,7 +12,7 @@
 #import "CPAppBannerTriggerType.h"
 #import "CPAppBannerHTMLBlock.h"
 #import "CPUtils.h"
-
+#import "CPAppBannerCarouselBlock.h"
 @interface CPAppBanner : NSObject
 
 @property (nonatomic) CPAppBannerType type;
@@ -24,16 +24,23 @@
 @property (nonatomic) CPAppBannerTriggerType triggerType;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
-
+@property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
 @property (nonatomic, strong) NSString *id;
+@property (nonatomic, strong) NSString *testId;
 @property (nonatomic, strong) NSString *channel;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *HTMLContent;
 @property (nonatomic, strong) NSString *contentType;
 @property (nonatomic, strong) NSDate *startAt;
 @property (nonatomic, strong) NSDate *stopAt;
+@property (nonatomic, strong) NSArray *tags;
+@property (nonatomic, strong) NSArray *topics;
+@property (nonatomic, strong) NSArray *excludeTags;
+@property (nonatomic, strong) NSArray *excludeTopics;
+@property (nonatomic, strong) NSArray *attributes;
 @property (nonatomic) int dismissTimeout;
 @property (nonatomic) int delaySeconds;
+@property (nonatomic) BOOL carouselEnabled;
 
 - (id)initWithJson:(NSDictionary*)json;
 
