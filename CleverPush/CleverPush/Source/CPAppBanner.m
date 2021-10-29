@@ -6,12 +6,15 @@
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
+        
         self.id = [json objectForKey:@"_id"];
         self.channel = [json objectForKey:@"channel"];
         self.name = [json objectForKey:@"name"];
         self.HTMLContent = [json objectForKey:@"content"];
         self.contentType = [json objectForKey:@"contentType"];
-        
+        if ([json objectForKey:@"testId"] != nil) {
+            self.testId = [json objectForKey:@"testId"];
+        }
         if ([[json objectForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
         } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
@@ -48,9 +51,26 @@
                 } else {
                     continue;
                 }
-                
                 [self.blocks addObject:block];
             }
+        }
+        
+        self.screens = [NSMutableArray new];
+        
+        if ([json objectForKey:@"screens"] != nil) {
+            for (NSDictionary *screensJson in [json objectForKey:@"screens"]) {
+                CPAppBannerCarouselBlock* screensBlock;
+                screensBlock = [[CPAppBannerCarouselBlock alloc] initWithJson:screensJson];
+                [self.screens addObject:screensBlock];
+            }
+        }
+        
+        if ([json objectForKey:@"carouselEnabled"] != true) {
+            CPAppBannerCarouselBlock* screensblock;
+            screensBlock = [[CPAppBannerCarouselBlock alloc]init];
+            screensBlock.id = 0;
+            screensBlock.blocks = self.blocks;
+            [self.screens addObject:screensBlock];
         }
         
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
@@ -96,6 +116,26 @@
             self.triggerType = CPAppBannerTriggerTypeConditions;
         } else {
             self.triggerType = CPAppBannerTriggerTypeAppOpen;
+        }
+        self.carouselEnabled = YES;
+        if ([json objectForKey:@"carouselEnabled"] == false) {
+            self.carouselEnabled = NO;
+        }
+        
+        if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {
+            self.tags = [json objectForKey:@"tags"];
+        }
+        if ([json objectForKey:@"excludeTags"] && [[json objectForKey:@"excludeTags"] isKindOfClass:[NSArray class]]) {
+            self.excludeTags = [json objectForKey:@"excludeTags"];
+        }
+        if ([json objectForKey:@"topics"] && [[json objectForKey:@"topics"] isKindOfClass:[NSArray class]]) {
+            self.topics = [json objectForKey:@"topics"];
+        }
+        if ([json objectForKey:@"excludeTopics"] && [[json objectForKey:@"excludeTopics"] isKindOfClass:[NSArray class]]) {
+            self.excludeTopics = [json objectForKey:@"excludeTopics"];
+        }
+        if ([json objectForKey:@"attributes"] && [[json objectForKey:@"attributes"] isKindOfClass:[NSArray class]]) {
+            self.attributes = [json objectForKey:@"attributes"];
         }
     }
     return self;

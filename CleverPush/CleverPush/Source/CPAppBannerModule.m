@@ -206,14 +206,76 @@ dispatch_queue_t dispatchQueue = nil;
     }];
 }
 
+#pragma mark - check the banner stop date is allowed or not.
 + (BOOL)stopAtAllowed:(CPAppBanner*)banner {
     return [banner.stopAt compare:[NSDate date]] == NSOrderedDescending;
+}
+
+#pragma mark - check the banner triggering allowed or not.
++ (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
+    BOOL allowed = YES;
+
+    if (allowed && banner.tags && [banner.tags count] > 0) {
+        allowed = NO;
+        for (NSString *tag in banner.tags) {
+            if ([CleverPush hasSubscriptionTag:tag]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+
+    if (allowed && banner.excludeTags && [banner.excludeTags count] > 0) {
+        for (NSString *tag in banner.excludeTags) {
+            if ([CleverPush hasSubscriptionTag:tag]) {
+                allowed = NO;
+                break;
+            }
+        }
+    }
+
+    if (allowed && banner.topics && [banner.topics count] > 0) {
+        allowed = NO;
+        for (NSString *topic in banner.topics) {
+            if ([CleverPush hasSubscriptionTopic:topic]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+
+    if (allowed && banner.excludeTopics && [banner.excludeTopics count] > 0) {
+        for (NSString *topic in banner.excludeTopics) {
+            if ([CleverPush hasSubscriptionTopic:topic]) {
+                allowed = NO;
+                break;
+            }
+        }
+    }
+
+    if (allowed && banner.attributes && [banner.attributes count] > 0) {
+        allowed = NO;
+        for (NSDictionary *attribute in banner.attributes) {
+            NSString *attributeId = [attribute objectForKey:@"id"];
+            NSString *attributeValue = [attribute objectForKey:@"value"];
+            if ([CleverPush hasSubscriptionAttributeValue:attributeId value:attributeValue]) {
+                allowed = YES;
+                break;
+            }
+        }
+    }
+
+    return allowed;
 }
 
 #pragma mark - Create banners based on conditional attributes within the objects
 + (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
         if (banner.status == CPAppBannerStatusDraft && !showDrafts) {
+            continue;
+        }
+
+        if (![self bannerTargetingAllowed:banner]) {
             continue;
         }
         
@@ -311,14 +373,8 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        CPAppBannerController* bannerController;
-        
-        if ([banner.contentType isEqualToString:@"html"]) {
-            bannerController = [[CPAppBannerController alloc] initWithHTMLBanner:banner];
-        } else {
-            bannerController = [[CPAppBannerController alloc] initWithBanner:banner];
-        }
-        
+        CPAppBannerViewController* appBannerViewController = [[CPAppBannerViewController alloc] init];
+
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
             
@@ -329,34 +385,66 @@ dispatch_queue_t dispatchQueue = nil;
             if (action && [action.type isEqualToString:@"subscribe"]) {
                 [CleverPush subscribe];
             }
+            
+            if (action && [action.type isEqualToString:@"addTags"]) {
+                [CleverPush addSubscriptionTags:action.tags];
+            }
+            if (action && [action.type isEqualToString:@"removeTags"]) {
+                [CleverPush removeSubscriptionTags:action.tags];
+            }
+            if (action && [action.type isEqualToString:@"addTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if (![topics containsObject:topic]) {
+                        [topics addObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+            if (action && [action.type isEqualToString:@"removeTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if ([topics containsObject:topic]) {
+                        [topics removeObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+            if (action && [action.type isEqualToString:@"setAttribute"]) {
+                [CleverPush setSubscriptionAttribute:action.attributeId value:action.attributeValue];
+            }
         };
-        [bannerController setActionCallback:callbackBlock];
-                
+        [appBannerViewController setActionCallback:callbackBlock];
+
         if (banner.frequency == CPAppBannerFrequencyOnce) {
             [CPAppBannerModule setBannerIsShown:banner.id];
         }
         
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
             if ([self stopAtAllowed:banner]) {
-                [CPAppBannerModule presentAppBanner:bannerController banner:banner];
+                [self presentAppBanner:appBannerViewController banner:banner];
             } else {
                 NSLog(@"CleverPush: Banner display date has been elapsed");
             }
         } else {
-            [CPAppBannerModule presentAppBanner:bannerController banner:banner];
+            [self presentAppBanner:appBannerViewController banner:banner];
         }
     });
 }
 
-+ (void)presentAppBanner:(CPAppBannerController*)controller banner:(CPAppBanner*)banner {
++ (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
+    
+    UIViewController* topController = [CleverPush topViewController];
+    
     if (!CleverPush.popupVisible) {
         [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        UIViewController* topController = [CleverPush topViewController];
-        [topController presentViewController:controller animated:NO completion:nil];
+        [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+        appBannerViewController.data = banner;
+        [topController presentViewController:appBannerViewController animated:YES completion:nil];
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
-                [controller onDismiss];
+                [appBannerViewController onDismiss];
             });
         }
         [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
@@ -373,12 +461,22 @@ dispatch_queue_t dispatchQueue = nil;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
     }
+    NSDictionary* dataDic = [[NSDictionary alloc]init];
+    if (banner.testId != nil) {
+        dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 banner.id, @"bannerId",
+                                 banner.channel, @"channelId",
+                                 banner.testId, @"testId",
+                                 subscriptionId, @"subscriptionId",
+                                 nil];
+    } else {
+        dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 banner.id, @"bannerId",
+                                 banner.channel, @"channelId",
+                                 subscriptionId, @"subscriptionId",
+                                 nil];
+    }
     
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             banner.id, @"bannerId",
-                             banner.channel, @"channelId",
-                             subscriptionId, @"subscriptionId",
-                             nil];
     
     NSLog(@"CleverPush: sendBannerEvent: %@ %@", event, dataDic);
     
@@ -388,7 +486,6 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 #pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)
-
 + (void)loadBannersDisabled {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     bannersDisabled = [userDefaults boolForKey:@"CleverPush_APP_BANNERS_DISABLED"];

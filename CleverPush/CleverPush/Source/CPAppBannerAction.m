@@ -31,6 +31,20 @@
         if ([json objectForKey:@"openInWebview"] != nil && ![[json objectForKey:@"openInWebview"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"openInWebview"] boolValue]) {
             self.openInWebview = YES;
         }
+        
+        if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {
+            self.tags = [json objectForKey:@"tags"];
+        }
+        if ([json objectForKey:@"topics"] && [[json objectForKey:@"topics"] isKindOfClass:[NSArray class]]) {
+            self.topics = [json objectForKey:@"topics"];
+        }
+        if ([json objectForKey:@"attributeId"] && [[json objectForKey:@"attributeId"] isKindOfClass:[NSString class]]) {
+            self.attributeId = [json objectForKey:@"attributeId"];
+        }
+        if ([json objectForKey:@"attributeValue"] && [[json objectForKey:@"attributeValue"] isKindOfClass:[NSString class]]) {
+            self.attributeValue = [json objectForKey:@"attributeValue"];
+        }
+
     }
     return self;
 }

@@ -4,6 +4,7 @@
 
 #pragma mark - Class Methods
 - (void)setImageWithURL:(NSURL*_Nonnull)imageURL;
+- (void)setImageWithURL:(NSURL*_Nonnull)imageURL callback:(void(^)(BOOL))callback;
 - (instancetype _Nonnull )initWithImage:(nullable UIImage *)image;
 - (instancetype _Nonnull )initWithImage:(nullable UIImage *)image highlightedImage:(nullable UIImage *)highlightedImage;
 

@@ -1881,6 +1881,11 @@ static id isNil(id object) {
     return [[self getSubscriptionTags] containsObject:tagId];
 }
 
+#pragma mark - check the topicId exists in the subscriptionTopics or not
++ (BOOL)hasSubscriptionTopic:(NSString*)topicId {
+    return [[self getSubscriptionTopics] containsObject:topicId];
+}
+
 #pragma mark - Retrieving subscription attributes which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_ATTRIBUTES"
 + (NSDictionary*)getSubscriptionAttributes {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
