@@ -448,10 +448,11 @@ dispatch_queue_t dispatchQueue = nil;
             });
         }
         [CPAppBannerModule sendBannerEvent:@"delivered" forBanner:banner];
-    }else{
+    } else {
         NSLog(@"CleverPush: You can not present two banners at the same time");
     }
 }
+
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
