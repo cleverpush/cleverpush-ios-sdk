@@ -21,7 +21,7 @@
 }
 
 - (void)DynamicHeight:(CGSize)value {
-    [self.delegate ManageTableHeightDelegate:value];
+    [self.delegate manageTableHeightDelegate:value];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
