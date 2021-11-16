@@ -131,6 +131,9 @@ dispatch_queue_t dispatchQueue = nil;
     if (initialized) {
         return;
     }
+
+    [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
     pendingBannerListeners = [NSMutableArray new];
@@ -432,16 +435,16 @@ dispatch_queue_t dispatchQueue = nil;
     });
 }
 
-+ (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
-    
-    UIViewController* topController = [CleverPush topViewController];
-    
++ (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner {
     if (!CleverPush.popupVisible) {
         [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_APP_BANNER_VISIBLE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         appBannerViewController.data = banner;
-        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+        
+        UIViewController* topController = [CleverPush topViewController];
+        [topController presentViewController:appBannerViewController animated:NO completion:nil];
+        
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                 [appBannerViewController onDismiss];

@@ -23,7 +23,7 @@
 #import "CPAppBannerHTMLBlock.h"
 #import "CPUtils.h"
 #import "CPAppBannerModule.h"
-#import "CPCardContainer.h"
+#import "CPBannerCardContainer.h"
 #import "CPAspectKeepImageView.h"
 
 @interface CPAppBannerViewController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UICollectionViewDelegate, UICollectionViewDataSource, HeightDelegate, UIScrollViewDelegate, NavigateNextPage>
@@ -48,6 +48,5 @@
 - (void)initWithHTMLBanner:(CPAppBanner*)banner;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)onDismiss;
-+ (UIViewController*)topViewController;
 
 @end

@@ -11,7 +11,7 @@
 - (void)navigateToNextPage;
 @end
 
-@interface CPCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
+@interface CPBannerCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) IBOutlet UITableView *tblCPBanner;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (strong, nonatomic) CPAppBanner *data;

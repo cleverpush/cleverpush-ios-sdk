@@ -6,7 +6,7 @@
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
-        self.id = [json objectForKey:@"_id"];
+        self.id = [json objectForKey:@"id"];
 
         self.blocks = [NSMutableArray new];
         if ([json objectForKey:@"blocks"] != nil) {

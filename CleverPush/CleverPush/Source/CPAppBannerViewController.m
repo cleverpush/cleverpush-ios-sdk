@@ -16,6 +16,8 @@
     if (self.data == nil) {
         return;
     }
+    
+    NSLog(@"CPAppBannerViewController viewDidLoad");
 }
 #pragma mark - Custom UI Functions
 - (void)conditionalPresentation {
@@ -27,6 +29,8 @@
         [self delagates];
         [self contentVisibility:false background:false htmlContent:true];
     }
+    
+    NSLog(@"CPAppBannerViewController conditionalPresentation");
 }
 
 - (void)contentVisibility:(BOOL)collection background:(BOOL)background htmlContent:(BOOL)htmlContent {
@@ -36,7 +40,10 @@
 }
 
 - (void)delagates {
-    [self.cardCollectionView registerNib:[UINib nibWithNibName:@"CPCardContainer" bundle:nil] forCellWithReuseIdentifier:@"CPCardContainer"];
+    NSBundle *bundle = [CPUtils getAssetsBundle];
+    if (bundle) {
+        [self.cardCollectionView registerNib:[UINib nibWithNibName:@"CPBannerCardContainer" bundle:bundle] forCellWithReuseIdentifier:@"CPBannerCardContainer"];
+    }
     self.cardCollectionView.delegate = self;
     self.cardCollectionView.dataSource = self;
 }
@@ -118,13 +125,17 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CPCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPCardContainer" forIndexPath:indexPath];
+    CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-    [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPImageBlockCell" bundle:nil] forCellReuseIdentifier:@"CPImageBlockCell"];
-    [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPTextBlockCell" bundle:nil] forCellReuseIdentifier:@"CPTextBlockCell"];
-    [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPButtonBlockCell" bundle:nil] forCellReuseIdentifier:@"CPButtonBlockCell"];
-    [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPHTMLBlockCell" bundle:nil] forCellReuseIdentifier:@"CPHTMLBlockCell"];
+    
+    NSBundle *bundle = [CPUtils getAssetsBundle];
+    if (bundle) {
+        [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPImageBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPImageBlockCell"];
+        [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPTextBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPTextBlockCell"];
+        [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPButtonBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPButtonBlockCell"];
+        [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPHTMLBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPHTMLBlockCell"];
+    }
     
     cell.tblCPBanner.delegate = cell;
     cell.tblCPBanner.dataSource = cell;
@@ -159,34 +170,6 @@
     return CGSizeMake(self.bannerContainer.frame.size.width, self.bannerContainer.frame.size.height);
 }
 
-+ (UIViewController*)topViewController {
-    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
-}
-
-#pragma mark - Define Root view controller
-+ (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
-    if ([viewController isKindOfClass:[UITabBarController class]]) {
-        UITabBarController* tabBarController = (UITabBarController*)viewController;
-        return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
-    } else if ([viewController isKindOfClass:[UINavigationController class]]) {
-        UINavigationController* navContObj = (UINavigationController*)viewController;
-        return [self topViewControllerWithRootViewController:navContObj.visibleViewController];
-    } else if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
-        UIViewController* presentedViewController = viewController.presentedViewController;
-        return [self topViewControllerWithRootViewController:presentedViewController];
-    } else {
-        for (UIView *view in [viewController.view subviews]) {
-            id subViewController = [view nextResponder];
-            if (subViewController && [subViewController isKindOfClass:[UIViewController class]]) {
-                if ([(UIViewController *)subViewController presentedViewController]  && ![subViewController presentedViewController].isBeingDismissed) {
-                    return [self topViewControllerWithRootViewController:[(UIViewController *)subViewController presentedViewController]];
-                }
-            }
-        }
-        return viewController;
-    }
-}
-
 #pragma mark - compose HTML Banner
 - (void)composeHTML:(NSString*)content {
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
@@ -196,7 +179,6 @@
     
     self.webBanner.scrollView.scrollEnabled = true;
     self.webBanner.scrollView.bounces = false;
-    self.webBanner.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
     self.webBanner.allowsBackForwardNavigationGestures = false;
     self.webBanner.contentMode = UIViewContentModeScaleToFill;
     self.webBanner.navigationDelegate = self;

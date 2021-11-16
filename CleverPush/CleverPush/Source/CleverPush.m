@@ -432,7 +432,7 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
-#pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application goint to terminate.
+#pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
 + (void)applicationWillTerminate {
     [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
     [[NSUserDefaults standardUserDefaults] synchronize];

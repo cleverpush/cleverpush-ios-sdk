@@ -22,20 +22,12 @@ static CGFloat const CPConstraints = 30.0;
     [CPUtils updateLastTopicCheckedTime];
 }
 
-- (NSBundle *)getAssetsBundle {
-    NSBundle *mainBundle = [NSBundle mainBundle];
-    NSBundle *sourceBundle = [NSBundle bundleForClass:[self class]];
-    NSBundle *bundle = [NSBundle bundleWithPath:[mainBundle pathForResource:@"CleverPushResources" ofType:@"bundle"]];
-    bundle = bundle ? : [NSBundle bundleWithPath:[sourceBundle pathForResource:@"CleverPushResources" ofType:@"bundle"]];
-    return bundle ? : sourceBundle;
-}
-
 #pragma mark - initialised CPIntrinsicTableView
 - (void)initialisedTableView {
     tableView = [[CPIntrinsicTableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
     tableView.translatesAutoresizingMaskIntoConstraints = NO;
     tableView.backgroundColor = UIColor.clearColor;
-    NSBundle *bundle = [self getAssetsBundle];
+    NSBundle *bundle = [CPUtils getAssetsBundle];
     if (bundle) {
         UINib *nib = [UINib nibWithNibName:@"CPTopicDialogCell" bundle:bundle];
         [tableView registerNib:nib forCellReuseIdentifier:@"CPTopicDialogCell"];
@@ -314,7 +306,7 @@ static CGFloat const CPConstraints = 30.0;
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     CPTopicDialogCell *cell = (CPTopicDialogCell *)[tableView dequeueReusableCellWithIdentifier:@"CPTopicDialogCell"];
     cell.backgroundColor = [UIColor clearColor];
-    NSBundle *bundle = [self getAssetsBundle];
+    NSBundle *bundle = [CPUtils getAssetsBundle];
     NSArray *nibs = [[NSArray alloc]init];
     if (bundle) {
         nibs = [[bundle loadNibNamed:@"CPTopicDialogCell" owner:self options:nil] lastObject];

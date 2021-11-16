@@ -491,4 +491,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSDate *localDate = [formatter dateFromString:dateString];
     return localDate;
 }
+
++ (NSBundle *)getAssetsBundle {
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    NSBundle *sourceBundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleWithPath:[mainBundle pathForResource:@"CleverPushResources" ofType:@"bundle"]];
+    bundle = bundle ? : [NSBundle bundleWithPath:[sourceBundle pathForResource:@"CleverPushResources" ofType:@"bundle"]];
+    return bundle ? : sourceBundle;
+}
+
 @end

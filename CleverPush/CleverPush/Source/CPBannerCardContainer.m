@@ -1,4 +1,4 @@
-#import "CPCardContainer.h"
+#import "CPBannerCardContainer.h"
 #import "CPAppBannerBlock.h"
 #import "CPAppBannerButtonBlock.h"
 #import "CPAppBannerTextBlock.h"
@@ -12,7 +12,7 @@
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
 
-@implementation CPCardContainer
+@implementation CPBannerCardContainer
 @synthesize delegate;
 
 - (void)awakeFromNib {

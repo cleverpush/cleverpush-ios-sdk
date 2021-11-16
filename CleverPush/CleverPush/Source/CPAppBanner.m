@@ -65,14 +65,6 @@
             }
         }
         
-        if ([json objectForKey:@"carouselEnabled"] != true) {
-            CPAppBannerCarouselBlock* screensblock;
-            screensBlock = [[CPAppBannerCarouselBlock alloc]init];
-            screensBlock.id = 0;
-            screensBlock.blocks = self.blocks;
-            [self.screens addObject:screensBlock];
-        }
-        
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
             self.startAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"startAt"]];
         }
@@ -117,9 +109,17 @@
         } else {
             self.triggerType = CPAppBannerTriggerTypeAppOpen;
         }
-        self.carouselEnabled = YES;
-        if ([json objectForKey:@"carouselEnabled"] == false) {
-            self.carouselEnabled = NO;
+
+        self.carouselEnabled = NO;
+        if ([[json objectForKey:@"carouselEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.carouselEnabled = YES;
+        } else {
+            CPAppBannerCarouselBlock* screensBlock;
+            screensBlock = [[CPAppBannerCarouselBlock alloc] init];
+            screensBlock.id = 0;
+            screensBlock.blocks = self.blocks;
+            [self.screens addObject:screensBlock];
+            NSLog(@"self.screens: %@", self.screens);
         }
         
         if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {

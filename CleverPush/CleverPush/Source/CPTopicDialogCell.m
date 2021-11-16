@@ -1,4 +1,5 @@
 #import "CPTopicDialogCell.h"
+
 @implementation CPTopicDialogCell
 
 - (void)awakeFromNib {

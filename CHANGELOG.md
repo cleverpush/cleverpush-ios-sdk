@@ -1,3 +1,6 @@
+# 1.14.0
+* Support for Carousel App Banners
+
 # 1.13.3
 * Improved `externalId` field mapping in `CPChannelTopic`
 
