@@ -129,7 +129,6 @@
         if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
             cell.webHTMLBlock.scrollView.bounces = false;
-            cell.webHTMLBlock.configuration.defaultWebpagePreferences.allowsContentJavaScript = true;
             cell.webHTMLBlock.opaque = false;
             cell.webHTMLBlock.backgroundColor = UIColor.clearColor;
             cell.webHTMLBlock.scrollView.backgroundColor = UIColor.clearColor;
