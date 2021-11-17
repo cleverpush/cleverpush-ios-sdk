@@ -56,7 +56,7 @@
         }
         
         self.screens = [NSMutableArray new];
-        
+
         if ([json objectForKey:@"screens"] != nil) {
             for (NSDictionary *screensJson in [json objectForKey:@"screens"]) {
                 CPAppBannerCarouselBlock* screensBlock;

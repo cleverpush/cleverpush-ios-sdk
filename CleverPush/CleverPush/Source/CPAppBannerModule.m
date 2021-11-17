@@ -376,8 +376,11 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 + (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        CPAppBannerViewController* appBannerViewController = [[CPAppBannerViewController alloc] init];
-
+        NSBundle *bundle = [CPUtils getAssetsBundle];
+        CPAppBannerViewController *appBannerViewController;
+        if (bundle) {
+            appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+        }
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
             
@@ -418,7 +421,7 @@ dispatch_queue_t dispatchQueue = nil;
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
-
+        
         if (banner.frequency == CPAppBannerFrequencyOnce) {
             [CPAppBannerModule setBannerIsShown:banner.id];
         }
