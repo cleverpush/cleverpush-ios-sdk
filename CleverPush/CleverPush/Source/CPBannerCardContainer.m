@@ -47,14 +47,16 @@
     if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
-        [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:block.imageUrl]callback:^(BOOL callback) {
-            if (callback) {
-                [cell setNeedsLayout];
-                [cell layoutIfNeeded];
-                [tableView beginUpdates];
-                [tableView endUpdates];
-            }
-        }];
+        if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
+            [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:block.imageUrl]callback:^(BOOL callback) {
+                if (callback) {
+                    [cell setNeedsLayout];
+                    [cell layoutIfNeeded];
+                    [tableView beginUpdates];
+                    [tableView endUpdates];
+                }
+            }];
+        }
         return  cell;
     } else if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];

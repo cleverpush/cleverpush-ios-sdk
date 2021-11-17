@@ -380,6 +380,8 @@ dispatch_queue_t dispatchQueue = nil;
         CPAppBannerViewController *appBannerViewController;
         if (bundle) {
             appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+        } else {
+            appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:[NSBundle mainBundle]];
         }
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner];
@@ -444,10 +446,10 @@ dispatch_queue_t dispatchQueue = nil;
         [[NSUserDefaults standardUserDefaults] synchronize];
         [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         appBannerViewController.data = banner;
-        
+
         UIViewController* topController = [CleverPush topViewController];
-        [topController presentViewController:appBannerViewController animated:NO completion:nil];
-        
+        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                 [appBannerViewController onDismiss];

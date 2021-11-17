@@ -1,4 +1,5 @@
 #import "CPButtonBlockCell.h"
+
 @implementation CPButtonBlockCell
 
 - (void)awakeFromNib {
