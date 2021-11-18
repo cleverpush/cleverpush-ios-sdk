@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="4352" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -37,7 +37,7 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </imageView>
                         <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="52o-O1-DCC">
-                            <rect key="frame" x="0.0" y="0.0" width="364" height="778"/>
+                            <rect key="frame" x="0.0" y="0.0" width="364" height="818"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="YZ7-Ii-f51">
                                 <size key="itemSize" width="128" height="128"/>
@@ -60,7 +60,7 @@
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="bottom" secondItem="52o-O1-DCC" secondAttribute="bottom" constant="40" id="1gj-3x-Pud"/>
+                        <constraint firstAttribute="bottom" secondItem="52o-O1-DCC" secondAttribute="bottom" id="1gj-3x-Pud"/>
                         <constraint firstAttribute="height" constant="818" id="51d-Zu-Lus"/>
                         <constraint firstItem="52o-O1-DCC" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="8B1-Uq-FKe"/>
                         <constraint firstItem="UcH-Vj-ipE" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="IWI-hq-0LQ"/>
@@ -75,17 +75,17 @@
                     </constraints>
                 </view>
                 <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="kLE-T5-04L">
-                    <rect key="frame" x="129" y="826" width="156" height="26"/>
+                    <rect key="frame" x="129" y="869" width="156" height="20"/>
                     <color key="backgroundColor" systemColor="systemGray4Color"/>
                     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="26" id="0o2-JD-FsU"/>
+                        <constraint firstAttribute="height" constant="20" id="0o2-JD-FsU"/>
                     </constraints>
                     <color key="pageIndicatorTintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <color key="currentPageIndicatorTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                            <integer key="value" value="13"/>
+                            <integer key="value" value="10"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </pageControl>
@@ -94,10 +94,10 @@
             <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="kLE-T5-04L" secondAttribute="bottom" constant="10" id="6vf-0v-Rab"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" identifier="topNotch" id="9ng-cm-mdZ"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="25" id="TS0-sf-eSN"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="25" id="aPi-J1-MG0"/>
+                <constraint firstItem="kLE-T5-04L" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="7" id="cwz-W2-CMC"/>
                 <constraint firstItem="kLE-T5-04L" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="d4Q-Hy-89c"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="centerY" secondItem="Q5M-cg-NOt" secondAttribute="centerY" identifier="centerY" id="kl1-98-T4C"/>
                 <constraint firstAttribute="bottom" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="34" identifier="bottomNotch" id="rre-Iy-Udo"/>
