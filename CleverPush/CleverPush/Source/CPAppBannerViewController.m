@@ -16,8 +16,6 @@
     if (self.data == nil) {
         return;
     }
-    
-    NSLog(@"CPAppBannerViewController viewDidLoad");
 }
 #pragma mark - Custom UI Functions
 - (void)conditionalPresentation {
@@ -29,8 +27,6 @@
         [self delagates];
         [self contentVisibility:false background:false htmlContent:true];
     }
-    
-    NSLog(@"CPAppBannerViewController conditionalPresentation");
 }
 
 - (void)contentVisibility:(BOOL)collection background:(BOOL)background htmlContent:(BOOL)htmlContent {
@@ -74,7 +70,7 @@
     } else if (self.data.type == CPAppBannerTypeCenter) {
         [self bannerPosition:NO bottom:NO center:YES];
     } else if (self.data.type == CPAppBannerTypeBottom) {
-        [self bannerPosition:YES bottom:NO center:NO];
+        [self bannerPosition:NO bottom:YES center:NO];
     } else {
         [self bannerPosition:YES bottom:YES center:YES];
     }
@@ -143,6 +139,7 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
+    [cell layoutIfNeeded];
     return cell;
 }
 
@@ -195,7 +192,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
         [self.webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
-        
     });
 }
 

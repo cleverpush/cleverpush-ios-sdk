@@ -26,6 +26,7 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     CGRect frame = self.tblCPBanner.frame;
+    frame.size.height = [CPUtils frameHeightWithoutSafeArea] - 50;
     if (self.tblCPBanner.contentSize.height > [CPUtils frameHeightWithoutSafeArea]) {
         self.tblCPBanner.frame = frame;
     } else {
