@@ -29,24 +29,31 @@
 @interface CPAppBannerViewController : UIViewController<UIGestureRecognizerDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UICollectionViewDelegate, UICollectionViewDataSource, HeightDelegate, UIScrollViewDelegate, NavigateNextPage>
 
 #pragma mark - Class Variables
+@property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, strong) IBOutlet CPAspectKeepImageView *backGroundImage;
+@property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
+@property (nonatomic, assign) long index;
 @property (nonatomic, strong) IBOutlet WKWebView *webBanner;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
 @property (weak, nonatomic) IBOutlet UIView *bannerContainer;
+@property (weak, nonatomic) IBOutlet UIButton *btnClose;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *popupHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *centerYConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerHeight;
-@property (strong, nonatomic) CPAppBanner *data;
-@property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
-@property (nonatomic, assign) long index;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnTopConstraints;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControllTopConstraint;
 
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;
 - (void)initWithHTMLBanner:(CPAppBanner*)banner;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)onDismiss;
+- (IBAction)tapOutSideBanner:(UIButton *)sender;
+- (IBAction)btnClose:(UIButton *)sender;
 
 @end

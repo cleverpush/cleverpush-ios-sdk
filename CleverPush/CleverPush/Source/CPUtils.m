@@ -224,7 +224,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  Check the font family has been exist in the UIBundle or not.
 + (BOOL)fontFamilyExists:(NSString*)fontFamily {
-    if (fontFamily == nil) {
+    if (fontFamily == nil || fontFamily.length == 0) {
         return NO;
     }
     
