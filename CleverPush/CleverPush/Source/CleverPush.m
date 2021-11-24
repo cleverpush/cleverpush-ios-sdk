@@ -65,7 +65,7 @@
 
 @implementation CleverPush
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.13.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.14.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1965,32 +1965,36 @@ static id isNil(id object) {
 
 #pragma mark - Retrieving notifications based on the flag remote/local
 + (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
-    NSMutableArray* localNotifications = [[self getNotifications] mutableCopy];
+    NSMutableArray* notifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
-        NSString *combinedURL = [self createDynamicURLForNotification];
+        NSString *combinedURL = [self generateGetReceivedNotificationsPath];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray *remoteNotifications) {
-            if ([remoteNotifications count] > 0) {
-                NSArray *mergedNotification = [localNotifications arrayByAddingObjectsFromArray:remoteNotifications];
-                NSArray *eliminateRedundancy = [self removeDuplicateEntriesFromArray:mergedNotification basedOnKey:@"_id"];
-                NSArray *grouped = [self groupArrayOfObjectByDates:eliminateRedundancy basedOnKey:@"createdAt"];
-                if (callback) {
-                    callback([self convertObjectToCPNotification:grouped]);
+            for (CPNotification *remoteNotification in remoteNotifications) {
+                BOOL found = NO;
+                for (CPNotification *localNotification in notifications) {
+                    if ([[localNotification valueForKey:@"_id"] isEqualToString:[remoteNotification valueForKey:@"_id"]]) {
+                        found = YES;
+                        break;
+                    }
                 }
-            } else {
-                if (callback) {
-                    callback([self convertObjectToCPNotification:localNotifications]);
+                if (!found) {
+                  [notifications addObject:remoteNotification];
                 }
+            }
+            if (callback) {
+                NSArray *sortedNotifications = [self sortArrayOfObjectByDates:notifications basedOnKey:@"createdAt"];
+                callback([self convertDictionariesToNotifications:sortedNotifications]);
             }
         }];
     } else {
         if (callback) {
-            callback([self convertObjectToCPNotification:localNotifications]);
+            callback([self convertDictionariesToNotifications:notifications]);
         }
     }
 }
 
 #pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
-+ (NSString *)createDynamicURLForNotification {
++ (NSString *)generateGetReceivedNotificationsPath {
     NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?", channelId];
     if ([self hasSubscriptionTopics]) {
         NSMutableArray* dynamicQueryParameters = [self getReceivedNotificationsQueryParameters];
@@ -2013,21 +2017,8 @@ static id isNil(id object) {
     return dynamicQueryParameter;
 }
 
-#pragma mark - Remove duplicate entries from array.
-+ (NSArray *)removeDuplicateEntriesFromArray:(NSArray *)array basedOnKey:(NSString *)key {
-    NSMutableArray *newArray = [NSMutableArray new];
-    NSArray *keysArray = [array valueForKey:key];
-    NSSet *noDuplicateKeys = [[NSSet alloc]initWithArray:keysArray];
-    for (NSString *currentKey in noDuplicateKeys) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%K == %@", key, currentKey];
-        NSArray *allObjectsWithKey = [array filteredArrayUsingPredicate:predicate];
-        [newArray addObject:[allObjectsWithKey firstObject]];
-    }
-    return [newArray copy];
-}
-
 #pragma mark - Group array of object by dates.
-+(NSArray*)groupArrayOfObjectByDates:(NSArray*)notifications basedOnKey:(NSString *)key {
++(NSArray*)sortArrayOfObjectByDates:(NSArray*)notifications basedOnKey:(NSString *)key {
     NSSortDescriptor *dateDescriptor = [NSSortDescriptor sortDescriptorWithKey:key ascending:YES];
     NSArray *sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
     NSArray *sortedEventArray = [notifications sortedArrayUsingDescriptors:sortDescriptors];
@@ -2035,7 +2026,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - converting objects to CPNotification.
-+ (NSMutableArray*)convertObjectToCPNotification:(NSArray*)notifications {
++ (NSMutableArray*)convertDictionariesToNotifications:(NSArray*)notifications {
     NSMutableArray* CPNotificationResult = [NSMutableArray new];
     [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL *stop) {
         CPNotification *notification = [[CPNotification alloc] init];

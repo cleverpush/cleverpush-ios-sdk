@@ -14,7 +14,6 @@
 
 #pragma mark - Parse json and set the data to the object variables
 - (void)parseJson:(NSDictionary*)json {
-    
     if ([json objectForKey:@"_id"] != nil && ![[json objectForKey:@"_id"] isKindOfClass:[NSNull class]]) {
         self.id = [json objectForKey:@"_id"];
     }

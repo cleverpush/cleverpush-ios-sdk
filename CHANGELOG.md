@@ -1,5 +1,6 @@
 # 1.14.0
 * Support for Carousel App Banners
+* Optimized `getNotifications` behaviour when filtering out duplicates
 
 # 1.13.3
 * Improved `externalId` field mapping in `CPChannelTopic`
