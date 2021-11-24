@@ -5,7 +5,6 @@
         <deployment version="4352" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -14,21 +13,34 @@
                 <outlet property="backGroundImage" destination="Cyo-o7-W9S" id="Cld-1g-rfg"/>
                 <outlet property="bannerContainer" destination="MUU-Pe-ICL" id="I1X-cs-xcx"/>
                 <outlet property="bottomConstraint" destination="rre-Iy-Udo" id="Gew-Pl-SYb"/>
+                <outlet property="btnClose" destination="1xX-fz-waW" id="2mu-om-mj6"/>
+                <outlet property="btnTopConstraints" destination="4Sw-DF-3BQ" id="KUI-6S-Nxs"/>
                 <outlet property="cardCollectionView" destination="52o-O1-DCC" id="3gg-md-igj"/>
                 <outlet property="centerYConstraint" destination="kl1-98-T4C" id="y7f-nU-0C1"/>
+                <outlet property="leadingConstraint" destination="TS0-sf-eSN" id="1sh-4I-BgT"/>
                 <outlet property="pageControl" destination="kLE-T5-04L" id="i1H-so-3gC"/>
+                <outlet property="pageControllTopConstraint" destination="bhS-yn-aSv" id="J0o-Aq-31u"/>
                 <outlet property="popupHeight" destination="51d-Zu-Lus" id="WMD-UR-882"/>
                 <outlet property="topConstraint" destination="9ng-cm-mdZ" id="WRR-wc-SX0"/>
+                <outlet property="trailingConstraint" destination="aPi-J1-MG0" id="3X2-7w-Pbp"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="nJc-Zy-lIx"/>
                 <outlet property="webBanner" destination="UcH-Vj-ipE" id="yrb-Jj-faw"/>
                 <outlet property="webBannerHeight" destination="nws-37-hH1" id="PCB-m4-9J5"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT" userLabel="Banner">
+        <view clearsContextBeforeDrawing="NO" tag="11" contentMode="scaleToFill" id="i5M-Pr-FkT" userLabel="Banner">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fq8-yd-VF1">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain"/>
+                    <connections>
+                        <action selector="tapOutSideBanner:" destination="-1" eventType="touchUpInside" id="kRy-Tj-KSi"/>
+                    </connections>
+                </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MUU-Pe-ICL">
                     <rect key="frame" x="25" y="44" width="364" height="818"/>
                     <subviews>
@@ -74,9 +86,21 @@
                         <constraint firstItem="Cyo-o7-W9S" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" id="rMf-dl-tIP"/>
                     </constraints>
                 </view>
-                <pageControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="kLE-T5-04L">
-                    <rect key="frame" x="129" y="869" width="156" height="20"/>
-                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1xX-fz-waW">
+                    <rect key="frame" x="325" y="64" width="44" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="44" id="4G0-bb-2mR"/>
+                        <constraint firstAttribute="height" constant="44" id="Qqf-4c-aH7"/>
+                    </constraints>
+                    <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <buttonConfiguration key="configuration" style="plain" image="multiply" catalog="system"/>
+                    <connections>
+                        <action selector="btnClose:" destination="-1" eventType="touchUpInside" id="0QU-Ed-EvC"/>
+                    </connections>
+                </button>
+                <pageControl opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="kLE-T5-04L">
+                    <rect key="frame" x="129" y="865" width="156" height="20"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="0o2-JD-FsU"/>
@@ -85,7 +109,7 @@
                     <color key="currentPageIndicatorTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                            <integer key="value" value="10"/>
+                            <integer key="value" value="13"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </pageControl>
@@ -94,28 +118,24 @@
             <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstItem="MUU-Pe-ICL" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" identifier="topNotch" id="9ng-cm-mdZ"/>
+                <constraint firstItem="Fq8-yd-VF1" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="4Cn-ef-Olj"/>
+                <constraint firstItem="1xX-fz-waW" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" constant="20" id="4Sw-DF-3BQ"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="44" identifier="topNotch" id="9ng-cm-mdZ"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="25" id="TS0-sf-eSN"/>
+                <constraint firstItem="Fq8-yd-VF1" firstAttribute="trailing" secondItem="Q5M-cg-NOt" secondAttribute="trailing" id="TzE-Oh-IKQ"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="25" id="aPi-J1-MG0"/>
-                <constraint firstItem="kLE-T5-04L" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="7" id="cwz-W2-CMC"/>
+                <constraint firstItem="kLE-T5-04L" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="3" id="bhS-yn-aSv"/>
+                <constraint firstAttribute="bottom" secondItem="Fq8-yd-VF1" secondAttribute="bottom" id="c5O-UG-fqz"/>
                 <constraint firstItem="kLE-T5-04L" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="d4Q-Hy-89c"/>
+                <constraint firstItem="Fq8-yd-VF1" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="gk7-o3-z9K"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="centerY" secondItem="Q5M-cg-NOt" secondAttribute="centerY" identifier="centerY" id="kl1-98-T4C"/>
+                <constraint firstItem="1xX-fz-waW" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="-20" id="l1Q-aE-Rig"/>
                 <constraint firstAttribute="bottom" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="34" identifier="bottomNotch" id="rre-Iy-Udo"/>
             </constraints>
-            <connections>
-                <outletCollection property="gestureRecognizers" destination="ffL-Fv-IMB" appends="YES" id="fFb-ZC-OQY"/>
-            </connections>
-            <point key="canvasLocation" x="-435" y="42"/>
+            <point key="canvasLocation" x="-436.23188405797106" y="41.517857142857139"/>
         </view>
-        <tapGestureRecognizer id="ffL-Fv-IMB">
-            <connections>
-                <action selector="tapGestureAction:" destination="-1" id="fhc-tI-ncU"/>
-            </connections>
-        </tapGestureRecognizer>
     </objects>
     <resources>
-        <systemColor name="systemGray4Color">
-            <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
+        <image name="multiply" catalog="system" width="128" height="111"/>
     </resources>
 </document>

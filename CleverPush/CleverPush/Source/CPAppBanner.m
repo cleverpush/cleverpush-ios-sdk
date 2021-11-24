@@ -122,6 +122,20 @@
             NSLog(@"self.screens: %@", self.screens);
         }
         
+        self.marginEnabled = YES;
+        if ([json objectForKey:@"marginEnabled"] != nil && ![[json objectForKey:@"marginEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"marginEnabled"] boolValue]) {
+            if ([json objectForKey:@"marginEnabled"] == false) {
+                self.marginEnabled = NO;
+            }
+        }
+
+        self.closeButtonEnabled = YES;
+        if ([json objectForKey:@"closeButtonEnabled"] != nil && ![[json objectForKey:@"closeButtonEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"closeButtonEnabled"] boolValue]) {
+            if ([json objectForKey:@"closeButtonEnabled"] == false) {
+                self.closeButtonEnabled = NO;
+            }
+        }
+        
         if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {
             self.tags = [json objectForKey:@"tags"];
         }

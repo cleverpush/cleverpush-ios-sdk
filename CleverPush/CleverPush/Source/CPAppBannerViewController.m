@@ -27,6 +27,8 @@
         [self delagates];
         [self contentVisibility:false background:false htmlContent:true];
     }
+    [self setDynamicBannerConstraints:self.data.marginEnabled];
+    [self setDynamicCloseButton:self.data.closeButtonEnabled];
 }
 
 - (void)contentVisibility:(BOOL)collection background:(BOOL)background htmlContent:(BOOL)htmlContent {
@@ -50,8 +52,6 @@
     } else {
         [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
     }
-    [self.bannerContainer.layer setCornerRadius:15.0];
-    [self.bannerContainer.layer setMasksToBounds:YES];
     [self.backGroundImage setContentMode:UIViewContentModeScaleAspectFill];
 }
 
@@ -76,7 +76,52 @@
     }
 }
 
+- (void)setDynamicBannerConstraints:(BOOL)marginEnabled {
+    if (self.data.type == CPAppBannerTypeFull && marginEnabled) {
+        [self setAppBannerWithoutMargin];
+    } else {
+        [self setAppBannerWithMargin];
+    }
+}
+
+- (void)setDynamicCloseButton:(BOOL)closeButtonEnabled{
+    if (closeButtonEnabled) {
+        self.btnClose.hidden = NO;
+    } else {
+        self.btnClose.hidden = YES;
+    }
+}
+
+- (void)setAppBannerWithMargin {
+    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    CGFloat topPadding = window.safeAreaInsets.top;
+    self.topConstraint.constant = topPadding;
+    self.bottomConstraint.constant = 34;
+    self.leadingConstraint.constant = 25;
+    self.trailingConstraint.constant = 25;
+    [self.bannerContainer.layer setCornerRadius:15.0];
+    [self.bannerContainer.layer setMasksToBounds:YES];
+    self.pageControllTopConstraint.constant = 3;
+}
+
+- (void)setAppBannerWithoutMargin {
+    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    CGFloat topPadding = window.safeAreaInsets.top;
+    CGFloat bottomPadding = window.safeAreaInsets.bottom;
+    self.topConstraint.constant = 0;
+    self.bottomConstraint.constant = 0;
+    self.leadingConstraint.constant = 0;
+    self.trailingConstraint.constant = 0;
+    [self.bannerContainer.layer setCornerRadius:0.0];
+    [self.bannerContainer.layer setMasksToBounds:YES];
+    self.btnTopConstraints.constant = topPadding;
+    self.pageControllTopConstraint.constant = - bottomPadding;
+}
+
 - (void)bannerPosition:(BOOL)top bottom:(BOOL)bottom center:(BOOL)center {
+    self.topConstraint.active = top;
+    self.bottomConstraint.active = bottom;
+    self.centerYConstraint.active = center;
     self.topConstraint.active = top;
     self.bottomConstraint.active = bottom;
     self.centerYConstraint.active = center;
@@ -106,10 +151,7 @@
     [self composeHTML:self.data.HTMLContent];
 }
 
-#pragma mark - Gesture recongniser when user tapped out side of the popup
-- (IBAction)tapGestureAction:(id)sender {
-    [self onDismiss];
-}
+
 
 #pragma mark - CollectionView Delegate and DataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -233,6 +275,10 @@
     } completion:nil];
 }
 
+- (IBAction)tapOutSideBanner:(UIButton *)sender {
+    [self onDismiss];
+}
+
 - (void)onDismiss {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self fadeOut];
@@ -247,4 +293,7 @@
     return self.view == touch.view;
 }
 
+- (IBAction)btnClose:(UIButton *)sender {
+    [self onDismiss];
+}
 @end

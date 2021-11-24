@@ -41,6 +41,8 @@
 @property (nonatomic) int dismissTimeout;
 @property (nonatomic) int delaySeconds;
 @property (nonatomic) BOOL carouselEnabled;
+@property (nonatomic) BOOL marginEnabled;
+@property (nonatomic) BOOL closeButtonEnabled;
 
 - (id)initWithJson:(NSDictionary*)json;
 
