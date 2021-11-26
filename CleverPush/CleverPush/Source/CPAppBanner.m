@@ -63,6 +63,13 @@
                 screensBlock = [[CPAppBannerCarouselBlock alloc] initWithJson:screensJson];
                 [self.screens addObject:screensBlock];
             }
+        } else {
+            CPAppBannerCarouselBlock* screensBlock;
+            screensBlock = [[CPAppBannerCarouselBlock alloc] init];
+            screensBlock.id = 0;
+            screensBlock.blocks = self.blocks;
+            [self.screens addObject:screensBlock];
+            NSLog(@"self.screens: %@", self.screens);
         }
         
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
@@ -113,13 +120,6 @@
         self.carouselEnabled = NO;
         if ([[json objectForKey:@"carouselEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
             self.carouselEnabled = YES;
-        } else {
-            CPAppBannerCarouselBlock* screensBlock;
-            screensBlock = [[CPAppBannerCarouselBlock alloc] init];
-            screensBlock.id = 0;
-            screensBlock.blocks = self.blocks;
-            [self.screens addObject:screensBlock];
-            NSLog(@"self.screens: %@", self.screens);
         }
         
         self.marginEnabled = YES;

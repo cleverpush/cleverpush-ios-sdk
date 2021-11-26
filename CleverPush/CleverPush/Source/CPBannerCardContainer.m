@@ -17,6 +17,9 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    self.tblCPBanner.delegate = self;
+    self.tblCPBanner.dataSource = self;
+
     [self.tblCPBanner addObserver:self forKeyPath:@"contentSize" options:0 context:NULL];
 }
 
@@ -40,14 +43,18 @@
     [self dynamicHeight:frame.size];
 }
 
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.data.screens[section].blocks count];
+    return [self.blocks count];
 }
 
-- (UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"section:%ld", (long)indexPath.section);
+    NSLog(@"row:%ld", indexPath.row);
+
+    if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
-        CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
+        CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
         if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
             [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:block.imageUrl]callback:^(BOOL callback) {
                 if (callback) {
@@ -59,10 +66,10 @@
             }];
         }
         return  cell;
-    } else if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
+    } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
         
-        CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
+        CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
         
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
         [cell.btnCPBanner setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
@@ -96,10 +103,11 @@
             [self actionCallback:block.action from:YES];
         }];
         return cell;
-    } else if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
+    } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
-        CPAppBannerTextBlock *block = (CPAppBannerTextBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
-        
+        CPAppBannerTextBlock *block = (CPAppBannerTextBlock*)self.blocks[indexPath.row];
+        NSLog(@"CleverPush:%@", block.text);
+
         cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
         cell.txtCPBanner.textColor = [UIColor colorWithHexString:block.color];
@@ -127,7 +135,7 @@
         return cell;
     } else {
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
-        CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
+        CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
         
         if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
@@ -148,14 +156,14 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.data.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
-        CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
+        CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
         [self actionCallback:block.action from:NO];
     }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.data.screens[indexPath.section].blocks[indexPath.row].type == CPAppBannerBlockTypeHTML) {
-        CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.data.screens[indexPath.section].blocks[indexPath.row];
+    if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeHTML) {
+        CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
         return block.height;
     } else {
         return UITableViewAutomaticDimension;
@@ -188,3 +196,4 @@
 }
 
 @end
+

@@ -17,6 +17,7 @@
         return;
     }
 }
+
 #pragma mark - Custom UI Functions
 - (void)conditionalPresentation {
     if (![self.data carouselEnabled] && [self.data.contentType isEqualToString:@"html"]) {
@@ -31,12 +32,14 @@
     [self setDynamicCloseButton:self.data.closeButtonEnabled];
 }
 
+#pragma mark - dynamic hide and shows the layer of the view heirarchy.
 - (void)contentVisibility:(BOOL)collection background:(BOOL)background htmlContent:(BOOL)htmlContent {
     self.cardCollectionView.hidden = collection;
     self.backGroundImage.hidden = background;
     self.webBanner.hidden = htmlContent;
 }
 
+#pragma mark - native delegates and registration of the nib.
 - (void)delagates {
     NSBundle *bundle = [CPUtils getAssetsBundle];
     if (bundle) {
@@ -46,6 +49,7 @@
     self.cardCollectionView.dataSource = self;
 }
 
+#pragma mark - setup background image
 - (void)setBackground {
     if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
         [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
@@ -55,6 +59,7 @@
     [self.backGroundImage setContentMode:UIViewContentModeScaleAspectFill];
 }
 
+#pragma mark - setting up the popup shadow
 - (void)backgroundPopupShadow {
     float shadowSize = 10.0f;
     UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:CGRectMake(self.bannerContainer.frame.origin.x - shadowSize / 2, self.bannerContainer.frame.origin.y - shadowSize / 2, self.bannerContainer.frame.size.width + shadowSize, self.bannerContainer.frame.size.height + shadowSize)];
@@ -64,6 +69,7 @@
     self.bannerContainer.layer.shadowPath = shadowPath.CGPath;
 }
 
+#pragma mark - set layout orientation
 - (void)setOrientation {
     if (self.data.type == CPAppBannerTypeTop) {
         [self bannerPosition:YES bottom:NO center:NO];
@@ -76,15 +82,21 @@
     }
 }
 
+#pragma mark - set dynamic constraints based on the layout conditional presentation
 - (void)setDynamicBannerConstraints:(BOOL)marginEnabled {
-    if (self.data.type == CPAppBannerTypeFull && marginEnabled) {
-        [self setAppBannerWithoutMargin];
-    } else {
+    if (self.data.type == CPAppBannerTypeTop || self.data.type == CPAppBannerTypeCenter || self.data.type == CPAppBannerTypeBottom) {
         [self setAppBannerWithMargin];
+    } else {
+        if (marginEnabled) {
+            [self setAppBannerWithMargin];
+        } else {
+            [self setAppBannerWithoutMargin];
+        }
     }
 }
 
-- (void)setDynamicCloseButton:(BOOL)closeButtonEnabled{
+#pragma mark - dynamic hide and show top button from top right corner
+- (void)setDynamicCloseButton:(BOOL)closeButtonEnabled {
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
     } else {
@@ -92,6 +104,7 @@
     }
 }
 
+#pragma mark - set app banner with margin
 - (void)setAppBannerWithMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGFloat topPadding = window.safeAreaInsets.top;
@@ -102,8 +115,10 @@
     [self.bannerContainer.layer setCornerRadius:15.0];
     [self.bannerContainer.layer setMasksToBounds:YES];
     self.pageControllTopConstraint.constant = 3;
+    self.btnTopConstraints.constant = 0;
 }
 
+#pragma mark - set app banner without margin padding from all of the edges will be zero
 - (void)setAppBannerWithoutMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGFloat topPadding = window.safeAreaInsets.top;
@@ -114,14 +129,12 @@
     self.trailingConstraint.constant = 0;
     [self.bannerContainer.layer setCornerRadius:0.0];
     [self.bannerContainer.layer setMasksToBounds:YES];
-    self.btnTopConstraints.constant = topPadding;
     self.pageControllTopConstraint.constant = - bottomPadding;
+    self.btnTopConstraints.constant = topPadding;
 }
 
+#pragma mark - activate and deativate constraints based on the layout type
 - (void)bannerPosition:(BOOL)top bottom:(BOOL)bottom center:(BOOL)center {
-    self.topConstraint.active = top;
-    self.bottomConstraint.active = bottom;
-    self.centerYConstraint.active = center;
     self.topConstraint.active = top;
     self.bottomConstraint.active = bottom;
     self.centerYConstraint.active = center;
@@ -131,6 +144,7 @@
     [self.pageControl setNumberOfPages:self.data.screens.count];
 }
 
+#pragma mark - custom delegate manage tableview constraint size based on it's content size and based on conditional
 - (void)manageTableHeightDelegate:(CGSize)value {
     if (value.height > UIScreen.mainScreen.bounds.size.height) {
         self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
@@ -151,8 +165,6 @@
     [self composeHTML:self.data.HTMLContent];
 }
 
-
-
 #pragma mark - CollectionView Delegate and DataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
@@ -166,7 +178,7 @@
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-    
+    cell.blocks = self.data.screens[indexPath.item].blocks;
     NSBundle *bundle = [CPUtils getAssetsBundle];
     if (bundle) {
         [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPImageBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPImageBlockCell"];
@@ -175,8 +187,6 @@
         [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPHTMLBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPHTMLBlockCell"];
     }
     
-    cell.tblCPBanner.delegate = cell;
-    cell.tblCPBanner.dataSource = cell;
     cell.delegate = self;
     cell.changePage = self;
     cell.controller = self;
@@ -185,6 +195,7 @@
     return cell;
 }
 
+#pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
 - (void)navigateToNextPage {
     NSIndexPath *nextItem = [NSIndexPath indexPathForItem:self.index + 1 inSection:0];
     if (nextItem.row < self.data.screens.count) {
@@ -296,4 +307,5 @@
 - (IBAction)btnClose:(UIButton *)sender {
     [self onDismiss];
 }
+
 @end
