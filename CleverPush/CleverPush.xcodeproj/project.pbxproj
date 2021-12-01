@@ -205,6 +205,21 @@
 		29DC4AC32182086F0051F6E9 /* CleverPushSelectorHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */; };
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
 		29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */; };
+		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
+		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
+		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
+		CB1B65D827577BA70087AC49 /* CPAttributesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D727577BA70087AC49 /* CPAttributesTests.m */; };
+		CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D927577BB60087AC49 /* CPTopicDialogueTest.m */; };
+		CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65DB27577BC50087AC49 /* CPChannelConfigTest.m */; };
+		CB1B65DE27577BD10087AC49 /* CPTrackPageTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */; };
+		CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */; };
+		CB1B65E227577BEB0087AC49 /* CPStoryWidgetTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */; };
+		CB1B65F327577C760087AC49 /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65EF27577C760087AC49 /* libOCMock.a */; };
+		CB1B65F427577C760087AC49 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65F127577C760087AC49 /* TestUtils.m */; };
+		CB1B65F6275780150087AC49 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65F5275780150087AC49 /* XCTest.framework */; };
+		CB1B65F82757801D0087AC49 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65F72757801D0087AC49 /* UIKit.framework */; };
+		CB1B65FA275780260087AC49 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65F9275780260087AC49 /* Foundation.framework */; };
+		CB1B65FD2757815C0087AC49 /* CPAppBannerModuleInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */; };
 		CB73FF8B272C3E300099B648 /* CPBannerCardContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = CB73FF8A272C3E300099B648 /* CPBannerCardContainer.m */; };
 		CB73FF8C272C3E400099B648 /* CPBannerCardContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = CB73FF89272C3E300099B648 /* CPBannerCardContainer.h */; };
 		CB73FF8D272C3E430099B648 /* CPBannerCardContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = CB73FF8A272C3E300099B648 /* CPBannerCardContainer.m */; };
@@ -268,6 +283,16 @@
 		CBA989BE2679D6A9003DE995 /* CPStoryCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA989B92679D6A1003DE995 /* CPStoryCell.h */; };
 		CBA989BF2679D6AC003DE995 /* CPStoryCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA989BA2679D6A1003DE995 /* CPStoryCell.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CB1B65D027577B6E0087AC49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 297B4DEC1E589AFE00BAF990 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 297B4DF41E589AFE00BAF990;
+			remoteInfo = CleverPushFramework;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		29DB95CC23FC3203008FC985 /* Copy Files */ = {
@@ -427,6 +452,33 @@
 		29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+CleverPush.m"; sourceTree = "<group>"; };
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
+		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
+		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
+		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB1B65D527577B960087AC49 /* CPTagsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTagsTest.m; sourceTree = "<group>"; };
+		CB1B65D727577BA70087AC49 /* CPAttributesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAttributesTests.m; sourceTree = "<group>"; };
+		CB1B65D927577BB60087AC49 /* CPTopicDialogueTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTopicDialogueTest.m; sourceTree = "<group>"; };
+		CB1B65DB27577BC50087AC49 /* CPChannelConfigTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChannelConfigTest.m; sourceTree = "<group>"; };
+		CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTrackPageTest.m; sourceTree = "<group>"; };
+		CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerTest.m; sourceTree = "<group>"; };
+		CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryWidgetTest.m; sourceTree = "<group>"; };
+		CB1B65E527577C760087AC49 /* OCMockObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMockObject.h; sourceTree = "<group>"; };
+		CB1B65E627577C760087AC49 /* OCMMacroState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMMacroState.h; sourceTree = "<group>"; };
+		CB1B65E727577C760087AC49 /* OCMock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMock.h; sourceTree = "<group>"; };
+		CB1B65E827577C760087AC49 /* NSNotificationCenter+OCMAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+OCMAdditions.h"; sourceTree = "<group>"; };
+		CB1B65E927577C760087AC49 /* OCMStubRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMStubRecorder.h; sourceTree = "<group>"; };
+		CB1B65EA27577C760087AC49 /* OCMRecorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMRecorder.h; sourceTree = "<group>"; };
+		CB1B65EB27577C760087AC49 /* OCMLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMLocation.h; sourceTree = "<group>"; };
+		CB1B65EC27577C760087AC49 /* OCMConstraint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMConstraint.h; sourceTree = "<group>"; };
+		CB1B65ED27577C760087AC49 /* OCMArg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMArg.h; sourceTree = "<group>"; };
+		CB1B65EF27577C760087AC49 /* libOCMock.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libOCMock.a; sourceTree = "<group>"; };
+		CB1B65F127577C760087AC49 /* TestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUtils.m; sourceTree = "<group>"; };
+		CB1B65F227577C760087AC49 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestUtils.h; sourceTree = "<group>"; };
+		CB1B65F5275780150087AC49 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		CB1B65F72757801D0087AC49 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		CB1B65F9275780260087AC49 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerModuleInstance.h; sourceTree = "<group>"; };
+		CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerModuleInstance.m; sourceTree = "<group>"; };
 		CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPBannerCardContainer.xib; sourceTree = "<group>"; };
 		CB73FF83272C3D920099B648 /* CPButtonBlockCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPButtonBlockCell.xib; sourceTree = "<group>"; };
 		CB73FF86272C3E060099B648 /* CPHTMLBlockCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPHTMLBlockCell.xib; sourceTree = "<group>"; };
@@ -521,6 +573,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CB1B65C827577B6E0087AC49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB1B65FA275780260087AC49 /* Foundation.framework in Frameworks */,
+				CB1B65F82757801D0087AC49 /* UIKit.framework in Frameworks */,
+				CB1B65F6275780150087AC49 /* XCTest.framework in Frameworks */,
+				CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */,
+				CB1B65F327577C760087AC49 /* libOCMock.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -575,6 +639,7 @@
 				297C34CC23FB70D600314A84 /* CleverPushLocation */,
 				29DB95CF23FC3203008FC985 /* CleverPush */,
 				29DB95DC23FC320C008FC985 /* CleverPushLocation */,
+				CB1B65CC27577B6E0087AC49 /* CleverPushTests */,
 				297B4DF61E589AFE00BAF990 /* Products */,
 				29C1BAF01E58B89500815CD6 /* Frameworks */,
 			);
@@ -587,6 +652,7 @@
 				294F7E7623FB5DB500806D23 /* CleverPushLocation.framework */,
 				29DB95CE23FC3203008FC985 /* libCleverPush.a */,
 				29DB95DB23FC320C008FC985 /* libCleverPushLocation.a */,
+				CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -613,6 +679,9 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CB1B65F9275780260087AC49 /* Foundation.framework */,
+				CB1B65F72757801D0087AC49 /* UIKit.framework */,
+				CB1B65F5275780150087AC49 /* XCTest.framework */,
 				29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */,
 				291FCDF72525ED2C00F5185E /* CleverPush.framework */,
 				2913D83425141344002BA52C /* SystemConfiguration.framework */,
@@ -669,6 +738,8 @@
 			children = (
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
+				CB1B65C42757763B0087AC49 /* CleverPushInstance.h */,
+				CB1B65C52757763B0087AC49 /* CleverPushInstance.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
 				297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */,
 				29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */,
@@ -695,6 +766,8 @@
 				CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */,
 				2986766F2572CC340002E9F1 /* CPAppBannerModule.h */,
 				298676702572CC400002E9F1 /* CPAppBannerModule.m */,
+				CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */,
+				CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */,
 				298676E02572D0340002E9F1 /* CPAppBannerStatus.h */,
 				298676E12572D0400002E9F1 /* CPAppBannerStopAtType.h */,
 				298677592572DFE00002E9F1 /* CPAppBannerTextBlock.h */,
@@ -798,6 +871,64 @@
 				297C34D023FB710100314A84 /* CleverPushLocation.m */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		CB1B65CC27577B6E0087AC49 /* CleverPushTests */ = {
+			isa = PBXGroup;
+			children = (
+				CB1B65E327577C760087AC49 /* include */,
+				CB1B65EE27577C760087AC49 /* lib */,
+				CB1B65F027577C760087AC49 /* TestUtils */,
+				CB1B65D527577B960087AC49 /* CPTagsTest.m */,
+				CB1B65D727577BA70087AC49 /* CPAttributesTests.m */,
+				CB1B65D927577BB60087AC49 /* CPTopicDialogueTest.m */,
+				CB1B65DB27577BC50087AC49 /* CPChannelConfigTest.m */,
+				CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */,
+				CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */,
+				CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */,
+			);
+			path = CleverPushTests;
+			sourceTree = "<group>";
+		};
+		CB1B65E327577C760087AC49 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				CB1B65E427577C760087AC49 /* OCMock */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		CB1B65E427577C760087AC49 /* OCMock */ = {
+			isa = PBXGroup;
+			children = (
+				CB1B65E527577C760087AC49 /* OCMockObject.h */,
+				CB1B65E627577C760087AC49 /* OCMMacroState.h */,
+				CB1B65E727577C760087AC49 /* OCMock.h */,
+				CB1B65E827577C760087AC49 /* NSNotificationCenter+OCMAdditions.h */,
+				CB1B65E927577C760087AC49 /* OCMStubRecorder.h */,
+				CB1B65EA27577C760087AC49 /* OCMRecorder.h */,
+				CB1B65EB27577C760087AC49 /* OCMLocation.h */,
+				CB1B65EC27577C760087AC49 /* OCMConstraint.h */,
+				CB1B65ED27577C760087AC49 /* OCMArg.h */,
+			);
+			path = OCMock;
+			sourceTree = "<group>";
+		};
+		CB1B65EE27577C760087AC49 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				CB1B65EF27577C760087AC49 /* libOCMock.a */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		CB1B65F027577C760087AC49 /* TestUtils */ = {
+			isa = PBXGroup;
+			children = (
+				CB1B65F127577C760087AC49 /* TestUtils.m */,
+				CB1B65F227577C760087AC49 /* TestUtils.h */,
+			);
+			path = TestUtils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -954,6 +1085,24 @@
 			productReference = 29DB95DB23FC320C008FC985 /* libCleverPushLocation.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		CB1B65CA27577B6E0087AC49 /* CleverPushTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CB1B65D227577B6E0087AC49 /* Build configuration list for PBXNativeTarget "CleverPushTests" */;
+			buildPhases = (
+				CB1B65C727577B6E0087AC49 /* Sources */,
+				CB1B65C827577B6E0087AC49 /* Frameworks */,
+				CB1B65C927577B6E0087AC49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CB1B65D127577B6E0087AC49 /* PBXTargetDependency */,
+			);
+			name = CleverPushTests;
+			productName = CleverPushTests;
+			productReference = CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1001,6 +1150,11 @@
 						CreatedOnToolsVersion = 11.3.1;
 						ProvisioningStyle = Automatic;
 					};
+					CB1B65CA27577B6E0087AC49 = {
+						CreatedOnToolsVersion = 13.0;
+						DevelopmentTeam = FH9ENAZ4V3;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 297B4DEF1E589AFE00BAF990 /* Build configuration list for PBXProject "CleverPush" */;
@@ -1026,9 +1180,20 @@
 				29DB95E423FC3249008FC985 /* CleverPush-Static-Framework */,
 				29DB960823FC6068008FC985 /* CleverPushLocation-Dynamic-Framework */,
 				29DB960423FC6059008FC985 /* CleverPushLocation-Static-Framework */,
+				CB1B65CA27577B6E0087AC49 /* CleverPushTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CB1B65C927577B6E0087AC49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		297C34D823FBF3B300314A84 /* ShellScript */ = {
@@ -1216,6 +1381,7 @@
 				CBA989872679D529003DE995 /* CPStoriesController.m in Sources */,
 				296A134325BE128700A2BEED /* CPSubscription.m in Sources */,
 				296A136225BE16CF00A2BEED /* CPChannelTag.m in Sources */,
+				CB1B65FD2757815C0087AC49 /* CPAppBannerModuleInstance.m in Sources */,
 				296068902574452B002159D0 /* CPAspectKeepImageView.m in Sources */,
 				29D22E71252C8E7500977567 /* CPIntrinsicTableView.m in Sources */,
 				CB73FF95272C3E970099B648 /* CPHTMLBlockCell.m in Sources */,
@@ -1243,6 +1409,7 @@
 				291FCD282525DC2800F5185E /* DWActionsStackView.m in Sources */,
 				298676712572CC400002E9F1 /* CPAppBannerModule.m in Sources */,
 				2906A2C725857E680078FD61 /* CPUIBlockButton.m in Sources */,
+				CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */,
 				296D0AD7257460E800531EFF /* UIControl+CPBlockActions.m in Sources */,
 				29DB95F823FC33D6008FC985 /* CleverPushHTTPClient.m in Sources */,
 				298676912572CD580002E9F1 /* UIColor+HexString.m in Sources */,
@@ -1264,7 +1431,30 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CB1B65C727577B6E0087AC49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */,
+				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
+				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
+				CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */,
+				CB1B65D827577BA70087AC49 /* CPAttributesTests.m in Sources */,
+				CB1B65E227577BEB0087AC49 /* CPStoryWidgetTest.m in Sources */,
+				CB1B65DE27577BD10087AC49 /* CPTrackPageTest.m in Sources */,
+				CB1B65F427577C760087AC49 /* TestUtils.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CB1B65D127577B6E0087AC49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 297B4DF41E589AFE00BAF990 /* CleverPushFramework */;
+			targetProxy = CB1B65D027577B6E0087AC49 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		29D9051F25698381002D6F9E /* Localizable.strings */ = {
@@ -1799,6 +1989,87 @@
 			};
 			name = Release;
 		};
+		CB1B65D327577B6E0087AC49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH9ENAZ4V3;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/CleverPushTests/include\"";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CleverPushTests/lib",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.pb.CleverPush.CleverPushTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CB1B65D427577B6E0087AC49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = FH9ENAZ4V3;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/CleverPushTests/include\"";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CleverPushTests/lib",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.pb.CleverPush.CleverPushTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1879,6 +2150,15 @@
 			buildConfigurations = (
 				29DB960A23FC6068008FC985 /* Debug */,
 				29DB960B23FC6068008FC985 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CB1B65D227577B6E0087AC49 /* Build configuration list for PBXNativeTarget "CleverPushTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB1B65D327577B6E0087AC49 /* Debug */,
+				CB1B65D427577B6E0087AC49 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
