@@ -75,6 +75,7 @@ static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600 ;
+static const int maximumNotifications = 100 ;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -1404,7 +1405,11 @@ static id isNil(id object) {
         notifications = [[NSMutableArray alloc] init];
     }
     [notifications addObject:notificationMutable];
-    [userDefaults setObject:notifications forKey:@"CleverPush_NOTIFICATIONS"];
+    NSArray *notificationsArray = [NSArray arrayWithArray:notifications];
+    if (notificationsArray.count > maximumNotifications) {
+        notificationsArray = [notificationsArray subarrayWithRange:NSMakeRange(notificationsArray.count - maximumNotifications, maximumNotifications)];
+    }
+    [userDefaults setObject:notificationsArray forKey:@"CleverPush_NOTIFICATIONS"];
     [userDefaults synchronize];
 }
 
@@ -1960,7 +1965,7 @@ static id isNil(id object) {
     if (!notifications) {
         return [[NSArray alloc] init];
     }
-    return notifications;
+    return [self convertDictionariesToNotifications:notifications];
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local
@@ -1969,21 +1974,30 @@ static id isNil(id object) {
     if (combineWithApi) {
         NSString *combinedURL = [self generateGetReceivedNotificationsPath];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray *remoteNotifications) {
-            for (CPNotification *remoteNotification in remoteNotifications) {
+            for (NSDictionary *remoteNotification in remoteNotifications) {
                 BOOL found = NO;
-                for (CPNotification *localNotification in notifications) {
+                for (NSDictionary *localNotification in notifications) {
                     if ([[localNotification valueForKey:@"_id"] isEqualToString:[remoteNotification valueForKey:@"_id"]]) {
                         found = YES;
                         break;
                     }
                 }
+                
                 if (!found) {
-                  [notifications addObject:remoteNotification];
+                    CPNotification *remoteObject = [[CPNotification alloc] init];
+                    remoteObject = [CPNotification initWithJson:remoteNotification];
+                  [notifications addObject:remoteObject];
                 }
             }
+            
             if (callback) {
                 NSArray *sortedNotifications = [self sortArrayOfObjectByDates:notifications basedOnKey:@"createdAt"];
-                callback([self convertDictionariesToNotifications:sortedNotifications]);
+                if (sortedNotifications.count > maximumNotifications) {
+                    sortedNotifications = [sortedNotifications subarrayWithRange:NSMakeRange(sortedNotifications.count - maximumNotifications, maximumNotifications)];
+                    callback(sortedNotifications);
+                } else {
+                    callback(sortedNotifications);
+                }
             }
         }];
     } else {
