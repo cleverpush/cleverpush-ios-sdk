@@ -1,3 +1,7 @@
+# 1.14.1
+* Fixed `createdAt` field in `CPNotification`
+* App Banner optimizations
+
 # 1.14.0
 * Support for Carousel App Banners
 * Optimized `getNotifications` behaviour when filtering out duplicates
