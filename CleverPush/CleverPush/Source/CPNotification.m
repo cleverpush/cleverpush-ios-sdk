@@ -69,9 +69,12 @@
         self.actions = actionArray;
     }
         
-    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
+    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"createdAt"] != nil) {
         self.createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
+    } else {
+        self.createdAt = [NSDate date];
     }
+    
     if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]]) {
         self.expiresAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"expiresAt"]];
     }
