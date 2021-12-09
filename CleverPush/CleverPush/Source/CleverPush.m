@@ -2656,6 +2656,11 @@ static id isNil(id object) {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
 
++ (void)setNotificationClickCallBack:(CPNotificationClickBlock)callback {
+    CPInboxView *inbox = [[CPInboxView alloc]init];
+    [inbox setNotificationClicked:callback];
+}
+
 + (void)disableAppBanners {
     [CPAppBannerModule disableBanners];
 }

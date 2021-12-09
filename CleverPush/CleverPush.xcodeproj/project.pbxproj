@@ -231,6 +231,8 @@
 		CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
 		CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */; };
+		CB8F47B5275F393D00FC19A7 /* CPInboxView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB8F47B3275F393D00FC19A7 /* CPInboxView.m */; };
+		CB8F47B6275F393D00FC19A7 /* CPInboxCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CB8F47B4275F393D00FC19A7 /* CPInboxCell.m */; };
 		CBA1906926DE5909001B8F39 /* CPTopicDialogCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */; };
 		CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
 		CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */; };
@@ -453,6 +455,11 @@
 		CB8129EE267B6F3B002B8A3D /* CPWKWebView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWKWebView.m; sourceTree = "<group>"; };
 		CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWKWebKitView.h; sourceTree = "<group>"; };
 		CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPWKWebKitView.m; sourceTree = "<group>"; };
+		CB8F47B1275F393D00FC19A7 /* CPInboxView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxView.h; sourceTree = "<group>"; };
+		CB8F47B2275F393D00FC19A7 /* CPInboxCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxCell.h; sourceTree = "<group>"; };
+		CB8F47B3275F393D00FC19A7 /* CPInboxView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxView.m; sourceTree = "<group>"; };
+		CB8F47B4275F393D00FC19A7 /* CPInboxCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxCell.m; sourceTree = "<group>"; };
+		CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPInboxCell.xib; sourceTree = "<group>"; };
 		CBA1906626DE5909001B8F39 /* CPTopicDialogCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTopicDialogCell.h; sourceTree = "<group>"; };
 		CBA1906726DE5909001B8F39 /* CPTopicDialogCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTopicDialogCell.m; sourceTree = "<group>"; };
 		CBA989852679D529003DE995 /* CPStoriesController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoriesController.h; sourceTree = "<group>"; };
@@ -635,6 +642,7 @@
 		29D3354C26F0C39E0058EF16 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */,
 				CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */,
 				CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */,
 				CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */,
@@ -667,6 +675,10 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				CB8F47B2275F393D00FC19A7 /* CPInboxCell.h */,
+				CB8F47B4275F393D00FC19A7 /* CPInboxCell.m */,
+				CB8F47B1275F393D00FC19A7 /* CPInboxView.h */,
+				CB8F47B3275F393D00FC19A7 /* CPInboxView.m */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				297B4E231E58A16600BAF990 /* CleverPushHTTPClient.h */,
@@ -1210,6 +1222,7 @@
 				291FCD272525DC2800F5185E /* DWAlertPresentationAnimationController.m in Sources */,
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,
 				CB73FF9A272C3EAA0099B648 /* CPImageBlockCell.m in Sources */,
+				CB8F47B5275F393D00FC19A7 /* CPInboxView.m in Sources */,
 				2986773D2572DFC40002E9F1 /* CPAppBannerButtonBlock.m in Sources */,
 				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
@@ -1222,6 +1235,7 @@
 				298676AB2572CF6E0002E9F1 /* UIImageView+CleverPush.m in Sources */,
 				29DB95F423FC33C9008FC985 /* CPChatView.m in Sources */,
 				291FCD2B2525DC2800F5185E /* DWDimmingView.m in Sources */,
+				CB8F47B6275F393D00FC19A7 /* CPInboxCell.m in Sources */,
 				29DB95F523FC33CD008FC985 /* CPNotificationCategoryController.m in Sources */,
 				CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCD2C2525DC2800F5185E /* DWAnimatableShapeLayer.m in Sources */,
