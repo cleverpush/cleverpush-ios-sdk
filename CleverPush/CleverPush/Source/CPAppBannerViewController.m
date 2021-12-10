@@ -97,6 +97,13 @@
 
 #pragma mark - dynamic hide and show top button from top right corner
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled {
+    if (@available(iOS 13.0, *)) {
+        [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        self.btnClose.tintColor = UIColor.whiteColor;
+    } else {
+        [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    }
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
     } else {
@@ -107,8 +114,10 @@
 #pragma mark - set app banner with margin
 - (void)setAppBannerWithMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-    CGFloat topPadding = window.safeAreaInsets.top;
-    self.topConstraint.constant = topPadding;
+    if (@available(iOS 11.0, *)) {
+        CGFloat topPadding = window.safeAreaInsets.top;
+        self.topConstraint.constant = topPadding;
+    }
     self.bottomConstraint.constant = 34;
     self.leadingConstraint.constant = 25;
     self.trailingConstraint.constant = 25;
@@ -121,16 +130,18 @@
 #pragma mark - set app banner without margin padding from all of the edges will be zero
 - (void)setAppBannerWithoutMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-    CGFloat topPadding = window.safeAreaInsets.top;
-    CGFloat bottomPadding = window.safeAreaInsets.bottom;
-    self.topConstraint.constant = 0;
-    self.bottomConstraint.constant = 0;
-    self.leadingConstraint.constant = 0;
-    self.trailingConstraint.constant = 0;
-    [self.bannerContainer.layer setCornerRadius:0.0];
-    [self.bannerContainer.layer setMasksToBounds:YES];
-    self.pageControllTopConstraint.constant = - bottomPadding;
-    self.btnTopConstraints.constant = topPadding;
+    if (@available(iOS 11.0, *)) {
+        CGFloat topPadding = window.safeAreaInsets.top;
+        CGFloat bottomPadding = window.safeAreaInsets.bottom;
+        self.topConstraint.constant = 0;
+        self.bottomConstraint.constant = 0;
+        self.leadingConstraint.constant = 0;
+        self.trailingConstraint.constant = 0;
+        [self.bannerContainer.layer setCornerRadius:0.0];
+        [self.bannerContainer.layer setMasksToBounds:YES];
+        self.pageControllTopConstraint.constant = - bottomPadding;
+        self.btnTopConstraints.constant = topPadding;
+    }
 }
 
 #pragma mark - activate and deativate constraints based on the layout type
