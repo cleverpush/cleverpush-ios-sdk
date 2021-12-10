@@ -8,7 +8,6 @@
 
 #pragma mark - Class Variables
 
-
 static CPAppBannerModuleInstance* singletonInstance = nil;
 
 + (CPAppBannerModuleInstance *)moduleInstance {
