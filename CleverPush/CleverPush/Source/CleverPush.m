@@ -449,6 +449,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
     return [self.CPSharedInstance handleSilentNotificationReceived:application UserInfo:messageDict completionHandler:completionHandler];
+    
+}
++ (void)setNotificationClickCallBack:(CPNotificationClickBlock)callback {
+    [self.CPSharedInstance setNotificationClickCallBack:callback];
 }
 
 + (BOOL)hasSubscriptionTag:(NSString*)tagId {

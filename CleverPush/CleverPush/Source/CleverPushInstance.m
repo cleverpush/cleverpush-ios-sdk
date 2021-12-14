@@ -2041,6 +2041,10 @@ static id isNil(id object) {
     }
 }
 
+- (void)setNotificationClickCallBack:(CPNotificationClickBlock)callback {
+    CPInboxView *inbox = [[CPInboxView alloc]init];
+    [inbox setNotificationClicked:callback];
+}
 #pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
 - (NSString *)generateGetReceivedNotificationsPath {
     NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?", channelId];
