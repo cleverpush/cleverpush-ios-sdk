@@ -19,6 +19,7 @@
 #import "CleverPush.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerCondition.h"
+#import "CPAppBannerModuleInstance.h"
 
 @interface CPAppBannerModule : NSObject
 
@@ -35,3 +36,4 @@
 + (void)enableBanners;
 
 @end
+
