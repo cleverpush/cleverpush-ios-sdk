@@ -1990,10 +1990,10 @@ static id isNil(id object) {
     return [self convertDictionariesToNotifications:notifications];
 }
 
-- (void)removeNotification:(NSString*)notificationId{
+- (void)removeNotification:(NSString*)notificationId {
     NSArray *notifications = [self getNotifications];
     NSMutableArray *tempNotifications = [notifications mutableCopy];
-    for (NSDictionary * notification in notifications){
+    for (NSDictionary * notification in notifications) {
         if ([[notification valueForKey:@"_id"] isEqualToString: notificationId])
             [tempNotifications removeObject: notification];
     }
