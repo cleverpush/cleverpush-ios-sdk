@@ -172,8 +172,8 @@ CPNotificationClickBlock handleClick;
     return  UITableViewAutomaticDimension;
 }
 
-#pragma mark - Call back while banner has been open-up successfully
-- (void)setNotificationClicked:(CPNotificationClickBlock)callback{
+#pragma mark - Call back while clicked on the notification
+- (void)notificationClickCallback:(CPNotificationClickBlock)callback{
     handleClick = callback;
 }
 
