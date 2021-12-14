@@ -482,6 +482,9 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance processLocalActionBasedNotification:notification actionIdentifier:actionIdentifier];
 }
 
++ (void)removeNotification:(NSString*)notificationId {
+    [self.CPSharedInstance removeNotification:notificationId];
+}
 
 #pragma mark - Singleton shared instance of the cleverpush.
 + (CleverPush*)sharedInstance {
