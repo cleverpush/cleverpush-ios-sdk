@@ -24,5 +24,6 @@
 + (NSDate*)getLocalDateTimeFromUTC:(NSString*)dateString;
 + (NSInteger)secondsBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime;
 + (NSBundle *)getAssetsBundle;
++ (NSString *)timeAgoStringFromDate:(NSDate *)date;
 
 @end
