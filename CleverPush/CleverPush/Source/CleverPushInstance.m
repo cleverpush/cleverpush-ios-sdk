@@ -1990,6 +1990,18 @@ static id isNil(id object) {
     return [self convertDictionariesToNotifications:notifications];
 }
 
+- (void)removeNotification:(NSString*)notificationId {
+    NSArray *notifications = [self getNotifications];
+    NSMutableArray *tempNotifications = [notifications mutableCopy];
+    for (NSDictionary * notification in notifications) {
+        if ([[notification valueForKey:@"_id"] isEqualToString: notificationId])
+            [tempNotifications removeObject: notification];
+    }
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
+    [userDefaults setObject:tempNotifications forKey:@"CleverPush_NOTIFICATIONS"];
+    [userDefaults synchronize];
+}
+
 #pragma mark - Retrieving notifications based on the flag remote/local
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
     NSMutableArray* notifications = [[self getNotifications] mutableCopy];

@@ -145,6 +145,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (UIViewController*)getTopViewController;
 - (NSArray*)getSubscriptionTags;
 - (NSArray*)getNotifications;
+- (void)removeNotification:(NSString*)notificationId;
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback;
 - (NSArray*)getSeenStories;
 - (NSMutableArray*)getSubscriptionTopics;

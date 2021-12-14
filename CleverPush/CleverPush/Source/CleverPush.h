@@ -116,6 +116,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
 + (NSArray*)getSubscriptionTags;
 + (NSArray*)getNotifications;
++ (void)removeNotification:(NSString*)notificationId;
 + (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
@@ -145,7 +146,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 #pragma clang diagnostic ignored "-Wdeprecated"
 + (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
 #pragma clang diagnostic pop
-
 
 
 @end
