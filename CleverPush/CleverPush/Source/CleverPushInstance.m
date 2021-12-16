@@ -1286,8 +1286,12 @@ static id isNil(id object) {
     if ([self getAutoClearBadge]) {
         [self clearBadge:true];
     }
-    
-    [self updateBadge:nil];
+    if (@available(iOS 10.0, *)) {
+        [self updateBadge:nil];
+    } else {
+        // Fallback on earlier versions
+    }
+
     
     if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
         

@@ -92,7 +92,7 @@
                         <constraint firstAttribute="height" constant="44" id="Qqf-4c-aH7"/>
                     </constraints>
                     <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <buttonConfiguration key="configuration" style="plain" image="multiply" catalog="system"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                     <connections>
                         <action selector="btnClose:" destination="-1" eventType="touchUpInside" id="0QU-Ed-EvC"/>
                     </connections>
@@ -134,7 +134,4 @@
             <point key="canvasLocation" x="-436.23188405797106" y="41.517857142857139"/>
         </view>
     </objects>
-    <resources>
-        <image name="multiply" catalog="system" width="128" height="111"/>
-    </resources>
 </document>
