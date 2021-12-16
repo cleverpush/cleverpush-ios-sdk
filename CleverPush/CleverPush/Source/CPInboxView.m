@@ -1,8 +1,11 @@
+#import <UIKit/UIKit.h>
 #import "CleverPush.h"
 #import "CPInboxView.h"
-#import <UIKit/UIKit.h>
 #import "CPInboxCell.h"
+#import "CPTranslate.h"
+
 @implementation CPInboxView
+
 CPNotificationClickBlock handleClick;
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
@@ -202,4 +205,5 @@ CPNotificationClickBlock handleClick;
     }
     return readNotifications;
 }
+
 @end

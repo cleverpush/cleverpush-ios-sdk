@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
 @interface CleverPushHTTPClient : NSObject
+
 #pragma mark - Base classs for api call.
 + (CleverPushHTTPClient *)sharedClient;
 @property (readonly, nonatomic) NSURL *apiEndpoint;

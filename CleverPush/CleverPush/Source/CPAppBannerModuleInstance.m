@@ -360,13 +360,14 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        
         NSBundle *bundle = [CPUtils getAssetsBundle];
         CPAppBannerViewController *appBannerViewController;
-            if (bundle) {
-                appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
-            }
-        
+        if (bundle) {
+            appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+        } else {
+            appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:[NSBundle mainBundle]];
+        }
+
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [self sendBannerEvent:@"clicked" forBanner:banner];
             
@@ -429,22 +430,22 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
-    
-    UIViewController* topController = [CleverPush topViewController];
-    
     if (![CleverPush popupVisible]) {
         [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_POPUP_VISIBILITY"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         appBannerViewController.data = banner;
+
+        UIViewController* topController = [CleverPush topViewController];
         [topController presentViewController:appBannerViewController animated:YES completion:nil];
+
         if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
                 [appBannerViewController onDismiss];
             });
         }
         [self sendBannerEvent:@"delivered" forBanner:banner];
-    }else{
+    } else {
         NSLog(@"CleverPush: You can not present two banners at the same time");
     }
 }

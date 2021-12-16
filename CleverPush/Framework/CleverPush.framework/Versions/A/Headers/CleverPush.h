@@ -17,38 +17,9 @@
 #import "CPSubscription.h"
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
+#import "CleverPushInstance.h"
+#import "CPInboxView.h"
 
-@interface CPNotificationReceivedResult : NSObject
-
-@property(readonly)NSDictionary* payload;
-@property(readonly)CPNotification* notification;
-@property(readonly)CPSubscription* subscription;
--(instancetype)initWithPayload:(NSDictionary *)payload;
-
-@end;
-
-@interface CPNotificationOpenedResult : NSObject
-
-@property(readonly)NSDictionary* payload;
-@property(readonly)CPNotification* notification;
-@property(readonly)CPSubscription* subscription;
-@property(readonly)NSString* action;
--(instancetype)initWithPayload:(NSDictionary *)payload action:(NSString*)action;
-
-@end;
-
-typedef void (^CPResultSuccessBlock)(NSDictionary* result);
-typedef void (^CPFailureBlock)(NSError* error);
-
-typedef void (^CPHandleSubscribedBlock)(NSString * result);
-
-typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* result);
-typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* result);
-
-typedef void (^CPResultSuccessBlock)(NSDictionary* result);
-typedef void (^CPFailureBlock)(NSError* error);
-
-typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
@@ -140,11 +111,13 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setOpenWebViewEnabled:(BOOL)opened;
 + (void)setUnsubscribeStatus:(BOOL)status;
 + (UIViewController*)topViewController;
++ (BOOL)hasSubscriptionTopic:(NSString*)topicId;
 
 + (NSArray*)getAvailableTags __attribute__((deprecated));
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
 + (NSArray*)getSubscriptionTags;
 + (NSArray*)getNotifications;
++ (void)removeNotification:(NSString*)notificationId;
 + (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
@@ -164,7 +137,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)isSubscribed;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
-+ (BOOL)hasSubscriptionTopic:(NSString*)topicId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
 
@@ -175,5 +147,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 #pragma clang diagnostic ignored "-Wdeprecated"
 + (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
 #pragma clang diagnostic pop
+
 
 @end

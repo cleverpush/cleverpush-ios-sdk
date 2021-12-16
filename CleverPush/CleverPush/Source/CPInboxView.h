@@ -1,6 +1,5 @@
 #import <UIKit/UIKit.h>
 #import "UIImageView+CleverPush.h"
-#import "CPTranslate.h"
 #import "CPNotification.h"
 #import "CleverPush.h"
 

@@ -17,7 +17,6 @@
 #import "CPSubscription.h"
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
-#import "CleverPushInstance.h"
 
 @interface CPNotificationReceivedResult : NSObject
 

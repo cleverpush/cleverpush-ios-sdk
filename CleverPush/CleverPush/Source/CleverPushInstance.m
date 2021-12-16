@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.13.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -76,8 +76,8 @@ static BOOL incrementBadge = NO;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static const int secDifferenceAtVeryFirstTime = 0;
-static const int validationSeconds = 3600 ;
-static const int maximumNotifications = 100 ;
+static const int validationSeconds = 3600;
+static const int maximumNotifications = 100;
 
 
 static NSString* channelId;
@@ -147,7 +147,6 @@ static id isNil(id object) {
 }
 
 - (void)setTrackingConsentRequired:(BOOL)required {
-    
     trackingConsentRequired = required;
 }
 
@@ -606,8 +605,6 @@ static id isNil(id object) {
     return [difference day];
 }
 
-
-
 #pragma mark - determine the last sync and update the data on the next sync date
 - (BOOL)shouldSync {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -922,8 +919,6 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
-    
-    //   [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 }
 
 #pragma mark - unsubscribe
@@ -1022,6 +1017,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICE_TOKEN"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
+
 - (BOOL)isSubscriptionInProgress {
     return registrationInProgress;
 }
@@ -1146,8 +1142,6 @@ static id isNil(id object) {
     }];
 }
 
-
-
 #pragma mark - add Attachments to content
 - (void)addAttachments:(NSString*)mediaUrl toContent:(UNMutableNotificationContent*)content  API_AVAILABLE(ios(10.0)) {
     NSMutableArray* unAttachments = [NSMutableArray new];
@@ -1266,7 +1260,6 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    
     NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload valueForKey:@"notification"];
     NSString* action = actionIdentifier;
@@ -1588,7 +1581,6 @@ static id isNil(id object) {
 
 - (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
-        
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
         
@@ -2361,7 +2353,6 @@ static id isNil(id object) {
     return currentPageUrl;
 }
 
-
 #pragma mark - track Session Start by api call subscription/session/start
 - (void)trackSessionStart {
     [self waitForTrackingConsent:^{
@@ -2531,7 +2522,7 @@ static id isNil(id object) {
                 if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:NO];
                 }
-                
+
                 CPTopicsViewController *topicsController = [[CPTopicsViewController alloc] initWithAvailableTopics:channelTopics selectedTopics:[self getSubscriptionTopics] hasSubscriptionTopics:[self hasSubscriptionTopics]];
                 channelTopicsPicker = [DWAlertController alertControllerWithContentController:topicsController];
                 topicsController.title = headerTitle;
@@ -2571,7 +2562,6 @@ static id isNil(id object) {
         }];
     }];
 }
-
 
 #pragma mark - update UserDefaults while toggled deselect switch
 - (void)updateDeselectFlag:(BOOL)value {

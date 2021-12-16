@@ -1,3 +1,8 @@
+# 1.15.0
+* Added Unit Test cases
+* Added `removeNotification(id)` method
+* Added CPInboxView
+
 # 1.14.1
 * Fixed `createdAt` field in `CPNotification`
 * App Banner optimizations
