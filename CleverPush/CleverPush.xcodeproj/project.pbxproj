@@ -721,7 +721,6 @@
 		29D3354C26F0C39E0058EF16 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */,
 				CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */,
 				CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */,
 				CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */,
@@ -729,6 +728,7 @@
 				CB73FF83272C3D920099B648 /* CPButtonBlockCell.xib */,
 				CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */,
 				29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */,
+				CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
