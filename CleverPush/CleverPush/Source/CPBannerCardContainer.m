@@ -48,8 +48,6 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"section:%ld", (long)indexPath.section);
-    NSLog(@"row:%ld", indexPath.row);
 
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
