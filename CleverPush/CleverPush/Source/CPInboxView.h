@@ -29,6 +29,6 @@ typedef void (^CPNotificationClickBlock)(CPNotification* result);
 #pragma mark - Call back while banner has been open-up successfully
 
 - (id)initWithFrame:(CGRect)frame combine_with_api:(BOOL)combine_with_api read_color:(UIColor *)read_color unread_color:(UIColor *)unread_color notification_text_color:(UIColor *)notification_text_color notification_text_font_family:(NSString *)notification_text_font_family notification_text_size:(int)notification_text_size date_text_color:(UIColor *)date_text_color date_text_font_family:(NSString *)date_text_font_family date_text_size:(int)date_text_size divider_colour:(UIColor *)divider_colour;
-- (void)setNotificationClicked:(CPNotificationClickBlock)callback;
+- (void)notificationClickCallback:(CPNotificationClickBlock)callback;
 
 @end
