@@ -13,13 +13,13 @@
         @"en": @{
                 @"deselectEverything": @"Deselect everything",
                 @"subscribedTopics": @"Subscribed Topics",
-                @"notificationsEmpty": @"notifications are empty",
+                @"notificationsEmpty": @"No notifications available",
                 @"save": @"Save"
         },
         @"de": @{
                 @"deselectEverything": @"Alles abwählen",
                 @"subscribedTopics": @"Abonnierte Themen",
-                @"notificationsEmpty": @"notifications are empty",
+                @"notificationsEmpty": @"Keine Nachrichten verfügbar",
                 @"save": @"Speichern"
         },
     };
