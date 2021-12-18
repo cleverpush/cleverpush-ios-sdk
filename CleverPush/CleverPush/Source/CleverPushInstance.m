@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -260,8 +260,7 @@ static id isNil(id object) {
     subscriptionTags = [[NSMutableArray alloc] init];
     
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-    if (userInfo)
-    {
+    if (userInfo) {
         startFromNotification = YES;
         if (pendingOpenedResult && handleNotificationOpened) {
             handleNotificationOpened(pendingOpenedResult);
@@ -272,7 +271,6 @@ static id isNil(id object) {
     }
     
     if (self) {
-        
         if (newChannelId) {
             channelId = newChannelId;
         } else {
@@ -355,9 +353,7 @@ static id isNil(id object) {
     
     UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"]){
-        [self setSubscriptionId:[userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"]];
-    }
+    subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
     deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
     if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
 #pragma clang diagnostic push
@@ -372,9 +368,9 @@ static id isNil(id object) {
         [self subscribe];
     }
     
-    
-    if ([self subscriptionId] != nil) {
+    if (subscriptionId != nil) {
         if (![self notificationsEnabled]) {
+            NSLog(@"CleverPush: notification authorization revoked, unsubscribing");
             [self unsubscribe];
         } else if ([self shouldSync]) {
             NSLog(@"CleverPush: syncSubscription called from initWithChannelId");
@@ -389,6 +385,7 @@ static id isNil(id object) {
             }
         }
     }
+    
     [self incrementAppOpens];
     [self initFeatures];
     
@@ -423,7 +420,6 @@ static id isNil(id object) {
 
 #pragma mark - update the user defaults value of selected Topics Dialog.
 - (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
-    NSLog(@"setDefaultCheckedTopics %@", topics);
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
     if (!topicsVersion) {
@@ -447,6 +443,11 @@ static id isNil(id object) {
     [self updateBadge:nil];
     [self trackSessionStart];
     [CPAppBannerModule initSession];
+
+    if (subscriptionId != nil && ![self notificationsEnabled]) {
+        NSLog(@"CleverPush: notification authorization revoked, unsubscribing");
+        [self unsubscribe];
+    }
 }
 
 #pragma mark - clear Badge count and start tracking the session when application goes to the Background.
@@ -673,12 +674,9 @@ static id isNil(id object) {
     }
 }
 
-- (void)setSubscriptionId:(NSString *)subscriptionId{
-    if (self.subscriptionId) {
-        self.subscriptionId = subscriptionId;
-    }
+- (void)setSubscriptionId:(NSString *)newSubscriptionId {
+    subscriptionId = newSubscriptionId;
 }
-
 
 - (NSString*)getSubscriptionId {
     if (subscriptionId) {
@@ -730,9 +728,10 @@ static id isNil(id object) {
     }
 }
 
--(void)addCallbacksToTrackingConsentListeners:(void(^)(void))callback {
+- (void)addCallbacksToTrackingConsentListeners:(void(^)(void))callback {
     [pendingTrackingConsentListeners addObject:callback];
 }
+
 - (BOOL)getTrackingConsentRequired {
     return trackingConsentRequired;
 }
@@ -935,11 +934,11 @@ static id isNil(id object) {
 - (void)unsubscribe:(void(^)(BOOL))callback {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
     
-    if ([self subscriptionId]) {
+    if (subscriptionId) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 [self channelId], @"channelId",
-                                 [self subscriptionId], @"subscriptionId",
+                                 channelId, @"channelId",
+                                 subscriptionId, @"subscriptionId",
                                  nil];
         
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -1370,7 +1369,6 @@ static id isNil(id object) {
 }
 
 - (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
-    
     NSString *notificationId = [notification valueForKey:@"_id"];
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"notification/delivered"];
@@ -1598,7 +1596,7 @@ static id isNil(id object) {
     }];
 }
 
--(void)addSubscriptionTagstoServer:(NSString*)tagId callback:(void (^)(NSString *))callback{
+- (void)addSubscriptionTagstoServer:(NSString*)tagId callback:(void (^)(NSString *))callback{
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:

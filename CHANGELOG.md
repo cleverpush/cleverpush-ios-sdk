@@ -1,3 +1,6 @@
+# 1.15.1
+* Fixed unsubscribe behaviour
+
 # 1.15.0
 * Added Unit Test cases
 * Added `removeNotification(id)` method
