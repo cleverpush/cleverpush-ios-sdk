@@ -172,6 +172,7 @@
 		298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 298F4FC225002DA400F086D3 /* CPUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 298F4FC225002DA400F086D3 /* CPUtils.h */; };
 		298F4FC525002F1F00F086D3 /* CPUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 298F4FC025002D6700F086D3 /* CPUtils.m */; };
+		29A9E556276FAD8200DD43A4 /* CPAppBannerSubscribedType.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */; };
 		29AD0C5326682A8E009E10D0 /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */; };
 		29AD0C5C26682A92009E10D0 /* CPAppBannerHTMLBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */; };
 		29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */; };
@@ -428,6 +429,7 @@
 		2986776C2572DFFA0002E9F1 /* CPAppBannerAlignment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerAlignment.h; sourceTree = "<group>"; };
 		298F4FC025002D6700F086D3 /* CPUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPUtils.m; sourceTree = "<group>"; };
 		298F4FC225002DA400F086D3 /* CPUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUtils.h; sourceTree = "<group>"; };
+		29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerSubscribedType.h; sourceTree = "<group>"; };
 		29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -792,6 +794,7 @@
 				CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */,
 				298676E02572D0340002E9F1 /* CPAppBannerStatus.h */,
 				298676E12572D0400002E9F1 /* CPAppBannerStopAtType.h */,
+				29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */,
 				298677592572DFE00002E9F1 /* CPAppBannerTextBlock.h */,
 				2986775A2572DFE70002E9F1 /* CPAppBannerTextBlock.m */,
 				2956401A258822E000FE7611 /* CPAppBannerTrigger.h */,
@@ -990,6 +993,7 @@
 				CB73FF8C272C3E400099B648 /* CPBannerCardContainer.h in Headers */,
 				CB73FFA0272C3EBB0099B648 /* CPTextBlockCell.h in Headers */,
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
+				29A9E556276FAD8200DD43A4 /* CPAppBannerSubscribedType.h in Headers */,
 				CBA989A12679D5FF003DE995 /* CPWidgetVariant.h in Headers */,
 				2956401B258822E000FE7611 /* CPAppBannerTrigger.h in Headers */,
 				CBA989BC2679D6A4003DE995 /* CPStoryView.h in Headers */,

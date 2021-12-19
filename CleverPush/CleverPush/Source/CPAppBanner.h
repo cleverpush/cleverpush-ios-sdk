@@ -8,6 +8,7 @@
 #import "CPAppBannerTextBlock.h"
 #import "CPAppBannerButtonBlock.h"
 #import "CPAppBannerImageBlock.h"
+#import "CPAppBannerSubscribedType.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerType.h"
 #import "CPAppBannerHTMLBlock.h"
@@ -22,6 +23,7 @@
 @property (nonatomic) CPAppBannerDismissType dismissType;
 @property (nonatomic) CPAppBannerFrequency frequency;
 @property (nonatomic) CPAppBannerTriggerType triggerType;
+@property (nonatomic) CPAppBannerSubscribedType subscribedType;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;

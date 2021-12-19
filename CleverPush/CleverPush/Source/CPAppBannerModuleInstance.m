@@ -203,6 +203,14 @@ dispatch_queue_t dispatchQueue = nil;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
     BOOL allowed = YES;
 
+    if (banner.subscribedType == CPAppBannerSubscribedTypeSubscribed && ![CleverPush isSubscribed]) {
+        allowed = NO;
+    }
+
+    if (banner.subscribedType == CPAppBannerSubscribedTypeUnsubscribed && [CleverPush isSubscribed]) {
+        allowed = NO;
+    }
+
     if (allowed && banner.tags && [banner.tags count] > 0) {
         allowed = NO;
         for (NSString *tag in banner.tags) {

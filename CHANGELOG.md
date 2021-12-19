@@ -1,3 +1,6 @@
+# 1.15.2
+* Added App Banner targeting filter: subscribed state
+
 # 1.15.1
 * Fixed unsubscribe behaviour
 
