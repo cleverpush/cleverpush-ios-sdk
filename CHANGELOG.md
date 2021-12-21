@@ -1,3 +1,6 @@
+# 1.15.3
+* Fixed `removeNotification` method
+
 # 1.15.2
 * Added App Banner targeting filter: subscribed state
 
