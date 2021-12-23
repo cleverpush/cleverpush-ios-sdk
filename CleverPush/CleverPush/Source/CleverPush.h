@@ -20,13 +20,11 @@
 #import "CleverPushInstance.h"
 #import "CPInboxView.h"
 
-
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
 @interface CleverPush : NSObject
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
-
 
 #pragma mark - Initialise with launch options
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
@@ -147,6 +145,5 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 #pragma clang diagnostic ignored "-Wdeprecated"
 + (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
 #pragma clang diagnostic pop
-
 
 @end

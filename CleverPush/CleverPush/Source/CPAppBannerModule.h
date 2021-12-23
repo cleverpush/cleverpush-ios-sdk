@@ -30,7 +30,7 @@
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 + (void)presentAppBanner:(UIViewController*)controller banner:(CPAppBanner*)banner;
-+ (void)initSession;
++ (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit;
 + (void)triggerEvent:(NSString *)key value:(NSString *)value;
 + (void)disableBanners;
 + (void)enableBanners;

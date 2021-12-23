@@ -66,8 +66,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 }
 
 #pragma mark - Initialised a session
-+ (void)initSession {
-    [self.moduleInstance initSession];
++ (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
+    [self.moduleInstance initSession:channelId afterInit:afterInit];
 }
 
 #pragma mark - Initialised a banner with channel

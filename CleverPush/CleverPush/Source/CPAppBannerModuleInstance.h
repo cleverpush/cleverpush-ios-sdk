@@ -20,6 +20,7 @@
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerCondition.h"
 #import "CPAppBannerViewController.h"
+
 @class CPAppBannerViewController;
 
 @interface CPAppBannerModuleInstance : NSObject
@@ -35,7 +36,7 @@
 - (NSMutableArray*)shownAppBanners;
 - (BOOL)isBannerShown:(NSString*)bannerId;
 - (void)setBannerIsShown:(NSString*)bannerId;
-- (void)initSession;
+- (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit;
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification;
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;

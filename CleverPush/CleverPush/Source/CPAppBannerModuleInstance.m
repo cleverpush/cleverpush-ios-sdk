@@ -22,9 +22,11 @@ BOOL pendingBannerRequest = NO;
 BOOL bannersDisabled = NO;
 BOOL isFromNotification = NO;
 
-long MIN_SESSION_LENGTH = 30 * 60 * 1000L;
+long MIN_SESSION_LENGTH = 30 * 60;
+long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
+
 dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - Get sessions from NSUserDefaults
@@ -106,7 +108,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 #pragma mark - Initialised a session
-- (void)initSession {
+- (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
     if ([self getLastSessionTimestamp] > 0
         && ((long)NSDate.date.timeIntervalSince1970 - [self getLastSessionTimestamp]) < [self getMinimumSessionLength]
         ) {
@@ -114,12 +116,17 @@ dispatch_queue_t dispatchQueue = nil;
     }
     activeBanners = [self getActiveBanners];
     [self setLastSessionTimestamp:(long)NSDate.date.timeIntervalSince1970];
-    [self setSessions:sessions += 1];
+    [self setSessions:sessions + 1];
     [self saveSessions];
-    [self setBanners:banners];
-    [self startup];
+    
+    if (afterInit) {
+        dispatch_sync(dispatchQueue, ^{
+            [self getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
+                [self startup];
+            }];
+        });
+    }
 }
-
 
 #pragma mark - Initialised a banner with channel
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification {
@@ -338,14 +345,14 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - manage the schedule to display the banner at a specific time
 - (void)scheduleBanners {
     if ([self getBannersDisabled]) {
-        for (CPAppBanner* banner in [self getActiveBanners]) {
+        for (CPAppBanner* banner in activeBanners) {
             [pendingBanners addObject:banner];
         }
         [activeBanners removeObjectsInArray:pendingBanners];
         return;
     }
     
-    for (CPAppBanner* banner in activeBanners) {
+    for (CPAppBanner* banner in [self getActiveBanners]) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void) {
@@ -527,14 +534,11 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (NSMutableArray *)getActiveBanners {
-    if ([activeBanners count] > 0) {
-        activeBanners = [NSMutableArray new];
-    }
     return activeBanners;
 }
 
 - (long)getMinimumSessionLength {
-    return [CleverPush isDevelopmentModeEnabled] ? 30 * 1000L : MIN_SESSION_LENGTH;
+    return [CleverPush isDevelopmentModeEnabled] ? MIN_SESSION_LENGTH_DEV : MIN_SESSION_LENGTH;
 }
 
 - (void)setSessions:(long)sessionsCount{

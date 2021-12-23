@@ -25,8 +25,8 @@
 #import "CleverPushInstance.h"
 #endif
 
-
 @implementation CleverPush
+
 static CleverPushInstance* singletonInstance = nil;
 static CleverPush* singleInstance = nil;
 
@@ -449,7 +449,6 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler{
     return [self.CPSharedInstance handleSilentNotificationReceived:application UserInfo:messageDict completionHandler:completionHandler];
-    
 }
 
 + (BOOL)hasSubscriptionTag:(NSString*)tagId {

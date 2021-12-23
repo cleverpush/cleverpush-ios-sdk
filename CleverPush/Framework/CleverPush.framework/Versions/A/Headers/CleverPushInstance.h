@@ -57,7 +57,6 @@ extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 
 extern NSString * const CLEVERPUSH_SDK_VERSION;
 
-
 #pragma mark - Initialise with launch options
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
@@ -221,4 +220,5 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)addSubscriptionTagstoServer:(NSString*)tagId callback:(void (^)(NSString *))callback;
 - (void)removeSubscriptionTagsfromServer:(NSString*)tagId callback:(void (^)(NSString *))callback;
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend;
+
 @end

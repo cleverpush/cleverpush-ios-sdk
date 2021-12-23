@@ -1,3 +1,6 @@
+# 1.15.4
+* App Banner optimizations when re-starting a session
+
 # 1.15.3
 * Fixed `removeNotification` method
 
