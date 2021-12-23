@@ -116,7 +116,7 @@ dispatch_queue_t dispatchQueue = nil;
     [self setLastSessionTimestamp:(long)NSDate.date.timeIntervalSince1970];
     [self setSessions:sessions += 1];
     [self saveSessions];
-    [self setBanners:nil];
+    [self setBanners:banners];
     [self startup];
 }
 
@@ -330,7 +330,7 @@ dispatch_queue_t dispatchQueue = nil;
         }
         
         if (!contains) {
-            [[self getActiveBanners] addObject:banner];
+            [activeBanners addObject:banner];
         }
     }
 }
