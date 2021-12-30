@@ -82,8 +82,11 @@ CPNotificationClickBlock handleClick;
                         }
                     }];
                     self.messageList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , frame.size.height)];
-                    UINib *nib = [UINib nibWithNibName:@"CPInboxCell" bundle:nil];
-                    [[self messageList] registerNib:nib forCellReuseIdentifier:@"CPInboxCell"];
+                    NSBundle *bundle = [CPUtils getAssetsBundle];
+                    if (bundle) {
+                        UINib *nib = [UINib nibWithNibName:@"CPInboxCell" bundle:bundle];
+                        [[self messageList] registerNib:nib forCellReuseIdentifier:@"CPInboxCell"];
+                    }
                     self.messageList.backgroundColor = UIColor.clearColor;
                     self.messageList.directionalLockEnabled = YES;
                     [self.messageList setSeparatorColor:self.divider_colour];
