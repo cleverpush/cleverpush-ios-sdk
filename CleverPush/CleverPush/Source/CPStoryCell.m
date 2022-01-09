@@ -13,7 +13,7 @@
 }
 
 #pragma mark - UICollectionViewCell Setup
--(void)setup {
+- (void)setup {
     self.backgroundColor = UIColor.clearColor;
     self.outerRing = [[UIView alloc] initWithFrame:CGRectMake(0, 0, IMAGEVIEW_BORDER_LENGTH, IMAGEVIEW_BORDER_LENGTH)];
     [self addSubview:self.outerRing];

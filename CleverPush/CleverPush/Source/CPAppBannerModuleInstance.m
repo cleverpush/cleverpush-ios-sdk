@@ -525,7 +525,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 #pragma mark - refactor for testcases
 
--(void)setBanners:(NSMutableArray*)appBanner {
+- (void)setBanners:(NSMutableArray*)appBanner {
     banners = appBanner;
 }
 
@@ -592,15 +592,15 @@ dispatch_queue_t dispatchQueue = nil;
     return showDrafts;
 }
 
--(void)updateShowDraftsFlag:(BOOL)value {
+- (void)updateShowDraftsFlag:(BOOL)value {
     showDrafts = value;
 }
 
--(void)updateInitialisedFlag:(BOOL)value {
+- (void)updateInitialisedFlag:(BOOL)value {
     initialized = value;
 }
 
--(BOOL)isInitialized {
+- (BOOL)isInitialized {
     return initialized;
 }
 
@@ -608,7 +608,7 @@ dispatch_queue_t dispatchQueue = nil;
     return pendingBanners;
 }
 
--(void)setBannersDisabled:(BOOL)value {
+- (void)setBannersDisabled:(BOOL)value {
     bannersDisabled = value;
 }
 
@@ -619,7 +619,9 @@ dispatch_queue_t dispatchQueue = nil;
 - (void)setFromNotification:(BOOL)value{
     isFromNotification = value;
 }
+
 - (BOOL)isFromNotification{
     return isFromNotification;
 }
+
 @end

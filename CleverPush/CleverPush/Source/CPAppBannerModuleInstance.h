@@ -52,7 +52,7 @@
 - (void)enableBanners;
 
 #pragma mark - refactor for testcases
--(void)setBanners:(NSMutableArray*)appBanner;
+- (void)setBanners:(NSMutableArray*)appBanner;
 - (NSMutableArray *)getListOfBanners;
 - (NSMutableArray *)getActiveBanners;
 - (long)getMinimumSessionLength;

@@ -78,7 +78,7 @@
     }];
 }
 
--(void)testVerifyApiCallAddTags {
+- (void)testVerifyApiCallAddTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
     [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {

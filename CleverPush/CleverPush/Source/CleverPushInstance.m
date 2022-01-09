@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -346,7 +346,6 @@ static id isNil(id object) {
     }
 }
 
-
 #pragma mark - syncSubscription by calling initWithChannelId.
 - (void)initWithChannelId {
     NSLog(@"CleverPush: initializing SDK %@ with channelId: %@", CLEVERPUSH_SDK_VERSION, channelId);
@@ -363,11 +362,13 @@ static id isNil(id object) {
     } else {
         registeredWithApple = deviceToken != nil;
     }
-    
+
+    [self incrementAppOpens];
+
     if (autoRegister && ![self getUnsubscribeStatus]) {
-        [self subscribe];
+        [self autoSubscribeWithDelays];
     }
-    
+
     if (subscriptionId != nil) {
         if (![self notificationsEnabled]) {
             NSLog(@"CleverPush: notification authorization revoked, unsubscribing");
@@ -385,8 +386,7 @@ static id isNil(id object) {
             }
         }
     }
-    
-    [self incrementAppOpens];
+
     [self initFeatures];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -516,7 +516,7 @@ static id isNil(id object) {
             
             NSString *appReviewEmail = [channelConfig valueForKey:@"appReviewEmail"];
             
-            if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= appReviewOpens && currentAppDays >= appReviewDays) {
+            if ([self getAppOpens] >= appReviewOpens && currentAppDays >= appReviewDays) {
                 NSLog(@"CleverPush: showing app review alert");
                 
                 dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
@@ -623,8 +623,6 @@ static id isNil(id object) {
     pendingChannelConfigRequest = NO;
     
     for (void (^listener)(NSDictionary *) in pendingChannelConfigListeners) {
-        
-        // NSLog(@"CleverPush: pendingChannelConfigListener channelConfig %@", channelConfig);
         // check if listener and channelConfig are non-nil (otherwise: EXC_BAD_ACCESS)
         if (listener && channelConfig) {
             __strong void (^callbackBlock)(NSDictionary *) = listener;
@@ -649,11 +647,9 @@ static id isNil(id object) {
     
     NSString *configPath = @"";
     if ([self channelId] != NULL) {
+        configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", channelId];
         if ([self isDevelopmentModeEnabled]) {
-            configPath = [NSString stringWithFormat:@"channel/%@/config", channelId];
-            configPath = [NSString stringWithFormat:@"%@?t=%f", configPath, NSDate.date.timeIntervalSince1970];
-        } else {
-            configPath = [NSString stringWithFormat:@"channel/%@/config", channelId];
+            configPath = [NSString stringWithFormat:@"%@&t=%f", configPath, NSDate.date.timeIntervalSince1970];
         }
         [self getChannelConfigFromChannelId:configPath];
     } else {
@@ -791,16 +787,29 @@ static id isNil(id object) {
 }
 
 - (void)setConfirmAlertShown {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             channelId, @"channelId",
-                             @"iOS", @"platformName",
-                             @"SDK", @"browserType",
-                             nil];
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: /channel/confirm-alert request error %@", error);
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"channel/confirm-alert"]];
+        
+        NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 @"iOS", @"platformName",
+                                 @"SDK", @"browserType",
+                                 nil];
+
+        if (
+            channelConfig != nil
+            && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
+            && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
+            && [channelConfig valueForKey:@"confirmAlertTestId"]
+        ) {
+            [dataDic setObject:[channelConfig valueForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
+        }
+
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
+            NSLog(@"CleverPush Error: /channel/confirm-alert request error %@", error);
+        }];
     }];
 }
 
@@ -893,6 +902,36 @@ static id isNil(id object) {
         }];
 #pragma clang diagnostic pop
     }
+}
+
+- (void)autoSubscribeWithDelays {
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if (
+            channelConfig != nil
+            && [channelConfig valueForKey:@"confirmAlertSettingsEnabled"] != nil
+            && [[channelConfig valueForKey:@"confirmAlertSettingsEnabled"] boolValue]
+        ) {
+            if (
+                [channelConfig objectForKey:@"alertMinimumVisits"]
+                && [self getAppOpens] <= [[channelConfig objectForKey:@"alertMinimumVisits"] intValue]
+            ) {
+                return;
+            }
+            
+            if (
+                [channelConfig objectForKey:@"alertTimeout"]
+            ) {
+                int milliseconds = [[channelConfig objectForKey:@"alertTimeout"] intValue];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_MSEC * milliseconds),  dispatch_get_main_queue(), ^(void) {
+                    [self subscribe];
+                });
+            } else {
+                [self subscribe];
+            }
+        } else {
+            [self subscribe];
+        }
+    }];
 }
 
 #pragma mark - update the userdefault value for key @"UNSUBSCRIBED" with the dynamic argument named status.
@@ -1031,22 +1070,22 @@ static id isNil(id object) {
         NSLog(@"CleverPush: syncSubscription aborted - registration already in progress");
         return;
     }
-    
+
     if (!deviceToken) {
         deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
     }
-    
+
     if (!deviceToken && !subscriptionId) {
         NSLog(@"CleverPush: syncSubscription aborted - no deviceToken and no subscriptionId available");
         return;
     }
-    
+
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
-    
+
     [self setSubscriptionInProgress:true];
     NSMutableURLRequest* request;
     request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-    
+
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
     if (!language) {
@@ -1057,12 +1096,12 @@ static id isNil(id object) {
         country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
     }
     NSString* timezone = [[NSTimeZone localTimeZone] name];
-    
+
     [request setAllHTTPHeaderFields:@{
         @"User-Agent": [NSString stringWithFormat:@"CleverPush iOS SDK %@", CLEVERPUSH_SDK_VERSION],
         @"Accept-Language": language
     }];
-    
+
     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                     @"SDK", @"browserType",
                                     CLEVERPUSH_SDK_VERSION, @"browserVersion",
@@ -1073,12 +1112,22 @@ static id isNil(id object) {
                                     isNil(timezone), @"timezone",
                                     isNil(language), @"language",
                                     nil];
-    
+
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
     }
+
     if (deviceToken) {
         [dataDic setObject:deviceToken forKey:@"apnsToken"];
+    }
+
+    if (
+        channelConfig != nil
+        && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
+        && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
+        && [channelConfig valueForKey:@"confirmAlertTestId"]
+    ) {
+        [dataDic setObject:[channelConfig valueForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
     }
     
     NSArray* topics = [self getSubscriptionTopics];
@@ -2768,6 +2817,27 @@ static id isNil(id object) {
         if (result != nil) {
             channelConfig = result;
         }
+        
+        if (
+            channelConfig != nil
+            && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
+            && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
+        ) {
+            NSString *testsConfigPath = [configPath stringByAppendingString:@"&confirmAlertTestsEnabled=true"];
+            NSMutableURLRequest* testsRequest = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:testsConfigPath];
+            [self enqueueRequest:testsRequest onSuccess:^(NSDictionary* testsResult) {
+                if (testsResult != nil) {
+                    channelConfig = testsResult;
+                }
+
+                [self fireChannelConfigListeners];
+            } onFailure:^(NSError* error) {
+                NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+                [self fireChannelConfigListeners];
+            }];
+            return;
+        }
+        
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: Failed getting the channel config %@", error);

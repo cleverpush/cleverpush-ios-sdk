@@ -134,7 +134,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 }
 
--(void)testInitSession {
+- (void)testInitSession {
     [self.appBanner initSession];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
@@ -143,7 +143,7 @@ dispatch_queue_t dispatchQueue = nil;
     [[self.appBanner verify] setBanners:[OCMArg any]];
 }
 
--(void)testInitBannerWithChannelIdWhenBannerIsAlreadyInitialised{
+- (void)testInitBannerWithChannelIdWhenBannerIsAlreadyInitialised{
     OCMStub([self.appBanner isInitialized]).andReturn(true);
     [self.appBanner initBannersWithChannel:@"channel_id" showDrafts:true fromNotification:true];
     [[self.appBanner reject] setBanners:[OCMArg any]];
@@ -156,7 +156,7 @@ dispatch_queue_t dispatchQueue = nil;
     [[self.appBanner reject] updateInitialisedFlag:[OCMArg any]];
 }
 
--(void)testInitBannerWithChannelIdWhenBannerIsNotInitialised{
+- (void)testInitBannerWithChannelIdWhenBannerIsNotInitialised{
     OCMStub([self.appBanner isInitialized]).andReturn(false);
     [self.appBanner initBannersWithChannel:@"channel_id" showDrafts:true fromNotification:false];
     [[self.appBanner verify] setPendingBannerListeners:[NSMutableArray new]];
@@ -167,13 +167,13 @@ dispatch_queue_t dispatchQueue = nil;
     [[self.appBanner verify] updateShowDraftsFlag:true];
     [[self.appBanner verify] updateInitialisedFlag:true];
 }
--(void)testInitBannerWithChannelIdWhenBannerIsNotInitialisedandNotFromNotificaion{
+- (void)testInitBannerWithChannelIdWhenBannerIsNotInitialisedandNotFromNotificaion{
     OCMStub([self.appBanner isInitialized]).andReturn(false);
     [self.appBanner initBannersWithChannel:@"channel_id" showDrafts:true fromNotification:false];
     [[self.appBanner verify] setFromNotification:false];
 }
 
--(void)testInitBannerWithChannelIdWhenBannerIsNotInitialisedandFromNotificaion{
+- (void)testInitBannerWithChannelIdWhenBannerIsNotInitialisedandFromNotificaion{
     OCMStub([self.appBanner isInitialized]).andReturn(false);
     [self.appBanner initBannersWithChannel:@"channel_id" showDrafts:true fromNotification:true];
     [[self.appBanner verify] setFromNotification:true];

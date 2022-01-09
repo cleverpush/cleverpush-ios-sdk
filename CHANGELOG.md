@@ -1,3 +1,6 @@
+# 1.15.5
+* Support opt in delay settings & split tests
+
 # 1.15.4
 * App Banner optimizations when re-starting a session
 

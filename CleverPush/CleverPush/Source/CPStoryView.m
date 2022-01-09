@@ -139,7 +139,7 @@
     cell.outerRing.alpha = 1.0;
 }
 
--(void)reloadReadStories:(NSArray *)array {
+- (void)reloadReadStories:(NSArray *)array {
     self.readStories = [[NSMutableArray alloc] initWithArray:CleverPush.getSeenStories];
     if (self.readStories.count != 0 && self.readStories.count != self.stories.count) {
         NSMutableArray<CPStory *> *seenArray = [NSMutableArray array];
