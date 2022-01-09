@@ -89,7 +89,7 @@
     XCTAssertTrue([self.cleverPush hasSubscriptionTopics]);
 }
 
--(void)testSubscribeWhenConfirmAlertHideChannelTopicsTrue {
+- (void)testSubscribeWhenConfirmAlertHideChannelTopicsTrue {
     void (^channelConfigListenerAnswer)(NSInvocation *) = ^(NSInvocation *invocation) {
         NSDictionary *value = [[NSDictionary alloc]initWithObjectsAndKeys:@"true", @"confirmAlertHideChannelTopics", nil];
         [invocation getArgument:&value atIndex:2];
@@ -101,7 +101,7 @@
     [[self.cleverPush reject] showPendingTopicsDialog];
 }
 
--(void)testShowTopicDialogWhenAvailableTopicCountZero {
+- (void)testShowTopicDialogWhenAvailableTopicCountZero {
     NSMutableArray *topics = [[NSMutableArray alloc]init];
     [OCMStub([self.cleverPush getAvailableTopics:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
         void (^handler)(NSArray *myFirstArgument);

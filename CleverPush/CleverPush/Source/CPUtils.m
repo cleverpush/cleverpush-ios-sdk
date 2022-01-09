@@ -26,7 +26,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 @synthesize error, response, done;
 
 #pragma mark - Recieve data and write
--(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     [outputHandle writeData:data];
 }
 
@@ -42,7 +42,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - error call back
--(void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
+- (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
     error = anError;
     done = YES;
     
@@ -50,7 +50,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - completion call back
--(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)anError {
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)anError {
     done = YES;
     error = anError;
     [outputHandle closeFile];

@@ -7,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol refreshReadStories <NSObject>
--(void)reloadReadStories:(NSArray *)array;
+- (void)reloadReadStories:(NSArray *)array;
 @end
 
 @interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>

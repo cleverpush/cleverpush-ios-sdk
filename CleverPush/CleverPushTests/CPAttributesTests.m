@@ -35,7 +35,7 @@
     self.cleverPush = OCMPartialMock(self.testableInstance);
     self.defaults = OCMPartialMock(self.userDefault);
 }
--(void)testGetAvailableAttributes {
+- (void)testGetAvailableAttributes {
     NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
     NSDictionary *finalResponseObject = responseObject;
     
@@ -50,7 +50,7 @@
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
 }
 
--(void)testGetAvailableAttributesFromConfigWhenChannelConfigIsNull {
+- (void)testGetAvailableAttributesFromConfigWhenChannelConfigIsNull {
     NSDictionary *finalResponseObject = [[NSDictionary alloc]init];
     
     [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
@@ -64,7 +64,7 @@
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
 }
 
--(void)testGetAvailableAttributesFromConfigWhenChannelConfigDoNotHaveCustomAttributes {
+- (void)testGetAvailableAttributesFromConfigWhenChannelConfigDoNotHaveCustomAttributes {
     NSDictionary *finalResponseObject = [[NSDictionary alloc]init];
     [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
         void (^handler)(NSDictionary *myFirstArgument);
@@ -78,7 +78,7 @@
     
 }
 
--(void)testGetAvailableAttributesFromConfigWhenChannelConfigHaveZeroCustomAttributes {
+- (void)testGetAvailableAttributesFromConfigWhenChannelConfigHaveZeroCustomAttributes {
     NSArray *customAttributes = [[NSArray alloc]init];
     NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:customAttributes,@"customAttributes", nil];
     [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
@@ -92,7 +92,7 @@
     }];
 }
 
--(void)testGetAvailableAttributesFromConfigWhenThereIsException {
+- (void)testGetAvailableAttributesFromConfigWhenThereIsException {
     NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:nil,@"customAttributes", nil];
     [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
         void (^handler)(NSDictionary *myFirstArgument);
@@ -105,7 +105,7 @@
     }];
 }
 
--(void)testGetAvailableAttributesFromConfigWhenChannelConfigHaveNonZeroCustomAttributes {
+- (void)testGetAvailableAttributesFromConfigWhenChannelConfigHaveNonZeroCustomAttributes {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
     [objAttribute setObject:@"attribute_name" forKey:@"name"];
     [objAttribute setObject:@"attribute_id" forKey:@"id"];
@@ -128,7 +128,7 @@
     }];
 }
 
--(void)testGetSubscriptionAttributeWhenThereIsAttributeValueForAttributeId {
+- (void)testGetSubscriptionAttributeWhenThereIsAttributeValueForAttributeId {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
     [objAttribute setObject:@"attribute_name" forKey:@"name"];
     [objAttribute setObject:@"attribute_id" forKey:@"id"];
@@ -137,7 +137,7 @@
     XCTAssertEqual(expectedAttribute, @"attribute_name");
 }
 
--(void)testGetSubscriptionAttributeWhenThereIsNoAttributeValueForAttributeId {
+- (void)testGetSubscriptionAttributeWhenThereIsNoAttributeValueForAttributeId {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
     [objAttribute setObject:@"attribute_name" forKey:@"name"];
     [objAttribute setObject:@"attribute_id" forKey:@"id"];
@@ -146,18 +146,18 @@
     XCTAssertNil(expectedAttribute);
 }
 
--(void)testGetSubscriptionAttributeWhenThereIsNoUserDefaultValues {
+- (void)testGetSubscriptionAttributeWhenThereIsNoUserDefaultValues {
     OCMStub([self.defaults valueForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]).andReturn(nil);
     XCTAssertEqual([[self.cleverPush getSubscriptionAttributes] count], 0);
 }
 
--(void)testGetSubscriptionAttributeWhenThereIsZeroSubscriptionAttributes {
+- (void)testGetSubscriptionAttributeWhenThereIsZeroSubscriptionAttributes {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
     OCMStub([self.defaults valueForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]).andReturn(objAttribute);
     XCTAssertEqual([[self.cleverPush getSubscriptionAttributes] count], 0);
 }
 
--(void)testGetSubscriptionAttributeWhenThereIsSubscriptionAttributes {
+- (void)testGetSubscriptionAttributeWhenThereIsSubscriptionAttributes {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
     [objAttribute setObject:@"attribute_name" forKey:@"name"];
     [objAttribute setObject:@"attribute_id" forKey:@"id"];

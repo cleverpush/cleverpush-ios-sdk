@@ -39,7 +39,7 @@
     };
 }
 
--(void)testInitWhenChannleIdIsNull {
+- (void)testInitWhenChannleIdIsNull {
     OCMStub([self.cleverPush channelId]).andReturn(nil);
     OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
     OCMExpect([self.cleverPush getChannelIdFromUserDefault]);
@@ -246,7 +246,7 @@
     }];
 }
 
--(void)testSyncUnsubscribeWhenSubscriptionIdExists{
+- (void)testSyncUnsubscribeWhenSubscriptionIdExists{
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"S9cA4fr2doS24d2f6");
     OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
     [self.cleverPush unsubscribe:^(BOOL success) {
@@ -258,7 +258,7 @@
         }
     }];
 }
--(void)testSyncUnsubscribeWhenSubscriptionIdNotExists {
+- (void)testSyncUnsubscribeWhenSubscriptionIdNotExists {
     OCMStub([self.cleverPush subscriptionId]).andReturn(nil);
     OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
     [self.cleverPush unsubscribe:^(BOOL failed) {
