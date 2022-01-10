@@ -1,3 +1,6 @@
+# 1.15.6
+* Added `getAppBanners` method
+
 # 1.15.5
 * Support opt in delay settings & split tests
 
