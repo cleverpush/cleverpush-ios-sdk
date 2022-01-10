@@ -2724,7 +2724,7 @@ static id isNil(id object) {
     [self showAppBanner:bannerId notificationId:nil];
 }
 
-- (void)getBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback {
+- (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback {
     [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
         callback(banners);
     }];

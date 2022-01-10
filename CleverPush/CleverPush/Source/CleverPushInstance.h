@@ -131,7 +131,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
 - (void)increaseSessionVisits;
 - (void)showAppBanner:(NSString*)bannerId;
-- (void)getBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback;
+- (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
