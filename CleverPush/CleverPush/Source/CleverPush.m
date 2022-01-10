@@ -174,14 +174,14 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
 + (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
@@ -194,14 +194,14 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
 + (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
@@ -230,20 +230,20 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getAvailableTags:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance getAvailableTags:^(NSArray *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getAvailableTags:^(NSArray *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
 + (void)getAvailableTopics:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance getAvailableTopics:^(NSArray *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getAvailableTopics:^(NSArray *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
 + (void)getAvailableAttributes:(void(^)(NSDictionary *))callback {
-    [self.CPSharedInstance getAvailableAttributes:^(NSDictionary *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getAvailableAttributes:^(NSDictionary *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
@@ -304,14 +304,14 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback {
-    [self.CPSharedInstance getChannelConfig:^(NSDictionary *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getChannelConfig:^(NSDictionary *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
 + (void)getSubscriptionId:(void(^)(NSString *))callback {
-    [self.CPSharedInstance getSubscriptionId:^(NSString *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getSubscriptionId:^(NSString *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
@@ -346,8 +346,8 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance getBanners:channelId callback:^(NSArray *callbacka) {
-        callback(callbacka);
+    [self.CPSharedInstance getBanners:channelId callback:^(NSArray *callbackInner) {
+        callback(callbackInner);
     }];
 }
 
