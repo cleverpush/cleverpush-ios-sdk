@@ -1,3 +1,6 @@
+# 1.15.7
+* Filter duplicate notifications in `getNotifications` method
+
 # 1.15.6
 * Added `getAppBanners` method
 
