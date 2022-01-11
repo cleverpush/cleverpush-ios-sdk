@@ -2067,7 +2067,7 @@ static id isNil(id object) {
                 if (!found) {
                     CPNotification *remoteObject = [[CPNotification alloc] init];
                     remoteObject = [CPNotification initWithJson:remoteNotification];
-                  [notifications addObject:remoteObject];
+                    [notifications addObject:remoteObject];
                 }
             }
             
@@ -2122,17 +2122,16 @@ static id isNil(id object) {
 
 #pragma mark - converting objects to CPNotification.
 - (NSMutableArray*)convertDictionariesToNotifications:(NSArray*)notifications {
-    NSMutableArray* CPNotificationResult = [NSMutableArray new];
+    NSMutableArray* resultNotifications = [NSMutableArray new];
     NSMutableArray* notificationIds = [NSMutableArray new];
     [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL *stop) {
-        CPNotification *notification = [[CPNotification alloc] init];
-        [notificationIds addObject:notification.id];
+        CPNotification *notification = [CPNotification initWithJson:objNotification];
         if (![notificationIds containsObject:notification.id]) {
-            notification = [CPNotification initWithJson:objNotification];
-            [CPNotificationResult addObject:notification];
+            [notificationIds addObject:notification.id];
+            [resultNotifications addObject:notification];
         }
     }];
-    return CPNotificationResult;
+    return resultNotifications;
 }
 
 #pragma mark - Get the Notifications based on the topic dialog Id's.
