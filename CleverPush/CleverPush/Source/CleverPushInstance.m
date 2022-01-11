@@ -2123,10 +2123,14 @@ static id isNil(id object) {
 #pragma mark - converting objects to CPNotification.
 - (NSMutableArray*)convertDictionariesToNotifications:(NSArray*)notifications {
     NSMutableArray* CPNotificationResult = [NSMutableArray new];
+    NSMutableArray* notificationIds = [NSMutableArray new];
     [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL *stop) {
         CPNotification *notification = [[CPNotification alloc] init];
-        notification = [CPNotification initWithJson:objNotification];
-        [CPNotificationResult addObject:notification];
+        [notificationIds addObject:notification.id];
+        if (![notificationIds containsObject:notification.id]) {
+            notification = [CPNotification initWithJson:objNotification];
+            [CPNotificationResult addObject:notification];
+        }
     }];
     return CPNotificationResult;
 }
