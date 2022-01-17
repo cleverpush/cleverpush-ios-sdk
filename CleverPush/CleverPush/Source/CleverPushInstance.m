@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.7";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.8";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -2051,9 +2051,14 @@ static id isNil(id object) {
 
 #pragma mark - Retrieving notifications based on the flag remote/local
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
+    [self getNotifications:combineWithApi limit:50 skip:0 callback:callback];
+}
+
+#pragma mark - Retrieving notifications based on the flag remote/local
+- (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray *))callback {
     NSMutableArray* notifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
-        NSString *combinedURL = [self generateGetReceivedNotificationsPath];
+        NSString *combinedURL = [self generateGetReceivedNotificationsPath:limit skip:skip];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray *remoteNotifications) {
             for (NSDictionary *remoteNotification in remoteNotifications) {
                 BOOL found = NO;
@@ -2089,8 +2094,8 @@ static id isNil(id object) {
 }
 
 #pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
-- (NSString *)generateGetReceivedNotificationsPath {
-    NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?", channelId];
+- (NSString *)generateGetReceivedNotificationsPath:(int)limit skip:(int)skip {
+    NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?limit=%d&skip=%d&", channelId, limit, skip];
     if ([self hasSubscriptionTopics]) {
         NSMutableArray* dynamicQueryParameters = [self getReceivedNotificationsQueryParameters];
         NSString* appendableQueryParameters = [dynamicQueryParameters componentsJoinedByString:@""];

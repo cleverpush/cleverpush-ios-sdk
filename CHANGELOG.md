@@ -1,3 +1,6 @@
+# 1.15.8
+* Implemented pagination for `getNotifications` call with `skip` and `limit`
+
 # 1.15.7
 * Filter duplicate notifications in `getNotifications` method
 
