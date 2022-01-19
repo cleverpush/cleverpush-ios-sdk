@@ -1,3 +1,7 @@
+# 1.15.9
+* Fixed duplicate notification filtering in `getNotifications`
+* Updated method signatures for `getNotifications` to include type of NSArray (CPNotification)
+
 # 1.15.8
 * Implemented pagination for `getNotifications` call with `skip` and `limit`
 

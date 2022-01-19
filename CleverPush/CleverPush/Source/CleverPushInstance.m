@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.9";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -2024,7 +2024,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving notifications which has been stored in NSUserDefaults by key "CleverPush_NOTIFICATIONS"
-- (NSArray*)getNotifications {
+- (NSArray<CPNotification*>*)getNotifications {
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
     NSArray* notifications = [userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"];
     if (!notifications) {
@@ -2050,20 +2050,23 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local
-- (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
+- (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback {
     [self getNotifications:combineWithApi limit:50 skip:0 callback:callback];
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local
-- (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray *))callback {
-    NSMutableArray* notifications = [[self getNotifications] mutableCopy];
+- (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback {
+    NSMutableArray<CPNotification*>* notifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
         NSString *combinedURL = [self generateGetReceivedNotificationsPath:limit skip:skip];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray *remoteNotifications) {
             for (NSDictionary *remoteNotification in remoteNotifications) {
                 BOOL found = NO;
-                for (NSDictionary *localNotification in notifications) {
-                    if ([[localNotification valueForKey:@"_id"] isEqualToString:[remoteNotification valueForKey:@"_id"]]) {
+                for (CPNotification *localNotification in notifications) {
+                    if (
+                        [localNotification.id isEqualToString:[remoteNotification valueForKey:@"_id"]]
+                        || [localNotification.tag isEqualToString:[remoteNotification valueForKey:@"_id"]]
+                    ) {
                         found = YES;
                         break;
                     }

@@ -399,14 +399,14 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getNotifications];
 }
 
-+ (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance getNotifications:combineWithApi callback:^(NSArray *notifications) {
++ (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback {
+    [self.CPSharedInstance getNotifications:combineWithApi callback:^(NSArray<CPNotification*> *notifications) {
         callback(notifications);
     }];
 }
 
-+ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray *))callback {
-    [self.CPSharedInstance getNotifications:combineWithApi limit:limit skip:skip callback:^(NSArray *notifications) {
++ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback {
+    [self.CPSharedInstance getNotifications:combineWithApi limit:limit skip:skip callback:^(NSArray<CPNotification*> *notifications) {
         callback(notifications);
     }];
 }

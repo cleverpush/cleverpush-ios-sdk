@@ -115,10 +115,10 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getAvailableTags __attribute__((deprecated));
 + (NSArray*)getAvailableTopics __attribute__((deprecated));
 + (NSArray*)getSubscriptionTags;
-+ (NSArray*)getNotifications;
+- (NSArray<CPNotification*>*)getNotifications;
 + (void)removeNotification:(NSString*)notificationId;
 + (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray *))callback;
-+ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray *))callback;
++ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
 
