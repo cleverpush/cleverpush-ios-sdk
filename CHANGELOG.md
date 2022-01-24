@@ -1,3 +1,6 @@
+# 1.15.11
+* Fixed `getNotifications` method in header file
+
 # 1.15.10
 * Improved empty `customData` dictionary in `CPNotification`
 
