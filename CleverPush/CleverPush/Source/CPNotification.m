@@ -88,8 +88,14 @@
     if ([json objectForKey:@"carouselEnabled"] && [json valueForKey:@"carouselEnabled"] != nil && ![[json valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]]) {
         self.carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
     }
+
     self.carouselItems = [json objectForKey:@"carouselItems"];
-    self.customData = [json objectForKey:@"customData"];
+    
+    if ([json objectForKey:@"customData"] && [json valueForKey:@"customData"] != nil && ![[json valueForKey:@"customData"] isKindOfClass:[NSNull class]]) {
+        self.customData = [json objectForKey:@"customData"];
+    } else {
+        self.customData = [[NSDictionary alloc] init];
+    }
 }
 
 @end

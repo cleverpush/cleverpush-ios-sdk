@@ -1,3 +1,6 @@
+# 1.15.10
+* Improved empty `customData` dictionary in `CPNotification`
+
 # 1.15.9
 * Fixed duplicate notification filtering in `getNotifications`
 * Updated method signatures for `getNotifications` to include type of NSArray (CPNotification)
