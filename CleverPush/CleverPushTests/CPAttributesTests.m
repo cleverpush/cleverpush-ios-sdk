@@ -147,13 +147,13 @@
 }
 
 - (void)testGetSubscriptionAttributeWhenThereIsNoUserDefaultValues {
-    OCMStub([self.defaults valueForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]).andReturn(nil);
+    OCMStub([self.defaults valueForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]).andReturn(nil);
     XCTAssertEqual([[self.cleverPush getSubscriptionAttributes] count], 0);
 }
 
 - (void)testGetSubscriptionAttributeWhenThereIsZeroSubscriptionAttributes {
     NSMutableDictionary *objAttribute = [[NSMutableDictionary alloc] init];
-    OCMStub([self.defaults valueForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]).andReturn(objAttribute);
+    OCMStub([self.defaults valueForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]).andReturn(objAttribute);
     XCTAssertEqual([[self.cleverPush getSubscriptionAttributes] count], 0);
 }
 

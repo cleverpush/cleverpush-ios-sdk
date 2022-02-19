@@ -68,14 +68,14 @@
         }];
         self.actions = actionArray;
     }
-        
-    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"createdAt"] != nil) {
+
+    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"createdAt"] != nil && [[json valueForKey:@"createdAt"] length] > 0) {
         self.createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     } else {
         self.createdAt = [NSDate date];
     }
-    
-    if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]]) {
+
+    if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"expiresAt"] != nil && [[json valueForKey:@"expiresAt"] length] > 0) {
         self.expiresAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"expiresAt"]];
     }
     
@@ -94,7 +94,7 @@
     if ([json objectForKey:@"customData"] && [json valueForKey:@"customData"] != nil && ![[json valueForKey:@"customData"] isKindOfClass:[NSNull class]]) {
         self.customData = [json objectForKey:@"customData"];
     } else {
-        self.customData = [[NSDictionary alloc] init];
+        self.customData = [[NSDictionary alloc] init];
     }
 }
 

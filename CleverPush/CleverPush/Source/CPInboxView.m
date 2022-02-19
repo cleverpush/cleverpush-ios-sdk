@@ -196,13 +196,13 @@ CPNotificationClickBlock handleClick;
 
 - (void)saveReadNotifications:(NSMutableArray *)readNotifications{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:readNotifications forKey:@"CleverPush_READ_NOTIFICATIONS"];
+    [defaults setObject:readNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
     [defaults synchronize];
 }
 
 - (NSArray *)getReadNotifications {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* readNotifications = [userDefaults arrayForKey:@"CleverPush_READ_NOTIFICATIONS"];
+    NSArray* readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
     if (!readNotifications) {
         return [[NSArray alloc] init];
     }

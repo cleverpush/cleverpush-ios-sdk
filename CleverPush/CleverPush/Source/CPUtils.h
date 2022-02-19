@@ -22,6 +22,7 @@
 + (NSDate*)getLastTimeAutomaticallyShowed;
 + (BOOL)newTopicAdded:(NSDictionary*)config;
 + (NSDate*)getLocalDateTimeFromUTC:(NSString*)dateString;
++ (NSString*)getCurrentDateString;
 + (NSInteger)secondsBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime;
 + (NSBundle *)getAssetsBundle;
 + (NSString *)timeAgoStringFromDate:(NSDate *)date;

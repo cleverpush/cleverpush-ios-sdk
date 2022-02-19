@@ -17,8 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite) BOOL chatNotification;
 @property (nonatomic, readwrite) BOOL carouselEnabled;
 @property (nonatomic, readwrite) BOOL silent;
-@property (nonatomic, strong) NSDate *createdAt;
-@property (nonatomic, strong) NSDate *expiresAt;
+@property (nonatomic, strong, nullable) NSDate *createdAt;
+@property (nonatomic, strong, nullable) NSDate *expiresAt;
 #pragma mark - Class Methods
 + (instancetype)initWithJson:(NSDictionary*)json;
 - (void)parseJson:(NSDictionary*)json;

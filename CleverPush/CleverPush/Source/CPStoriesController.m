@@ -180,7 +180,7 @@
         [self.readStories addObject:self.stories[carousel.currentItemIndex].id];
     }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:self.readStories forKey:@"CleverPush_SEEN_STORIES"];
+    [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     self.storyIndex = carousel.currentItemIndex;
 }
 

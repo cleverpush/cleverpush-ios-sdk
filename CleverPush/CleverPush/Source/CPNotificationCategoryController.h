@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 #import <UserNotificationsUI/UserNotificationsUI.h>
+#import "CleverPushUserDefaults.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

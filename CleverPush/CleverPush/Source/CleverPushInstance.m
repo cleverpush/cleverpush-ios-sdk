@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.11";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.12";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -352,8 +352,8 @@ static id isNil(id object) {
     
     UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    subscriptionId = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_ID"];
-    deviceToken = [userDefaults stringForKey:@"CleverPush_DEVICE_TOKEN"];
+    subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+    deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
@@ -421,20 +421,20 @@ static id isNil(id object) {
 #pragma mark - update the user defaults value of selected Topics Dialog.
 - (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
     if (!topicsVersion) {
         topicsVersion = 1;
     } else {
         topicsVersion += 1;
     }
-    [userDefaults setObject:topics forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
-    [userDefaults setInteger:topicsVersion forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+    [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
     [userDefaults synchronize];
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application goint to terminate.
 - (void)applicationWillTerminate {
-    [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+    [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -458,7 +458,7 @@ static id isNil(id object) {
 
 #pragma mark - Initialised Features.
 - (void)initFeatures {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self showTopicDialogOnNewAdded];
         [self initAppReview];
         
@@ -475,7 +475,7 @@ static id isNil(id object) {
         if (channelConfig != nil && [channelConfig valueForKey:@"appReviewEnabled"]) {
             NSString* iosStoreId = [channelConfig valueForKey:@"iosStoreId"];
             
-            if ([userDefaults objectForKey:@"CleverPush_APP_REVIEW_SHOWN"]) {
+            if ([userDefaults objectForKey:CLEVERPUSH_APP_REVIEW_SHOWN_KEY]) {
                 // already shown
                 return;
             }
@@ -492,7 +492,7 @@ static id isNil(id object) {
             if (!appReviewSeconds) {
                 appReviewSeconds = 0;
             }
-            NSInteger currentAppDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] andDate:[NSDate date]] : 0;
+            NSInteger currentAppDays = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] ? [self daysBetweenDate:[userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] andDate:[NSDate date]] : 0;
             
             NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
             if (!appReviewTitle) {
@@ -521,11 +521,11 @@ static id isNil(id object) {
                 
                 dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * appReviewSeconds);
                 dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
-                    if ([userDefaults objectForKey:@"CleverPush_APP_REVIEW_SHOWN"]) {
+                    if ([userDefaults objectForKey:CLEVERPUSH_APP_REVIEW_SHOWN_KEY]) {
                         return;
                     }
                     
-                    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_APP_REVIEW_SHOWN"];
+                    [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_REVIEW_SHOWN_KEY];
                     [userDefaults synchronize];
                     
                     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:appReviewTitle message:@"" preferredStyle:UIAlertControllerStyleAlert];
@@ -609,7 +609,7 @@ static id isNil(id object) {
 #pragma mark - determine the last sync and update the data on the next sync date
 - (BOOL)shouldSync {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    lastSync = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+    lastSync = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
     NSDate* nextSync = [NSDate date];
     if (lastSync) {
         nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60]; // 3 days after last sync
@@ -847,7 +847,7 @@ static id isNil(id object) {
                                     
                                     if (!skipTopicsDialog) {
                                         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                        [userDefaults setBool:YES forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+                                        [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
                                         [userDefaults synchronize];
                                         [self showPendingTopicsDialog];
                                     }
@@ -936,24 +936,24 @@ static id isNil(id object) {
 
 #pragma mark - update the userdefault value for key @"UNSUBSCRIBED" with the dynamic argument named status.
 - (void)setUnsubscribeStatus:(BOOL)status {
-    [[NSUserDefaults standardUserDefaults] setBool:status forKey:@"CleverPush_UNSUBSCRIBED"];
+    [[NSUserDefaults standardUserDefaults] setBool:status forKey:CLEVERPUSH_UNSUBSCRIBED_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark - get the userdefault value for key @"UNSUBSCRIBED" and prevent subscribe based on the boolean flag.
 - (BOOL)getUnsubscribeStatus {
-    return [[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_UNSUBSCRIBED"];
+    return [[NSUserDefaults standardUserDefaults] boolForKey:CLEVERPUSH_UNSUBSCRIBED_KEY];
 }
 
 #pragma mark - Clear the previous channel data from the NSUserDefaults on a fresh login and session expired.
 - (void)clearSubscriptionData {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ID"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
@@ -1052,7 +1052,7 @@ static id isNil(id object) {
     
     deviceToken = newDeviceToken;
     
-    [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:@"CleverPush_DEVICE_TOKEN"];
+    [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -1072,7 +1072,7 @@ static id isNil(id object) {
     }
 
     if (!deviceToken) {
-        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
+        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     }
 
     if (!deviceToken && !subscriptionId) {
@@ -1087,11 +1087,11 @@ static id isNil(id object) {
     request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
 
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* language = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+    NSString* language = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
     if (!language) {
         language = [[[NSLocale preferredLanguages] firstObject] substringToIndex:2];
     }
-    NSString* country = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+    NSString* country = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY];
     if (!country) {
         country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
     }
@@ -1134,7 +1134,7 @@ static id isNil(id object) {
     if (topics != nil && [topics count] >= 0) {
         
         [dataDic setObject:topics forKey:@"topics"];
-        NSInteger topicsVersion = [userDefaults integerForKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
         if (topicsVersion) {
             [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
         } else {
@@ -1155,20 +1155,20 @@ static id isNil(id object) {
 
         if ([results valueForKey:@"topics"] != nil) {
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:[results valueForKey:@"topics"] forKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+            [userDefaults setObject:[results valueForKey:@"topics"] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
             if ([results valueForKey:@"topicsVersion"] != nil) {
-                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:@"CleverPush_SUBSCRIPTION_TOPICS_VERSION"];
+                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
             }
             [userDefaults synchronize];
         }
         
         if ([results objectForKey:@"id"] != nil) {
             if (!subscriptionId) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"];
+                [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
             }
             subscriptionId = [results objectForKey:@"id"];
-            [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:@"CleverPush_SUBSCRIPTION_ID"];
-            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"CleverPush_SUBSCRIPTION_LAST_SYNC"];
+            [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
             [[NSUserDefaults standardUserDefaults] synchronize];
             
             if (handleSubscribed && ![self getHandleSubscribedCalled]) {
@@ -1370,7 +1370,7 @@ static id isNil(id object) {
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
-    if ([userDefaults boolForKey:@"CleverPush_INCREMENT_BADGE"]) {
+    if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY]) {
         if (replacementContent != nil) {
             dispatch_semaphore_t sema = dispatch_semaphore_create(0);
             
@@ -1439,13 +1439,16 @@ static id isNil(id object) {
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
     
-    [userDefaults setObject:notificationId forKey:@"CleverPush_LAST_NOTIFICATION_ID"];
+    [userDefaults setObject:notificationId forKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
     [userDefaults synchronize];
     
     NSMutableDictionary *notificationMutable = [notification mutableCopy];
     [notificationMutable removeObjectsForKeys:[notification allKeysForObject:[NSNull null]]];
+    if (![[notificationMutable objectForKey:@"createdAt"] isKindOfClass:[NSString class]] || [[notificationMutable objectForKey:@"createdAt"] length] == 0) {
+        [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
+    }
     
-    NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"]];
+    NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY]];
     if (!notifications) {
         notifications = [[NSMutableArray alloc] init];
     }
@@ -1454,7 +1457,7 @@ static id isNil(id object) {
     if (notificationsArray.count > maximumNotifications) {
         notificationsArray = [notificationsArray subarrayWithRange:NSMakeRange(notificationsArray.count - maximumNotifications, maximumNotifications)];
     }
-    [userDefaults setObject:notificationsArray forKey:@"CleverPush_NOTIFICATIONS"];
+    [userDefaults setObject:notificationsArray forKey:CLEVERPUSH_NOTIFICATIONS_KEY];
     [userDefaults synchronize];
 }
 
@@ -1495,8 +1498,8 @@ static id isNil(id object) {
             bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
         }
         NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
-        if ([userDefaults objectForKey:@"CleverPush_BADGE_COUNT"] != nil) {
-            [userDefaults setInteger:0 forKey:@"CleverPush_BADGE_COUNT"];
+        if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
+            [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
             [userDefaults synchronize];
         }
         
@@ -1629,7 +1632,7 @@ static id isNil(id object) {
 - (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+        subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
         
         if ([subscriptionTags containsObject:tagId]) {
             if (callback) {
@@ -1666,7 +1669,7 @@ static id isNil(id object) {
                 [subscriptionTags addObject:tagId];
             }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+            [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
             [userDefaults synchronize];
             
             if (callback) {
@@ -1702,14 +1705,14 @@ static id isNil(id object) {
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
             
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"]];
+            subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
             
             if (!subscriptionTags) {
                 subscriptionTags = [[NSMutableArray alloc] init];
             }
             [subscriptionTags removeObject:tagId];
             
-            [userDefaults setObject:subscriptionTags forKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+            [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
             [userDefaults synchronize];
             
             if (callback) {
@@ -1736,12 +1739,12 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
                 [subscriptionAttributes setValue:value forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
         });
@@ -1764,7 +1767,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
@@ -1778,7 +1781,7 @@ static id isNil(id object) {
                 [arrayValue addObject:value];
                 
                 [subscriptionAttributes setValue:arrayValue forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
         });
@@ -1801,7 +1804,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
@@ -1815,7 +1818,7 @@ static id isNil(id object) {
                 [arrayValue removeObject:value];
                 
                 [subscriptionAttributes setValue:arrayValue forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
         });
@@ -1825,7 +1828,7 @@ static id isNil(id object) {
 #pragma mark - Check if subscription array attribute has a value.
 - (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"]];
+    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
     if (!subscriptionAttributes) {
         return NO;
     }
@@ -1940,7 +1943,7 @@ static id isNil(id object) {
 #pragma mark - Retrieving subscription tag which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TAGS"
 - (NSArray*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* subscriptionTags = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TAGS"];
+    NSArray* subscriptionTags = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
     if (!subscriptionTags) {
         return [[NSArray alloc] init];
     }
@@ -1959,7 +1962,7 @@ static id isNil(id object) {
 #pragma mark - Retrieving subscription attributes which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_ATTRIBUTES"
 - (NSDictionary*)getSubscriptionAttributes {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary* subscriptionAttributes = [userDefaults dictionaryForKey:@"CleverPush_SUBSCRIPTION_ATTRIBUTES"];
+    NSDictionary* subscriptionAttributes = [userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
     if (!subscriptionAttributes) {
         return [[NSDictionary alloc] init];
     }
@@ -1973,9 +1976,9 @@ static id isNil(id object) {
 #pragma mark - Update/Set subscription language which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_LANGUAGE"
 - (void)setSubscriptionLanguage:(NSString *)language {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* currentLanguage = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+    NSString* currentLanguage = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
     if (!currentLanguage || (language && ![currentLanguage isEqualToString:language])) {
-        [userDefaults setObject:language forKey:@"CleverPush_SUBSCRIPTION_LANGUAGE"];
+        [userDefaults setObject:language forKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
         [userDefaults synchronize];
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1987,9 +1990,9 @@ static id isNil(id object) {
 #pragma mark - Update/Set subscription country which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_COUNTRY"
 - (void)setSubscriptionCountry:(NSString *)country {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* currentCountry = [userDefaults stringForKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+    NSString* currentCountry = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY];
     if (!currentCountry || (country && ![currentCountry isEqualToString:country])) {
-        [userDefaults setObject:country forKey:@"CleverPush_SUBSCRIPTION_COUNTRY"];
+        [userDefaults setObject:country forKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY];
         [userDefaults synchronize];
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -2001,7 +2004,7 @@ static id isNil(id object) {
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (NSArray*)getSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     if (!subscriptionTopics) {
         return [[NSArray alloc] init];
     }
@@ -2011,7 +2014,7 @@ static id isNil(id object) {
 #pragma mark - Check if the any topic is exists in the NSUserDefaults or not
 - (BOOL)hasSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* subscriptionTopics = [userDefaults arrayForKey:@"CleverPush_SUBSCRIPTION_TOPICS"];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     return subscriptionTopics ? YES : NO;
 }
 
@@ -2026,7 +2029,7 @@ static id isNil(id object) {
 #pragma mark - Retrieving notifications which has been stored in NSUserDefaults by key "CleverPush_NOTIFICATIONS"
 - (NSArray<CPNotification*>*)getNotifications {
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
-    NSArray* notifications = [userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"];
+    NSArray* notifications = [userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
     if (!notifications) {
         return [[NSArray alloc] init];
     }
@@ -2035,8 +2038,8 @@ static id isNil(id object) {
 
 - (void)removeNotification:(NSString*)notificationId {
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
-    if ([userDefaults objectForKey:@"CleverPush_NOTIFICATIONS"] != nil) {
-        NSArray* notifications = [userDefaults arrayForKey:@"CleverPush_NOTIFICATIONS"];
+    if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATIONS_KEY] != nil) {
+        NSArray* notifications = [userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
         NSMutableArray *tempNotifications = [notifications mutableCopy];
         if ([notifications count] != 0) {
             for (NSDictionary * notification in notifications) {
@@ -2044,7 +2047,7 @@ static id isNil(id object) {
                     [tempNotifications removeObject: notification];
             }
         }
-        [userDefaults setObject:tempNotifications forKey:@"CleverPush_NOTIFICATIONS"];
+        [userDefaults setObject:tempNotifications forKey:CLEVERPUSH_NOTIFICATIONS_KEY];
         [userDefaults synchronize];
     }
 }
@@ -2161,7 +2164,7 @@ static id isNil(id object) {
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
 - (NSArray*)getSeenStories {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSArray* seenStories = [userDefaults arrayForKey:@"CleverPush_SEEN_STORIES"];
+    NSArray* seenStories = [userDefaults arrayForKey:CLEVERPUSH_SEEN_STORIES_KEY];
     if (!seenStories) {
         return [[NSArray alloc] init];
     }
@@ -2426,11 +2429,11 @@ static id isNil(id object) {
                     sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
                     
                     if (!deviceToken) {
-                        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
+                        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
                     }
                     
                     NSUserDefaults* groupUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
-                    NSString* lastNotificationId = [groupUserDefaults stringForKey:@"CleverPush_LAST_NOTIFICATION_ID"];
+                    NSString* lastNotificationId = [groupUserDefaults stringForKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
                     
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/session/start"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2465,7 +2468,7 @@ static id isNil(id object) {
                 bool trackAppStatistics = [channelConfig valueForKey:@"trackAppStatistics"] != nil && ![[channelConfig valueForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig valueForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
                     if (!deviceToken) {
-                        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:@"CleverPush_DEVICE_TOKEN"];
+                        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
                     }
                     
                     if (sessionStartedTimestamp == 0) {
@@ -2499,7 +2502,7 @@ static id isNil(id object) {
 #pragma mark - Display pending topic dialog
 - (void)showPendingTopicsDialog {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if (![userDefaults boolForKey:@"CleverPush_TOPICS_DIALOG_PENDING"]) {
+    if (![userDefaults boolForKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY]) {
         return;
     }
     
@@ -2515,18 +2518,18 @@ static id isNil(id object) {
     if (!topicsDialogSeconds) {
         topicsDialogSeconds = 0;
     }
-    NSInteger currentTopicsDialogDays = [userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:@"CleverPush_SUBSCRIPTION_CREATED_AT"]] : 0;
+    NSInteger currentTopicsDialogDays = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] ? [self daysBetweenDate:[NSDate date] andDate:[userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY]] : 0;
     
-    if ([userDefaults integerForKey:@"CleverPush_APP_OPENS"] >= topicsDialogSessions && currentTopicsDialogDays >= topicsDialogDays) {
+    if ([userDefaults integerForKey:CLEVERPUSH_APP_OPENS_KEY] >= topicsDialogSessions && currentTopicsDialogDays >= topicsDialogDays) {
         NSLog(@"CleverPush: showing pending topics dialog");
         
         dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * topicsDialogSeconds);
         dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
-            if (![userDefaults boolForKey:@"CleverPush_TOPICS_DIALOG_PENDING"]) {
+            if (![userDefaults boolForKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY]) {
                 return;
             }
             
-            [userDefaults setBool:NO forKey:@"CleverPush_TOPICS_DIALOG_PENDING"];
+            [userDefaults setBool:NO forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
             [userDefaults synchronize];
             
             [self showTopicsDialog];
@@ -2627,7 +2630,7 @@ static id isNil(id object) {
 
 #pragma mark - update UserDefaults while toggled deselect switch
 - (void)updateDeselectFlag:(BOOL)value {
-    [[NSUserDefaults standardUserDefaults] setBool:value forKey:@"CleverPush_DESELECT_ALL"];
+    [[NSUserDefaults standardUserDefaults] setBool:value forKey:CLEVERPUSH_DESELECT_ALL_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -2638,8 +2641,8 @@ static id isNil(id object) {
 
 #pragma mark - retrieve Deselect value from UserDefaults
 - (BOOL)getDeselectValue {
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_DESELECT_ALL"] != nil) {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_DESELECT_ALL"]) {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DESELECT_ALL_KEY] != nil) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:CLEVERPUSH_DESELECT_ALL_KEY]) {
             return NO;
         } else {
             return YES;
@@ -2659,7 +2662,7 @@ static id isNil(id object) {
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
-    [userDefaults setBool:increment forKey:@"CleverPush_INCREMENT_BADGE"];
+    [userDefaults setBool:increment forKey:CLEVERPUSH_INCREMENT_BADGE_KEY];
     [userDefaults synchronize];
 }
 
@@ -2768,8 +2771,8 @@ static id isNil(id object) {
 }
 
 - (BOOL)popupVisible {
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"CleverPush_APP_BANNER_VISIBLE"] != nil) {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"CleverPush_APP_BANNER_VISIBLE"]) {
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY] != nil) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY]) {
             return NO;
         } else {
             return YES;
@@ -2780,12 +2783,12 @@ static id isNil(id object) {
 }
 #pragma mark - refactor for testcases
 - (NSString*)getChannelIdFromBundle {
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CleverPush_CHANNEL_ID"];
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:CLEVERPUSH_CHANNEL_ID_KEY];
 }
 
 - (NSString*)getChannelIdFromUserDefault {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    return [userDefaults stringForKey:@"CleverPush_CHANNEL_ID"];
+    return [userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY];
 }
 
 - (BOOL)getPendingChannelConfigRequest {
@@ -2794,7 +2797,7 @@ static id isNil(id object) {
 
 - (NSInteger)getAppOpens {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSInteger appOpens = [userDefaults integerForKey:@"CleverPush_APP_OPENS"];
+    NSInteger appOpens = [userDefaults integerForKey:CLEVERPUSH_APP_OPENS_KEY];
     return appOpens;
 }
 
@@ -2802,7 +2805,7 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSInteger appOpens = [self getAppOpens];
     appOpens++;
-    [userDefaults setInteger:appOpens forKey:@"CleverPush_APP_OPENS"];
+    [userDefaults setInteger:appOpens forKey:CLEVERPUSH_APP_OPENS_KEY];
 }
 
 - (void)getChannelConfigFromBundleId:(NSString *)configPath {
@@ -2813,8 +2816,8 @@ static id isNil(id object) {
             NSLog(@"CleverPush: Detected Channel ID from Bundle Identifier: %@", channelId);
             
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
-            [userDefaults setObject:nil forKey:@"CleverPush_SUBSCRIPTION_ID"];
+            [userDefaults setObject:channelId forKey:CLEVERPUSH_CHANNEL_ID_KEY];
+            [userDefaults setObject:nil forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
             [userDefaults synchronize];
             
             channelConfig = result;
@@ -2864,7 +2867,7 @@ static id isNil(id object) {
 
 - (BOOL)isChannelIdChanged:(NSString *)channelId; {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([channelId isEqualToString:[userDefaults stringForKey:@"CleverPush_CHANNEL_ID"]]) {
+    if ([channelId isEqualToString:[userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY]]) {
         return false;
     } else {
         return true;
@@ -2873,7 +2876,7 @@ static id isNil(id object) {
 
 - (void)addOrUpdateChannelId:(NSString *)channelId{
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:channelId forKey:@"CleverPush_CHANNEL_ID"];
+    [userDefaults setObject:channelId forKey:CLEVERPUSH_CHANNEL_ID_KEY];
     [userDefaults synchronize];
 }
 

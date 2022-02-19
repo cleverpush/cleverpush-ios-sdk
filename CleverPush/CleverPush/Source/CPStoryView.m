@@ -112,7 +112,7 @@
         [self.readStories addObject:self.stories[indexPath.item].id];
     }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:self.readStories forKey:@"CleverPush_SEEN_STORIES"];
+    [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     storiesController.storyIndex = indexPath.item;
     storiesController.stories = self.stories;
     storiesController.readStories = self.readStories;

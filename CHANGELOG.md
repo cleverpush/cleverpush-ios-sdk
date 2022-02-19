@@ -1,3 +1,7 @@
+# 1.15.12
+* Optimized "createdAt" field in CPNotification
+* Exported all user defaults keys to #defines
+
 # 1.15.11
 * Fixed `getNotifications` method in header file
 

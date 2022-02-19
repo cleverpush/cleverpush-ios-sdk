@@ -19,6 +19,7 @@
 #import "CPChannelTopic.h"
 #import "CleverPushInstance.h"
 #import "CPInboxView.h"
+#import "CleverPushUserDefaults.h"
 
 extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 

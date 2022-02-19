@@ -8,7 +8,7 @@
 @implementation CPAppBannerModuleInstance
 
 #pragma mark - Class Variables
-NSString *ShownAppBannersDefaultsKey = @"CleverPush_SHOWN_APP_BANNERS";
+NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
@@ -32,13 +32,13 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    return [userDefaults integerForKey:@"CleverPush_APP_BANNER_SESSIONS"];
+    return [userDefaults integerForKey:CLEVERPUSH_APP_BANNER_SESSIONS_KEY];
 }
 
 #pragma mark - Save sessions in NSUserDefaults
 - (void)saveSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setInteger:sessions forKey:@"CleverPush_APP_BANNER_SESSIONS"];
+    [userDefaults setInteger:sessions forKey:CLEVERPUSH_APP_BANNER_SESSIONS_KEY];
     [userDefaults synchronize];
 }
 
@@ -446,7 +446,7 @@ dispatch_queue_t dispatchQueue = nil;
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
     if (![CleverPush popupVisible]) {
-        [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"CleverPush_POPUP_VISIBILITY"];
+        [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
         appBannerViewController.data = banner;
@@ -464,6 +464,7 @@ dispatch_queue_t dispatchQueue = nil;
         NSLog(@"CleverPush: You can not present two banners at the same time");
     }
 }
+
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
@@ -499,12 +500,12 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)
 - (void)loadBannersDisabled {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [self setBannersDisabled:[userDefaults boolForKey:@"CleverPush_APP_BANNERS_DISABLED"]];
+    [self setBannersDisabled:[userDefaults boolForKey:CLEVERPUSH_APP_BANNERS_DISABLED_KEY]];
 }
 
 - (void)saveBannersDisabled {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setBool:[self getBannersDisabled] forKey:@"CleverPush_APP_BANNERS_DISABLED"];
+    [userDefaults setBool:[self getBannersDisabled] forKey:CLEVERPUSH_APP_BANNERS_DISABLED_KEY];
     [userDefaults synchronize];
 }
 

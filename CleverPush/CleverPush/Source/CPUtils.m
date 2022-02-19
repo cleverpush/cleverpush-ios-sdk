@@ -1,8 +1,9 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
-#import "CPUtils.h"
 #import <sys/utsname.h>
+#import "CPUtils.h"
+
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
 NSString * const dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -201,14 +202,14 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark - Update last check out time of topic dialog
 + (void)updateLastTopicCheckedTime {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_LAST_CHECKED_TIME"];
+    [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_LAST_CHECKED_TIME_KEY];
     [userDefaults synchronize];
 }
 
 #pragma mark - Get the last check out time of topic dialog
 + (NSDate*)getLastTopicCheckedTime {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    return [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] ? [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME"] : [NSDate date];
+    return [userDefaults objectForKey:CLEVERPUSH_LAST_CHECKED_TIME_KEY] ? [userDefaults objectForKey:CLEVERPUSH_LAST_CHECKED_TIME_KEY] : [NSDate date];
 }
 
 #pragma mark -  General function to get the color from hex string
@@ -271,7 +272,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark -  Open safari and dismiss on a specific controller.
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller {
     [controller dismissViewControllerAnimated:YES completion:^{
-        [[NSUserDefaults standardUserDefaults] setBool:false forKey:@"CleverPush_APP_BANNER_VISIBLE"];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         dispatch_async(dispatch_get_main_queue(), ^(void){
             if (URL) {
@@ -450,14 +451,14 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark -  update the last checked date & time of automatically displayed dilog
 + (void)updateLastTimeAutomaticallyShowed {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:[NSDate date] forKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"];
+    [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_LAST_CHECKED_TIME_AUTO_SHOWED_KEY];
     [userDefaults synchronize];
 }
 
 #pragma mark -  get the last checked date & time of automatically displayed dilog
 + (NSDate*)getLastTimeAutomaticallyShowed {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    return [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"] ? [userDefaults objectForKey:@"CleverPush_LAST_CHECKED_TIME_AUTO_SHOWED"] : [NSDate date];
+    return [userDefaults objectForKey:CLEVERPUSH_LAST_CHECKED_TIME_AUTO_SHOWED_KEY] ? [userDefaults objectForKey:CLEVERPUSH_LAST_CHECKED_TIME_AUTO_SHOWED_KEY] : [NSDate date];
 }
 
 #pragma mark - check the existance of new topic in the channel configuration.
@@ -490,6 +491,14 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:localeIdentifier]];
     NSDate *localDate = [formatter dateFromString:dateString];
     return localDate;
+}
+
+#pragma mark - convert UTC date in to local date.
++ (NSString*)getCurrentDateString {
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:dateFormat];
+    [formatter setLocale:[[NSLocale alloc] initWithLocaleIdentifier:localeIdentifier]];
+    return [formatter stringFromDate:[NSDate date]];
 }
 
 + (NSBundle *)getAssetsBundle {

@@ -54,6 +54,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		290187F627C1020200535617 /* CleverPushUserDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 290187F527C1020200535617 /* CleverPushUserDefaults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29052183276B778D00D81148 /* CleverPushInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = CB1B65C42757763B0087AC49 /* CleverPushInstance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29052185276B77A400D81148 /* CPInboxCell.h in Headers */ = {isa = PBXBuildFile; fileRef = CB8F47B2275F393D00FC19A7 /* CPInboxCell.h */; };
 		29052186276B77A600D81148 /* CPInboxView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB8F47B1275F393D00FC19A7 /* CPInboxView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -332,6 +333,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		290187F527C1020200535617 /* CleverPushUserDefaults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushUserDefaults.h; sourceTree = "<group>"; };
 		2906A2C525857E680078FD61 /* CPUIBlockButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPUIBlockButton.m; sourceTree = "<group>"; };
 		2906A2D025857E900078FD61 /* CPUIBlockButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUIBlockButton.h; sourceTree = "<group>"; };
 		2913D82C25141324002BA52C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -768,6 +770,7 @@
 				297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */,
 				29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */,
 				29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */,
+				290187F527C1020200535617 /* CleverPushUserDefaults.h */,
 				298676B52572CFE50002E9F1 /* CPAppBanner.h */,
 				298676B62572CFEF0002E9F1 /* CPAppBanner.m */,
 				CB73FFA2272C3F4D0099B648 /* CPAppBannerCarouselBlock.h */,
@@ -1043,6 +1046,7 @@
 				CBA989B32679D664003DE995 /* CPWidgetPosition.h in Headers */,
 				2906A16D258557C20078FD61 /* CPAppBannerImageBlock.h in Headers */,
 				2905218C276B8C6500D81148 /* CPAppBannerModuleInstance.h in Headers */,
+				290187F627C1020200535617 /* CleverPushUserDefaults.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
