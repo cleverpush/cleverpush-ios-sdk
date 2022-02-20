@@ -1,3 +1,6 @@
+# 1.16.0
+* Added optional failure block for `subscribe` function
+
 # 1.15.12
 * Optimized "createdAt" field in CPNotification
 * Exported all user defaults keys to #defines

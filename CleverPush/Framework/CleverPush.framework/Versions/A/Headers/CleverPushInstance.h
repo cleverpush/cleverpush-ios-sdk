@@ -81,6 +81,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)enableDevelopmentMode;
 - (void)subscribe;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
+- (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock;
 
 - (void)disableAppBanners;
 - (void)enableAppBanners;

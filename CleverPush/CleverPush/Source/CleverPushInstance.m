@@ -67,7 +67,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.15.12";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -782,9 +782,6 @@ static id isNil(id object) {
 }
 
 #pragma mark - channel subscription
-- (void)subscribe {
-    [self subscribe:nil];
-}
 
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
@@ -813,11 +810,23 @@ static id isNil(id object) {
     }];
 }
 
+- (void)subscribe {
+    [self subscribe:nil];
+}
+
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
-    [self subscribe:subscribedBlock skipTopicsDialog:NO];
+    [self subscribe:subscribedBlock failure:nil skipTopicsDialog:NO];
+}
+
+- (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock {
+    [self subscribe:subscribedBlock failure:failureBlock skipTopicsDialog:NO];
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    [self subscribe:subscribedBlock failure:nil skipTopicsDialog:skipTopicsDialog];
+}
+
+- (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     if (@available(iOS 10.0, *)) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
@@ -862,6 +871,8 @@ static id isNil(id object) {
                         } else if (subscribedBlock) {
                             subscribedBlock(subscriptionId);
                         }
+                    } else if (failureBlock) {
+                        failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"User has not granted permission dialog."}]);
                     }
                 });
             }];

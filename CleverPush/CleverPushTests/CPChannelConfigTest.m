@@ -74,7 +74,6 @@
     OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelIdChanged" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
     [[self.cleverPush verify] clearSubscriptionData];
-
 }
 
 - (void)testInItWhenNotificationOpenedhandlerIsNullDonotExecuteHandlerAndClearList {

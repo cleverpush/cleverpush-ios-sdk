@@ -51,6 +51,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)enableDevelopmentMode;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
++ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock;
 
 + (void)disableAppBanners;
 + (void)enableAppBanners;
@@ -63,7 +64,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
-+ (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
++ (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*)error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback;
 + (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
 + (void)addSubscriptionTags:(NSArray*)tagIds;

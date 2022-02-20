@@ -125,6 +125,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance subscribe:subscribedBlock];
 }
 
++ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance subscribe:subscribedBlock failure:failureBlock];
+}
+
 + (void)disableAppBanners {
     [self.CPSharedInstance disableAppBanners];
 }
