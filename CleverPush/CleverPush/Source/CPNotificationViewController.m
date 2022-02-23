@@ -145,7 +145,7 @@
 - (void)getImages:(UNNotification *)notification API_AVAILABLE(ios(10.0)) {
     NSArray <UNNotificationAttachment *> *attachments = notification.request.content.attachments;
     [self fetchAttachmentsToImageArray:attachments];
-    NSDictionary* cpNotification = [notification.request.content.userInfo valueForKey:@"notification"];
+    NSDictionary* cpNotification = [notification.request.content.userInfo objectForKey:@"notification"];
     self.carouselItems = [cpNotification objectForKey:@"carouselItems"];
     
     if (self.items.count < self.carouselItems.count) {

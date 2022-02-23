@@ -3,6 +3,7 @@
 #import "CPInboxView.h"
 #import "CPInboxCell.h"
 #import "CPTranslate.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPInboxView
 
@@ -76,7 +77,7 @@ CPNotificationClickBlock handleClick;
                     }
                   
                     [CleverPush getChannelConfig:^(NSDictionary *config) {
-                        NSString *channelIcon = [config valueForKey:@"channelIcon"];
+                        NSString *channelIcon = [config stringForKey:@"channelIcon"];
                         if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
                             self.notificationThumbnail = channelIcon;
                         }

@@ -1,23 +1,24 @@
 #import "CleverPushLocation.h"
 #import "CleverPush.h"
 #import "CleverPushHTTPClient.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CleverPushLocation
 
 CLLocationManager* locationManager;
 
 + (void)init {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
         [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (channelConfig != nil && [channelConfig valueForKey:@"geoFences"] != nil) {
+                    if (channelConfig != nil && [channelConfig arrayForKey:@"geoFences"] != nil) {
                         if (!locationManager) {
                             locationManager = [CLLocationManager new];
                         }
                         locationManager.delegate = (id)self;
                         
-                        NSArray* geoFencesDict = [channelConfig valueForKey:@"geoFences"];
+                        NSArray* geoFencesDict = [channelConfig arrayForKey:@"geoFences"];
                         for (NSDictionary *geoFence in geoFencesDict) {
                             if (geoFence != nil) {
                                 CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[geoFence objectForKey:@"latitude"] doubleValue], [[geoFence objectForKey:@"longitude"] doubleValue]);

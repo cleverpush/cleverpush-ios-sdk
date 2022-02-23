@@ -3,6 +3,7 @@
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
 #import "CPUtils.h"
+#import "NSDictionary+SafeExpectations.h"
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
@@ -463,15 +464,15 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark - check the existance of new topic in the channel configuration.
 + (BOOL)newTopicAdded:(NSDictionary*)config {
-    if (config != nil && [config valueForKey:@"topicsDialogShowWhenNewAdded"]) {
-        topicsDialogShowWhenNewAdded = [[config valueForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
+    if (config != nil && [config objectForKey:@"topicsDialogShowWhenNewAdded"]) {
+        topicsDialogShowWhenNewAdded = [[config objectForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
     }
-    
-    NSArray* channelTopics = [config valueForKey:@"channelTopics"];
+
+    NSArray* channelTopics = [config arrayForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         for (id channelTopic in channelTopics) {
-            if (channelTopic != nil && ([channelTopic valueForKey:@"createdAt"] == nil || [[channelTopic valueForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
-                NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic valueForKey:@"createdAt"]];
+            if (channelTopic != nil && ([channelTopic stringForKey:@"createdAt"] == nil || [[channelTopic stringForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
+                NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic stringForKey:@"createdAt"]];
                 NSDate *addedCacheDelay = [createdAt dateByAddingTimeInterval:+60*60];
                 NSComparisonResult result;
                 result = [addedCacheDelay compare:[CPUtils getLastTopicCheckedTime]];

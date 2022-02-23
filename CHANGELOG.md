@@ -1,3 +1,6 @@
+# 1.16.1
+* Optimized usage of `NSDictionaries` to prevent crashes
+
 # 1.16.0
 * Added optional failure block for `subscribe` function
 

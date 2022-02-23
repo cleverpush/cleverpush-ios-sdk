@@ -23,6 +23,7 @@
 #import "DWAlertController/DWAlertController.h"
 #import "DWAlertController/DWAlertAction.h"
 #import "CPChannelTag.h"
+#import "NSDictionary+SafeExpectations.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -31,8 +32,8 @@
     self = [super init];
     if (self) {
         _payload = inPayload;
-        _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
-        _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
+        _notification = [CPNotification initWithJson:[[_payload dictionaryForKey:@"notification"] mutableCopy]];
+        _subscription = [CPSubscription initWithJson:[[_payload dictionaryForKey:@"subscription"] mutableCopy]];
     }
     return self;
 }
@@ -45,8 +46,8 @@
     self = [super init];
     if (self) {
         _payload = inPayload;
-        _notification = [CPNotification initWithJson:[[_payload valueForKey:@"notification"] mutableCopy]];
-        _subscription = [CPSubscription initWithJson:[[_payload valueForKey:@"subscription"] mutableCopy]];
+        _notification = [CPNotification initWithJson:[[_payload dictionaryForKey:@"notification"] mutableCopy]];
+        _subscription = [CPSubscription initWithJson:[[_payload dictionaryForKey:@"subscription"] mutableCopy]];
         _action = action;
     }
     return self;
@@ -67,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -396,15 +397,15 @@ static id isNil(id object) {
 
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend {
     NSLog(@"initTopicsDialogData");
-    NSArray* channelTopics = [config valueForKey:@"channelTopics"];
+    NSArray* channelTopics = [config arrayForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         NSArray* topics = [self getSubscriptionTopics];
         
         if (!topics || [topics count] == 0) {
             NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
             for (id channelTopic in channelTopics) {
-                if (channelTopic != nil && ([channelTopic valueForKey:@"defaultUnchecked"] == nil || ![[channelTopic valueForKey:@"defaultUnchecked"] boolValue])) {
-                    [selectedTopicIds addObject:[channelTopic valueForKey:@"_id"]];
+                if (channelTopic != nil && ([channelTopic objectForKey:@"defaultUnchecked"] == nil || ![[channelTopic objectForKey:@"defaultUnchecked"] boolValue])) {
+                    [selectedTopicIds addObject:[channelTopic objectForKey:@"_id"]];
                 }
             }
             if ([selectedTopicIds count] > 0) {
@@ -472,49 +473,49 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     
     [self getChannelConfig:^(NSDictionary* channelConfig) {
-        if (channelConfig != nil && [channelConfig valueForKey:@"appReviewEnabled"]) {
-            NSString* iosStoreId = [channelConfig valueForKey:@"iosStoreId"];
+        if (channelConfig != nil && [channelConfig objectForKey:@"appReviewEnabled"]) {
+            NSString* iosStoreId = [channelConfig stringForKey:@"iosStoreId"];
             
             if ([userDefaults objectForKey:CLEVERPUSH_APP_REVIEW_SHOWN_KEY]) {
                 // already shown
                 return;
             }
             
-            int appReviewOpens = (int)[[channelConfig valueForKey:@"appReviewOpens"] integerValue];
+            int appReviewOpens = (int)[[channelConfig objectForKey:@"appReviewOpens"] integerValue];
             if (!appReviewOpens) {
                 appReviewOpens = 0;
             }
-            int appReviewDays = (int)[[channelConfig valueForKey:@"appReviewDays"] integerValue];
+            int appReviewDays = (int)[[channelConfig objectForKey:@"appReviewDays"] integerValue];
             if (!appReviewDays) {
                 appReviewDays = 0;
             }
-            int appReviewSeconds = (int)[[channelConfig valueForKey:@"appReviewSeconds"] integerValue];
+            int appReviewSeconds = (int)[[channelConfig objectForKey:@"appReviewSeconds"] integerValue];
             if (!appReviewSeconds) {
                 appReviewSeconds = 0;
             }
             NSInteger currentAppDays = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] ? [self daysBetweenDate:[userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] andDate:[NSDate date]] : 0;
             
-            NSString *appReviewTitle = [channelConfig valueForKey:@"appReviewTitle"];
+            NSString *appReviewTitle = [channelConfig stringForKey:@"appReviewTitle"];
             if (!appReviewTitle) {
                 appReviewTitle = @"Do you like our app?";
             }
             
-            NSString *appReviewYes = [channelConfig valueForKey:@"appReviewYes"];
+            NSString *appReviewYes = [channelConfig stringForKey:@"appReviewYes"];
             if (!appReviewYes) {
                 appReviewYes = @"Yes";
             }
             
-            NSString *appReviewNo = [channelConfig valueForKey:@"appReviewNo"];
+            NSString *appReviewNo = [channelConfig stringForKey:@"appReviewNo"];
             if (!appReviewNo) {
                 appReviewNo = @"No";
             }
             
-            NSString *appReviewFeedbackTitle = [channelConfig valueForKey:@"appReviewFeedbackTitle"];
+            NSString *appReviewFeedbackTitle = [channelConfig stringForKey:@"appReviewFeedbackTitle"];
             if (!appReviewFeedbackTitle) {
                 appReviewFeedbackTitle = @"Do you want to tell us what you do not like?";
             }
             
-            NSString *appReviewEmail = [channelConfig valueForKey:@"appReviewEmail"];
+            NSString *appReviewEmail = [channelConfig stringForKey:@"appReviewEmail"];
             
             if ([self getAppOpens] >= appReviewOpens && currentAppDays >= appReviewDays) {
                 NSLog(@"CleverPush: showing app review alert");
@@ -795,11 +796,11 @@ static id isNil(id object) {
 
         if (
             channelConfig != nil
-            && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
-            && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
-            && [channelConfig valueForKey:@"confirmAlertTestId"]
+            && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
+            && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
+            && [channelConfig objectForKey:@"confirmAlertTestId"]
         ) {
-            [dataDic setObject:[channelConfig valueForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
+            [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
         }
 
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -849,7 +850,7 @@ static id isNil(id object) {
                             [self performSelector:@selector(syncSubscription) withObject:nil];
                             
                             [self getChannelConfig:^(NSDictionary* channelConfig) {
-                                if (channelConfig != nil && ([channelConfig valueForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig valueForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                                if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
                                     if (![self isSubscribed]) {
                                         [self initTopicsDialogData:channelConfig syncToBackend:YES];
                                     }
@@ -919,8 +920,8 @@ static id isNil(id object) {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (
             channelConfig != nil
-            && [channelConfig valueForKey:@"confirmAlertSettingsEnabled"] != nil
-            && [[channelConfig valueForKey:@"confirmAlertSettingsEnabled"] boolValue]
+            && [channelConfig objectForKey:@"confirmAlertSettingsEnabled"] != nil
+            && [[channelConfig objectForKey:@"confirmAlertSettingsEnabled"] boolValue]
         ) {
             if (
                 [channelConfig objectForKey:@"alertMinimumVisits"]
@@ -1134,11 +1135,11 @@ static id isNil(id object) {
 
     if (
         channelConfig != nil
-        && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
-        && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
-        && [channelConfig valueForKey:@"confirmAlertTestId"]
+        && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
+        && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
+        && [channelConfig objectForKey:@"confirmAlertTestId"]
     ) {
-        [dataDic setObject:[channelConfig valueForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
+        [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
     }
     
     NSArray* topics = [self getSubscriptionTopics];
@@ -1164,10 +1165,10 @@ static id isNil(id object) {
         [self setUnsubscribeStatus:NO];
         [self updateDeselectFlag:NO];
 
-        if ([results valueForKey:@"topics"] != nil) {
+        if ([results objectForKey:@"topics"] != nil) {
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:[results valueForKey:@"topics"] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-            if ([results valueForKey:@"topicsVersion"] != nil) {
+            [userDefaults setObject:[results objectForKey:@"topics"] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+            if ([results objectForKey:@"topicsVersion"] != nil) {
                 [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
             }
             [userDefaults synchronize];
@@ -1286,23 +1287,29 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
-    NSDictionary* notification = [messageDict valueForKey:@"notification"];
+    NSDictionary* notification = [messageDict dictionaryForKey:@"notification"];
+
     if (!notification) {
+        NSLog(@"CleverPush: handleNotificationReceived EXIT 1");
         return;
     }
-    
-    NSString* notificationId = [notification valueForKey:@"_id"];
+
+    NSString* notificationId = [notification stringForKey:@"_id"];
     
     if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
+        NSLog(@"CleverPush: handleNotificationReceived EXIT 2 %@ %@", notificationId, lastNotificationReceivedId);
         return;
     }
     lastNotificationReceivedId = notificationId;
     
     NSLog(@"CleverPush: handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict);
     
-    [self setNotificationDelivered:notification withChannelId:[messageDict valueForKeyPath:@"channel._id"] withSubscriptionId:[messageDict valueForKeyPath:@"subscription._id"]];
+    [self setNotificationDelivered:notification
+                     withChannelId:[messageDict stringForKeyPath:@"channel._id"]
+                withSubscriptionId:[messageDict stringForKeyPath:@"subscription._id"]
+    ];
     
-    if (isActive && notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
+    if (isActive && notification != nil && [notification objectForKey:@"chatNotification"] != nil && ![[notification objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"chatNotification"] boolValue]) {
         
         if (currentChatView != nil) {
             [currentChatView loadChat];
@@ -1319,10 +1326,14 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    NSString* notificationId = [payload valueForKeyPath:@"notification._id"];
-    NSDictionary* notification = [payload valueForKey:@"notification"];
+    NSString* notificationId = [payload stringForKeyPath:@"notification._id"];
+    NSDictionary* notification = [payload dictionaryForKey:@"notification"];
     NSString* action = actionIdentifier;
-    
+
+    if (!notification) {
+        return;
+    }
+
     if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationOpenedId] && ![notificationId isEqualToString:@"chat"])) {
         return;
     }
@@ -1333,7 +1344,11 @@ static id isNil(id object) {
     }
     NSLog(@"CleverPush: handleNotificationOpened, %@, %@", action, payload);
     
-    [self setNotificationClicked:notificationId withChannelId:[payload valueForKeyPath:@"channel._id"] withSubscriptionId:[payload valueForKeyPath:@"subscription._id"] withAction:action];
+    [self setNotificationClicked:notificationId
+                   withChannelId:[payload stringForKeyPath:@"channel._id"]
+              withSubscriptionId:[payload stringForKeyPath:@"subscription._id"]
+                      withAction:action
+    ];
     
     if ([self getAutoClearBadge]) {
         [self clearBadge:true];
@@ -1345,14 +1360,14 @@ static id isNil(id object) {
     }
 
     
-    if (notification != nil && [notification valueForKey:@"chatNotification"] != nil && ![[notification valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"chatNotification"] boolValue]) {
+    if (notification != nil && [notification objectForKey:@"chatNotification"] != nil && ![[notification objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"chatNotification"] boolValue]) {
         
         if (currentChatView != nil) {
             [currentChatView loadChat];
         }
     }
-    if (notification != nil && [notification valueForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload valueForKeyPath:@"channel._id"] notificationId:notificationId];
+    if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload stringForKeyPath:@"channel._id"] notificationId:notificationId];
     }
     
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
@@ -1362,8 +1377,8 @@ static id isNil(id object) {
     }
     if (!handleNotificationOpened) {
         if (hasWebViewOpened) {
-            if (notification != nil && [notification valueForKey:@"url"] != nil && [[notification valueForKey:@"url"] length] != 0 && ![[notification valueForKey:@"url"] isKindOfClass:[NSNull class]]) {
-                NSURL *url = [NSURL URLWithString:[notification valueForKey:@"url"]];
+            if (notification != nil && [notification objectForKey:@"url"] != nil && [[notification objectForKey:@"url"] length] != 0 && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]]) {
+                NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
                 [CPUtils openSafari:url];
             }
         }
@@ -1489,7 +1504,7 @@ static id isNil(id object) {
                                     nil];
     
     if (action != nil) {
-        [dataDic setValue:action forKey:@"action"];
+        [dataDic setObject:action forKey:@"action"];
     }
     
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -1754,7 +1769,7 @@ static id isNil(id object) {
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
-                [subscriptionAttributes setValue:value forKey:attributeId];
+                [subscriptionAttributes setObject:value forKey:attributeId];
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
@@ -1791,7 +1806,7 @@ static id isNil(id object) {
                 }
                 [arrayValue addObject:value];
                 
-                [subscriptionAttributes setValue:arrayValue forKey:attributeId];
+                [subscriptionAttributes setObject:arrayValue forKey:attributeId];
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
@@ -1828,7 +1843,7 @@ static id isNil(id object) {
                 }
                 [arrayValue removeObject:value];
                 
-                [subscriptionAttributes setValue:arrayValue forKey:attributeId];
+                [subscriptionAttributes setObject:arrayValue forKey:attributeId];
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
             } onFailure:nil];
@@ -1867,7 +1882,7 @@ static id isNil(id object) {
 - (void)getAvailableTags:(void(^)(NSArray *))callback {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
-            NSArray* channelTags = [channelConfig valueForKey:@"channelTags"];
+            NSArray* channelTags = [channelConfig arrayForKey:@"channelTags"];
             if (channelTags != nil && ![channelTags isKindOfClass:[NSNull class]] && [channelTags count] > 0) {
                 NSMutableArray* channelTagsArray = [NSMutableArray new];
                 [channelTags enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
@@ -1899,7 +1914,7 @@ static id isNil(id object) {
 - (void)getAvailableTopics:(void(^)(NSArray *))callback {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
-            NSArray* channelTopics = [channelConfig valueForKey:@"channelTopics"];
+            NSArray* channelTopics = [channelConfig arrayForKey:@"channelTopics"];
             if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
                 NSSortDescriptor *valueDescriptor = [[NSSortDescriptor alloc] initWithKey:@"sort" ascending:YES];
                 NSArray *descriptors = [NSArray arrayWithObject:valueDescriptor];
@@ -1943,7 +1958,7 @@ static id isNil(id object) {
 }
 
 - (NSDictionary*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig{
-    NSDictionary* customAttributes = [channelConfig valueForKey:@"customAttributes"];
+    NSDictionary* customAttributes = [channelConfig dictionaryForKey:@"customAttributes"];
     if (customAttributes != nil) {
         return customAttributes;
     } else {
@@ -2054,7 +2069,7 @@ static id isNil(id object) {
         NSMutableArray *tempNotifications = [notifications mutableCopy];
         if ([notifications count] != 0) {
             for (NSDictionary * notification in notifications) {
-                if ([[notification valueForKey:@"_id"] isEqualToString: notificationId])
+                if ([[notification stringForKey:@"_id"] isEqualToString: notificationId])
                     [tempNotifications removeObject: notification];
             }
         }
@@ -2078,8 +2093,8 @@ static id isNil(id object) {
                 BOOL found = NO;
                 for (CPNotification *localNotification in notifications) {
                     if (
-                        [localNotification.id isEqualToString:[remoteNotification valueForKey:@"_id"]]
-                        || [localNotification.tag isEqualToString:[remoteNotification valueForKey:@"_id"]]
+                        [localNotification.id isEqualToString:[remoteNotification stringForKey:@"_id"]]
+                        || [localNotification.tag isEqualToString:[remoteNotification stringForKey:@"_id"]]
                     ) {
                         found = YES;
                         break;
@@ -2162,8 +2177,8 @@ static id isNil(id object) {
     [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
             if (callback) {
-                if ([result objectForKey:@"notifications"] && [result valueForKey:@"notifications"] != nil && ![[result valueForKey:@"notifications"] isKindOfClass:[NSNull class]]) {
-                    callback([result valueForKey:@"notifications"]);
+                if ([result arrayForKey:@"notifications"] && [result arrayForKey:@"notifications"] != nil && ![[result arrayForKey:@"notifications"] isKindOfClass:[NSNull class]]) {
+                    callback([result arrayForKey:@"notifications"]);
                 }
             }
         }
@@ -2189,7 +2204,7 @@ static id isNil(id object) {
 - (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self getChannelConfig:^(NSDictionary* channelConfig) {
-            NSArray* channelEvents = [channelConfig valueForKey:@"channelEvents"];
+            NSArray* channelEvents = [channelConfig arrayForKey:@"channelEvents"];
             if (channelEvents == nil) {
                 NSLog(@"Event not found");
                 return;
@@ -2198,7 +2213,7 @@ static id isNil(id object) {
             NSUInteger eventIndex = [channelEvents indexOfObjectWithOptions:NSEnumerationConcurrent
                                                                 passingTest:^BOOL(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 NSDictionary *event = (NSDictionary*) obj;
-                return event != nil && [[event valueForKey:@"name"] isEqualToString:eventName];
+                return event != nil && [[event stringForKey:@"name"] isEqualToString:eventName];
             }];
             if (eventIndex == NSNotFound) {
                 NSLog(@"Event not found");
@@ -2206,7 +2221,7 @@ static id isNil(id object) {
             }
             
             NSDictionary *event = [channelEvents objectAtIndex:eventIndex];
-            NSString *eventId = [event valueForKey:@"_id"];
+            NSString *eventId = [event stringForKey:@"_id"];
             
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/conversion"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2228,7 +2243,7 @@ static id isNil(id object) {
 
 #pragma mark - auto Assign Tag Matches
 - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback {
-    NSString* path = [tag valueForKey:@"autoAssignPath"];
+    NSString* path = [tag autoAssignPath];
     if (path != nil) {
         if ([path isEqualToString:@"[EMPTY]"]) {
             path = @"";
@@ -2239,7 +2254,7 @@ static id isNil(id object) {
         }
     }
     
-    NSString* function = [tag valueForKey:@"autoAssignFunction"];
+    NSString* function = [tag autoAssignFunction];
     if (function != nil && params != nil) {
         JSContext *context = [[JSContext alloc] initWithVirtualMachine:[[JSVirtualMachine alloc] init]];
         [context evaluateScript:[NSString stringWithFormat:@"var _cp_autoAssignTagResult = function(params) { return %@ }", function]];
@@ -2253,7 +2268,7 @@ static id isNil(id object) {
         return;
     }
     
-    if ([tag valueForKey:@"autoAssignSelector"] != nil) {
+    if (tag.autoAssignSelector != nil) {
         // not implemented
         callback(NO);
         return;
@@ -2276,20 +2291,20 @@ static id isNil(id object) {
                 if (tagMatches) {
                     NSLog(@"CleverPush: checkTags: autoAssignTagMatches:YES %@", [tag name]);
                     
-                    NSString* tagId = [tag valueForKey:@"_id"];
+                    NSString* tagId = tag.id;
                     NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
                     NSString* sessionsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessions-%@", tagId];
                     
                     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                     [dateFormatter setDateFormat:@"dd-MM-yyyy"];
                     
-                    int autoAssignVisits = [[tag valueForKey:@"autoAssignVisits"] intValue];
+                    int autoAssignVisits = [[tag autoAssignVisits] intValue];
                     
                     NSString *dateKey = [dateFormatter stringFromDate:[NSDate date]];
                     
                     NSDate *dateAfter = nil;
                     
-                    int autoAssignDays = [[tag valueForKey:@"autoAssignDays"] intValue];
+                    int autoAssignDays = [[tag autoAssignDays] intValue];
                     if (autoAssignDays > 0) {
                         dateAfter = [[NSDate date] dateByAddingTimeInterval:-1*autoAssignDays*24*60*60];
                     }
@@ -2312,8 +2327,8 @@ static id isNil(id object) {
                         visits = (int) [userDefaults integerForKey:visitsStorageKey];
                     }
                     
-                    int autoAssignSessions = [[tag valueForKey:@"autoAssignSessions"] intValue];
-                    int autoAssignSeconds = [[tag valueForKey:@"autoAssignSeconds"] intValue];
+                    int autoAssignSessions = [[tag autoAssignSessions] intValue];
+                    int autoAssignSeconds = [[tag autoAssignSeconds] intValue];
                     
                     int sessions = 0;
                     NSMutableDictionary* dailySessions = [[NSMutableDictionary alloc] init];
@@ -2349,9 +2364,9 @@ static id isNil(id object) {
                             if (autoAssignDays > 0) {
                                 int dateVisits = 0;
                                 if ([dailyVisits objectForKey:dateKey] == nil) {
-                                    [dailyVisits setValue:0 forKey:dateKey];
+                                    [dailyVisits setObject:[NSNumber numberWithInt:0] forKey:dateKey];
                                 } else {
-                                    dateVisits = [[dailyVisits valueForKey:dateKey] intValue];
+                                    dateVisits = [[dailyVisits objectForKey:dateKey] intValue];
                                 }
                                 dateVisits += 1;
                                 [dailyVisits setObject:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
@@ -2368,12 +2383,12 @@ static id isNil(id object) {
                         if (autoAssignDays > 0) {
                             int dateVisits = 0;
                             if ([dailyVisits objectForKey:dateKey] == nil) {
-                                [dailyVisits setValue:0 forKey:dateKey];
+                                [dailyVisits setObject:[NSNumber numberWithInt:0] forKey:dateKey];
                             } else {
                                 dateVisits = [[dailyVisits objectForKey:dateKey] intValue];
                             }
                             dateVisits += 1;
-                            [dailyVisits setValue:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
+                            [dailyVisits setObject:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
                             
                             [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
                             [userDefaults synchronize];
@@ -2383,7 +2398,7 @@ static id isNil(id object) {
                                 if ([dailySessions objectForKey:dateKey] == nil) {
                                     [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
                                 } else {
-                                    dateSessions = [[dailySessions valueForKey:dateKey] intValue];
+                                    dateSessions = [[dailySessions objectForKey:dateKey] intValue];
                                 }
                                 dateSessions += 1;
                                 [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
@@ -2434,7 +2449,7 @@ static id isNil(id object) {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
-                bool trackAppStatistics = [channelConfig valueForKey:@"trackAppStatistics"] != nil && ![[channelConfig valueForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig valueForKey:@"trackAppStatistics"] boolValue];
+                bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
                     sessionVisits = 0;
                     sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
@@ -2476,7 +2491,7 @@ static id isNil(id object) {
     [self waitForTrackingConsent:^{
         dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
-                bool trackAppStatistics = [channelConfig valueForKey:@"trackAppStatistics"] != nil && ![[channelConfig valueForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig valueForKey:@"trackAppStatistics"] boolValue];
+                bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
                     if (!deviceToken) {
                         deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
@@ -2517,15 +2532,15 @@ static id isNil(id object) {
         return;
     }
     
-    int topicsDialogSessions = (int)[[channelConfig valueForKey:@"topicsDialogMinimumSessions"] integerValue];
+    int topicsDialogSessions = (int)[[channelConfig numberForKey:@"topicsDialogMinimumSessions"] integerValue];
     if (!topicsDialogSessions) {
         topicsDialogSessions = 0;
     }
-    int topicsDialogDays = (int)[[channelConfig valueForKey:@"topicsDialogMinimumDays"] integerValue];
+    int topicsDialogDays = (int)[[channelConfig numberForKey:@"topicsDialogMinimumDays"] integerValue];
     if (!topicsDialogDays) {
         topicsDialogDays = 0;
     }
-    int topicsDialogSeconds = (int)[[channelConfig valueForKey:@"topicsDialogMinimumSeconds"] integerValue];
+    int topicsDialogSeconds = (int)[[channelConfig numberForKey:@"topicsDialogMinimumSeconds"] integerValue];
     if (!topicsDialogSeconds) {
         topicsDialogSeconds = 0;
     }
@@ -2590,8 +2605,8 @@ static id isNil(id object) {
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             NSString* headerTitle = [CPTranslate translate:@"subscribedTopics"];
             
-            if (channelConfig != nil && [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
-                headerTitle = [channelConfig valueForKey:@"confirmAlertSelectTopicsLaterTitle"];
+            if (channelConfig != nil && [channelConfig stringForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig stringForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
+                headerTitle = [channelConfig stringForKey:@"confirmAlertSelectTopicsLaterTitle"];
             }
 
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2606,12 +2621,12 @@ static id isNil(id object) {
                 if (normalTintColor != nil) {
                     channelTopicsPicker.normalTintColor = normalTintColor;
                 }
-                if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowUnsubscribe"]) {
-                    topicsController.topicsDialogShowUnsubscribe = [[channelConfig valueForKey:@"topicsDialogShowUnsubscribe"] boolValue];
+                if (channelConfig != nil && [channelConfig objectForKey:@"topicsDialogShowUnsubscribe"]) {
+                    topicsController.topicsDialogShowUnsubscribe = [[channelConfig objectForKey:@"topicsDialogShowUnsubscribe"] boolValue];
                 }
                 
-                if (channelConfig != nil && [channelConfig valueForKey:@"topicsDialogShowWhenNewAdded"]) {
-                    topicsController.topicsDialogShowWhenNewAdded = [[channelConfig valueForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
+                if (channelConfig != nil && [channelConfig objectForKey:@"topicsDialogShowWhenNewAdded"]) {
+                    topicsController.topicsDialogShowWhenNewAdded = [[channelConfig objectForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
                 }
                 
                 DWAlertAction *okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
@@ -2851,8 +2866,8 @@ static id isNil(id object) {
         
         if (
             channelConfig != nil
-            && [channelConfig valueForKey:@"confirmAlertTestsEnabled"]
-            && [[channelConfig valueForKey:@"confirmAlertTestsEnabled"] boolValue]
+            && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
+            && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
         ) {
             NSString *testsConfigPath = [configPath stringByAppendingString:@"&confirmAlertTestsEnabled=true"];
             NSMutableURLRequest* testsRequest = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:testsConfigPath];
@@ -2920,7 +2935,7 @@ static id isNil(id object) {
     }
     
     NSDictionary* payload = request.content.userInfo;
-    NSDictionary* notification = [payload valueForKey:@"notification"];
+    NSDictionary* notification = [payload dictionaryForKey:@"notification"];
     
     [self handleNotificationReceived:payload isActive:NO];
     
@@ -2929,7 +2944,7 @@ static id isNil(id object) {
     
     // rich notifications
     if (notification != nil) {
-        bool isCarousel = [notification valueForKey:@"carouselEnabled"] != nil && ![[notification valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification valueForKey:@"carouselItems"] != nil && ![[notification valueForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"carouselEnabled"] boolValue];
+        bool isCarousel = [notification objectForKey:@"carouselEnabled"] != nil && ![[notification objectForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification arrayForKey:@"carouselItems"] != nil && ![[notification arrayForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"carouselEnabled"] boolValue];
         
         [self addActionButtonsToNotificationRequest:request
                                         withPayload:payload
@@ -2979,7 +2994,7 @@ static id isNil(id object) {
     }
     
     NSDictionary* notification = [payload valueForKey:@"notification"];
-    bool isCarousel = notification != nil && [notification valueForKey:@"carouselEnabled"] != nil && ![[notification valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification valueForKey:@"carouselItems"] != nil && ![[notification valueForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification valueForKey:@"carouselEnabled"] boolValue];
+    bool isCarousel = notification != nil && [notification objectForKey:@"carouselEnabled"] != nil && ![[notification objectForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification arrayForKey:@"carouselItems"] != nil && ![[notification arrayForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"carouselEnabled"] boolValue];
     
     NSArray* actions = [notification objectForKey:@"actions"];
     
@@ -3002,7 +3017,7 @@ static id isNil(id object) {
             [actionArray addObject:action];
         }];
         
-        NSString* newCategoryIdentifier = [CPNotificationCategoryController.sharedInstance registerNotificationCategoryForNotificationId:[payload valueForKeyPath:@"notification._id"]];
+        NSString* newCategoryIdentifier = [CPNotificationCategoryController.sharedInstance registerNotificationCategoryForNotificationId:[payload stringForKeyPath:@"notification._id"]];
         
         UNNotificationCategory* category = [UNNotificationCategory categoryWithIdentifier:newCategoryIdentifier
                                                                                   actions:actionArray

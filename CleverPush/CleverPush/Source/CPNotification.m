@@ -1,5 +1,6 @@
 #import "CPNotification.h"
 #import "CPUtils.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPNotification
 #pragma mark - Initialise notifications by NSDictionary
@@ -50,18 +51,18 @@
             
             NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
             
-            [action setValue:actionId forKey:@"id"];
-            if ([item valueForKey:@"title"]) {
-                [action setValue:[item valueForKey:@"title"] forKey:@"title"];
+            [action setObject:actionId forKey:@"id"];
+            if ([item stringForKey:@"title"]) {
+                [action setObject:[item stringForKey:@"title"] forKey:@"title"];
             }
-            if ([item valueForKey:@"url"]) {
-                [action setValue:[item valueForKey:@"url"] forKey:@"url"];
+            if ([item stringForKey:@"url"]) {
+                [action setObject:[item stringForKey:@"url"] forKey:@"url"];
             }
-            if ([item valueForKey:@"type"]) {
-                [action setValue:[item valueForKey:@"type"] forKey:@"type"];
+            if ([item stringForKey:@"type"]) {
+                [action setObject:[item stringForKey:@"type"] forKey:@"type"];
             }
-            if ([item valueForKey:@"customData"]) {
-                [action setValue:[item valueForKey:@"customData"] forKey:@"customData"];
+            if ([item dictionaryForKey:@"customData"]) {
+                [action setObject:[item dictionaryForKey:@"customData"] forKey:@"customData"];
             }
             
             [actionArray addObject:action];
@@ -69,29 +70,29 @@
         self.actions = actionArray;
     }
 
-    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"createdAt"] != nil && [[json valueForKey:@"createdAt"] length] > 0) {
+    if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]] && [json objectForKey:@"createdAt"] != nil && [[json objectForKey:@"createdAt"] length] > 0) {
         self.createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     } else {
         self.createdAt = [NSDate date];
     }
 
-    if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]] && [json valueForKey:@"expiresAt"] != nil && [[json valueForKey:@"expiresAt"] length] > 0) {
+    if ([[json objectForKey:@"expiresAt"] isKindOfClass:[NSString class]] && [json objectForKey:@"expiresAt"] != nil && [[json objectForKey:@"expiresAt"] length] > 0) {
         self.expiresAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"expiresAt"]];
     }
     
     self.chatNotification = NO;
-    if ([json objectForKey:@"chatNotification"] && [json valueForKey:@"chatNotification"] != nil && ![[json valueForKey:@"chatNotification"] isKindOfClass:[NSNull class]]) {
+    if ([json objectForKey:@"chatNotification"] && [json objectForKey:@"chatNotification"] != nil && ![[json objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]]) {
         self.chatNotification = [[json objectForKey:@"chatNotification"] boolValue];
     }
     
     self.carouselEnabled = NO;
-    if ([json objectForKey:@"carouselEnabled"] && [json valueForKey:@"carouselEnabled"] != nil && ![[json valueForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]]) {
+    if ([json objectForKey:@"carouselEnabled"] && [json objectForKey:@"carouselEnabled"] != nil && ![[json objectForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]]) {
         self.carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
     }
 
     self.carouselItems = [json objectForKey:@"carouselItems"];
     
-    if ([json objectForKey:@"customData"] && [json valueForKey:@"customData"] != nil && ![[json valueForKey:@"customData"] isKindOfClass:[NSNull class]]) {
+    if ([json objectForKey:@"customData"] && [json objectForKey:@"customData"] != nil && ![[json objectForKey:@"customData"] isKindOfClass:[NSNull class]]) {
         self.customData = [json objectForKey:@"customData"];
     } else {
         self.customData = [[NSDictionary alloc] init];

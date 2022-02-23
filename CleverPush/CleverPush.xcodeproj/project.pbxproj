@@ -176,6 +176,8 @@
 		29A9E556276FAD8200DD43A4 /* CPAppBannerSubscribedType.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */; };
 		29AD0C5326682A8E009E10D0 /* CPAppBannerHTMLBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */; };
 		29AD0C5C26682A92009E10D0 /* CPAppBannerHTMLBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */; };
+		29B3BFA227C697E500D52D64 /* NSDictionary+SafeExpectations.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */; };
+		29B3BFA327C697EA00D52D64 /* NSDictionary+SafeExpectations.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */; };
 		29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */; };
 		29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF31E58B89900815CD6 /* UIKit.framework */; };
 		29D22E70252C8E7500977567 /* CPIntrinsicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */; };
@@ -433,6 +435,8 @@
 		298F4FC225002DA400F086D3 /* CPUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUtils.h; sourceTree = "<group>"; };
 		29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerSubscribedType.h; sourceTree = "<group>"; };
 		29B2CB6523F60EEC008A43F9 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
+		29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+SafeExpectations.m"; sourceTree = "<group>"; };
+		29B3BFA127C697E500D52D64 /* NSDictionary+SafeExpectations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+SafeExpectations.h"; sourceTree = "<group>"; };
 		29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		29C1BAF31E58B89900815CD6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		29C1BAF51E58BAB800815CD6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -849,6 +853,8 @@
 				298676AA2572CF6E0002E9F1 /* UIImageView+CleverPush.m */,
 				29DC4AB92181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.h */,
 				29DC4ABA2181D9E40051F6E9 /* UNUserNotificationCenter+CleverPush.m */,
+				29B3BFA127C697E500D52D64 /* NSDictionary+SafeExpectations.h */,
+				29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */,
 				CBA989852679D529003DE995 /* CPStoriesController.h */,
 				CBA989862679D529003DE995 /* CPStoriesController.m */,
 				CBA989882679D543003DE995 /* CPWidgetModule.h */,
@@ -1353,6 +1359,7 @@
 				29DC4AC22182086B0051F6E9 /* UNUserNotificationCenter+CleverPush.m in Sources */,
 				CBA989A92679D632003DE995 /* CPStoryWidget.m in Sources */,
 				CBA989AF2679D642003DE995 /* CPStoryContent.m in Sources */,
+				29B3BFA327C697EA00D52D64 /* NSDictionary+SafeExpectations.m in Sources */,
 				291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
@@ -1431,6 +1438,7 @@
 				291FCD2B2525DC2800F5185E /* DWDimmingView.m in Sources */,
 				CB8F47B6275F393D00FC19A7 /* CPInboxCell.m in Sources */,
 				29DB95F523FC33CD008FC985 /* CPNotificationCategoryController.m in Sources */,
+				29B3BFA227C697E500D52D64 /* NSDictionary+SafeExpectations.m in Sources */,
 				CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCD2C2525DC2800F5185E /* DWAnimatableShapeLayer.m in Sources */,
 				CBA9898D2679D553003DE995 /* CPWidgetsStories.m in Sources */,
