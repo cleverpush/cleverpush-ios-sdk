@@ -287,6 +287,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
 
++ (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
+    [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
+}
+
 + (void)setIncrementBadge:(BOOL)increment {
     [self.CPSharedInstance setIncrementBadge:increment];
 }

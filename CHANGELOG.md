@@ -1,3 +1,6 @@
+# 1.16.2
+* Implemented `setIgnoreDisabledNotificationPermission` to subscribe users, even when the notification permission has not been accepted (disabled by default).
+
 # 1.16.1
 * Optimized usage of `NSDictionaries` to prevent crashes
 

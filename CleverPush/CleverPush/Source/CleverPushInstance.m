@@ -68,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -76,6 +76,7 @@ static BOOL autoClearBadge = YES;
 static BOOL incrementBadge = NO;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
+static BOOL ignoreDisabledNotificationPermission = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const int maximumNotifications = 100;
@@ -371,7 +372,7 @@ static id isNil(id object) {
     }
 
     if (subscriptionId != nil) {
-        if (![self notificationsEnabled]) {
+        if (![self notificationsEnabled] && !ignoreDisabledNotificationPermission) {
             NSLog(@"CleverPush: notification authorization revoked, unsubscribing");
             [self unsubscribe];
         } else if ([self shouldSync]) {
@@ -445,7 +446,7 @@ static id isNil(id object) {
     [self trackSessionStart];
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
-    if (subscriptionId != nil && ![self notificationsEnabled]) {
+    if (subscriptionId != nil && ![self notificationsEnabled] && !ignoreDisabledNotificationPermission) {
         NSLog(@"CleverPush: notification authorization revoked, unsubscribing");
         [self unsubscribe];
     }
@@ -844,7 +845,7 @@ static id isNil(id object) {
                         NSLog(@"CleverPush: requestAuthorizationWithOptions not granted");
                     }
                     
-                    if (granted) {
+                    if (granted || ignoreDisabledNotificationPermission) {
                         if (subscriptionId == nil) {
                             NSLog(@"CleverPush: syncSubscription called from subscribe");
                             [self performSelector:@selector(syncSubscription) withObject:nil];
@@ -2704,7 +2705,7 @@ static id isNil(id object) {
     return foundWindow;
 }
 
-#pragma mark - variable updates and call backs
+#pragma mark - variable updates and callbacks
 - (void)setBrandingColor:(UIColor *)color {
     brandingColor = color;
 }
@@ -2727,6 +2728,10 @@ static id isNil(id object) {
 
 - (void)setAutoClearBadge:(BOOL)autoClear {
     autoClearBadge = autoClear;
+}
+
+- (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
+    ignoreDisabledNotificationPermission = ignore;
 }
 
 - (void)setChatBackgroundColor:(UIColor *)color {
