@@ -26,5 +26,6 @@
 + (NSInteger)secondsBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime;
 + (NSBundle *)getAssetsBundle;
 + (NSString *)timeAgoStringFromDate:(NSDate *)date;
++ (NSUserDefaults *)getUserDefaultsAppGroup;
 
 @end

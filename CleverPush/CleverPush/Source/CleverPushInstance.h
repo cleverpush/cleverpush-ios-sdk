@@ -120,6 +120,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setChatBackgroundColor:(UIColor *)color;
 - (void)setAutoClearBadge:(BOOL)autoClear;
 - (void)setIncrementBadge:(BOOL)increment;
+- (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
 - (void)addChatView:(CPChatView*)chatView;
 - (void)showTopicsDialog;

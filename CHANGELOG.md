@@ -1,3 +1,6 @@
+# 1.16.3
+* Implemented `setShowNotificationsInForeground` (enabled by default)
+
 # 1.16.2
 * Implemented `setIgnoreDisabledNotificationPermission` to subscribe users, even when the notification permission has not been accepted (disabled by default).
 

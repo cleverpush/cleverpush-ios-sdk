@@ -167,21 +167,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             NSLog(@"CleverPush: error while attempting to download file with URL: %@", error);
             return nil;
         }
-        
-        /*
-         NSArray* cachedFiles = [[NSUserDefaults standardUserDefaults] objectForKey:@"CACHED_MEDIA"];
-         NSMutableArray* appendedCache;
-         if (cachedFiles) {
-         appendedCache = [[NSMutableArray alloc] initWithArray:cachedFiles];
-         [appendedCache addObject:name];
-         } else {
-         appendedCache = [[NSMutableArray alloc] initWithObjects:name, nil];
-         }
-         
-         [[NSUserDefaults standardUserDefaults] setObject:appendedCache forKey:@"CACHED_MEDIA"];
-         [[NSUserDefaults standardUserDefaults] synchronize];
-         */
-        
+ 
         return name;
     } @catch (NSException *exception) {
         NSLog(@"CleverPush: error while downloading file (%@), error: %@", url, exception.description);
@@ -542,6 +528,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSString *formatString = NSLocalizedString(@"%@ ago", @"Used to say how much time has passed. e.g. '2 hours ago'");
 
     return [NSString stringWithFormat:formatString, [formatter stringFromDateComponents:components]];
+}
+
++ (NSUserDefaults *)getUserDefaultsAppGroup {
+    NSBundle *bundle = [NSBundle mainBundle];
+    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
+        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
+        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
+    }
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    return userDefaults;
 }
 
 @end

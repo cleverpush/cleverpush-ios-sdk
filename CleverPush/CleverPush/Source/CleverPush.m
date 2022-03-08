@@ -295,6 +295,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setIncrementBadge:increment];
 }
 
++ (void)setShowNotificationsInForeground:(BOOL)show {
+    [self.CPSharedInstance setShowNotificationsInForeground:show];
+}
+
 + (void)addChatView:(CPChatView*)chatView {
     [self.CPSharedInstance addChatView:chatView];
 }

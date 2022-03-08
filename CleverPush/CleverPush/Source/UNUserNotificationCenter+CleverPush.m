@@ -5,6 +5,7 @@
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CleverPush.h"
+#import "CPUtils.h"
 
 @interface CleverPush (UN_extra)
 
@@ -30,7 +31,6 @@ __weak static id previousDelegate;
         injectToProperClass(@selector(cleverPushGetNotificationSettingsWithCompletionHandler:),
                             @selector(getNotificationSettingsWithCompletionHandler:), @[],
                             [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
-        
     }
 }
 
@@ -39,15 +39,15 @@ __weak static id previousDelegate;
     id wrapperBlock = ^(BOOL granted, NSError* error) {
         completionHandler(granted, error);
     };
-    
+
     [self cleverPushRequestAuthorizationWithOptions:options completionHandler:wrapperBlock];
 }
 
-- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler  API_AVAILABLE(ios(10.0)) {
+- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler API_AVAILABLE(ios(10.0)) {
     id wrapperBlock = ^(UNNotificationSettings* settings) {
         completionHandler(settings);
     };
-    
+
     [self cleverPushGetNotificationSettingsWithCompletionHandler:wrapperBlock];
 }
 
@@ -56,32 +56,32 @@ __weak static id previousDelegate;
         [self setCleverPushUNDelegate:delegate];
         return;
     }
-    
+
     previousDelegate = delegate;
-    
+
     delegateUNClass = getClassWithProtocolInHierarchy([delegate class], @protocol(UNUserNotificationCenterDelegate));
     delegateUNSubclasses = ClassGetSubclasses(delegateUNClass);
-    
+
     injectToProperClass(@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:),
                         @selector(userNotificationCenter:willPresentNotification:withCompletionHandler:), delegateUNSubclasses, [CleverPushUNUserNotificationCenter class], delegateUNClass);
-    
+
     injectToProperClass(@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:),
                         @selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:), delegateUNSubclasses, [CleverPushUNUserNotificationCenter class], delegateUNClass);
-    
+
     [self setCleverPushUNDelegate:delegate];
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
                  willPresentNotification:(UNNotification *)notification
-                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler  API_AVAILABLE(ios(10.0)) {
-    NSUInteger completionHandlerOptions = 7;
-    
+                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler API_AVAILABLE(ios(10.0)) {
+    NSUInteger completionHandlerOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
+
     NSLog(@"CleverPush cleverPushUserNotificationCenter willPresentNotification");
-    
+
     if ([CleverPush channelId]) {
         [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
     }
-    
+
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
         [self cleverPushUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
     } else {
@@ -92,31 +92,36 @@ __weak static id previousDelegate;
                                                     fromPresentNotification:true
                                                       withCompletionHandler:^() {}];
     }
-    
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults objectForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY] != nil) {
+        BOOL showInForeground = [userDefaults boolForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY];
+        if (!showInForeground) {
+            completionHandlerOptions = UNNotificationPresentationOptionNone;
+        }
+    }
+
     completionHandler(completionHandlerOptions);
-    
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
-          didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler  API_AVAILABLE(ios(10.0)) {
+          didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler API_AVAILABLE(ios(10.0)) {
     NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
-    
+
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
         [CleverPush updateBadge:nil];
         return;
     }
 
     [CleverPush handleNotificationOpened:response.notification.request.content.userInfo isActive:[UIApplication sharedApplication].applicationState == UIApplicationStateActive actionIdentifier:response.actionIdentifier];
-    
+
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
-        
         [self cleverPushUserNotificationCenter:center didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-        
+
     } else if (![CleverPushUNUserNotificationCenter isDismissEvent:response]) {
-        
         BOOL isTextReply = [response isKindOfClass:NSClassFromString(@"UNTextInputNotificationResponse")];
         NSString* userText = isTextReply ? [response valueForKey:@"userText"] : nil;
-        
+
         [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:response.notification
                                                                 isTextReply:isTextReply
                                                            actionIdentifier:response.actionIdentifier
@@ -124,7 +129,6 @@ __weak static id previousDelegate;
                                                     fromPresentNotification:false
                                                       withCompletionHandler:completionHandler];
     } else {
-        
         completionHandler();
     }
 }
@@ -140,13 +144,13 @@ __weak static id previousDelegate;
                 fromPresentNotification:(BOOL)fromPresentNotification
                   withCompletionHandler:(void(^)(void))completionHandler  API_AVAILABLE(ios(10.0)) {
     UIApplication *sharedApp = [UIApplication sharedApplication];
-    
+
     BOOL isCustomAction = actionIdentifier && ![@"com.apple.UNNotificationDefaultActionIdentifier" isEqualToString:actionIdentifier];
     BOOL isRemote = [notification.request.trigger isKindOfClass:NSClassFromString(@"UNPushNotificationTrigger")];
-    
+
     if (isRemote) {
         NSDictionary* remoteUserInfo = notification.request.content.userInfo;
-        
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
         if (isTextReply &&
@@ -166,8 +170,7 @@ __weak static id previousDelegate;
             [sharedApp.delegate application:sharedApp didReceiveRemoteNotification:remoteUserInfo fetchCompletionHandler:^(UIBackgroundFetchResult result) {
                 completionHandler();
             }];
-        }
-        else {
+        } else {
             completionHandler();
         }
 #pragma clang diagnostic pop

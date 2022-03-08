@@ -68,12 +68,13 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
 static BOOL incrementBadge = NO;
+static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
@@ -155,7 +156,7 @@ static id isNil(id object) {
 - (void)setTrackingConsent:(BOOL)consent {
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
-    
+
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
     } else {
@@ -260,7 +261,7 @@ static id isNil(id object) {
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
-    
+
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
@@ -271,7 +272,7 @@ static id isNil(id object) {
             handleNotificationReceived(pendingDeliveryResult);
         }
     }
-    
+
     if (self) {
         if (newChannelId) {
             channelId = newChannelId;
@@ -305,11 +306,11 @@ static id isNil(id object) {
             [self initWithChannelId];
         }
     }
-    
+
     if ([self getAutoClearBadge]) {
         [self clearBadge:false];
     }
-    
+
     return self;
 }
 
@@ -332,14 +333,11 @@ static id isNil(id object) {
     } else if (viewController.presentedViewController && !viewController.presentedViewController.isBeingDismissed) {
         UIViewController* presentedViewController = viewController.presentedViewController;
         return [self topViewControllerWithRootViewController:presentedViewController];
-    }
-    else {
-        for (UIView *view in [viewController.view subviews])
-        {
+    } else {
+        for (UIView *view in [viewController.view subviews]) {
             id subViewController = [view nextResponder];
-            if ( subViewController && [subViewController isKindOfClass:[UIViewController class]])
-            {
-                if ([(UIViewController *)subViewController presentedViewController]  && ![subViewController presentedViewController].isBeingDismissed) {
+            if ( subViewController && [subViewController isKindOfClass:[UIViewController class]]) {
+                if ([(UIViewController *)subViewController presentedViewController] && ![subViewController presentedViewController].isBeingDismissed) {
                     return [self topViewControllerWithRootViewController:[(UIViewController *)subViewController presentedViewController]];
                 }
             }
@@ -390,7 +388,7 @@ static id isNil(id object) {
     }
 
     [self initFeatures];
-    
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
@@ -1291,38 +1289,36 @@ static id isNil(id object) {
     NSDictionary* notification = [messageDict dictionaryForKey:@"notification"];
 
     if (!notification) {
-        NSLog(@"CleverPush: handleNotificationReceived EXIT 1");
         return;
     }
 
     NSString* notificationId = [notification stringForKey:@"_id"];
     
     if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
-        NSLog(@"CleverPush: handleNotificationReceived EXIT 2 %@ %@", notificationId, lastNotificationReceivedId);
         return;
     }
     lastNotificationReceivedId = notificationId;
-    
+
     NSLog(@"CleverPush: handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict);
-    
+
     [self setNotificationDelivered:notification
                      withChannelId:[messageDict stringForKeyPath:@"channel._id"]
                 withSubscriptionId:[messageDict stringForKeyPath:@"subscription._id"]
     ];
-    
+
     if (isActive && notification != nil && [notification objectForKey:@"chatNotification"] != nil && ![[notification objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"chatNotification"] boolValue]) {
         
         if (currentChatView != nil) {
             [currentChatView loadChat];
         }
     }
-    
+
     if (!handleNotificationReceived) {
         return;
     }
-    
+
     CPNotificationReceivedResult * result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
-    
+
     handleNotificationReceived(result);
 }
 
@@ -1391,12 +1387,7 @@ static id isNil(id object) {
 
 #pragma mark - Update counts of the notification badge
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent  API_AVAILABLE(ios(10.0)) {
-    NSBundle *bundle = [NSBundle mainBundle];
-    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
-        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
-    }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY]) {
         if (replacementContent != nil) {
             dispatch_semaphore_t sema = dispatch_semaphore_create(0);
@@ -1459,12 +1450,7 @@ static id isNil(id object) {
     [self enqueueRequest:request onSuccess:nil onFailure:nil];
     
     // save notification to user defaults
-    NSBundle *bundle = [NSBundle mainBundle];
-    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
-        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
-    }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     
     [userDefaults setObject:notificationId forKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
     [userDefaults synchronize];
@@ -1519,12 +1505,8 @@ static id isNil(id object) {
     if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-        
-        NSBundle *bundle = [NSBundle mainBundle];
-        if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
-            bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
-        }
-        NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+
+        NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
         if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
             [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
             [userDefaults synchronize];
@@ -2682,14 +2664,18 @@ static id isNil(id object) {
 #pragma mark - Badge count increment
 - (void)setIncrementBadge:(BOOL)increment {
     incrementBadge = increment;
-    
-    NSBundle *bundle = [NSBundle mainBundle];
-    if ([[bundle.bundleURL pathExtension] isEqualToString:@"appex"]) {
-        // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
-        bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
-    }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     [userDefaults setBool:increment forKey:CLEVERPUSH_INCREMENT_BADGE_KEY];
+    [userDefaults synchronize];
+}
+
+#pragma mark - Show notifications in foreground
+- (void)setShowNotificationsInForeground:(BOOL)show {
+    showNotificationsInForeground = show;
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    [userDefaults setBool:show forKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY];
     [userDefaults synchronize];
 }
 
