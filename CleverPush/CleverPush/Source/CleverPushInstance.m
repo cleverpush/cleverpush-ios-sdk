@@ -2224,6 +2224,31 @@ static id isNil(id object) {
     });
 }
 
+- (void)triggerFollowUpEvent:(NSString*)eventName {
+    return [self triggerFollowUpEvent:eventName parameters:nil];
+}
+
+- (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        [self waitForTrackingConsent:^{
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/event"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     eventName, @"name",
+                                     isNil(parameters), @"parameters",
+                                     [self getSubscriptionId], @"subscriptionId",
+                                     nil];
+            
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                
+            } onFailure:nil];
+        }];
+    });
+}
+
 #pragma mark - auto Assign Tag Matches
 - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback {
     NSString* path = [tag autoAssignPath];

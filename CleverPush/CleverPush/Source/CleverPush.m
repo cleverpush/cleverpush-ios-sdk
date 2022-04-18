@@ -335,6 +335,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance trackEvent:eventName amount:amount];
 }
 
++ (void)triggerFollowUpEvent:(NSString*)eventName {
+    [self.CPSharedInstance triggerFollowUpEvent:eventName];
+}
+
++ (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters {
+    [self.CPSharedInstance triggerFollowUpEvent:eventName parameters:parameters];
+}
+
 + (void)trackPageView:(NSString*)url {
     [self.CPSharedInstance trackPageView:url];
 }

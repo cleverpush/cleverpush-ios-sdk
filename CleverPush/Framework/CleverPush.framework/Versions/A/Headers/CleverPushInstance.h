@@ -50,7 +50,6 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 
-extern NSString * const kCPSettingsKeyInFocusDisplayOption;
 @class CPChannelTag;
 
 @interface CleverPushInstance : NSObject
@@ -130,6 +129,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)getSubscriptionId:(void(^)(NSString *))callback;
 - (void)trackEvent:(NSString*)eventName;
 - (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
+- (void)triggerFollowUpEvent:(NSString*)eventName;
+- (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters;
 - (void)trackPageView:(NSString*)url;
 - (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
 - (void)increaseSessionVisits;

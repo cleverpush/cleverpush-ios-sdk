@@ -1,3 +1,6 @@
+# 1.17.0
+* Implemented `triggerFollowUpEvent` method
+
 # 1.16.3
 * Implemented `setShowNotificationsInForeground` (enabled by default)
 
