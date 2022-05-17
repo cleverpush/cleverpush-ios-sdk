@@ -1,3 +1,6 @@
+# 1.17.1
+* Implemented callback block for `showTopicsDialog` method
+
 # 1.17.0
 * Implemented `triggerFollowUpEvent` method
 

@@ -68,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.16.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.17.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -2575,35 +2575,16 @@ static id isNil(id object) {
 - (void)showTopicsDialog {
     if (topicsDialogWindow) {
         [self showTopicsDialog:topicsDialogWindow];
+        return;
     }
     [self showTopicsDialog:[self keyWindow]];
 }
 
-- (void)showTopicDialogOnNewAdded {
-    [self getChannelConfig:^(NSDictionary* channelConfig) {
-        if ([self hasNewTopicAfterOneHour:channelConfig initialDifference:secDifferenceAtVeryFirstTime displayDialogDifference:validationSeconds]) {
-            [self showTopicsDialog];
-            [CPUtils updateLastTimeAutomaticallyShowed];
-        } else {
-            [self showPendingTopicsDialog];
-        }
-    }];
-}
-
-- (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter {
-    NSInteger secondsAfterLastCheck = [self secondsAfterLastCheck];
-    if ([CPUtils newTopicAdded:config] && (secondsAfterLastCheck == initialDifference || secondsAfterLastCheck > displayAfter)) {
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
-- (NSInteger)secondsAfterLastCheck {
-    return [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
-}
-
 - (void)showTopicsDialog:(UIWindow *)targetWindow {
+    [self showTopicsDialog:targetWindow callback:nil];
+}
+
+- (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback {
     [self getAvailableTopics:^(NSArray* channelTopics_) {
         channelTopics = channelTopics_;
         if ([channelTopics count] == 0) {
@@ -2651,6 +2632,10 @@ static id isNil(id object) {
                         }
                     }
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
+
+                    if (callback) {
+                        callback();
+                    }
                 }];
                 [channelTopicsPicker addAction:okAction];
                 
@@ -2660,6 +2645,30 @@ static id isNil(id object) {
             });
         }];
     }];
+}
+
+- (void)showTopicDialogOnNewAdded {
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if ([self hasNewTopicAfterOneHour:channelConfig initialDifference:secDifferenceAtVeryFirstTime displayDialogDifference:validationSeconds]) {
+            [self showTopicsDialog];
+            [CPUtils updateLastTimeAutomaticallyShowed];
+        } else {
+            [self showPendingTopicsDialog];
+        }
+    }];
+}
+
+- (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter {
+    NSInteger secondsAfterLastCheck = [self secondsAfterLastCheck];
+    if ([CPUtils newTopicAdded:config] && (secondsAfterLastCheck == initialDifference || secondsAfterLastCheck > displayAfter)) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
+- (NSInteger)secondsAfterLastCheck {
+    return [CPUtils secondsBetweenDate:[CPUtils getLastTimeAutomaticallyShowed] andDate:[NSDate date]];
 }
 
 #pragma mark - update UserDefaults while toggled deselect switch

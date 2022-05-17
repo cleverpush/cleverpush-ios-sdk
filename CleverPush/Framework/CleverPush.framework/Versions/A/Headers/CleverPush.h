@@ -94,6 +94,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showTopicsDialog;
 + (void)showTopicDialogOnNewAdded;
 + (void)showTopicsDialog:(UIWindow *)targetWindow;
++ (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback;
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback;
 + (void)getSubscriptionId:(void(^)(NSString *))callback;
 + (void)trackEvent:(NSString*)eventName;

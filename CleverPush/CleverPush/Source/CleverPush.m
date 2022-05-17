@@ -315,6 +315,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance showTopicsDialog:targetWindow];
 }
 
++ (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback {
+    [self.CPSharedInstance showTopicsDialog:targetWindow callback:callback];
+}
+
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback {
     [self.CPSharedInstance getChannelConfig:^(NSDictionary *callbackInner) {
         callback(callbackInner);
