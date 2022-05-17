@@ -6,6 +6,7 @@
 @property (nonatomic, strong) NSString *urlType;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *type;
+@property (nonatomic, strong) NSString *screen;
 @property (nonatomic, strong) NSArray *tags;
 @property (nonatomic, strong) NSArray *topics;
 @property (nonatomic, strong) NSString *attributeId;

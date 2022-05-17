@@ -173,7 +173,15 @@
         [CPUtils openSafari:action.url dismissViewController:self.controller];
     } else if (!action.dismiss && action.openInWebview) {
         [CPUtils openSafari:action.url];
-    } else if (action.dismiss && !action.openInWebview) {
+    }else if (action.dismiss && ![action.screen isEqualToString:@""] && action.screen != nil) {
+        // TODO: PUsh to next screen.
+        if(self.data.multiscreenEnable == true){
+            [self.changePage navigateToNextPage:action.screen];
+        }else{
+            [self onDismiss];
+        }
+        
+    }else if (action.dismiss && !action.openInWebview) {
         [self onDismiss];
     } else {
         if (!buttonBlock || !self.data.carouselEnabled) {

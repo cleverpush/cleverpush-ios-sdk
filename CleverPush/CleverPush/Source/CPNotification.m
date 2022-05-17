@@ -90,6 +90,11 @@
         self.carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
     }
 
+    self.multiscreenEnable = NO;
+    if ([json objectForKey:@"enableMultipleScreens"] && [json objectForKey:@"enableMultipleScreens"] != nil && ![[json objectForKey:@"enableMultipleScreens"] isKindOfClass:[NSNull class]]) {
+        self.multiscreenEnable = [[json objectForKey:@"enableMultipleScreens"] boolValue];
+    }
+    
     self.carouselItems = [json objectForKey:@"carouselItems"];
     
     if ([json objectForKey:@"customData"] && [json objectForKey:@"customData"] != nil && ![[json objectForKey:@"customData"] isKindOfClass:[NSNull class]]) {

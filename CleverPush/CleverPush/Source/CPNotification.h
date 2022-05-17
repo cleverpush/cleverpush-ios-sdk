@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite) BOOL silent;
 @property (nonatomic, strong, nullable) NSDate *createdAt;
 @property (nonatomic, strong, nullable) NSDate *expiresAt;
+@property (nonatomic) BOOL multiscreenEnable;
 #pragma mark - Class Methods
 + (instancetype)initWithJson:(NSDictionary*)json;
 - (void)parseJson:(NSDictionary*)json;
