@@ -153,10 +153,10 @@
 }
 
 - (void)setUpPageControl {
-    if (self.data.carouselEnabled == true){
+    if (self.data.carouselEnabled == true) {
         [self.pageControl setNumberOfPages:self.data.screens.count];
         [self.cardCollectionView setScrollEnabled:true];
-    }else{
+    } else {
         [self.pageControl setNumberOfPages:0];
         [self.cardCollectionView setScrollEnabled:false];
     }
@@ -221,26 +221,16 @@
         self.pageControl.currentPage = self.index + 1;
     }
 }
+
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen and Carousel is dissable.
 - (void)navigateToNextPage:(NSString *)value {
-
-    for (int i; i< self.data.screens; i++){
+    for (int i; i< self.data.screens; i++) {
         CPAppBannerCarouselBlock *item = [self.data.screens objectAtIndex:i];
-        
-        if ([item.id isEqualToString:value]){
+        if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
-                // Need to Research on scroll..
-//                [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
-                /*
-                 let rect = self.collectionView.layoutAttributesForItem(at: IndexPath(row: index, section: 0))?.frame
-                        self.collectionView.scrollRectToVisible(rect!, animated: true)
-                 */
                 CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
                 [self.cardCollectionView scrollRectToVisible:rect animated:true];
-                
-//                [self.cardCollectionView setPagingEnabled:TRUE];
-//                [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition: UICollectionViewScrollPositionCenteredHorizontally animated:YES];
                 self.pageControl.currentPage = i;
                 break;
             }

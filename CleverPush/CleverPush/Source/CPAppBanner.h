@@ -42,7 +42,7 @@
 @property (nonatomic, strong) NSArray *attributes;
 @property (nonatomic) int dismissTimeout;
 @property (nonatomic) int delaySeconds;
-@property (nonatomic) BOOL multiscreenEnable;
+@property (nonatomic) BOOL multiScreenEnable;
 @property (nonatomic) BOOL carouselEnabled;
 @property (nonatomic) BOOL marginEnabled;
 @property (nonatomic) BOOL closeButtonEnabled;
