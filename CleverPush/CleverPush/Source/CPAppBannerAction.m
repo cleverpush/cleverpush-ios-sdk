@@ -17,7 +17,9 @@
         if ([json objectForKey:@"type"] && [[json objectForKey:@"type"] isKindOfClass:[NSString class]]) {
             self.type = [json objectForKey:@"type"];
         }
-        
+        if ([json objectForKey:@"screen"] && [[json objectForKey:@"screen"] isKindOfClass:[NSString class]]) {
+            self.screen = [json objectForKey:@"screen"];
+        }
         if ([json objectForKey:@"name"] && [[json objectForKey:@"name"] isKindOfClass:[NSString class]]) {
             self.name = [json objectForKey:@"name"];
         }

@@ -9,6 +9,7 @@
 
 @protocol NavigateNextPage <NSObject>
 - (void)navigateToNextPage;
+- (void)navigateToNextPage:(NSString *)value;
 @end
 
 @interface CPBannerCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
