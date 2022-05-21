@@ -34,6 +34,11 @@
             self.openInWebview = YES;
         }
         
+        self.openBySystem = NO;
+        if ([json objectForKey:@"openBySystem"] != nil && ![[json objectForKey:@"openBySystem"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"openBySystem"] boolValue]) {
+            self.openBySystem = YES;
+        }
+        
         if ([json objectForKey:@"tags"] && [[json objectForKey:@"tags"] isKindOfClass:[NSArray class]]) {
             self.tags = [json objectForKey:@"tags"];
         }

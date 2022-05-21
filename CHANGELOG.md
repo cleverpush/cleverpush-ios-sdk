@@ -1,3 +1,6 @@
+# 1.18.0
+* Support app banners without carousel and with multiple screens
+
 # 1.17.1
 * Implemented callback block for `showTopicsDialog` method
 

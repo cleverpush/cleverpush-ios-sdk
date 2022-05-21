@@ -222,9 +222,9 @@
     }
 }
 
-#pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen and Carousel is dissable.
+#pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen and carousel is disabled.
 - (void)navigateToNextPage:(NSString *)value {
-    for (int i; i< self.data.screens; i++) {
+    for (int i = 0; i < self.data.screens.count; i++) {
         CPAppBannerCarouselBlock *item = [self.data.screens objectAtIndex:i];
         if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];

@@ -174,17 +174,15 @@
     } else if (!action.dismiss && action.openInWebview) {
         [CPUtils openSafari:action.url];
     } else if (action.dismiss && ![action.screen isEqualToString:@""] && action.screen != nil) {
-        if(self.data.multiScreenEnable == true) {
+        if (self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage:action.screen];
         } else {
             [self onDismiss];
         }
-    } else if (action.dismiss && !action.openInWebview) {
+    } else if (action.dismiss) {
         [self onDismiss];
     } else {
-        if (!buttonBlock || !self.data.carouselEnabled) {
-            [CPUtils openSafari:action.url];
-        } else {
+        if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
         }
     }

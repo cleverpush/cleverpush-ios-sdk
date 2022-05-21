@@ -385,23 +385,27 @@ dispatch_queue_t dispatchQueue = nil;
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             [self sendBannerEvent:@"clicked" forBanner:banner];
-            
+
             if (handleBannerOpened && action) {
                 handleBannerOpened(action);
             }
-            
+
+            if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
+                [[UIApplication sharedApplication] openURL:action.url];
+            }
+
             if (action && [action.type isEqualToString:@"subscribe"]) {
                 [CleverPush subscribe];
             }
-            
+
             if (action && [action.type isEqualToString:@"addTags"]) {
                 [CleverPush addSubscriptionTags:action.tags];
             }
-            
+
             if (action && [action.type isEqualToString:@"removeTags"]) {
                 [CleverPush removeSubscriptionTags:action.tags];
             }
-            
+
             if (action && [action.type isEqualToString:@"addTopics"]) {
                 NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
                 for (NSString *topic in action.topics) {
@@ -411,7 +415,7 @@ dispatch_queue_t dispatchQueue = nil;
                 }
                 [CleverPush setSubscriptionTopics:topics];
             }
-            
+
             if (action && [action.type isEqualToString:@"removeTopics"]) {
                 NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
                 for (NSString *topic in action.topics) {
@@ -421,7 +425,7 @@ dispatch_queue_t dispatchQueue = nil;
                 }
                 [CleverPush setSubscriptionTopics:topics];
             }
-            
+
             if (action && [action.type isEqualToString:@"setAttribute"]) {
                 [CleverPush setSubscriptionAttribute:action.attributeId value:action.attributeValue];
             }

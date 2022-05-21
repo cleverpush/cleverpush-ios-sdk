@@ -13,6 +13,7 @@
 @property (nonatomic, strong) NSString *attributeValue;
 @property (nonatomic) BOOL dismiss;
 @property (nonatomic) BOOL openInWebview;
+@property (nonatomic) BOOL openBySystem;
 
 - (id)initWithJson:(NSDictionary*)json;
 

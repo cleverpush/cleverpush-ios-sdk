@@ -68,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.17.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.18.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -872,7 +872,7 @@ static id isNil(id object) {
                             subscribedBlock(subscriptionId);
                         }
                     } else if (failureBlock) {
-                        failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"User has not granted permission dialog."}]);
+                        failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
                     }
                 });
             }];

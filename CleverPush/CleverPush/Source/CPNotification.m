@@ -89,11 +89,6 @@
     if ([json objectForKey:@"carouselEnabled"] && [json objectForKey:@"carouselEnabled"] != nil && ![[json objectForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]]) {
         self.carouselEnabled = [[json objectForKey:@"carouselEnabled"] boolValue];
     }
-
-    self.multiscreenEnable = NO;
-    if ([json objectForKey:@"enableMultipleScreens"] && [json objectForKey:@"enableMultipleScreens"] != nil && ![[json objectForKey:@"enableMultipleScreens"] isKindOfClass:[NSNull class]]) {
-        self.multiscreenEnable = [[json objectForKey:@"enableMultipleScreens"] boolValue];
-    }
     
     self.carouselItems = [json objectForKey:@"carouselItems"];
     

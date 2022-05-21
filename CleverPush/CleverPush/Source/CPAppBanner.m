@@ -121,9 +121,9 @@
             self.carouselEnabled = YES;
         }
         
-        self.multiscreenEnable = NO;
+        self.multipleScreensEnabled = NO;
         if ([[json objectForKey:@"enableMultipleScreens"] isEqual:[NSNumber numberWithBool:true]]) {
-            self.multiscreenEnable = YES;
+            self.multipleScreensEnabled = YES;
         }
 
         self.marginEnabled = YES;
