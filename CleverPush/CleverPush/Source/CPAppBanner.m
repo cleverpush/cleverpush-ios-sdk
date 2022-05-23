@@ -11,6 +11,10 @@
         self.name = [json objectForKey:@"name"];
         self.HTMLContent = [json objectForKey:@"content"];
         self.contentType = [json objectForKey:@"contentType"];
+        self.appVersionFilterRelation = [json objectForKey:@"appVersionFilterRelation"];
+        self.appVersionFilterValue = [json objectForKey:@"appVersionFilterValue"];
+        self.fromVersion = [json objectForKey:@"fromVersion"];
+        self.toVersion = [json objectForKey:@"toVersion"];
         if ([json objectForKey:@"testId"] != nil) {
             self.testId = [json objectForKey:@"testId"];
         }

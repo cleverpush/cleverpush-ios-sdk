@@ -268,8 +268,48 @@ dispatch_queue_t dispatchQueue = nil;
         }
     }
 
-    return allowed;
+    return allowed == true? [self appVersionFilter:banner]:false;
 }
+
+#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+-(BOOL)appVersionFilter:(CPAppBanner*)banner{
+    if ([banner.appVersionFilterValue isEqualToString:@""]) {
+        return true;
+    }
+    
+    if ([banner.appVersionFilterRelation isEqualToString:@"equals"]) {
+        if (APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"greaterThan"]) {
+        if (APP_VERSION_GREATER_THAN(banner.appVersionFilterValue)) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"lessThan"]) {
+        if (APP_VERSION_LESS_THAN(banner.appVersionFilterValue)) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"between"]) {
+        if (APP_VERSION_GREATER_THAN_OR_EQUAL_TO(banner.fromVersion) && APP_VERSION_LESS_THAN_OR_EQUAL_TO(banner.toVersion)) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"notEquals"]) {
+        if (!APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"contains"]) {
+        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location != NSNotFound) {
+            return true;
+        }
+    } else if ([banner.appVersionFilterRelation isEqualToString:@"notContains"]) {
+        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location == NSNotFound) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
