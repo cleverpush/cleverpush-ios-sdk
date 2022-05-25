@@ -6,29 +6,31 @@
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
-        self.id = [json objectForKey:@"_id"];
-        self.channel = [json objectForKey:@"channel"];
-        self.name = [json objectForKey:@"name"];
-        self.HTMLContent = [json objectForKey:@"content"];
-        self.contentType = [json objectForKey:@"contentType"];
+        self.id = [json valueForKey:@"_id"];
+        self.channel = [json valueForKey:@"channel"];
+        self.name = [json valueForKey:@"name"];
+        self.HTMLContent = [json valueForKey:@"content"];
+        self.contentType = [json valueForKey:@"contentType"];
         self.appVersionFilterRelation = [json valueForKey:@"appVersionFilterRelation"];
         self.appVersionFilterValue = [json valueForKey:@"appVersionFilterValue"];
         self.fromVersion = [json valueForKey:@"fromVersion"];
         self.toVersion = [json valueForKey:@"toVersion"];
-        if ([json objectForKey:@"testId"] != nil) {
-            self.testId = [json objectForKey:@"testId"];
+        
+        if ([json valueForKey:@"testId"] != nil) {
+            self.testId = [json valueForKey:@"testId"];
         }
-        if ([[json objectForKey:@"type"] isEqual:@"top"]) {
+        
+        if ([[json valueForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
-        } else if ([[json objectForKey:@"type"] isEqual:@"full"]) {
+        } else if ([[json valueForKey:@"type"] isEqualToString:@"full"]) {
             self.type = CPAppBannerTypeFull;
-        } else if ([[json objectForKey:@"type"] isEqual:@"bottom"]) {
+        } else if ([[json valueForKey:@"type"] isEqualToString:@"bottom"]) {
             self.type = CPAppBannerTypeBottom;
         } else {
             self.type = CPAppBannerTypeCenter;
         }
 
-        if ([[json objectForKey:@"status"] isEqual:@"draft"]) {
+        if ([[json valueForKey:@"status"] isEqualToString:@"draft"]) {
             self.status = CPAppBannerStatusDraft;
         } else {
             self.status = CPAppBannerStatusPublished;
