@@ -335,6 +335,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		18B5BD83283FB14C0046577F /* CPAppBannerVersionRelationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerVersionRelationType.h; sourceTree = "<group>"; };
 		290187F527C1020200535617 /* CleverPushUserDefaults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushUserDefaults.h; sourceTree = "<group>"; };
 		2906A2C525857E680078FD61 /* CPUIBlockButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPUIBlockButton.m; sourceTree = "<group>"; };
 		2906A2D025857E900078FD61 /* CPUIBlockButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUIBlockButton.h; sourceTree = "<group>"; };
@@ -811,6 +812,7 @@
 				29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */,
 				295640002588224100FE7611 /* CPAppBannerTriggerType.h */,
 				298676F62572D08B0002E9F1 /* CPAppBannerType.h */,
+				18B5BD83283FB14C0046577F /* CPAppBannerVersionRelationType.h */,
 				2960688E2574451E002159D0 /* CPAspectKeepImageView.h */,
 				2960688F2574452B002159D0 /* CPAspectKeepImageView.m */,
 				296A136B25BE16DF00A2BEED /* CPChannelTag.h */,
