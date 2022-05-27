@@ -37,3 +37,10 @@
 #define CLEVERPUSH_APP_BANNERS_DISABLED_KEY @"CleverPush_APP_BANNERS_DISABLED"
 
 #define CLEVERPUSH_SEEN_STORIES_KEY @"CleverPush_SEEN_STORIES"
+
+#define APP_VERSION_EQUAL_TO(v)                  ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedSame)
+#define APP_VERSION_GREATER_THAN(v)              ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define APP_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define APP_VERSION_LESS_THAN(v)                 ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define APP_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] != NSOrderedDescending)
+#define APP_VERSION [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"]

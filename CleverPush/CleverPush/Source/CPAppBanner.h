@@ -14,6 +14,7 @@
 #import "CPAppBannerHTMLBlock.h"
 #import "CPUtils.h"
 #import "CPAppBannerCarouselBlock.h"
+#import "CPAppBannerVersionRelationType.h"
 @interface CPAppBanner : NSObject
 
 @property (nonatomic) CPAppBannerType type;
@@ -46,6 +47,10 @@
 @property (nonatomic) BOOL carouselEnabled;
 @property (nonatomic) BOOL marginEnabled;
 @property (nonatomic) BOOL closeButtonEnabled;
+@property (nonatomic, strong) NSString *appVersionFilterRelation;
+@property (nonatomic, strong) NSString *appVersionFilterValue;
+@property (nonatomic, strong) NSString *fromVersion;
+@property (nonatomic, strong) NSString *toVersion;
 
 - (id)initWithJson:(NSDictionary*)json;
 
