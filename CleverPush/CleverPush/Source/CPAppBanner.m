@@ -1,4 +1,5 @@
 #import "CPAppBanner.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPAppBanner
 
@@ -6,31 +7,31 @@
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
-        self.id = [json valueForKey:@"_id"];
-        self.channel = [json valueForKey:@"channel"];
-        self.name = [json valueForKey:@"name"];
-        self.HTMLContent = [json valueForKey:@"content"];
-        self.contentType = [json valueForKey:@"contentType"];
-        self.appVersionFilterRelation = [json valueForKey:@"appVersionFilterRelation"];
-        self.appVersionFilterValue = [json valueForKey:@"appVersionFilterValue"];
-        self.fromVersion = [json valueForKey:@"fromVersion"];
-        self.toVersion = [json valueForKey:@"toVersion"];
+        self.id = [json stringForKey:@"_id"];
+        self.channel = [json stringForKey:@"channel"];
+        self.name = [json stringForKey:@"name"];
+        self.HTMLContent = [json stringForKey:@"content"];
+        self.contentType = [json stringForKey:@"contentType"];
+        self.appVersionFilterRelation = [json stringForKey:@"appVersionFilterRelation"];
+        self.appVersionFilterValue = [json stringForKey:@"appVersionFilterValue"];
+        self.fromVersion = [json stringForKey:@"fromVersion"];
+        self.toVersion = [json stringForKey:@"toVersion"];
         
-        if ([json valueForKey:@"testId"] != nil) {
-            self.testId = [json valueForKey:@"testId"];
+        if ([json stringForKey:@"testId"] != nil) {
+            self.testId = [json stringForKey:@"testId"];
         }
         
-        if ([[json valueForKey:@"type"] isEqual:@"top"]) {
+        if ([[json stringForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
-        } else if ([[json valueForKey:@"type"] isEqualToString:@"full"]) {
+        } else if ([[json stringForKey:@"type"] isEqualToString:@"full"]) {
             self.type = CPAppBannerTypeFull;
-        } else if ([[json valueForKey:@"type"] isEqualToString:@"bottom"]) {
+        } else if ([[json stringForKey:@"type"] isEqualToString:@"bottom"]) {
             self.type = CPAppBannerTypeBottom;
         } else {
             self.type = CPAppBannerTypeCenter;
         }
 
-        if ([[json valueForKey:@"status"] isEqualToString:@"draft"]) {
+        if ([[json stringForKey:@"status"] isEqualToString:@"draft"]) {
             self.status = CPAppBannerStatusDraft;
         } else {
             self.status = CPAppBannerStatusPublished;
@@ -45,13 +46,13 @@
                 
                 CPAppBannerBlock* block;
                 
-                if ([[blockJson objectForKey:@"type"] isEqual:@"button"]) {
+                if ([[blockJson stringForKey:@"type"] isEqual:@"button"]) {
                     block = [[CPAppBannerButtonBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson objectForKey:@"type"] isEqual:@"text"]) {
+                } else if ([[blockJson stringForKey:@"type"] isEqual:@"text"]) {
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson objectForKey:@"type"] isEqual:@"image"]) {
+                } else if ([[blockJson stringForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson objectForKey:@"type"] isEqual:@"html"]) {
+                } else if ([[blockJson stringForKey:@"type"] isEqual:@"html"]) {
                     block = [[CPAppBannerHTMLBlock alloc] initWithJson:blockJson];
                 } else {
                     continue;
@@ -84,27 +85,27 @@
             self.stopAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"stopAt"]];
         }
 
-        if ([[json objectForKey:@"dismissType"] isEqual:@"timeout"]) {
+        if ([[json stringForKey:@"dismissType"] isEqual:@"timeout"]) {
             self.dismissType = CPAppBannerDismissTypeTimeout;
-        } else if ([[json objectForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
+        } else if ([[json stringForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
             self.dismissType = CPAppBannerDismissTypeTillDismissed;
         }
 
-        if ([json objectForKey:@"dismissTimeout"] != nil) {
-            self.dismissTimeout = [[json objectForKey:@"dismissTimeout"] intValue];
+        if ([json stringForKey:@"dismissTimeout"] != nil) {
+            self.dismissTimeout = [[json stringForKey:@"dismissTimeout"] intValue];
         } else {
             self.dismissTimeout = 60;
         }
 
-        if ([[json objectForKey:@"stopAtType"] isEqual:@"forever"]) {
+        if ([[json stringForKey:@"stopAtType"] isEqual:@"forever"]) {
             self.stopAtType = CPAppBannerStopAtTypeForever;
-        } else if ([[json objectForKey:@"stopAtType"] isEqual:@"specific_time"]) {
+        } else if ([[json stringForKey:@"stopAtType"] isEqual:@"specific_time"]) {
             self.stopAtType = CPAppBannerStopAtTypeSpecificTime;
         }
 
-        if ([[json objectForKey:@"frequency"] isEqual:@"once"]) {
+        if ([[json stringForKey:@"frequency"] isEqual:@"once"]) {
             self.frequency = CPAppBannerFrequencyOnce;
-        } else if ([[json objectForKey:@"frequency"] isEqual:@"once_per_session"]) {
+        } else if ([[json stringForKey:@"frequency"] isEqual:@"once_per_session"]) {
             self.frequency = CPAppBannerFrequencyOncePerSession;
         }
 
@@ -116,7 +117,7 @@
             }
         }
 
-        if ([[json objectForKey:@"triggerType"] isEqual:@"conditions"]) {
+        if ([[json stringForKey:@"triggerType"] isEqual:@"conditions"]) {
             self.triggerType = CPAppBannerTriggerTypeConditions;
         } else {
             self.triggerType = CPAppBannerTriggerTypeAppOpen;
@@ -146,9 +147,9 @@
             }
         }
 
-        if ([json objectForKey:@"subscribedType"] != nil && [[json objectForKey:@"subscribedType"] isEqual:@"subscribed"]) {
+        if ([json stringForKey:@"subscribedType"] != nil && [[json stringForKey:@"subscribedType"] isEqual:@"subscribed"]) {
             self.subscribedType = CPAppBannerSubscribedTypeSubscribed;
-        } else if ([json objectForKey:@"subscribedType"] != nil && [[json objectForKey:@"subscribedType"] isEqual:@"unsubscribed"]) {
+        } else if ([json stringForKey:@"subscribedType"] != nil && [[json stringForKey:@"subscribedType"] isEqual:@"unsubscribed"]) {
             self.subscribedType = CPAppBannerSubscribedTypeUnsubscribed;
         } else {
             self.subscribedType = CPAppBannerSubscribedTypeAll;

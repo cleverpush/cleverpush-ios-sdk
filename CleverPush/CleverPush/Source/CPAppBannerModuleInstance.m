@@ -273,7 +273,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
--(BOOL)appVersionFilter:(CPAppBanner*)banner isAllowed:(BOOL)allowed{
+-(BOOL)appVersionFilter:(CPAppBanner*)banner isAllowed:(BOOL)allowed {
     if (banner.appVersionFilterRelation == nil || banner.appVersionFilterValue == nil) {
         return allowed;
     }
