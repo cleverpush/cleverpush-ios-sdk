@@ -1,3 +1,6 @@
+# 1.18.1
+* Added `layoutSubviews` in `CPChatView` to make sure the contained WebView always has the correct size
+
 # 1.18.0
 * Support app banners without carousel and with multiple screens
 

@@ -48,6 +48,11 @@ NSString* lastSubscriptionId;
     return self;
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _webView.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, self.frame.size.height);
+}
+
 #pragma mark - Initialise with frame
 - (id)initWithFrame:(CGRect)frame urlOpenedCallback:(CPChatURLOpenedCallback)urlOpenedBlock subscribeCallback:(CPChatSubscribeCallback)subscribeBlock {
     urlOpenedCallback = urlOpenedBlock;
