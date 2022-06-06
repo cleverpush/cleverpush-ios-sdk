@@ -268,6 +268,44 @@ dispatch_queue_t dispatchQueue = nil;
         }
     }
 
+    allowed = [self appVersionFilter:banner isAllowed:allowed];
+    return allowed;
+}
+
+#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+-(BOOL)appVersionFilter:(CPAppBanner*)banner isAllowed:(BOOL)allowed {
+    if (banner.appVersionFilterRelation == nil || banner.appVersionFilterValue == nil) {
+        return allowed;
+    }
+    if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeEquals)]) {
+        if (allowed && !APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeGreaterThan)]) {
+        if (!APP_VERSION_GREATER_THAN(banner.appVersionFilterValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeLessThan)]) {
+        if (!APP_VERSION_LESS_THAN(banner.appVersionFilterValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeBetween)]) {
+        if (!APP_VERSION_GREATER_THAN_OR_EQUAL_TO(banner.fromVersion) && !APP_VERSION_LESS_THAN_OR_EQUAL_TO(banner.toVersion)) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeNotEqual)]) {
+        if (!APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeContains)]) {
+        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location == NSNotFound) {
+            allowed = NO;
+        }
+    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeNotContains)]) {
+        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location != NSNotFound) {
+            allowed = NO;
+        }
+    }
     return allowed;
 }
 
@@ -284,7 +322,6 @@ dispatch_queue_t dispatchQueue = nil;
         if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
             continue;
         }
-        
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
             continue;
         }
