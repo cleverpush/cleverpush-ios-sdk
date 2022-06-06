@@ -68,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.18.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.19.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -81,7 +81,6 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const int maximumNotifications = 100;
-
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;

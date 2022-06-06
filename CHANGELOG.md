@@ -1,4 +1,5 @@
-# 1.18.1
+# 1.19.0
+* Added App Banner version filter relation
 * Added `layoutSubviews` in `CPChatView` to make sure the contained WebView always has the correct size
 
 # 1.18.0

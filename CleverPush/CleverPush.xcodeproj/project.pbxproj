@@ -134,6 +134,7 @@
 		29660B8C2693A591001231C8 /* UIImageView+CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676B42572CF790002E9F1 /* UIImageView+CleverPush.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29660B8D2693A5BF001231C8 /* CPWKWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB8129ED267B6F3B002B8A3D /* CPWKWebView.h */; };
 		29660B8E2693A5DD001231C8 /* CPWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB8129EE267B6F3B002B8A3D /* CPWKWebView.m */; };
+		2967EA8C284E51DE00303648 /* CPAppBannerVersionRelationType.h in Headers */ = {isa = PBXBuildFile; fileRef = 18B5BD83283FB14C0046577F /* CPAppBannerVersionRelationType.h */; };
 		2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2969757824C0FD8F009563C6 /* JavaScriptCore.framework */; };
 		296A132525BE124900A2BEED /* CPNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 296A132425BE124900A2BEED /* CPNotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		296A133025BE127600A2BEED /* CPNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 296A132F25BE127600A2BEED /* CPNotification.m */; };
@@ -1016,6 +1017,7 @@
 				2906A149258557B20078FD61 /* CPAppBannerBlockType.h in Headers */,
 				2906A114258557640078FD61 /* CPAppBannerFrequency.h in Headers */,
 				CBA989A62679D62A003DE995 /* CPWidgetsStories.h in Headers */,
+				2967EA8C284E51DE00303648 /* CPAppBannerVersionRelationType.h in Headers */,
 				2906A176258557D40078FD61 /* CPAppBannerTextBlock.h in Headers */,
 				CBA989AE2679D63F003DE995 /* CPStoryContent.h in Headers */,
 				29D9053725698BB6002D6F9E /* CPTranslate.h in Headers */,
