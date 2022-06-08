@@ -1,5 +1,5 @@
 #import "CPTopicsViewController.h"
-#import <CleverPush/CleverPush.h>
+#import "CleverPush.h"
 #import "CPIntrinsicTableView.h"
 #import "CPChannelTopic.h"
 #import "CPTranslate.h"

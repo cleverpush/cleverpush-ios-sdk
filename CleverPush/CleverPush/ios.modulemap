@@ -1,0 +1,4 @@
+framework module CleverPush {
+    header "CleverPush.h"
+    export *
+}
