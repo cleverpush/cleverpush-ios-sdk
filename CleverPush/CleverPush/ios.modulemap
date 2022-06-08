@@ -1,0 +1,10 @@
+framework module CleverPush {
+    header "CleverPush.h"
+//    header "CPChatView.h"
+//    header "CPiCarousel.h"
+//    header "CPNotificationViewController.h"
+//    header "CPStoryView.h"
+//    header "CPTopicsViewController.h"
+//    header "CPUtils.h"
+    export *
+}
