@@ -859,8 +859,8 @@ static id isNil(id object) {
                                         [userDefaults synchronize];
                                         [self showPendingTopicsDialog];
                                     }
-                                }else{
-                                    if (failureBlock){
+                                }else {
+                                    if (failureBlock) {
                                         failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings?"}]);
                                     }
                                 }
@@ -1050,8 +1050,8 @@ static id isNil(id object) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self performSelector:@selector(syncSubscription:) withObject:nil afterDelay:1.0f];
                     });
-                }else{
-                    if (failureBlock){
+                }else {
+                    if (failureBlock) {
                         failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
                     }
                 }
@@ -1213,7 +1213,7 @@ static id isNil(id object) {
 - (void)syncSubscription:(CPFailureBlock)failureBlock {
     if ([self isSubscriptionInProgress]) {
         NSLog(@"CleverPush: syncSubscription aborted - registration already in progress");
-        if (failureBlock){
+        if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Registration already in progress"}]);
         }
         return;
@@ -1225,7 +1225,7 @@ static id isNil(id object) {
     
     if (!deviceToken && !subscriptionId) {
         NSLog(@"CleverPush: syncSubscription aborted - no deviceToken and no subscriptionId available");
-        if (failureBlock){
+        if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"No deviceToken and no subscriptionId available"}]);
         }
         return;
@@ -1332,7 +1332,7 @@ static id isNil(id object) {
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        if (failureBlock){
+        if (failureBlock) {
             failureBlock(error);
         }
         [self setSubscriptionInProgress:false];
