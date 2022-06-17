@@ -448,9 +448,6 @@
 		29D71E75238073FE00C48ACA /* CPChatView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChatView.h; sourceTree = "<group>"; };
 		29D71E762380742800C48ACA /* CPChatView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChatView.m; sourceTree = "<group>"; };
 		29D71E7E23807E1700C48ACA /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
-		29D9052025698381002D6F9E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		29D905212569838A002D6F9E /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
-		29D905222569839C002D6F9E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29D9052B25698B7F002D6F9E /* CPTranslate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTranslate.m; sourceTree = "<group>"; };
 		29D9053625698BB6002D6F9E /* CPTranslate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTranslate.h; sourceTree = "<group>"; };
 		29DB577E23D4CB0A0040E823 /* CPiCarousel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPiCarousel.m; sourceTree = "<group>"; };
@@ -845,7 +842,6 @@
 				CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */,
 				CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */,
 				291FCD072525DC1500F5185E /* DWAlertController */,
-				29D9051F25698381002D6F9E /* Localizable.strings */,
 				29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */,
 				29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */,
 				2986768F2572CD4E0002E9F1 /* UIColor+HexString.h */,
@@ -1509,19 +1505,6 @@
 			targetProxy = CB1B65D027577B6E0087AC49 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		29D9051F25698381002D6F9E /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				29D9052025698381002D6F9E /* de */,
-				29D905212569838A002D6F9E /* English */,
-				29D905222569839C002D6F9E /* en */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		294F7E8823FB5DB500806D23 /* Debug */ = {

@@ -88,6 +88,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)unsubscribe;
 - (void)unsubscribe:(void(^)(BOOL))callback;
 - (void)syncSubscription;
+- (void)syncSubscription:(CPFailureBlock)failureBlock;
 - (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken;
 - (void)handleDidFailRegisterForRemoteNotification:(NSError*)err;
 - (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
