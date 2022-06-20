@@ -352,7 +352,6 @@ static CGFloat const CPConstraints = 30.0;
     result = [addedCacheDelay compare:[CPUtils getLastTopicCheckedTime]];
     
     if (self.topicsDialogShowWhenNewAdded && result == NSOrderedDescending) {
-        [cell updateSeparatorWithTopicHighlighter:YES];
         cell.topicHighlighter.hidden = NO;
         if ([CleverPush getBrandingColor]) {
             cell.topicHighlighter.textColor = [CleverPush getBrandingColor];
@@ -361,14 +360,17 @@ static CGFloat const CPConstraints = 30.0;
         }
     } else {
         cell.topicHighlighter.hidden = YES;
-        [cell updateSeparatorWithTopicHighlighter:NO];
     }
-    
+    [cell updateSeparatorWithTopicHighlighter];
     cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    [(CPTopicDialogCell *)cell updateSeparatorWithTopicHighlighter];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

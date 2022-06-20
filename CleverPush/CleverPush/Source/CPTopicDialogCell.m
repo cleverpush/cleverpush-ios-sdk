@@ -1,6 +1,9 @@
 #import "CPTopicDialogCell.h"
 
 #define separatorTag 1001
+#define separatorHeight 0.45
+#define separatorX 1.0
+#define separatorY 1.0
 
 @implementation CPTopicDialogCell
 
@@ -12,29 +15,25 @@
     [super setSelected:selected animated:animated];
 }
 
--(void)createSeparator{
+- (void)createSeparator{
     UIView *separatorView = [self.contentView viewWithTag:separatorTag];
     if (separatorView == nil) {
-        UIView *separatorView = [[UIView alloc] initWithFrame:CGRectMake(8, self.bounds.size.height-1, (self.bounds.size.width - 16), 0.45)];
+        UIView *separatorView = [[UIView alloc] initWithFrame:CGRectMake(separatorX, self.bounds.size.height-separatorY, (self.bounds.size.width - (separatorX*2)), separatorHeight)];
         separatorView.tag = separatorTag;
         [separatorView setBackgroundColor:[UIColor lightGrayColor]];
         [self.contentView addSubview:separatorView];
     }
 }
 
--(void)updateSeparatorWithTopicHighlighter :(BOOL) isTopicHighlighter{
+- (void)updateSeparatorWithTopicHighlighter{
     UIView *separatorView = [self.contentView viewWithTag:separatorTag];
-    if (isTopicHighlighter) {
-        [separatorView setFrame:CGRectMake(23, self.bounds.size.height-4, (self.bounds.size.width - 32), 1.0)];
-    }else{
-        [separatorView setFrame:CGRectMake(8, self.bounds.size.height-4, (self.bounds.size.width - 16), 1.0)];
-    }
+    [self layoutIfNeeded];
+    [separatorView setFrame:CGRectMake(separatorX, self.bounds.size.height-separatorY, (self.bounds.size.width - (separatorX*2)), separatorHeight)];
 }
 
--(void)hideSeprator :(BOOL) isHidden{
+- (void)hideSeprator:(BOOL)isHidden{
     UIView *separatorView = [self.contentView viewWithTag:separatorTag];
     [separatorView setHidden:isHidden];
 }
-
 
 @end
