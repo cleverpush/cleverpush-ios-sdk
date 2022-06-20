@@ -859,7 +859,7 @@ static id isNil(id object) {
                                         [userDefaults synchronize];
                                         [self showPendingTopicsDialog];
                                     }
-                                }else {
+                                } else {
                                     if (failureBlock) {
                                         failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings?"}]);
                                     }
@@ -1050,7 +1050,7 @@ static id isNil(id object) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self performSelector:@selector(syncSubscription:) withObject:nil afterDelay:1.0f];
                     });
-                }else {
+                } else {
                     if (failureBlock) {
                         failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
                     }
@@ -1085,128 +1085,7 @@ static id isNil(id object) {
 
 #pragma mark - Api call and fetch out the subscription data and sync
 - (void)syncSubscription {
-    if ([self isSubscriptionInProgress]) {
-        NSLog(@"CleverPush: syncSubscription aborted - registration already in progress");
-        return;
-    }
-
-    if (!deviceToken) {
-        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
-    }
-
-    if (!deviceToken && !subscriptionId) {
-        NSLog(@"CleverPush: syncSubscription aborted - no deviceToken and no subscriptionId available");
-        return;
-    }
-
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
-
-    [self setSubscriptionInProgress:true];
-    NSMutableURLRequest* request;
-    request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSString* language = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
-    if (!language) {
-        language = [[[NSLocale preferredLanguages] firstObject] substringToIndex:2];
-    }
-    NSString* country = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY];
-    if (!country) {
-        country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
-    }
-    NSString* timezone = [[NSTimeZone localTimeZone] name];
-
-    [request setAllHTTPHeaderFields:@{
-        @"User-Agent": [NSString stringWithFormat:@"CleverPush iOS SDK %@", CLEVERPUSH_SDK_VERSION],
-        @"Accept-Language": language
-    }];
-
-    NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                    @"SDK", @"browserType",
-                                    CLEVERPUSH_SDK_VERSION, @"browserVersion",
-                                    @"iOS", @"platformName",
-                                    [[UIDevice currentDevice] systemVersion], @"platformVersion",
-                                    [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @"appVersion",
-                                    isNil(country), @"country",
-                                    isNil(timezone), @"timezone",
-                                    isNil(language), @"language",
-                                    nil];
-
-    if (subscriptionId) {
-        [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
-    }
-
-    if (deviceToken) {
-        [dataDic setObject:deviceToken forKey:@"apnsToken"];
-    }
-
-    if (
-        channelConfig != nil
-        && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
-        && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
-        && [channelConfig objectForKey:@"confirmAlertTestId"]
-    ) {
-        [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
-    }
-    
-    NSArray* topics = [self getSubscriptionTopics];
-    if (topics != nil && [topics count] >= 0) {
-        
-        [dataDic setObject:topics forKey:@"topics"];
-        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-        if (topicsVersion) {
-            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
-        } else {
-            [dataDic setObject:@"1" forKey:@"topicsVersion"];
-        }
-    }
-    
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-    
-    NSLog(@"CleverPush: syncSubscription Request data:%@ id:%@", dataDic, subscriptionId);
-    
-    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        [self setSubscriptionInProgress:false];
-
-        [self setUnsubscribeStatus:NO];
-        [self updateDeselectFlag:NO];
-
-        if ([results objectForKey:@"topics"] != nil) {
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:[results objectForKey:@"topics"] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-            if ([results objectForKey:@"topicsVersion"] != nil) {
-                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-            }
-            [userDefaults synchronize];
-        }
-        
-        if ([results objectForKey:@"id"] != nil) {
-            if (!subscriptionId) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
-            }
-            subscriptionId = [results objectForKey:@"id"];
-            [[NSUserDefaults standardUserDefaults] setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
-            [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            if (handleSubscribed && ![self getHandleSubscribedCalled]) {
-                handleSubscribed(subscriptionId);
-                [self setHandleSubscribedCalled:YES];
-            }
-            if (handleSubscribedInternal) {
-                handleSubscribedInternal(subscriptionId);
-            }
-            for (id (^listener)() in pendingSubscriptionListeners) {
-                listener(subscriptionId);
-            }
-            pendingSubscriptionListeners = [NSMutableArray new];
-        }
-    } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        
-        [self setSubscriptionInProgress:false];
-    }];
+    [self syncSubscription:nil];
 }
 
 #pragma mark - Api call and fetch out the subscription data and sync with Failure block
@@ -1231,6 +1110,7 @@ static id isNil(id object) {
         return;
     }
     
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription:) object:nil];
     
     [self setSubscriptionInProgress:true];
