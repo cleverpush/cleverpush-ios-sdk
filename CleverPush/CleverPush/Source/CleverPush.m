@@ -291,6 +291,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
 }
 
++ (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
+    [self.CPSharedInstance setKeepTargetingDataOnUnsubscribe:keepData];
+}
+
 + (void)setIncrementBadge:(BOOL)increment {
     [self.CPSharedInstance setIncrementBadge:increment];
 }

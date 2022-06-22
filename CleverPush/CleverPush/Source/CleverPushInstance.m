@@ -68,7 +68,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.19.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.19.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -78,6 +78,7 @@ static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
+static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const int maximumNotifications = 100;
@@ -280,7 +281,7 @@ static id isNil(id object) {
         }
         
         if (channelId == nil) {
-            channelId  = [self getChannelIdFromUserDefault];
+            channelId  = [self getChannelIdFromUserDefaults];
         } else if ([self isChannelIdChanged:channelId]) {
             [self addOrUpdateChannelId:channelId];
             [self clearSubscriptionData];
@@ -1091,6 +1092,10 @@ static id isNil(id object) {
     }
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
+    
+    if (channelId == nil) {
+        channelId = [self getChannelIdFromUserDefaults];
+    }
 
     [self setSubscriptionInProgress:true];
     NSMutableURLRequest* request;
@@ -2753,6 +2758,10 @@ static id isNil(id object) {
     ignoreDisabledNotificationPermission = ignore;
 }
 
+- (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
+    keepTargetingDataOnUnsubscribe = keepData;
+}
+
 - (void)setChatBackgroundColor:(UIColor *)color {
     chatBackgroundColor = color;
 }
@@ -2836,7 +2845,7 @@ static id isNil(id object) {
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:CLEVERPUSH_CHANNEL_ID_KEY];
 }
 
-- (NSString*)getChannelIdFromUserDefault {
+- (NSString*)getChannelIdFromUserDefaults {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     return [userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY];
 }
