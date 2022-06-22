@@ -120,6 +120,7 @@ CPHandleSubscribedBlock handleSubscribedInternal;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
+CPAddRemoveTopicHandler addRemoveTopicResult;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -1188,6 +1189,9 @@ static id isNil(id object) {
             if (handleSubscribedInternal) {
                 handleSubscribedInternal(subscriptionId);
             }
+            if (addRemoveTopicResult != nil) {
+                addRemoveTopicResult(subscriptionId);
+            }
             for (id (^listener)() in pendingSubscriptionListeners) {
                 listener(subscriptionId);
             }
@@ -1195,6 +1199,9 @@ static id isNil(id object) {
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
+        if (addRemoveTopicResult != nil) {
+            addRemoveTopicResult(subscriptionId);
+        }
         
         [self setSubscriptionInProgress:false];
     }];
@@ -1593,6 +1600,20 @@ static id isNil(id object) {
 
 - (void)addSubscriptionTags:(NSArray*)tagIds {
     [self addSubscriptionTags:tagIds callback:nil];
+}
+
+- (void)removeSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
+    addRemoveTopicResult = callback;
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *topics = [userDefaults valueForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    if ([topics containsObject:topicId]){
+        [topics removeObject:topics];
+    }
+    [self setSubscriptionTopics:topics];
+}
+
+- (void)removeSubscriptionTopic:(NSString*)topicId {
+    [self removeSubscriptionTopic:topicId callback:nil];
 }
 
 - (void)removeSubscriptionTags:(NSArray*)tagIds {
@@ -2024,6 +2045,17 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     return subscriptionTopics ? YES : NO;
+}
+
+- (void)addSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
+    addRemoveTopicResult = callback;
+    NSMutableArray *topics = [[NSMutableArray alloc] initWithObjects:nil];
+    [topics addObject:topicId];
+    [self setSubscriptionTopics:topics];
+}
+
+- (void)addSubscriptionTopic:(NSString*)topicId {
+    [self addSubscriptionTopic:topicId callback:nil];
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
