@@ -1171,6 +1171,9 @@ static id isNil(id object) {
                 [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
             }
             [userDefaults synchronize];
+            if (addRemoveTopicResult != nil) {
+                addRemoveTopicResult();
+            }
         }
         
         if ([results objectForKey:@"id"] != nil) {
@@ -1189,9 +1192,6 @@ static id isNil(id object) {
             if (handleSubscribedInternal) {
                 handleSubscribedInternal(subscriptionId);
             }
-            if (addRemoveTopicResult != nil) {
-                addRemoveTopicResult(subscriptionId);
-            }
             for (id (^listener)() in pendingSubscriptionListeners) {
                 listener(subscriptionId);
             }
@@ -1199,9 +1199,6 @@ static id isNil(id object) {
         }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        if (addRemoveTopicResult != nil) {
-            addRemoveTopicResult(subscriptionId);
-        }
         
         [self setSubscriptionInProgress:false];
     }];
@@ -1604,10 +1601,9 @@ static id isNil(id object) {
 
 - (void)removeSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
     addRemoveTopicResult = callback;
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *topics = [userDefaults valueForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-    if ([topics containsObject:topicId]){
-        [topics removeObject:topics];
+    NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
+    if ([topics containsObject:topicId]) {
+        [topics removeObject:topicId];
     }
     [self setSubscriptionTopics:topics];
 }
@@ -2049,9 +2045,11 @@ static id isNil(id object) {
 
 - (void)addSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
     addRemoveTopicResult = callback;
-    NSMutableArray *topics = [[NSMutableArray alloc] initWithObjects:nil];
-    [topics addObject:topicId];
-    [self setSubscriptionTopics:topics];
+    NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
+    if (![topics containsObject:topicId]) {
+        [topics addObject:topicId];
+        [self setSubscriptionTopics:topics];
+    }
 }
 
 - (void)addSubscriptionTopic:(NSString*)topicId {

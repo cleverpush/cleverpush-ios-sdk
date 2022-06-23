@@ -197,7 +197,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance addSubscriptionTag:tagId];
 }
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
     [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback];
 }
 
@@ -271,7 +271,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTopicsDialogWindow:window];
 }
 
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
     [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
 }
 

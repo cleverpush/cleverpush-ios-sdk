@@ -50,7 +50,7 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 
-typedef void (^CPAddRemoveTopicHandler)(NSString* message);
+typedef void (^CPAddRemoveTopicHandler)();
 
 @class CPChannelTag;
 
