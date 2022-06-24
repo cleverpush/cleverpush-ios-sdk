@@ -407,6 +407,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setUnsubscribeStatus:status];
 }
 
++ (void)setConfirmAlertShown {
+    [self.CPSharedInstance setConfirmAlertShown];
+}
+
 + (UIViewController*)topViewController {
     return [self.CPSharedInstance topViewController];
 }
