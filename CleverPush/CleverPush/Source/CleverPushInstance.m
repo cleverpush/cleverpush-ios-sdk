@@ -1057,6 +1057,8 @@ static id isNil(id object) {
 - (void)isSubscribed:(void(^)(BOOL))callback {
     if (subscriptionId) {
         [self notificationsEnabled:callback] ;
+    } else if (callback) {
+        callback(NO);
     }
 }
 
