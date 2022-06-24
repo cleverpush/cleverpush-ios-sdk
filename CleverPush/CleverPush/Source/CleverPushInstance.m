@@ -1150,10 +1150,15 @@ static id isNil(id object) {
         channelId = [self getChannelIdFromUserDefaults];
     }
 
+    [self makeSyncSubscriptionRequest:nil successBlock:nil];
+}
+
+#pragma mark - add Subcription API call
+- (void)makeSyncSubscriptionRequest:(CPFailureBlock)failureBlock successBlock:(void(^)())successBlock {
     [self setSubscriptionInProgress:true];
     NSMutableURLRequest* request;
     request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-
+    
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* language = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
     if (!language) {
@@ -1164,12 +1169,11 @@ static id isNil(id object) {
         country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode];
     }
     NSString* timezone = [[NSTimeZone localTimeZone] name];
-
+    
     [request setAllHTTPHeaderFields:@{
         @"User-Agent": [NSString stringWithFormat:@"CleverPush iOS SDK %@", CLEVERPUSH_SDK_VERSION],
         @"Accept-Language": language
     }];
-
     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                     @"SDK", @"browserType",
                                     CLEVERPUSH_SDK_VERSION, @"browserVersion",
@@ -1180,24 +1184,21 @@ static id isNil(id object) {
                                     isNil(timezone), @"timezone",
                                     isNil(language), @"language",
                                     nil];
-
+    
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
     }
-
     if (deviceToken) {
         [dataDic setObject:deviceToken forKey:@"apnsToken"];
     }
-
     if (
         channelConfig != nil
         && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
         && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
         && [channelConfig objectForKey:@"confirmAlertTestId"]
-    ) {
-        [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
-    }
-    
+        ) {
+            [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
+        }
     NSArray* topics = [self getSubscriptionTopics];
     if (topics != nil && [topics count] >= 0) {
         
@@ -1217,13 +1218,21 @@ static id isNil(id object) {
     
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         [self setSubscriptionInProgress:false];
-
+        
         [self setUnsubscribeStatus:NO];
         [self updateDeselectFlag:NO];
-
+        
         if ([results objectForKey:@"topics"] != nil) {
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:[results objectForKey:@"topics"] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+            NSMutableArray *arrTopics = [[NSMutableArray alloc] init];
+            [[results objectForKey:@"topics"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if (![obj isKindOfClass:[NSNull class]]) {
+                    [arrTopics addObject:obj];
+                }
+                
+            }];
+            
+            [userDefaults setObject:arrTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
             if ([results objectForKey:@"topicsVersion"] != nil) {
                 [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
             }
@@ -1251,9 +1260,17 @@ static id isNil(id object) {
             }
             pendingSubscriptionListeners = [NSMutableArray new];
         }
+
+        if (successBlock) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+              successBlock();
+            });
+        }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        
+        if (failureBlock) {
+            failureBlock(error);
+        }
         [self setSubscriptionInProgress:false];
     }];
 }
@@ -1653,6 +1670,21 @@ static id isNil(id object) {
     [self addSubscriptionTags:tagIds callback:nil];
 }
 
+- (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
+    NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
+    if ([topics containsObject:topicId]) {
+        [topics removeObject:topicId];
+        [self setDefaultCheckedTopics:topics];
+        [self makeSyncSubscriptionRequest:nil successBlock:callback];
+    } else if (callback) {
+        callback();
+    }
+}
+
+- (void)removeSubscriptionTopic:(NSString*)topicId {
+    [self removeSubscriptionTopic:topicId callback:nil];
+}
+
 - (void)removeSubscriptionTags:(NSArray*)tagIds {
     [self removeSubscriptionTags:tagIds callback:nil];
 }
@@ -1715,7 +1747,7 @@ static id isNil(id object) {
 }
 
 - (void)addSubscriptionTagstoServer:(NSString*)tagId callback:(void (^)(NSString *))callback{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -1758,7 +1790,7 @@ static id isNil(id object) {
 }
 
 - (void)removeSubscriptionTagsfromServer:(NSString *)tagId callback:(void (^)(NSString *))callback {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -2082,6 +2114,21 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     return subscriptionTopics ? YES : NO;
+}
+
+- (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
+    NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
+    if (![topics containsObject:topicId]) {
+        [topics addObject:topicId];
+        [self setDefaultCheckedTopics:topics];
+        [self makeSyncSubscriptionRequest:nil successBlock:callback];
+    } else if (callback) {
+        callback();
+    }
+}
+
+- (void)addSubscriptionTopic:(NSString*)topicId {
+    [self addSubscriptionTopic:topicId callback:nil];
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"

@@ -9,9 +9,9 @@
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyWidgetId:(NSString *)id {
     self = [super initWithFrame:frame];
     if (self) {
-        if (id != nil && id.length != 0){
-            [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget){
-                dispatch_async(dispatch_get_main_queue(), ^(void){
+        if (id != nil && id.length != 0) {
+            [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget) {
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
                     if (backgroundColor != nil) {
                         self.backgroundColor = backgroundColor;
                     } else {

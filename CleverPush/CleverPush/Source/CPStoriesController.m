@@ -36,7 +36,7 @@
     CGFloat topSideRestrction = CGRectGetMinX(self.view.frame);
     CGFloat viewCurrentOrginYValue = self.view.frame.origin.y;
     
-    if (panGesture.state == UIGestureRecognizerStateBegan || panGesture.state == UIGestureRecognizerStateChanged){
+    if (panGesture.state == UIGestureRecognizerStateBegan || panGesture.state == UIGestureRecognizerStateChanged) {
         [self setFrameRect:CGPointMake(0, translation.y)];
         viewCurrentOrginYValue = self.view.frame.origin.y;
         
@@ -133,7 +133,7 @@
     NSString *content = [NSString stringWithFormat:@"<!DOCTYPE html><html><head><script async src=\"https://cdn.ampproject.org/v0.js\"></script><script async custom-element=\"amp-story-player\" src=\"https://cdn.ampproject.org/v0/amp-story-player-0.1.js\"></script></head><body><amp-story-player layout=\"fixed\" width=\"%f\" height=\"%f\"><a href=\"%@\">\"%@\"</a></amp-story-player><script>var player = document.querySelector('amp-story-player');player.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});player.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});</script></body></html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
     
     view = webview;
-    [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error){
+    [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
@@ -196,7 +196,7 @@
     if (self.storyIndex == self.stories.count - 1) {
         [self onDismiss];
     } else if (self.storyIndex >= 0) {
-        dispatch_async(dispatch_get_main_queue(), ^(void){
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
         });
     }
@@ -206,7 +206,7 @@
     if (self.storyIndex == 0)  {
         self.carousel.currentItemIndex = 0;
     } else if (self.storyIndex >= 0) {
-        dispatch_async(dispatch_get_main_queue(), ^(void){
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
         });
     }
@@ -214,7 +214,7 @@
 
 #pragma mark Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
-    if ([message.name isEqualToString:@"previous"]){
+    if ([message.name isEqualToString:@"previous"]) {
         [self previous];
     } else {
         [self next];
