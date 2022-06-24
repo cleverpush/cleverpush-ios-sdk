@@ -7,5 +7,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UILabel *titleText;
 @property (weak, nonatomic) IBOutlet UILabel *topicHighlighter;
 
+-(void)createSeparator;
+-(void)updateSeparatorWithTopicHighlighter;
+-(void)hideSeprator :(BOOL) isHidden;
+
 @end
 NS_ASSUME_NONNULL_END

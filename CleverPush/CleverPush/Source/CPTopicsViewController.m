@@ -38,6 +38,7 @@ static CGFloat const CPConstraints = 30.0;
     tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.001)];
     tableView.delegate = self;
     tableView.dataSource = self;
+    [tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     self.view = tableView;
 }
 
@@ -316,11 +317,19 @@ static CGFloat const CPConstraints = 30.0;
     if (cell == nil) {
         cell = nibs[0];
     }
+    [cell layoutIfNeeded];
+    [cell createSeparator];
     int row = (int)indexPath.row;
     CPChannelTopic *topic = [self getTopic:row];
     
     NSString* topicId = [topic id];
     int topicIndex = [self getTopicIndex:topicId];
+    
+    if ([topicId isEqualToString:((CPChannelTopic *)[availableTopics lastObject]).id]) {
+        [cell hideSeprator:YES];
+    }else {
+        [cell hideSeprator:NO];
+    }
     
     cell.operatableSwitch.tag = topicIndex + 1;
     cell.operatableSwitch.on = [self defaultTopicState:topic] ? YES : NO;
@@ -352,12 +361,16 @@ static CGFloat const CPConstraints = 30.0;
     } else {
         cell.topicHighlighter.hidden = YES;
     }
-    
+    [cell updateSeparatorWithTopicHighlighter];
     cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    [(CPTopicDialogCell *)cell updateSeparatorWithTopicHighlighter];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
