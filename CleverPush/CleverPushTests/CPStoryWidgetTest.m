@@ -28,8 +28,8 @@
 
 - (void)testWidgetStories {
     XCTestExpectation *expectation = [self expectationWithDescription:@"WidgetStories"];
-    [CPWidgetModule getWidgetsStories:@"o76RepCskiS9QiHsy" completion:^(CPWidgetsStories *Widget){
-        dispatch_async(dispatch_get_main_queue(), ^(void){
+    [CPWidgetModule getWidgetsStories:@"o76RepCskiS9QiHsy" completion:^(CPWidgetsStories *Widget) {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
             XCTAssertNotNil(Widget);
             XCTAssertNotNil(Widget.widgets);
             XCTAssertNotNil(Widget.stories);

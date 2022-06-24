@@ -189,7 +189,7 @@
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void){
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.controller dismissViewControllerAnimated:NO completion:nil];

@@ -50,8 +50,6 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 
-typedef void (^CPAddRemoveTopicHandler)();
-
 @class CPChannelTag;
 
 @interface CleverPushInstance : NSObject
@@ -100,7 +98,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
 - (void)addSubscriptionTags:(NSArray*)tagIds;
 - (void)addSubscriptionTag:(NSString*)tagId;
-- (void)removeSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback;
+- (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback;
 - (void)removeSubscriptionTopic:(NSString*)topicId;
 - (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback;
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
@@ -116,7 +114,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setSubscriptionLanguage:(NSString*)language;
 - (void)setSubscriptionCountry:(NSString*)country;
 - (void)setTopicsDialogWindow:(UIWindow *)window;
-- (void)addSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback;
+- (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback;
 - (void)addSubscriptionTopic:(NSString*)topicId;
 - (void)setSubscriptionTopics:(NSMutableArray *)topics;
 - (void)setBrandingColor:(UIColor *)color;

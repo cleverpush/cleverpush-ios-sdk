@@ -1092,11 +1092,11 @@ static id isNil(id object) {
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription) object:nil];
 
-    [self updateSubcriptionsAPI:nil topicBlock:nil];
+    [self makeSyncSubscriptionRequest:nil successBlock:nil];
 }
 
 #pragma mark - add Subcription API call
-- (void)updateSubcriptionsAPI:(CPFailureBlock)failureBlock topicBlock:(CPAddRemoveTopicHandler)addTopicBlock {
+- (void)makeSyncSubscriptionRequest:(CPFailureBlock)failureBlock successBlock:(void(^)())successBlock {
     [self setSubscriptionInProgress:true];
     NSMutableURLRequest* request;
     request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
@@ -1179,11 +1179,6 @@ static id isNil(id object) {
                 [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
             }
             [userDefaults synchronize];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (addTopicBlock) {
-                    addTopicBlock();
-                }
-            });
         }
         
         if ([results objectForKey:@"id"] != nil) {
@@ -1207,9 +1202,15 @@ static id isNil(id object) {
             }
             pendingSubscriptionListeners = [NSMutableArray new];
         }
+
+        if (successBlock) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+              successBlock();
+            });
+        }
     } onFailure:^(NSError* error) {
         NSLog(@"CleverPush Error: syncSubscription failure %@", error);
-        if (failureBlock){
+        if (failureBlock) {
             failureBlock(error);
         }
         [self setSubscriptionInProgress:false];
@@ -1611,12 +1612,14 @@ static id isNil(id object) {
     [self addSubscriptionTags:tagIds callback:nil];
 }
 
-- (void)removeSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
+- (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
     NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
     if ([topics containsObject:topicId]) {
         [topics removeObject:topicId];
         [self setDefaultCheckedTopics:topics];
-        [self updateSubcriptionsAPI:nil topicBlock:callback];
+        [self makeSyncSubscriptionRequest:nil successBlock:callback];
+    } else if (callback) {
+        callback();
     }
 }
 
@@ -1686,7 +1689,7 @@ static id isNil(id object) {
 }
 
 - (void)addSubscriptionTagstoServer:(NSString*)tagId callback:(void (^)(NSString *))callback{
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/tag"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -1729,7 +1732,7 @@ static id isNil(id object) {
 }
 
 - (void)removeSubscriptionTagsfromServer:(NSString *)tagId callback:(void (^)(NSString *))callback {
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/untag"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -2055,12 +2058,14 @@ static id isNil(id object) {
     return subscriptionTopics ? YES : NO;
 }
 
-- (void)addSubscriptionTopic:(NSString*)topicId callback:(CPAddRemoveTopicHandler)callback {
+- (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
     NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
     if (![topics containsObject:topicId]) {
         [topics addObject:topicId];
         [self setDefaultCheckedTopics:topics];
-        [self updateSubcriptionsAPI:nil topicBlock:callback];
+        [self makeSyncSubscriptionRequest:nil successBlock:callback];
+    } else if (callback) {
+        callback();
     }
 }
 

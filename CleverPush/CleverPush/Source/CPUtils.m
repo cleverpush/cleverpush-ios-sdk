@@ -261,7 +261,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     [controller dismissViewControllerAnimated:YES completion:^{
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        dispatch_async(dispatch_get_main_queue(), ^(void){
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (URL) {
                 if ([SFSafariViewController class] != nil) {
                     SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
@@ -420,7 +420,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             deviceName = @"iPod Touch";
         } else if ([code rangeOfString:@"iPad"].location != NSNotFound) {
             deviceName = @"iPad";
-        } else if([code rangeOfString:@"iPhone"].location != NSNotFound){
+        } else if([code rangeOfString:@"iPhone"].location != NSNotFound) {
             deviceName = @"iPhone";
         } else {
             deviceName = @"Unknown";

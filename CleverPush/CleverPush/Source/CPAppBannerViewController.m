@@ -242,7 +242,7 @@
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.cardCollectionView.frame.size.width;
     float currentPage = self.cardCollectionView.contentOffset.x / pageWidth;
-    if (0.0f != fmodf(currentPage, 1.0f)){
+    if (0.0f != fmodf(currentPage, 1.0f)) {
         self.pageControl.currentPage = currentPage + 1;
     } else {
         self.pageControl.currentPage = currentPage;
@@ -285,7 +285,7 @@
 #pragma mark - UIWebView Delgate Method
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
-    if ([message.name isEqualToString:@"close"]){
+    if ([message.name isEqualToString:@"close"]) {
         [self onDismiss];
     }
 }
@@ -325,7 +325,7 @@
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void){
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self fadeOut];
         [self jumpOut];
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
