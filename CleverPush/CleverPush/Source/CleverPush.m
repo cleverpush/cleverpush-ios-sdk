@@ -483,6 +483,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance isDevelopmentModeEnabled];
 }
 
++ (void)isSubscribed:(void(^)(BOOL))callback {
+    [self.CPSharedInstance isSubscribed:callback];
+}
+
 + (BOOL)isSubscribed {
     return [self.CPSharedInstance isSubscribed];
 }

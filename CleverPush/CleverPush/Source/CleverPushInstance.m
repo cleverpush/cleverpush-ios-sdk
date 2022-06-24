@@ -741,6 +741,49 @@ static id isNil(id object) {
 }
 
 #pragma mark - notificationsEnabled
+- (void)notificationsEnabled:(void(^)(BOOL))callback{
+    __block BOOL isEnabled = NO;
+    
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {
+        
+        if (@available(iOS 10.0, *)) {
+            [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
+                if (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                    isEnabled = YES;
+                }
+                
+                if (callback) {
+                    callback(isEnabled);
+                }
+            }];
+        }
+    } else {
+        [self ensureMainThreadSync:^{
+            if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+                UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+                if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+                    isEnabled = NO;
+                } else {
+                    isEnabled = YES;
+                }
+#pragma clang diagnostic pop
+            } else {
+                if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+                    isEnabled = YES;
+                } else {
+                    isEnabled = NO;
+                }
+            }
+            
+            if (callback) {
+                callback(isEnabled);
+            }
+        }];
+    }
+}
+
 - (BOOL)notificationsEnabled {
     __block BOOL isEnabled = NO;
     
@@ -1011,6 +1054,12 @@ static id isNil(id object) {
 }
 
 #pragma mark - identify the channels being subscribed or not
+- (void)isSubscribed:(void(^)(BOOL))callback {
+    if (subscriptionId) {
+        [self notificationsEnabled:callback] ;
+    }
+}
+
 - (BOOL)isSubscribed {
     BOOL isSubscribed = NO;
     if (subscriptionId && [self notificationsEnabled]) {

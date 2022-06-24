@@ -140,7 +140,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSDictionary*)getSubscriptionAttributes;
 
 + (BOOL)isDevelopmentModeEnabled;
-+ (BOOL)isSubscribed;
++ (void)isSubscribed:(void(^)(BOOL))callback;
++ (BOOL)isSubscribed __attribute__((deprecated));
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 + (BOOL)getDeselectValue;
