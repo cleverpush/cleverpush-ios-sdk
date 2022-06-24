@@ -325,7 +325,7 @@ static CGFloat const CPConstraints = 30.0;
     NSString* topicId = [topic id];
     int topicIndex = [self getTopicIndex:topicId];
     
-    if (availableTopics.count - 1 == row) {
+    if ([topicId isEqualToString:((CPChannelTopic *)[availableTopics lastObject]).id]) {
         [cell hideSeprator:YES];
     }else {
         [cell hideSeprator:NO];
