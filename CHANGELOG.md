@@ -1,3 +1,6 @@
+# 1.19.1
+* Implemented `setKeepTargetingDataOnUnsubscribe` method
+
 # 1.19.0
 * Added App Banner version filter relation
 * Added `layoutSubviews` in `CPChatView` to make sure the contained WebView always has the correct size

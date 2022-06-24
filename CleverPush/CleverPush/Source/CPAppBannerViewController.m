@@ -104,7 +104,12 @@
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
         [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
-
+    
+    [self.btnClose.layer setShadowColor:[UIColor blackColor].CGColor];
+    [self.btnClose.layer setShadowRadius:3.0];
+    [self.btnClose.layer setShadowOpacity:1.0];
+    [self.btnClose.layer setShadowOffset:CGSizeMake(0, 0)];
+    [self.btnClose.layer setMasksToBounds:false];
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
     } else {
@@ -209,8 +214,12 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
-    [cell layoutIfNeeded];
     return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
+    [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
+    [cell layoutIfNeeded];
 }
 
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
