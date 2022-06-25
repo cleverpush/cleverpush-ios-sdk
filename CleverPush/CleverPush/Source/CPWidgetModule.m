@@ -1,4 +1,7 @@
 #import "CPWidgetModule.h"
+#import "CPUtils.h"
+#import "CPLog.h"
+
 @interface CPWidgetModule()
 @end
 
@@ -11,7 +14,7 @@
         widgetsPath = [NSString stringWithFormat:@"%@&t=%f", widgetsPath, NSDate.date.timeIntervalSince1970];
     }
     
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:widgetsPath];
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:widgetsPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
             CPWidgetsStories *widgets = [[CPWidgetsStories alloc] initWithJson:result];
@@ -21,7 +24,7 @@
             }
         }
     } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: Failed getting widgets stories %@", error);
+        [CPLog error:@"Failed getting widgets stories %@", error];
     }];
 }
 @end

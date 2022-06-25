@@ -4,6 +4,7 @@
 #import "UIApplicationDelegate+CleverPush.h"
 #import "CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
+#import "CPLog.h"
 
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
@@ -103,7 +104,7 @@ static NSArray* delegateSubclasses = nil;
 }
 
 - (void)cleverPushReceivedRemoteNotification:(UIApplication*)application userInfo:(NSDictionary*)userInfo {
-    NSLog(@"CleverPush: cleverPushReceivedRemoteNotification");
+    [CPLog info:@"cleverPushReceivedRemoteNotification"];
     
     if ([CleverPush channelId]) {
         [CleverPush handleNotificationReceived:userInfo isActive:[application applicationState] == UIApplicationStateActive];

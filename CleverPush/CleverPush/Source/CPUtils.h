@@ -5,6 +5,9 @@
 
 @interface CPUtils : NSObject
 
+#define HTTP_GET @"GET"
+#define HTTP_POST @"POST"
+
 #pragma mark - Utilities singleton functions
 + (NSString*)downloadMedia:(NSString*)urlString;
 + (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj;
@@ -27,5 +30,6 @@
 + (NSBundle *)getAssetsBundle;
 + (NSString *)timeAgoStringFromDate:(NSDate *)date;
 + (NSUserDefaults *)getUserDefaultsAppGroup;
++ (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor;
 
 @end

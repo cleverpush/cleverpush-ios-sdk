@@ -3,6 +3,7 @@
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
 #import "CPUtils.h"
+#import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 
 static BOOL existanceOfNewTopic = NO;
@@ -47,7 +48,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 - (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)anError {
     error = anError;
     done = YES;
-    
+
     [outputHandle closeFile];
 }
 
@@ -63,7 +64,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if (self = [super init]) {
         if ([[NSFileManager defaultManager] fileExistsAtPath:path])
             [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-        
+
         [[NSFileManager defaultManager] createFileAtPath:path contents:nil attributes:nil];
         outputHandle = [NSFileHandle fileHandleForWritingAtPath:path];
     }
@@ -81,28 +82,28 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (NSString *)downloadItemAtURL:(NSURL *)url toFile:(NSString *)localPath error:(NSError **)error {
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
-    
+
     DirectDownloadDelegate *delegate = [[DirectDownloadDelegate alloc] initWithFilePath:localPath];
-    
+
     NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:delegate delegateQueue:nil];
-    
+
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request];
-    
+
     [task resume];
-    
+
     [session finishTasksAndInvalidate];
-    
+
     while (![delegate isDone]) {
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
     }
-    
+
     NSError *downloadError = [delegate error];
     if (downloadError != nil) {
         if (error)
             *error = downloadError;
         return nil;
     }
-    
+
     return delegate.response.MIMEType;
 }
 
@@ -124,17 +125,17 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark - dictionary with properties of object.
 + (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    
+
     unsigned count;
     objc_property_t *properties = class_copyPropertyList([obj class], &count);
-    
+
     for (int i = 0; i < count; i++) {
         NSString *key = [NSString stringWithUTF8String:property_getName(properties[i])];
         [dict setObject:[obj valueForKey:key] forKey:key];
     }
-    
+
     free(properties);
-    
+
     return [NSDictionary dictionaryWithDictionary:dict];
 }
 
@@ -142,35 +143,35 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSString*)downloadMedia:(NSString*)urlString {
     NSURL* url = [NSURL URLWithString:urlString];
     NSString* extension = url.pathExtension;
-    
+
     if ([extension isEqualToString:@""]) {
         extension = nil;
     }
-    
+
     NSArray *supportedAttachmentTypes = @[@"aiff", @"wav", @"mp3", @"mp4", @"jpg", @"jpeg", @"png", @"gif", @"mpeg", @"mpg", @"avi", @"m4a", @"m4v"];
     if (extension != nil && ![supportedAttachmentTypes containsObject:extension]) {
         return nil;
     }
-    
+
     NSString* name = [self randomStringWithLength:8];
     if (extension) {
         name = [name stringByAppendingString:[NSString stringWithFormat:@".%@", extension]];
     }
-    
+
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
-    
+
     @try {
         NSError *error;
         [NSURLSession downloadItemAtURL:url toFile:filePath error:&error];
         if (error) {
-            NSLog(@"CleverPush: error while attempting to download file with URL: %@", error);
+            [CPLog error:@"error while attempting to download file with URL: %@", error];
             return nil;
         }
- 
+
         return name;
     } @catch (NSException *exception) {
-        NSLog(@"CleverPush: error while downloading file (%@), error: %@", url, exception.description);
+        [CPLog error:@"error while downloading file (%@), error: %@", url, exception.description];
         return nil;
     }
 }
@@ -202,11 +203,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark -  General function to get the color from hex string
 + (NSString *)hexStringFromColor:(UIColor *)color {
     const CGFloat *components = CGColorGetComponents(color.CGColor);
-    
+
     CGFloat r = components[0];
     CGFloat g = components[1];
     CGFloat b = components[2];
-    
+
     return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
 }
 
@@ -215,10 +216,10 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if (fontFamily == nil || fontFamily.length == 0) {
         return NO;
     }
-    
+
     UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
     NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
-    
+
     return ([matches count] > 0);
 }
 
@@ -539,6 +540,24 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
     NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
     return userDefaults;
+}
+
++ (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor {
+    size_t count = CGColorGetNumberOfComponents(backgroundColor.CGColor);
+    const CGFloat *componentColors = CGColorGetComponents(backgroundColor.CGColor);
+
+    CGFloat darknessScore = 0;
+    if (count == 2) {
+        darknessScore = (((componentColors[0]*255) * 299) + ((componentColors[0]*255) * 587) + ((componentColors[0]*255) * 114)) / 1000;
+    } else if (count == 4) {
+        darknessScore = (((componentColors[0]*255) * 299) + ((componentColors[1]*255) * 587) + ((componentColors[2]*255) * 114)) / 1000;
+    }
+
+    if (darknessScore >= 125) {
+        return [UIColor blackColor];
+    }
+
+    return [UIColor whiteColor];
 }
 
 @end

@@ -7,7 +7,7 @@
     if (![hexString isKindOfClass:[NSString class]]) {
         return [UIColor blackColor];
     }
-    
+
     NSString *colorString = [[hexString stringByReplacingOccurrencesOfString: @"#" withString: @""] uppercaseString];
     CGFloat alpha, red, blue, green;
     switch ([colorString length]) {

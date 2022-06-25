@@ -1,12 +1,14 @@
 #import "CPStoryWidget.h"
 #import "CPUtils.h"
+
 NS_ASSUME_NONNULL_BEGIN
 @implementation CPStoryWidget
+
 #pragma mark - wrapping the data of the Widget in to CPWidget NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
-        
+
         if ([json objectForKey:@"_id"] != nil && ![[json objectForKey:@"_id"] isKindOfClass:[NSNull class]]) {
             self.id = [json objectForKey:@"_id"];
         }
@@ -25,11 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
         if ([json objectForKey:@"margin"] != nil && ![[json objectForKey:@"margin"] isKindOfClass:[NSNull class]]) {
             self.margin = [json objectForKey:@"margin"];
         }
-                
+
         if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
             self.createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
         }
-        
+
         if ([[json objectForKey:@"variant"] isEqual:@"bubbles"]) {
             self.variant = CPWidgetVariantBubbles;
         } else if ([[json objectForKey:@"variant"] isEqual:@"cards"]) {
@@ -37,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             self.variant = CPWidgetVariantInline;
         }
-        
+
         if ([[json objectForKey:@"position"] isEqual:@"inline"]) {
             self.position = CPWidgetPositionInline;
         } else if ([[json objectForKey:@"position"] isEqual:@"sticky"]) {
@@ -47,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             self.position = CPWidgetPositionFixedBottom;
         }
-        
+
         if ([[json objectForKey:@"display"] isEqual:@"all"]) {
             self.display = CPWidgetDisplayAll;
         } else if ([[json objectForKey:@"display"] isEqual:@"desktop"]) {
@@ -55,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             self.display = CPWidgetDisplayMobile;
         }
-        
+
         self.selectedStories = [NSMutableArray new];
         if ([json objectForKey:@"selectedStories"] != nil) {
             for (NSDictionary *story in [json objectForKey:@"selectedStories"]) {
@@ -65,5 +67,6 @@ NS_ASSUME_NONNULL_BEGIN
     }
     return self;
 }
+
 @end
 NS_ASSUME_NONNULL_END

@@ -89,7 +89,7 @@
     [self.cleverPush addSubscriptionTag:@"tagId"];
     
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
-    OCMVerify([self.cleverPush addSubscriptionTagstoServer:[OCMArg any] callback:[OCMArg any]]);
+    OCMVerify([self.cleverPush sendSubscriptionTagsToApi:[OCMArg any] callback:[OCMArg any]]);
 }
 
 - (void)testVerifyApiCallRemoveTags {
@@ -102,7 +102,7 @@
     }];
     [self.cleverPush removeSubscriptionTag:@"tagId"];
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
-    OCMVerify([self.cleverPush removeSubscriptionTagsfromServer:[OCMArg any] callback:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTagsFromApi:[OCMArg any] callback:[OCMArg any]]);
 }
 
 - (void)tearDown {

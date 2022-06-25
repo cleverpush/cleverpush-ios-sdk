@@ -1,6 +1,7 @@
 #import "CPStoryContentPreview.h"
 
 @implementation CPStoryContentPreview
+
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
@@ -29,4 +30,5 @@
     }
     return self;
 }
+
 @end

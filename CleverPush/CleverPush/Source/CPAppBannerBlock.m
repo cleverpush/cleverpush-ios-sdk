@@ -3,6 +3,7 @@
 #import "CPAppBannerTextBlock.h"
 #import "CPAppBannerImageBlock.h"
 #import "CPAppBannerHTMLBlock.h"
+
 @implementation CPAppBannerBlock
 
 #pragma mark - wrapping the data of the Banner Block in to CPAppBannerBlock NSObject

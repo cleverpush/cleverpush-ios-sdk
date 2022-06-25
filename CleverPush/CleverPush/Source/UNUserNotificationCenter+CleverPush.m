@@ -6,6 +6,7 @@
 #import "CleverPushSelectorHelpers.h"
 #import "CleverPush.h"
 #import "CPUtils.h"
+#import "CPLog.h"
 
 @interface CleverPush (UN_extra)
 
@@ -76,7 +77,7 @@ __weak static id previousDelegate;
                    withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler API_AVAILABLE(ios(10.0)) {
     NSUInteger completionHandlerOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
 
-    NSLog(@"CleverPush cleverPushUserNotificationCenter willPresentNotification");
+    [CPLog info:@"cleverPushUserNotificationCenter willPresentNotification"];
 
     if ([CleverPush channelId]) {
         [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
@@ -106,7 +107,7 @@ __weak static id previousDelegate;
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
           didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler API_AVAILABLE(ios(10.0)) {
-    NSLog(@"CleverPush cleverPushUserNotificationCenter didReceiveNotificationResponse");
+    [CPLog info:@"cleverPushUserNotificationCenter didReceiveNotificationResponse"];
 
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
         [CleverPush updateBadge:nil];

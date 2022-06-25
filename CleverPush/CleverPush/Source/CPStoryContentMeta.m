@@ -1,6 +1,7 @@
 #import "CPStoryContentMeta.h"
 
 @implementation CPStoryContentMeta
+
 #pragma mark - wrapping the data of the contentMeta in to CPStoryContentMeta NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
@@ -11,4 +12,5 @@
     }
     return self;
 }
+
 @end

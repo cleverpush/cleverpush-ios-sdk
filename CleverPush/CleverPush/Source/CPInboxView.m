@@ -4,6 +4,7 @@
 #import "CPInboxCell.h"
 #import "CPTranslate.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPLog.h"
 
 @implementation CPInboxView
 
@@ -21,61 +22,61 @@ CPNotificationClickBlock handleClick;
                     if (combine_with_api) {
                         self.combine_with_api = combine_with_api;
                     }
-                    
+
                     if (read_color != nil) {
                         self.read_color = read_color;
                     } else {
                         self.read_color = [UIColor whiteColor];
                     }
-                    
+
                     if (unread_color != nil) {
                         self.unread_color = unread_color;
                     } else {
                         self.unread_color = [UIColor lightGrayColor];
                     }
-                    
+
                     if (notification_text_color != nil) {
                         self.notification_text_color = notification_text_color;
                     } else {
                         self.notification_text_color = [UIColor blackColor];
                     }
-                    
+
                     if (notification_text_font_family != nil && notification_text_font_family.length != 0) {
                         self.notification_text_font_family = notification_text_font_family;
                     } else {
                         self.notification_text_font_family = @"AppleSDGothicNeo-Regular";
                     }
-                    
+
                     if (notification_text_size != 0) {
                         self.notification_text_size = notification_text_size;
                     } else {
                         self.notification_text_size = 15.0;
                     }
-                    
+
                     if (date_text_color != nil) {
                         self.date_text_color = date_text_color;
                     } else {
                         self.date_text_color = [UIColor darkGrayColor];
                     }
-                    
+
                     if (date_text_font_family != nil && date_text_font_family.length != 0) {
                         self.date_text_font_family = date_text_font_family;
                     } else {
                         self.date_text_font_family = @"AppleSDGothicNeo-Regular";
                     }
-                    
+
                     if (date_text_size != 0) {
                         self.date_text_size = date_text_size;
                     } else {
                         self.date_text_size = 12.0;
                     }
-                    
+
                     if (divider_colour != nil) {
                         self.divider_colour = divider_colour;
                     } else {
                         self.divider_colour = [UIColor lightGrayColor];
                     }
-                  
+
                     [CleverPush getChannelConfig:^(NSDictionary *config) {
                         NSString *channelIcon = [config stringForKey:@"channelIcon"];
                         if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
@@ -98,7 +99,7 @@ CPNotificationClickBlock handleClick;
                         [self presentEmptyView:frame];
                     }
                 });
-                
+
             }];
         } else {
             [self presentEmptyView:frame];
@@ -141,33 +142,33 @@ CPNotificationClickBlock handleClick;
             });
         }];
     }
-    
+
     cell.notificationTitle.text = self.notifications[indexPath.row].title;
     cell.notificationTitle.textColor = self.notification_text_color;
-    
+
     if (self.notification_text_font_family && [self.notification_text_font_family length] > 0 && [CPUtils fontFamilyExists:self.notification_text_font_family] && self.notification_text_size != 0) {
         [cell.notificationTitle setFont:[UIFont fontWithName:self.notification_text_font_family size:(CGFloat)(self.notification_text_size)]];
     } else {
-        NSLog(@"CleverPush: Font Family not found");
+        [CPLog error:@"Font Family not found %@", self.notification_text_font_family];
         [cell.notificationTitle setFont:[UIFont systemFontOfSize:(CGFloat)(10.0) weight:UIFontWeightSemibold]];
     }
-    
+
     cell.notificationDate.text = [CPUtils timeAgoStringFromDate:self.notifications[indexPath.row].createdAt];
     cell.notificationDate.textColor = self.date_text_color;
-    
+
     if (self.date_text_font_family && [self.date_text_font_family length] > 0 && [CPUtils fontFamilyExists:self.date_text_font_family] && self.date_text_size != 0) {
         [cell.notificationDate setFont:[UIFont fontWithName:self.date_text_font_family size:(CGFloat)(self.date_text_size)]];
     } else {
-        NSLog(@"CleverPush: Font Family not found");
+        [CPLog error:@"Font Family not found %@", self.date_text_font_family];
         [cell.notificationDate setFont:[UIFont systemFontOfSize:(CGFloat)(10.0) weight:UIFontWeightSemibold]];
     }
-    
+
     if (![self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
         cell.backgroundColor = self.read_color;
     } else {
         cell.backgroundColor = self.unread_color;
     }
-    
+
     return cell;
 }
 

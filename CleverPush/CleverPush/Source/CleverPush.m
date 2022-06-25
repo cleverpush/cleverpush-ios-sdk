@@ -197,7 +197,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance addSubscriptionTag:tagId];
 }
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
     [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback];
 }
 
@@ -271,7 +271,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTopicsDialogWindow:window];
 }
 
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)())callback {
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
     [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
 }
 
@@ -503,10 +503,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance isDevelopmentModeEnabled];
 }
 
-+ (void)isSubscribed:(void(^)(BOOL))callback {
-    [self.CPSharedInstance isSubscribed:callback];
-}
-
 + (BOOL)isSubscribed {
     return [self.CPSharedInstance isSubscribed];
 }
@@ -556,7 +552,7 @@ static CleverPush* singleInstance = nil;
         if (!singleInstance)
             singleInstance = [CleverPush new];
     }
-    
+
     return singleInstance;
 }
 
@@ -569,23 +565,23 @@ static CleverPush* singleInstance = nil;
     if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"]) {
         return;
     }
-    
+
     if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"8.0")) {
         return;
     }
-    
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
-    
+
     BOOL existing = injectSelector([CleverPushAppDelegate class], @selector(cleverPushLoadedTagSelector:), self, @selector(cleverPushLoadedTagSelector:));
     if (existing) {
         return;
     }
-    
+
     injectToProperClass(@selector(setCleverPushDelegate:), @selector(setDelegate:), @[], [CleverPushAppDelegate class], [UIApplication class]);
-    
+
 #pragma clang diagnostic pop
-    
+
     [self setupUNUserNotificationCenterDelegate];
 }
 
@@ -594,9 +590,9 @@ static CleverPush* singleInstance = nil;
     if (!NSClassFromString(@"UNUserNotificationCenter")) {
         return;
     }
-    
+
     [CleverPushUNUserNotificationCenter injectSelectors];
-    
+
     if (@available(iOS 10.0, *)) {
         UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
         if (!currentNotificationCenter.delegate) {

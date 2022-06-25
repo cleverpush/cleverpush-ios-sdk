@@ -1,6 +1,7 @@
 #import "CPStoryContent.h"
 
 @implementation CPStoryContent
+
 #pragma mark - wrapping the data of the Story Content in to CPStoryContent NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
@@ -30,7 +31,7 @@
         if ([json objectForKey:@"supportsLandscape"] != nil && ![[json objectForKey:@"supportsLandscape"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"supportsLandscape"] boolValue]) {
             self.supportsLandscape = YES;
         }
-        
+
         self.published = NO;
         if ([json objectForKey:@"published"] != nil && ![[json objectForKey:@"published"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"published"] boolValue]) {
             self.published = YES;
@@ -38,4 +39,5 @@
     }
     return self;
 }
+
 @end

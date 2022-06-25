@@ -3,6 +3,8 @@
 #import "CPStoryCell.h"
 #import "CPWidgetModule.h"
 #import "CPStoriesController.h"
+#import "CPLog.h"
+
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
@@ -81,7 +83,7 @@
     if (self.fontStyle && [self.fontStyle length] > 0 && [CPUtils fontFamilyExists:self.fontStyle]) {
         [cell.name setFont:[UIFont fontWithName:self.fontStyle size:(CGFloat)(10.0)]];
     } else {
-        NSLog(@"CleverPush: Font Family not found");
+        [CPLog error:@"Font Family not found: %@", self.fontStyle];
         [cell.name setFont:[UIFont systemFontOfSize:(CGFloat)(10.0) weight:UIFontWeightSemibold]];
     }
 

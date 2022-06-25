@@ -11,6 +11,7 @@
 #import "CPAppBannerViewController.h"
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
+#import "CPLog.h"
 
 @implementation CPBannerCardContainer
 @synthesize delegate;
@@ -65,19 +66,21 @@
         return  cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
-        
+
         CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
-        
+
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
         [cell.btnCPBanner setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
-        
+
         if ([CPUtils fontFamilyExists:block.family]) {
             [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
         } else {
-            NSLog(@"CleverPush: Font Family not found for button block");
+            if (block.family != nil) {
+                [CPLog error:@"Font Family not found for button block: %@", block.family];
+            }
             [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
         }
-        
+
         switch (block.alignment) {
             case CPAppBannerAlignmentRight:
                 cell.btnCPBanner.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
@@ -95,7 +98,7 @@
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        
+
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
             [self actionCallback:block.action from:YES];
         }];
@@ -103,19 +106,20 @@
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
         CPAppBannerTextBlock *block = (CPAppBannerTextBlock*)self.blocks[indexPath.row];
-        NSLog(@"CleverPush:%@", block.text);
 
         cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
         cell.txtCPBanner.textColor = [UIColor colorWithHexString:block.color];
-        
+
         if ([CPUtils fontFamilyExists:block.family]) {
             [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
         } else {
-            NSLog(@"CleverPush: Font Family not found for Text block");
+            if (block.family != nil) {
+                [CPLog error:@"Font Family not found for text block: %@", block.family];
+            }
             [cell.txtCPBanner setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
         }
-        
+
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         cell.txtCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         switch (block.alignment) {
@@ -133,7 +137,7 @@
     } else {
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
-        
+
         if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
             cell.webHTMLBlock.scrollView.bounces = false;
@@ -197,4 +201,3 @@
 }
 
 @end
-

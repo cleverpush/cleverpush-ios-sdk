@@ -1,5 +1,6 @@
-
 #import "CPAppBannerModuleInstance.h"
+#import "CPUtils.h"
+#import "CPLog.h"
 
 @interface CPAppBannerModuleInstance()
 
@@ -100,7 +101,7 @@ dispatch_queue_t dispatchQueue = nil;
 - (void)setBannerIsShown:(NSString*)bannerId {
     NSMutableArray* bannerIds = [self shownAppBanners];
     [bannerIds addObject:bannerId];
-    
+
     NSMutableArray* shownAppBanners = [self shownAppBanners];
     [shownAppBanners addObject:bannerId];
     [[NSUserDefaults standardUserDefaults] setObject:shownAppBanners forKey:ShownAppBannersDefaultsKey];
@@ -118,7 +119,7 @@ dispatch_queue_t dispatchQueue = nil;
     [self setLastSessionTimestamp:(long)NSDate.date.timeIntervalSince1970];
     [self setSessions:sessions + 1];
     [self saveSessions];
-    
+
     if (afterInit) {
         dispatch_sync(dispatchQueue, ^{
             [self getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
@@ -133,7 +134,10 @@ dispatch_queue_t dispatchQueue = nil;
     if ([self isInitialized]) {
         return;
     }
-    
+
+    [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
     dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
     [self setPendingBannerListeners:[NSMutableArray new]];
     [self setActiveBanners:[NSMutableArray new]];
@@ -161,25 +165,25 @@ dispatch_queue_t dispatchQueue = nil;
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
     if (notificationId == nil) {
-        
+
         [pendingBannerListeners addObject:callback];
         if ([self getPendingBannerRequest]) {
             return;
         }
         [self setPendingBannerRequest:YES];
     }
-    
+
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
-    
+
     if ([CleverPush isDevelopmentModeEnabled]) {
         bannersPath = [NSString stringWithFormat:@"%@&t=%f", bannersPath, NSDate.date.timeIntervalSince1970];
     }
-    
+
     if (notificationId != nil) {
         bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
     }
-    
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:bannersPath];
+
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSArray *jsonBanners = [result objectForKey:@"banners"];
         if (jsonBanners != nil) {
@@ -187,7 +191,7 @@ dispatch_queue_t dispatchQueue = nil;
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
             }
-            
+
             if (notificationId && callback) {
                 callback([self getListOfBanners]);
             } else {
@@ -202,7 +206,7 @@ dispatch_queue_t dispatchQueue = nil;
             [self setPendingBannerListeners:[NSMutableArray new]];
         }
     } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: Failed getting app banners %@", error);
+        [CPLog error:@"Failed getting app banners %@", error];
     }];
 }
 
@@ -318,14 +322,14 @@ dispatch_queue_t dispatchQueue = nil;
         if (![self bannerTargetingAllowed:banner]) {
             continue;
         }
-        
+
         if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
             continue;
         }
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
             continue;
         }
-        
+
         if (banner.triggerType == CPAppBannerTriggerTypeConditions) {
             BOOL triggers = NO;
             for (CPAppBannerTrigger *trigger in banner.triggers) {
@@ -347,24 +351,24 @@ dispatch_queue_t dispatchQueue = nil;
                         NSString *event = [events objectForKey:condition.key];
                         conditionTrue = event != nil && [event isEqualToString:condition.value];
                     }
-                    
+
                     if (conditionTrue) {
                         triggerTrue = YES;
                         break;
                     }
                 }
-                
+
                 if (triggerTrue) {
                     triggers = YES;
                     break;
                 }
             }
-            
+
             if (!triggers) {
                 continue;
             }
         }
-        
+
         BOOL contains = NO;
         for (CPAppBanner* tryBanner in [self getActiveBanners]) {
             if ([tryBanner.id isEqualToString:banner.id]) {
@@ -372,7 +376,7 @@ dispatch_queue_t dispatchQueue = nil;
                 break;
             }
         }
-        
+
         if (!contains) {
             [activeBanners addObject:banner];
         }
@@ -388,7 +392,7 @@ dispatch_queue_t dispatchQueue = nil;
         [activeBanners removeObjectsInArray:pendingBanners];
         return;
     }
-    
+
     for (CPAppBanner* banner in [self getActiveBanners]) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
@@ -472,12 +476,12 @@ dispatch_queue_t dispatchQueue = nil;
         if (banner.frequency == CPAppBannerFrequencyOnce) {
             [self setBannerIsShown:banner.id];
         }
-        
+
         if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
             if ([banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
                 [self presentAppBanner:appBannerViewController banner:banner];
             } else {
-                NSLog(@"CleverPush: Banner display date has been elapsed");
+                [CPLog info:@"Banner display date has been elapsed"];
             }
         } else {
             [self presentAppBanner:appBannerViewController banner:banner];
@@ -486,30 +490,31 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
-    if (![CleverPush popupVisible]) {
-        [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
-        appBannerViewController.data = banner;
-
-        UIViewController* topController = [CleverPush topViewController];
-        [topController presentViewController:appBannerViewController animated:YES completion:nil];
-
-        if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
-                [appBannerViewController onDismiss];
-            });
-        }
-        [self sendBannerEvent:@"delivered" forBanner:banner];
-    } else {
-        NSLog(@"CleverPush: You can not present two banners at the same time");
+    if ([CleverPush popupVisible]) {
+        [CPLog info:@"You can not present two banners at the same time"];
+        return;
     }
+
+    [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    appBannerViewController.data = banner;
+
+    UIViewController* topController = [CleverPush topViewController];
+    [topController presentViewController:appBannerViewController animated:YES completion:nil];
+
+    if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
+            [appBannerViewController onDismiss];
+        });
+    }
+    [self sendBannerEvent:@"delivered" forBanner:banner];
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
-    
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
+
     NSString* subscriptionId = nil;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
@@ -529,10 +534,9 @@ dispatch_queue_t dispatchQueue = nil;
                                  subscriptionId, @"subscriptionId",
                                  nil];
     }
-    
-    
-    NSLog(@"CleverPush: sendBannerEvent: %@ %@", event, dataDic);
-    
+
+    [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
+
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];

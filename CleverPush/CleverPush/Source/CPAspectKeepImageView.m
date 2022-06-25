@@ -1,4 +1,5 @@
 #import "CPAspectKeepImageView.h"
+#import "CPLog.h"
 
 #import <objc/runtime.h>
 
@@ -85,7 +86,7 @@ static char kCPSessionDataTaskKey;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (error) {
-                NSLog(@"ERROR: %@", error);
+                [CPLog error:@"Error while getting image %@", error];
                 callback(false);
             }
             else {
@@ -98,8 +99,7 @@ static char kCPSessionDataTaskKey;
                         callback(true);
                     });
                 } else {
-                    NSLog(@"Couldn't load image at URL: %@", imageURL);
-                    NSLog(@"HTTP %ld", (long)httpResponse.statusCode);
+                    [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
                     callback(false);
                 }
             }
@@ -122,7 +122,7 @@ static char kCPSessionDataTaskKey;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (error) {
-                NSLog(@"ERROR: %@", error);
+                [CPLog error:@"Error while getting image: %@", error];
             }
             else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
@@ -133,8 +133,7 @@ static char kCPSessionDataTaskKey;
                         [strongSelf updateAspectConstraint];
                     });
                 } else {
-                    NSLog(@"Couldn't load image at URL: %@", imageURL);
-                    NSLog(@"HTTP %ld", (long)httpResponse.statusCode);
+                    [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
                 }
             }
         }];

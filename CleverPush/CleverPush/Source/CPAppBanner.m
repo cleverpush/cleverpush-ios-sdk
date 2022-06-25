@@ -1,4 +1,5 @@
 #import "CPAppBanner.h"
+#import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 
 @implementation CPAppBanner
@@ -16,11 +17,11 @@
         self.appVersionFilterValue = [json stringForKey:@"appVersionFilterValue"];
         self.fromVersion = [json stringForKey:@"fromVersion"];
         self.toVersion = [json stringForKey:@"toVersion"];
-        
+
         if ([json stringForKey:@"testId"] != nil) {
             self.testId = [json stringForKey:@"testId"];
         }
-        
+
         if ([[json stringForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
         } else if ([[json stringForKey:@"type"] isEqualToString:@"full"]) {
@@ -41,11 +42,11 @@
 
         self.blocks = [NSMutableArray new];
         if ([json objectForKey:@"blocks"] != nil) {
-            
+
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {
-                
+
                 CPAppBannerBlock* block;
-                
+
                 if ([[blockJson stringForKey:@"type"] isEqual:@"button"]) {
                     block = [[CPAppBannerButtonBlock alloc] initWithJson:blockJson];
                 } else if ([[blockJson stringForKey:@"type"] isEqual:@"text"]) {
@@ -75,7 +76,6 @@
             screensBlock.id = 0;
             screensBlock.blocks = self.blocks;
             [self.screens addObject:screensBlock];
-            NSLog(@"self.screens: %@", self.screens);
         }
 
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
@@ -127,7 +127,7 @@
         if ([[json objectForKey:@"carouselEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
             self.carouselEnabled = YES;
         }
-        
+
         self.multipleScreensEnabled = NO;
         if ([[json objectForKey:@"enableMultipleScreens"] isEqual:[NSNumber numberWithBool:true]]) {
             self.multipleScreensEnabled = YES;

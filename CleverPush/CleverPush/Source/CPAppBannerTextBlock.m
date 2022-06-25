@@ -1,4 +1,5 @@
 #import "CPAppBannerTextBlock.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPAppBannerTextBlock
 
@@ -7,29 +8,29 @@
     self = [super init];
     if (self) {
         self.type = CPAppBannerBlockTypeText;
-        
+
         self.text = @"";
-        if ([json objectForKey:@"text"]) {
-            self.text = [json objectForKey:@"text"];
+        if ([json stringForKey:@"text"]) {
+            self.text = [json stringForKey:@"text"];
         }
-        
+
         self.color = @"#000000";
-        if ([json objectForKey:@"color"]) {
-            self.color = [json objectForKey:@"color"];
+        if ([json stringForKey:@"color"]) {
+            self.color = [json stringForKey:@"color"];
         }
-        if ([json objectForKey:@"family"]) {
-            self.family = [json objectForKey:@"family"];
+        if ([json stringForKey:@"family"] && ![[json stringForKey:@"family"] isEqual:@""]) {
+            self.family = [json stringForKey:@"family"];
         }
-        
+
         self.size = 18;
         if ([json objectForKey:@"size"]) {
             self.size = [[json objectForKey:@"size"] intValue];
         }
-        
+
         self.alignment = CPAppBannerAlignmentCenter;
-        if ([[json objectForKey:@"alignment"] isEqual:@"right"]) {
+        if ([[json stringForKey:@"alignment"] isEqual:@"right"]) {
             self.alignment = CPAppBannerAlignmentRight;
-        } else if ([[json objectForKey:@"alignment"] isEqual:@"right"]) {
+        } else if ([[json stringForKey:@"alignment"] isEqual:@"right"]) {
             self.alignment = CPAppBannerAlignmentRight;
         }
     }

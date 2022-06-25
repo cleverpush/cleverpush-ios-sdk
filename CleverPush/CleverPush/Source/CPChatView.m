@@ -1,6 +1,8 @@
 #import "CPChatView.h"
 #import "CleverPush.h"
 #import "CPUtils.h"
+#import "CPLog.h"
+
 @interface CPChatView()
 
 @end
@@ -28,13 +30,13 @@ NSString* lastSubscriptionId;
     self = [super initWithFrame:frame];
     if (self) {
         [CleverPush addChatView:self];
-        
+
         WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
         WKUserContentController* userController = [[WKUserContentController alloc] init];
-        
+
         [userController addScriptMessageHandler:self name:@"chat"];
         configuration.userContentController = userController;
-        
+
         _webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
         _webView.scrollView.scrollEnabled = true;
         _webView.scrollView.bounces = false;
@@ -57,7 +59,7 @@ NSString* lastSubscriptionId;
 - (id)initWithFrame:(CGRect)frame urlOpenedCallback:(CPChatURLOpenedCallback)urlOpenedBlock subscribeCallback:(CPChatSubscribeCallback)subscribeBlock {
     urlOpenedCallback = urlOpenedBlock;
     subscribeCallback = subscribeBlock;
-    
+
     self = [self initWithFrame:frame];
     return self;
 }
@@ -67,7 +69,7 @@ NSString* lastSubscriptionId;
     urlOpenedCallback = urlOpenedBlock;
     subscribeCallback = subscribeBlock;
     headerCodes = headerHtmlCodes;
-    
+
     self = [self initWithFrame:frame urlOpenedCallback:urlOpenedBlock subscribeCallback:subscribeBlock];
     return self;
 }
@@ -79,23 +81,24 @@ NSString* lastSubscriptionId;
 
 #pragma mark - load chat with subscription id along with custom javascript
 - (void)loadChatWithSubscriptionId:(NSString*)subscriptionId {
-    NSLog(@"CleverPush: CPChatView: loadChatWithSubscriptionId: %@", subscriptionId);
+    [CPLog info:@"CPChatView: loadChatWithSubscriptionId: %@", subscriptionId];
+
     lastSubscriptionId = subscriptionId;
-    
+
     [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
         NSString *content;
         NSError *error;
         NSData* jsonData;
         NSString* jsonConfig = @"null";
-        
+
         if (channelConfig != nil) {
             jsonData = [NSJSONSerialization dataWithJSONObject:channelConfig options:0 error:&error];
-            
+
             if (jsonData != nil) {
                 jsonConfig = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
             }
         }
-        
+
         NSString* brandingColor;
         NSString* backgroundColor;
         if ([CleverPush getBrandingColor]) {
@@ -104,11 +107,11 @@ NSString* lastSubscriptionId;
         if ([CleverPush getChatBackgroundColor]) {
             backgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatBackgroundColor]];
         }
-        
+
         if (!headerCodes) {
             headerCodes = @"";
         }
-        
+
         content = [NSString stringWithFormat:@"\
                    <!DOCTYPE html>\
                    <html>\
@@ -167,9 +170,7 @@ NSString* lastSubscriptionId;
                    <script onerror='showErrorView()' src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
                    </body>\
                    </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor];
-        
-        // NSLog(@"CleverPush: ChatView content: %@", content);
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.webView loadHTMLString:content baseURL:[[NSBundle mainBundle] resourceURL]];
         });
@@ -183,11 +184,11 @@ NSString* lastSubscriptionId;
         decisionHandler(WKNavigationActionPolicyAllow);
         return;
     }
-    
+
     if (urlOpenedCallback != nil) {
         urlOpenedCallback([request URL]);
     }
-    
+
     decisionHandler(WKNavigationActionPolicyCancel);
 }
 
@@ -199,7 +200,7 @@ NSString* lastSubscriptionId;
             subscribeCallback();
             return;
         }
-        
+
         [CleverPush subscribe:^(NSString* subscriptionId) {
             // wait for ID
             [CleverPush getSubscriptionId];

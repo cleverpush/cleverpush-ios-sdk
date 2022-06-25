@@ -97,18 +97,15 @@
 
 #pragma mark - dynamic hide and show top button from top right corner
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled {
+    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
     if (@available(iOS 13.0, *)) {
         [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        self.btnClose.tintColor = UIColor.whiteColor;
+        self.btnClose.tintColor = color;
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
-        [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:color forState:UIControlStateNormal];
     }
-    
-    [self.btnClose.layer setShadowColor:[UIColor blackColor].CGColor];
-    [self.btnClose.layer setShadowRadius:3.0];
-    [self.btnClose.layer setShadowOpacity:1.0];
-    [self.btnClose.layer setShadowOffset:CGSizeMake(0, 0)];
+
     [self.btnClose.layer setMasksToBounds:false];
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
@@ -209,7 +206,7 @@
         [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPButtonBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPButtonBlockCell"];
         [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPHTMLBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPHTMLBlockCell"];
     }
-    
+
     cell.delegate = self;
     cell.changePage = self;
     cell.controller = self;
@@ -269,22 +266,22 @@
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:self name:@"close"];
     config.userContentController = userController;
-    
+
     self.webBanner.scrollView.scrollEnabled = true;
     self.webBanner.scrollView.bounces = false;
     self.webBanner.allowsBackForwardNavigationGestures = false;
     self.webBanner.contentMode = UIViewContentModeScaleToFill;
     self.webBanner.navigationDelegate = self;
     self.webBanner.layer.cornerRadius = 15.0;
-    
+
     if ([content containsString:@"</body></html>"]) {
         content = [content stringByReplacingOccurrencesOfString:@"</body></html>" withString:@""];
     }
-    
+
     NSString *script = @"<script type=\"text/javascript\">var keyword = 'close';function onCloseClick() {try {window.webkit.messageHandlers.close.postMessage(null);} catch (error) {console.log('Caught error on closeBTN click', error);}}var elemsWithId = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.id && item.id.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}var elemsWithClass = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.className && item.className.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}</script>";
     NSString *bodyText = @"</body></html>";
     NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, bodyText];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
         [self.webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];

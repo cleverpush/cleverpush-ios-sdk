@@ -116,6 +116,10 @@
 		291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD202525DC2800F5185E /* DWAlertPresentationController.m */; };
 		291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD1A2525DC2800F5185E /* DWAlertView.m */; };
 		291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD122525DC2800F5185E /* DWAlertViewActionButton.m */; };
+		294B19D3286717A2003A9FCD /* CPLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 294B19D2286717A2003A9FCD /* CPLog.m */; };
+		294B19D4286717A2003A9FCD /* CPLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 294B19D2286717A2003A9FCD /* CPLog.m */; };
+		294B19D6286717CB003A9FCD /* CPLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 294B19D5286717AE003A9FCD /* CPLog.h */; };
+		294B19D728672217003A9FCD /* CPLog.h in Headers */ = {isa = PBXBuildFile; fileRef = 294B19D5286717AE003A9FCD /* CPLog.h */; };
 		29563FF725881F6F00FE7611 /* CPAppBannerTriggerConditionType.h in Headers */ = {isa = PBXBuildFile; fileRef = 29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */; };
 		295640012588224100FE7611 /* CPAppBannerTriggerType.h in Headers */ = {isa = PBXBuildFile; fileRef = 295640002588224100FE7611 /* CPAppBannerTriggerType.h */; };
 		2956401B258822E000FE7611 /* CPAppBannerTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 2956401A258822E000FE7611 /* CPAppBannerTrigger.h */; };
@@ -375,6 +379,8 @@
 		291FCD382525E2AD00F5185E /* CPTopicsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTopicsViewController.m; sourceTree = "<group>"; };
 		291FCD422525E2BB00F5185E /* CPTopicsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTopicsViewController.h; sourceTree = "<group>"; };
 		291FCDF72525ED2C00F5185E /* CleverPush.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleverPush.framework; path = Framework/CleverPush.framework; sourceTree = "<group>"; };
+		294B19D2286717A2003A9FCD /* CPLog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPLog.m; sourceTree = "<group>"; };
+		294B19D5286717AE003A9FCD /* CPLog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPLog.h; sourceTree = "<group>"; };
 		294F7E7623FB5DB500806D23 /* CleverPushLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPushLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		294F7E8F23FB5E0200806D23 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerTriggerConditionType.h; sourceTree = "<group>"; };
@@ -448,9 +454,6 @@
 		29D71E75238073FE00C48ACA /* CPChatView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPChatView.h; sourceTree = "<group>"; };
 		29D71E762380742800C48ACA /* CPChatView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPChatView.m; sourceTree = "<group>"; };
 		29D71E7E23807E1700C48ACA /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
-		29D9052025698381002D6F9E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
-		29D905212569838A002D6F9E /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
-		29D905222569839C002D6F9E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29D9052B25698B7F002D6F9E /* CPTranslate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTranslate.m; sourceTree = "<group>"; };
 		29D9053625698BB6002D6F9E /* CPTranslate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPTranslate.h; sourceTree = "<group>"; };
 		29DB577E23D4CB0A0040E823 /* CPiCarousel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPiCarousel.m; sourceTree = "<group>"; };
@@ -764,6 +767,7 @@
 		29DB960023FC3574008FC985 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				291FCD072525DC1500F5185E /* DWAlertController */,
 				CB8F47B2275F393D00FC19A7 /* CPInboxCell.h */,
 				CB8F47B4275F393D00FC19A7 /* CPInboxCell.m */,
 				CB8F47B1275F393D00FC19A7 /* CPInboxView.h */,
@@ -826,6 +830,8 @@
 				29DB577E23D4CB0A0040E823 /* CPiCarousel.m */,
 				29D22E6E252C8E6400977567 /* CPIntrinsicTableView.h */,
 				29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */,
+				294B19D5286717AE003A9FCD /* CPLog.h */,
+				294B19D2286717A2003A9FCD /* CPLog.m */,
 				296A132425BE124900A2BEED /* CPNotification.h */,
 				296A132F25BE127600A2BEED /* CPNotification.m */,
 				29DB578823D4D62C0040E823 /* CPNotificationCategoryController.h */,
@@ -844,8 +850,6 @@
 				298F4FC025002D6700F086D3 /* CPUtils.m */,
 				CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */,
 				CB88F8FF262FE91E0037787E /* CPWKWebKitView.m */,
-				291FCD072525DC1500F5185E /* DWAlertController */,
-				29D9051F25698381002D6F9E /* Localizable.strings */,
 				29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */,
 				29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */,
 				2986768F2572CD4E0002E9F1 /* UIColor+HexString.h */,
@@ -975,6 +979,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				294B19D728672217003A9FCD /* CPLog.h in Headers */,
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
@@ -1034,6 +1039,7 @@
 				CBA1906926DE5909001B8F39 /* CPTopicDialogCell.h in Headers */,
 				2906A126258557670078FD61 /* CPAppBannerStopAtType.h in Headers */,
 				CB88F909262FE9520037787E /* CPWKWebKitView.h in Headers */,
+				294B19D6286717CB003A9FCD /* CPLog.h in Headers */,
 				CBA989AC2679D63A003DE995 /* CPStoryContentMeta.h in Headers */,
 				29052183276B778D00D81148 /* CleverPushInstance.h in Headers */,
 				29052186276B77A600D81148 /* CPInboxView.h in Headers */,
@@ -1205,13 +1211,11 @@
 			};
 			buildConfigurationList = 297B4DEF1E589AFE00BAF990 /* Build configuration list for PBXProject "CleverPush" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
-				en,
-				de,
 				Base,
+				en,
 			);
 			mainGroup = 297B4DEB1E589AFE00BAF990;
 			productRefGroup = 297B4DF61E589AFE00BAF990 /* Products */;
@@ -1365,6 +1369,7 @@
 				CBA989AF2679D642003DE995 /* CPStoryContent.m in Sources */,
 				29B3BFA327C697EA00D52D64 /* NSDictionary+SafeExpectations.m in Sources */,
 				291FCEAF252B65DA00F5185E /* DWDimmingView.m in Sources */,
+				294B19D3286717A2003A9FCD /* CPLog.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
 				CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */,
@@ -1457,6 +1462,7 @@
 				CB73FF90272C3E820099B648 /* CPButtonBlockCell.m in Sources */,
 				29DB95F723FC33D4008FC985 /* CPiCarousel.m in Sources */,
 				29564039258822FD00FE7611 /* CPAppBannerTrigger.m in Sources */,
+				294B19D4286717A2003A9FCD /* CPLog.m in Sources */,
 				291FCD392525E2AD00F5185E /* CPTopicsViewController.m in Sources */,
 				2956402E258822F000FE7611 /* CPAppBannerTriggerCondition.m in Sources */,
 				CB73FFA9272C44610099B648 /* CPAppBannerViewController.m in Sources */,
@@ -1509,19 +1515,6 @@
 			targetProxy = CB1B65D027577B6E0087AC49 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		29D9051F25698381002D6F9E /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				29D9052025698381002D6F9E /* de */,
-				29D905212569838A002D6F9E /* English */,
-				29D905222569839C002D6F9E /* en */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		294F7E8823FB5DB500806D23 /* Debug */ = {
@@ -1608,7 +1601,6 @@
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
 					x86_64,
-					armv7s,
 				);
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -1666,7 +1658,6 @@
 				ARCHS = (
 					"$(ARCHS_STANDARD)",
 					x86_64,
-					armv7s,
 				);
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";

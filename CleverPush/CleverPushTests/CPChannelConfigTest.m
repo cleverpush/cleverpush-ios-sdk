@@ -42,9 +42,9 @@
 - (void)testInitWhenChannleIdIsNull {
     OCMStub([self.cleverPush channelId]).andReturn(nil);
     OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
-    OCMExpect([self.cleverPush getChannelIdFromUserDefault]);
+    OCMExpect([self.cleverPush getChannelIdFromUserDefaults]);
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:nil handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
-    OCMVerify([self.cleverPush getChannelIdFromUserDefault]);
+    OCMVerify([self.cleverPush getChannelIdFromUserDefaults]);
 }
 
 - (void)testInitWhenChannelIdIsNullAndAlsoNoChannelIdInPrefrence {
@@ -121,7 +121,7 @@
 - (void)testSubscriptionIdIsNotNilAndNotificationNotEnableThanVerifyUnsubscribe {
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
-    OCMStub([self.cleverPush notificationsEnabled]).andReturn(false);
+    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(false);
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     OCMVerify([self.cleverPush unsubscribe]);
 }
@@ -130,7 +130,7 @@
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
     OCMStub([self.cleverPush shouldSync]).andReturn(true);
-    OCMStub([self.cleverPush notificationsEnabled]).andReturn(true);
+    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(true);
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     [_testUtilInstance performSelector:@selector(syncSubscription) withObject:self.cleverPush afterDelay:10.0f];
 }

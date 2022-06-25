@@ -2,6 +2,7 @@
 #import "CleverPush.h"
 #import "CleverPushHTTPClient.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPLog.h"
 
 @implementation CleverPushLocation
 
@@ -70,27 +71,27 @@ CLLocationManager* locationManager;
 
 #pragma mark - Location delegates
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    NSLog(@"CleverPush: LocationManager didChangeAuthorizationStatus %@", status);
+    [CPLog info:@"LocationManager: didChangeAuthorizationStatus %@", status];
 }
 
 + (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: LocationManager didStartMonitoringForRegion %@", [region identifier]);
+    [CPLog info:@"LocationManager: didStartMonitoringForRegion %@", [region identifier]];
 }
 
 + (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: LocationManager didDetermineState %@", [region identifier]);
+    [CPLog info:@"LocationManager: LocationManager didDetermineState %@", [region identifier]];
     if (state == CLRegionStateInside) {
         [self locationManager:manager didEnterRegion:region];
     }
 }
 
 + (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: Entered Geo Fence %@", [region identifier]);
+    [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
     [self trackGeoFence:[region identifier] withState:@"enter"];
 }
 
 + (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
-    NSLog(@"CleverPush: Exited Geo Fence %@", [region identifier]);
+    [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
     [self trackGeoFence:[region identifier] withState:@"exit"];
 }
 

@@ -1,3 +1,8 @@
+# 1.20.0
+* Improved `isSubscribed` behaviour
+* Implemented `setConfirmAlertShown` method to track the confirm alert counts when prompting the push permission before calling `subscribe`
+* Implemented `addSubscriptionTopic` and `removeSubscriptionTopic` methods
+
 # 1.19.1
 * Implemented `setKeepTargetingDataOnUnsubscribe` method
 
