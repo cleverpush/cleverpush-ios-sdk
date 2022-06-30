@@ -163,7 +163,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSArray*)getAvailableTags __attribute__((deprecated));
 - (NSArray*)getAvailableTopics __attribute__((deprecated));
 
-- (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
+- (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 - (NSString*)getSubscriptionId;
 - (NSString*)getApiEndpoint;
 - (NSString*)channelId;

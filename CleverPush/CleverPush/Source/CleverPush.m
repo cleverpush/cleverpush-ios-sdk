@@ -467,7 +467,7 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getSubscriptionTopics];
 }
 
-+ (NSString*)getSubscriptionAttribute:(NSString*)attributeId {
++ (NSObject*)getSubscriptionAttribute:(NSString*)attributeId {
     return [self.CPSharedInstance getSubscriptionAttribute:attributeId];
 }
 

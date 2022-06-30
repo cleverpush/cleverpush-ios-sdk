@@ -1,3 +1,6 @@
+# 1.20.2
+* Changed method signature of `getSubscriptionAttribute` to return an object instead of a string
+
 # 1.20.1
 * Optimized `pushSubscriptionAttributeValue` and `pullSubscriptionAttributeValue` methods
 

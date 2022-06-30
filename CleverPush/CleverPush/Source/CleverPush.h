@@ -132,7 +132,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
 
-+ (NSString*)getSubscriptionAttribute:(NSString*)attributeId;
++ (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 + (NSString*)getSubscriptionId;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
