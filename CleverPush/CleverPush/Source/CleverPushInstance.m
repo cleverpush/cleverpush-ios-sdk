@@ -25,6 +25,7 @@
 #import "DWAlertController/DWAlertAction.h"
 #import "CPChannelTag.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "NSMutableArray+ContainsString.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -69,7 +70,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.20.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.20.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1820,6 +1821,26 @@ static id isNil(id object) {
 #pragma mark - Push subscription array attribute value.
 - (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+        if (!subscriptionAttributes) {
+            subscriptionAttributes = [[NSMutableDictionary alloc] init];
+        }
+
+        NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+        if (!arrayValue) {
+            arrayValue = [NSMutableArray new];
+        } else {
+            arrayValue = [arrayValue mutableCopy];
+        }
+        if (![arrayValue containsString:value]) {
+            [arrayValue addObject:value];
+        }
+
+        [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+        [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+        [userDefaults synchronize];
+
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1828,24 +1849,6 @@ static id isNil(id object) {
                                      value, @"value",
                                      [self getSubscriptionId], @"subscriptionId",
                                      nil];
-
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            [arrayValue addObject:value];
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
@@ -1860,6 +1863,24 @@ static id isNil(id object) {
 #pragma mark - Pull subscription array attribute value.
 - (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+        if (!subscriptionAttributes) {
+            subscriptionAttributes = [[NSMutableDictionary alloc] init];
+        }
+
+        NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+        if (!arrayValue) {
+            arrayValue = [NSMutableArray new];
+        } else {
+            arrayValue = [arrayValue mutableCopy];
+        }
+        [arrayValue removeObject:value];
+
+        [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+        [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+        [userDefaults synchronize];
+
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1868,24 +1889,6 @@ static id isNil(id object) {
                                      value, @"value",
                                      [self getSubscriptionId], @"subscriptionId",
                                      nil];
-
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            [arrayValue removeObject:value];
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];

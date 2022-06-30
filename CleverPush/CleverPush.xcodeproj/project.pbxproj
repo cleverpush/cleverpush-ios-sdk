@@ -83,6 +83,9 @@
 		2906A2C625857E680078FD61 /* CPUIBlockButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2906A2C525857E680078FD61 /* CPUIBlockButton.m */; };
 		2906A2C725857E680078FD61 /* CPUIBlockButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2906A2C525857E680078FD61 /* CPUIBlockButton.m */; };
 		2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 2906A2D025857E900078FD61 /* CPUIBlockButton.h */; };
+		2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */ = {isa = PBXBuildFile; fileRef = 2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */; };
+		2907D0F6286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */ = {isa = PBXBuildFile; fileRef = 2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */; };
+		2907D0F8286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h in Headers */ = {isa = PBXBuildFile; fileRef = 2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */; };
 		2913D82D25141324002BA52C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D82C25141324002BA52C /* WebKit.framework */; };
 		2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D82E2514132A002BA52C /* UserNotifications.framework */; };
 		2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D8302514132F002BA52C /* StoreKit.framework */; };
@@ -344,6 +347,8 @@
 		290187F527C1020200535617 /* CleverPushUserDefaults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushUserDefaults.h; sourceTree = "<group>"; };
 		2906A2C525857E680078FD61 /* CPUIBlockButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPUIBlockButton.m; sourceTree = "<group>"; };
 		2906A2D025857E900078FD61 /* CPUIBlockButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUIBlockButton.h; sourceTree = "<group>"; };
+		2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+ContainsString.m"; sourceTree = "<group>"; };
+		2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+ContainsString.h"; sourceTree = "<group>"; };
 		2913D82C25141324002BA52C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
 		2913D82E2514132A002BA52C /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/Library/Frameworks/UserNotifications.framework; sourceTree = DEVELOPER_DIR; };
 		2913D8302514132F002BA52C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -901,6 +906,8 @@
 				CB73FF9E272C3EB80099B648 /* CPTextBlockCell.m */,
 				CB73FFA7272C44610099B648 /* CPAppBannerViewController.h */,
 				CB73FFA8272C44610099B648 /* CPAppBannerViewController.m */,
+				2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */,
+				2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -1024,6 +1031,7 @@
 				CBA989A62679D62A003DE995 /* CPWidgetsStories.h in Headers */,
 				2967EA8C284E51DE00303648 /* CPAppBannerVersionRelationType.h in Headers */,
 				2906A176258557D40078FD61 /* CPAppBannerTextBlock.h in Headers */,
+				2907D0F8286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h in Headers */,
 				CBA989AE2679D63F003DE995 /* CPStoryContent.h in Headers */,
 				29D9053725698BB6002D6F9E /* CPTranslate.h in Headers */,
 				295640432588230E00FE7611 /* CPAppBannerTriggerCondition.h in Headers */,
@@ -1372,6 +1380,7 @@
 				294B19D3286717A2003A9FCD /* CPLog.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
+				2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */,
 				CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */,
 				296D0AD6257460E800531EFF /* UIControl+CPBlockActions.m in Sources */,
 				291FCEE8252B662F00F5185E /* DWAlertView.m in Sources */,
@@ -1477,6 +1486,7 @@
 				CBA9898A2679D543003DE995 /* CPWidgetModule.m in Sources */,
 				CBA989962679D57B003DE995 /* CPStoryContentMeta.m in Sources */,
 				298677502572DFD30002E9F1 /* CPAppBannerImageBlock.m in Sources */,
+				2907D0F6286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */,
 				298676B72572CFEF0002E9F1 /* CPAppBanner.m in Sources */,
 				2986775B2572DFE70002E9F1 /* CPAppBannerTextBlock.m in Sources */,
 				CB79117D2667558F00253F9F /* CPAppBannerHTMLBlock.m in Sources */,

@@ -1,3 +1,6 @@
+# 1.20.3
+* Improved subscription attribute array methods with duplicates
+
 # 1.20.2
 * Changed method signature of `getSubscriptionAttribute` to return an object instead of a string
 
