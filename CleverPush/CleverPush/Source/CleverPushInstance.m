@@ -69,7 +69,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.20.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.20.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1829,26 +1829,29 @@ static id isNil(id object) {
                                      [self getSubscriptionId], @"subscriptionId",
                                      nil];
 
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+            if (!subscriptionAttributes) {
+                subscriptionAttributes = [[NSMutableDictionary alloc] init];
+            }
+
+            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+            if (!arrayValue) {
+                arrayValue = [NSMutableArray new];
+            } else {
+                arrayValue = [arrayValue mutableCopy];
+            }
+            [arrayValue addObject:value];
+
+            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+            [userDefaults synchronize];
+
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
+
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                if (!subscriptionAttributes) {
-                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
-                }
-
-                NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                if (!arrayValue) {
-                    arrayValue = [NSMutableArray new];
-                } else {
-                    arrayValue = [arrayValue mutableCopy];
-                }
-                [arrayValue addObject:value];
-
-                [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-                [userDefaults synchronize];
+                [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
             } onFailure:nil];
         });
     }];
@@ -1866,26 +1869,29 @@ static id isNil(id object) {
                                      [self getSubscriptionId], @"subscriptionId",
                                      nil];
 
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+            if (!subscriptionAttributes) {
+                subscriptionAttributes = [[NSMutableDictionary alloc] init];
+            }
+
+            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+            if (!arrayValue) {
+                arrayValue = [NSMutableArray new];
+            } else {
+                arrayValue = [arrayValue mutableCopy];
+            }
+            [arrayValue removeObject:value];
+
+            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+            [userDefaults synchronize];
+
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
+
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                if (!subscriptionAttributes) {
-                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
-                }
-
-                NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                if (!arrayValue) {
-                    arrayValue = [NSMutableArray new];
-                } else {
-                    arrayValue = [arrayValue mutableCopy];
-                }
-                [arrayValue removeObject:value];
-
-                [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-                [userDefaults synchronize];
+                [CPLog debug:@"Attribute value pulled successfully: %@ %@", attributeId, value];
             } onFailure:nil];
         });
     }];

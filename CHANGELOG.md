@@ -1,3 +1,6 @@
+# 1.20.1
+* Optimized `pushSubscriptionAttributeValue` and `pullSubscriptionAttributeValue` methods
+
 # 1.20.0
 * Improved `isSubscribed` behaviour
 * Implemented `setConfirmAlertShown` method to track the confirm alert counts when prompting the push permission before calling `subscribe`
