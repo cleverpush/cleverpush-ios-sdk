@@ -140,11 +140,9 @@
             }
         }
 
-        self.closeButtonEnabled = YES;
-        if ([json objectForKey:@"closeButtonEnabled"] != nil && ![[json objectForKey:@"closeButtonEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"closeButtonEnabled"] boolValue]) {
-            if ([json objectForKey:@"closeButtonEnabled"] == false) {
-                self.closeButtonEnabled = NO;
-            }
+        self.closeButtonEnabled = NO;
+        if ([[json objectForKey:@"closeButtonEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.closeButtonEnabled = YES;
         }
 
         if ([json stringForKey:@"subscribedType"] != nil && [[json stringForKey:@"subscribedType"] isEqual:@"subscribed"]) {

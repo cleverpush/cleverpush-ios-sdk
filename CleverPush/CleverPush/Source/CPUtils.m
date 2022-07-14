@@ -217,10 +217,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         return NO;
     }
 
-    UIFontDescriptor *fontDescriptor = [UIFontDescriptor fontDescriptorWithFontAttributes:@{NSFontAttributeName:fontFamily}];
-    NSArray *matches = [fontDescriptor matchingFontDescriptorsWithMandatoryKeys: nil];
-
-    return ([matches count] > 0);
+    return [UIFont fontWithName:fontFamily size:18.0f] != nil;
 }
 
 #pragma mark -  Check the empty.

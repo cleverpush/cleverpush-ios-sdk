@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21179.7" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="4352" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21169.4"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -13,7 +13,7 @@
         <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="CPHTMLBlockCell" rowHeight="206" id="KGk-i7-Jjw" customClass="CPHTMLBlockCell">
             <rect key="frame" x="0.0" y="0.0" width="320" height="206"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="206"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -30,7 +30,7 @@
                     </wkWebView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="jpg-VN-2lg" secondAttribute="bottom" constant="8" id="bNW-Gg-j7z"/>
+                    <constraint firstAttribute="bottom" secondItem="jpg-VN-2lg" secondAttribute="bottom" constant="15" id="bNW-Gg-j7z"/>
                     <constraint firstItem="jpg-VN-2lg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="iqP-Qf-0Pn"/>
                     <constraint firstAttribute="trailing" secondItem="jpg-VN-2lg" secondAttribute="trailing" constant="15" id="lzJ-Ij-O0A"/>
                     <constraint firstItem="jpg-VN-2lg" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="mTb-yu-dOK"/>

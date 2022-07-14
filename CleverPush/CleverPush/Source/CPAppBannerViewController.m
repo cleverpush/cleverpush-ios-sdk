@@ -236,7 +236,7 @@
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
                 CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
-                [self.cardCollectionView scrollRectToVisible:rect animated:true];
+                [self.cardCollectionView scrollRectToVisible:rect animated:NO];
                 self.pageControl.currentPage = i;
                 break;
             }

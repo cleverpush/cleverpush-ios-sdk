@@ -333,27 +333,28 @@ dispatch_queue_t dispatchQueue = nil;
         if (banner.triggerType == CPAppBannerTriggerTypeConditions) {
             BOOL triggers = NO;
             for (CPAppBannerTrigger *trigger in banner.triggers) {
-                BOOL triggerTrue = NO;
+                BOOL triggerTrue = YES;
                 for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
-                    BOOL conditionTrue = NO;
+                    // true by default to make the AND check work
+                    BOOL conditionTrue = YES;
                     if (condition.type == CPAppBannerTriggerConditionTypeDuration) {
                         banner.delaySeconds = condition.seconds;
                         conditionTrue = YES;
-                    }
-                    if (condition.type == CPAppBannerTriggerConditionTypeSessions) {
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeSessions) {
                         if (condition.relation != nil && [condition.relation isEqualToString:@"lt"]) {
                             conditionTrue = sessions < condition.sessions;
                         } else {
                             conditionTrue = sessions > condition.sessions;
                         }
-                    }
-                    if (condition.type == CPAppBannerTriggerConditionTypeEvent && events != nil) {
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && events != nil) {
                         NSString *event = [events objectForKey:condition.key];
                         conditionTrue = event != nil && [event isEqualToString:condition.value];
+                    } else {
+                        conditionTrue = NO;
                     }
 
-                    if (conditionTrue) {
-                        triggerTrue = YES;
+                    if (!conditionTrue) {
+                        triggerTrue = NO;
                         break;
                     }
                 }
@@ -498,6 +499,7 @@ dispatch_queue_t dispatchQueue = nil;
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];

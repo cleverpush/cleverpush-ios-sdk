@@ -1,3 +1,6 @@
+## 1.20.4
+* Improve app banners
+
 ## 1.20.3
 * Improved subscription attribute array methods with duplicates
 

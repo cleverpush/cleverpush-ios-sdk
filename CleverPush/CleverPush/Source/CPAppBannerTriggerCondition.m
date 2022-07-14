@@ -26,8 +26,8 @@
             self.value = [json objectForKey:@"value"];
         }
         
-        if ([json objectForKey:@"relation"] && [[json objectForKey:@"relation"] isKindOfClass:[NSString class]]) {
-            self.relation = [json objectForKey:@"relation"];
+        if ([json objectForKey:@"operator"] && [[json objectForKey:@"operator"] isKindOfClass:[NSString class]]) {
+            self.relation = [json objectForKey:@"operator"];
         }
         
         if ([json objectForKey:@"sessions"]) {

@@ -43,13 +43,11 @@
     [self dynamicHeight:frame.size];
 }
 
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [self.blocks count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
@@ -72,13 +70,14 @@
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
         [cell.btnCPBanner setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
 
+        CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
+            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:fontSize]];
         } else {
             if (block.family != nil) {
                 [CPLog error:@"Font Family not found for button block: %@", block.family];
             }
-            [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
+            [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
         }
 
         switch (block.alignment) {
@@ -95,7 +94,7 @@
         cell.btnCPBanner.backgroundColor = [UIColor colorWithHexString:block.background];
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
-        cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius;
+        cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 1.2;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
@@ -111,13 +110,14 @@
         cell.txtCPBanner.numberOfLines = 0;
         cell.txtCPBanner.textColor = [UIColor colorWithHexString:block.color];
 
+        CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:(CGFloat)(block.size * 1.2)]];
+            [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:fontSize]];
         } else {
             if (block.family != nil) {
                 [CPLog error:@"Font Family not found for text block: %@", block.family];
             }
-            [cell.txtCPBanner setFont:[UIFont systemFontOfSize:(CGFloat)(block.size * 1.2) weight:UIFontWeightSemibold]];
+            [cell.txtCPBanner setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
         }
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
@@ -173,11 +173,13 @@
 
 - (void)actionCallback:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
     self.actionCallback(action);
-    if (action.dismiss && action.openInWebview) {
-        [CPUtils openSafari:action.url dismissViewController:self.controller];
-    } else if (!action.dismiss && action.openInWebview) {
-        [CPUtils openSafari:action.url];
-    } else if (action.dismiss && ![action.screen isEqualToString:@""] && action.screen != nil) {
+    if (action.openInWebview) {
+        if (action.dismiss) {
+            [CPUtils openSafari:action.url dismissViewController:self.controller];
+        } else {
+            [CPUtils openSafari:action.url];
+        }
+    } else if (![action.screen isEqualToString:@""] && action.screen != nil) {
         if (self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage:action.screen];
         } else {
