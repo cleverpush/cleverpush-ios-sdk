@@ -1,3 +1,6 @@
+## 1.20.5
+* Fixed a potential crash in app banners
+
 ## 1.20.4
 * Improve app banners
 

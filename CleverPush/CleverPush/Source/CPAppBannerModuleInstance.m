@@ -28,8 +28,6 @@ long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
 
-dispatch_queue_t dispatchQueue = nil;
-
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -121,7 +119,7 @@ dispatch_queue_t dispatchQueue = nil;
     [self saveSessions];
 
     if (afterInit) {
-        dispatch_sync(dispatchQueue, ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
                 [self startup];
             }];
@@ -138,7 +136,6 @@ dispatch_queue_t dispatchQueue = nil;
     [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    dispatchQueue = dispatch_queue_create("CleverPush_AppBanners", nil);
     [self setPendingBannerListeners:[NSMutableArray new]];
     [self setActiveBanners:[NSMutableArray new]];
     [self setPendingBanners:[NSMutableArray new]];
@@ -149,7 +146,7 @@ dispatch_queue_t dispatchQueue = nil;
     [self updateInitialisedFlag:YES];
     [self setFromNotification:fromNotification];
     if (![self isFromNotification]) {
-        dispatch_sync(dispatchQueue, ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
                 [self startup];
             }];
@@ -397,17 +394,17 @@ dispatch_queue_t dispatchQueue = nil;
     for (CPAppBanner* banner in [self getActiveBanners]) {
         if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatchQueue, ^(void) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                     [self showBanner:banner];
                 });
             } else {
-                dispatch_sync(dispatchQueue, ^{
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                     [self showBanner:banner];
                 });
             }
         } else {
             double delay = [[NSDate date] timeIntervalSinceDate:banner.startAt] + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatchQueue, ^(void) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 [self showBanner:banner];
             });
         }
@@ -506,7 +503,7 @@ dispatch_queue_t dispatchQueue = nil;
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatchQueue, ^(void) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [appBannerViewController onDismiss];
         });
     }
