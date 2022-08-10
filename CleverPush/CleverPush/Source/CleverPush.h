@@ -131,7 +131,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)removeNotification:(NSString*)notificationId;
 + (NSArray*)getSeenStories;
 + (NSMutableArray*)getSubscriptionTopics;
-
 + (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 + (NSString*)getSubscriptionId;
 + (NSString*)getApiEndpoint;

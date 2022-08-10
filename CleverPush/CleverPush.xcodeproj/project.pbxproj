@@ -1530,6 +1530,7 @@
 		294F7E8823FB5DB500806D23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1569,6 +1570,7 @@
 		294F7E8923FB5DB500806D23 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1715,6 +1717,7 @@
 		297B4E0A1E589AFE00BAF990 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_MODULES_AUTOLINK = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1743,6 +1746,7 @@
 		297B4E0B1E589AFE00BAF990 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_MODULES_AUTOLINK = NO;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1771,11 +1775,7 @@
 		297C34D623FBF3AE00314A84 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					"$(ARCHS_STANDARD)",
-					x86_64h,
-					armv7s,
-				);
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
@@ -1798,11 +1798,7 @@
 		297C34D723FBF3AE00314A84 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					"$(ARCHS_STANDARD)",
-					x86_64h,
-					armv7s,
-				);
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
@@ -1824,6 +1820,7 @@
 		29DB95D523FC3203008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1855,6 +1852,7 @@
 		29DB95D623FC3203008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1885,6 +1883,7 @@
 		29DB95E223FC320C008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1915,6 +1914,7 @@
 		29DB95E323FC320C008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1944,6 +1944,7 @@
 		29DB95E623FC3249008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
@@ -1964,6 +1965,7 @@
 		29DB95E723FC3249008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
@@ -1983,6 +1985,7 @@
 		29DB960623FC6059008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPushLocation;
@@ -1999,6 +2002,7 @@
 		29DB960723FC6059008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework";
 				CLEVERPUSH_MACH_O_TYPE = staticlib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPushLocation;
@@ -2015,6 +2019,7 @@
 		29DB960A23FC6068008FC985 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPushLocation;
@@ -2031,6 +2036,7 @@
 		29DB960B23FC6068008FC985 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLEVERPUSH_DESTINATION_PATH = "${SRCROOT}/Framework/Dynamic";
 				CLEVERPUSH_MACH_O_TYPE = mh_dylib;
 				CLEVERPUSH_OUTPUT_NAME = CleverPushLocation;
@@ -2047,6 +2053,7 @@
 		CB1B65D327577B6E0087AC49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -2088,6 +2095,7 @@
 		CB1B65D427577B6E0087AC49 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;

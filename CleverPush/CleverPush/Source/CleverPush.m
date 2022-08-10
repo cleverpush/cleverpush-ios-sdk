@@ -459,7 +459,7 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
-+ (NSArray*)getSeenStories {
++ (NSArray *)getSeenStories {
     return [self.CPSharedInstance getSeenStories];
 }
 
