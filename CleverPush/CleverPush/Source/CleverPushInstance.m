@@ -1915,7 +1915,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving all the available tags from the channelConfig
-- (NSArray<NSString*>*)getAvailableTags {
+- (NSArray*)getAvailableTags {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     __block NSArray* channelTags = nil;
@@ -1947,7 +1947,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving all the available topics from the channelConfig
-- (NSArray<NSString*>*)getAvailableTopics {
+- (NSArray*)getAvailableTopics {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     __block NSArray* channelTopics = nil;
@@ -2016,7 +2016,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription tag which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TAGS"
-- (NSArray<NSString*>*)getSubscriptionTags {
+- (NSArray*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTags = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
     if (!subscriptionTags) {
@@ -2077,7 +2077,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (NSArray<NSString*>*)getSubscriptionTopics {
+- (NSArray*)getSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     if (!subscriptionTopics) {
@@ -2262,7 +2262,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Appending the topicId's as a query parameter.
-- (NSMutableArray<NSString*>*)getReceivedNotificationsQueryParameters {
+- (NSMutableArray*)getReceivedNotificationsQueryParameters {
     NSMutableArray* subscriptionTopics = [self getSubscriptionTopics];
     NSMutableArray* dynamicQueryParameter = [NSMutableArray new];
     [subscriptionTopics enumerateObjectsUsingBlock: ^(id topic, NSUInteger index, BOOL *stop) {
@@ -2311,7 +2311,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
-- (NSArray<NSString*>*)getSeenStories {
+- (NSArray*)getSeenStories {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* seenStories = [userDefaults arrayForKey:CLEVERPUSH_SEEN_STORIES_KEY];
     if (!seenStories) {

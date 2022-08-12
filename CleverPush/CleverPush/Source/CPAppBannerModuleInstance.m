@@ -82,7 +82,7 @@ long sessions = 0;
 }
 
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
-- (NSMutableArray<NSString*>*)shownAppBanners {
+- (NSMutableArray*)shownAppBanners {
     NSMutableArray* shownAppBanners = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:ShownAppBannersDefaultsKey]];
     if (!shownAppBanners) {
         shownAppBanners = [[NSMutableArray alloc] init];
