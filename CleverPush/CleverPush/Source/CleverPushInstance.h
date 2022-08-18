@@ -82,6 +82,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock;
 
+- (void)setMaximumNotificationCount:(int)limit;
+
 - (void)disableAppBanners;
 - (void)enableAppBanners;
 - (BOOL)popupVisible;

@@ -83,7 +83,7 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
-static const int maximumNotifications = 100;
+int maximumNotifications = 100;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -665,6 +665,11 @@ static id isNil(id object) {
 }
 - (NSString*)getBundleName {
     return [[NSBundle mainBundle] bundleIdentifier];
+}
+
+#pragma mark - Set maximum notification count.
+- (void)setMaximumNotificationCount:(int)limit {
+    maximumNotifications = limit;
 }
 
 #pragma mark - getSubscriptionId.
