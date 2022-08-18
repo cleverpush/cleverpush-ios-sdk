@@ -1,6 +1,7 @@
 #import "CPAppBannerModuleInstance.h"
 #import "CPUtils.h"
 #import "CPLog.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @interface CPAppBannerModuleInstance()
 
@@ -260,50 +261,64 @@ long sessions = 0;
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
         allowed = NO;
         for (NSDictionary *attribute in banner.attributes) {
-            NSString *attributeId = [attribute objectForKey:@"id"];
-            NSString *attributeValue = [attribute objectForKey:@"value"];
-            if ([CleverPush hasSubscriptionAttributeValue:attributeId value:attributeValue]) {
+            NSString *attributeId = [attribute stringForKey:@"id"];
+            NSString *compareAttributeValue = [attribute stringForKey:@"value"];
+
+            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
+            NSString *relation = [attribute stringForKey:@"relation"];
+            if (!relation || [relation isKindOfClass:[NSNull class]]) {
+                relation = @"equals";
+            }
+
+            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES];
+            if (attributeFilterAllowed) {
                 allowed = YES;
                 break;
             }
         }
     }
 
-    allowed = [self appVersionFilter:banner isAllowed:allowed];
+    NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
+    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed];
     return allowed;
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
--(BOOL)appVersionFilter:(CPAppBanner*)banner isAllowed:(BOOL)allowed {
-    if (banner.appVersionFilterRelation == nil || banner.appVersionFilterValue == nil) {
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed {
+    return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
+}
+
+#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
+    if (relation == nil || compareValue == nil) {
         return allowed;
     }
-    if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeEquals)]) {
-        if (allowed && !APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (allowed && !CHECK_FILTER_EQUAL_TO(value, compareValue)) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeGreaterThan)]) {
-        if (!APP_VERSION_GREATER_THAN(banner.appVersionFilterValue)) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeLessThan)]) {
-        if (!APP_VERSION_LESS_THAN(banner.appVersionFilterValue)) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeBetween)]) {
-        if (!APP_VERSION_GREATER_THAN_OR_EQUAL_TO(banner.fromVersion) && !APP_VERSION_LESS_THAN_OR_EQUAL_TO(banner.toVersion)) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        if (!CHECK_FILTER_GREATER_THAN_OR_EQUAL_TO(value, compareValueFrom) && !CHECK_FILTER_LESS_THAN_OR_EQUAL_TO(value, compareValueTo)) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeNotEqual)]) {
-        if (!APP_VERSION_EQUAL_TO(banner.appVersionFilterValue)) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeContains)]) {
-        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location == NSNotFound) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
+        if ([value rangeOfString:compareValue].location == NSNotFound) {
             allowed = NO;
         }
-    } else if (allowed && [banner.appVersionFilterRelation isEqualToString:versionRelation(CPAppBannerTypeNotContains)]) {
-        if ([APP_VERSION rangeOfString:banner.appVersionFilterValue].location != NSNotFound) {
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
+        if ([value rangeOfString:compareValue].location != NSNotFound) {
             allowed = NO;
         }
     }

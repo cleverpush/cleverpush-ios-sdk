@@ -13,6 +13,7 @@
 #import "CPAppBannerImageBlock.h"
 #import "CPAppBannerBlockType.h"
 #import "CPAppBannerAction.h"
+#import "CPFilterRelationType.h"
 #import "UIColor+HexString.h"
 #import "UIImageView+CleverPush.h"
 #import "CPAppBannerViewController.h"

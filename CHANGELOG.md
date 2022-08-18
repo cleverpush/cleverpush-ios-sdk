@@ -1,3 +1,6 @@
+## 1.21.0
+* Added support for attribute filter relations
+
 ## 1.20.5
 * Fixed a potential crash in app banners
 
