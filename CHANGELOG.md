@@ -1,3 +1,6 @@
+## 1.21.2
+* Improved `setMaximumNotificationCount` method
+
 ## 1.21.1
 * Added `setMaximumNotificationCount` method for limiting internal data of `getNotifications`
 
