@@ -546,6 +546,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeNotification:notificationId];
 }
 
++ (void)setMaximumNotificationCount:(int)limit {
+    [self.CPSharedInstance setMaximumNotificationCount:limit];
+}
+
 #pragma mark - Singleton shared instance of the cleverpush.
 + (CleverPush*)sharedInstance {
     @synchronized(singleInstance) {

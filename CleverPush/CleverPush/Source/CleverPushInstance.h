@@ -82,8 +82,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock;
 
-- (void)setMaximumNotificationCount:(int)limit;
-
 - (void)disableAppBanners;
 - (void)enableAppBanners;
 - (BOOL)popupVisible;
@@ -158,6 +156,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSArray*)getSubscriptionTags;
 - (NSArray<CPNotification*>*)getNotifications;
 - (void)removeNotification:(NSString*)notificationId;
+- (void)setMaximumNotificationCount:(int)limit;
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback;
 - (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback;
 - (NSArray*)getSeenStories;
