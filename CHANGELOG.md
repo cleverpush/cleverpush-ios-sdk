@@ -1,3 +1,6 @@
+## 1.21.1
+* Added `setMaximumNotificationCount` method for limiting internal data of `getNotifications`
+
 ## 1.21.0
 * Added support for attribute filter relations
 
