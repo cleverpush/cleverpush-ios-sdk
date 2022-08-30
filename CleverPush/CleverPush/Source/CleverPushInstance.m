@@ -676,6 +676,17 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
+#pragma mark - getDeviceToken.
+- (void)getDeviceToken:(void(^)(NSString *))callback {
+    if (deviceToken) {
+        callback(deviceToken);
+    }
+}
+
+- (NSString*)getDeviceToken {
+    return deviceToken;
+}
+
 #pragma mark - getSubscriptionId.
 - (void)getSubscriptionId:(void(^)(NSString *))callback {
     if (subscriptionId) {
@@ -1586,10 +1597,6 @@ static id isNil(id object) {
 
     }
     return wasSet;
-}
-
-- (NSString*)getDeviceToken {
-    return deviceToken;
 }
 
 #pragma mark - Removed space from 32bytes and convert token in to string.
