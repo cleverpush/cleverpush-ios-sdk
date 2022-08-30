@@ -687,6 +687,10 @@ static id isNil(id object) {
     }
 }
 
+- (NSString*)getDeviceToken {
+    return deviceToken;
+}
+
 #pragma mark - getSubscriptionId.
 - (void)getSubscriptionId:(void(^)(NSString *))callback {
     if (subscriptionId) {
@@ -1101,7 +1105,7 @@ static id isNil(id object) {
     }
 
     deviceToken = newDeviceToken;
-    
+
     for (id (^listener)() in pendingDeviceTokenListeners) {
         listener(deviceToken);
     }
