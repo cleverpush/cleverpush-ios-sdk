@@ -352,9 +352,7 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getDeviceToken:(void(^)(NSString *))callback {
-    [self.CPSharedInstance getDeviceToken:^(NSString *callbackInner) {
-        callback(callbackInner);
-    }];
+    [self.CPSharedInstance getDeviceToken:callback];
 }
 
 + (void)trackEvent:(NSString*)eventName {
@@ -479,10 +477,6 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getSubscriptionId {
     return [self.CPSharedInstance getSubscriptionId];
-}
-
-+ (NSString*)getDeviceToken {
-    return [self.CPSharedInstance getDeviceToken];
 }
 
 + (NSString*)getApiEndpoint {

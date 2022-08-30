@@ -101,6 +101,7 @@ NSArray* channelTopics;
 
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
+NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* subscriptionTags;
 
@@ -261,6 +262,7 @@ static id isNil(id object) {
     channelConfig = nil;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
+    pendingDeviceTokenListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
@@ -680,11 +682,9 @@ static id isNil(id object) {
 - (void)getDeviceToken:(void(^)(NSString *))callback {
     if (deviceToken) {
         callback(deviceToken);
+    } else {
+        [pendingDeviceTokenListeners addObject:[callback copy]];
     }
-}
-
-- (NSString*)getDeviceToken {
-    return deviceToken;
 }
 
 #pragma mark - getSubscriptionId.
@@ -1077,7 +1077,7 @@ static id isNil(id object) {
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
-
+        
         if (@available(iOS 10.0, *)) {
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
                 if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
@@ -1101,6 +1101,11 @@ static id isNil(id object) {
     }
 
     deviceToken = newDeviceToken;
+    
+    for (id (^listener)() in pendingDeviceTokenListeners) {
+        listener(deviceToken);
+    }
+    pendingDeviceTokenListeners = [NSMutableArray new];
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];

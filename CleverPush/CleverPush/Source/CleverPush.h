@@ -136,7 +136,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 + (NSString*)getSubscriptionId;
-+ (NSString*)getDeviceToken;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
 
