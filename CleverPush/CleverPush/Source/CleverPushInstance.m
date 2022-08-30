@@ -101,6 +101,7 @@ NSArray* channelTopics;
 
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
+NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* subscriptionTags;
 
@@ -261,6 +262,7 @@ static id isNil(id object) {
     channelConfig = nil;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
+    pendingDeviceTokenListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
@@ -674,6 +676,19 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     [userDefaults setInteger:limit forKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT];
     [userDefaults synchronize];
+}
+
+#pragma mark - getDeviceToken.
+- (void)getDeviceToken:(void(^)(NSString *))callback {
+    if (deviceToken) {
+        callback(deviceToken);
+    } else {
+        [pendingDeviceTokenListeners addObject:[callback copy]];
+    }
+}
+
+- (NSString*)getDeviceToken {
+    return deviceToken;
 }
 
 #pragma mark - getSubscriptionId.
@@ -1090,6 +1105,11 @@ static id isNil(id object) {
     }
 
     deviceToken = newDeviceToken;
+
+    for (id (^listener)() in pendingDeviceTokenListeners) {
+        listener(deviceToken);
+    }
+    pendingDeviceTokenListeners = [NSMutableArray new];
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1586,10 +1606,6 @@ static id isNil(id object) {
 
     }
     return wasSet;
-}
-
-- (NSString*)getDeviceToken {
-    return deviceToken;
 }
 
 #pragma mark - Removed space from 32bytes and convert token in to string.

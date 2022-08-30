@@ -351,6 +351,10 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)getDeviceToken:(void(^)(NSString *))callback {
+    [self.CPSharedInstance getDeviceToken:callback];
+}
+
 + (void)trackEvent:(NSString*)eventName {
     [self.CPSharedInstance trackEvent:eventName];
 }

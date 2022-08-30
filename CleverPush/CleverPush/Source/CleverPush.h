@@ -102,6 +102,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback;
 + (void)getChannelConfig:(void(^)(NSDictionary *))callback;
 + (void)getSubscriptionId:(void(^)(NSString *))callback;
++ (void)getDeviceToken:(void(^)(NSString *))callback;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
 + (void)triggerFollowUpEvent:(NSString*)eventName;
