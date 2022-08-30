@@ -1660,7 +1660,7 @@ static id isNil(id object) {
     [self removeSubscriptionTags:tagIds callback:nil];
 }
 
-- (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <CPSubscription*>*))callback {
+- (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
@@ -1675,7 +1675,7 @@ static id isNil(id object) {
     });
 }
 
-- (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <CPSubscription*>*))callback{
+- (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback{
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
@@ -2016,7 +2016,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription tag which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TAGS"
-- (NSArray<CPSubscription*>*)getSubscriptionTags {
+- (NSArray<NSString*>*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTags = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
     if (!subscriptionTags) {
@@ -2077,7 +2077,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (NSArray<CPSubscription*>*)getSubscriptionTopics {
+- (NSArray<NSString*>*)getSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     if (!subscriptionTopics) {
@@ -2168,7 +2168,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (void)setSubscriptionTopics:(NSMutableArray <CPSubscription*>*)topics {
+- (void)setSubscriptionTopics:(NSMutableArray <NSString*>*)topics {
     [self setDefaultCheckedTopics:topics];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
@@ -2311,7 +2311,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
-- (NSArray<CPStory*>*)getSeenStories {
+- (NSArray<NSString*>*)getSeenStories {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* seenStories = [userDefaults arrayForKey:CLEVERPUSH_SEEN_STORIES_KEY];
     if (!seenStories) {
