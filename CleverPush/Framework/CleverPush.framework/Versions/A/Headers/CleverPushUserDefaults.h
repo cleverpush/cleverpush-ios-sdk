@@ -30,6 +30,7 @@
 #define CLEVERPUSH_INCREMENT_BADGE_KEY @"CleverPush_INCREMENT_BADGE"
 #define CLEVERPUSH_BADGE_COUNT_KEY @"CleverPush_BADGE_COUNT"
 #define CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY @"CleverPush_SHOW_NOTIFICATIONS_IN_FOREGROUND"
+#define CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT @"CleverPush_MAXIMUM_NOTIFICATION_COUNT"
 
 #define CLEVERPUSH_SHOWN_APP_BANNERS_KEY @"CleverPush_SHOWN_APP_BANNERS"
 #define CLEVERPUSH_APP_BANNER_SESSIONS_KEY @"CleverPush_APP_BANNER_SESSIONS"
@@ -38,9 +39,8 @@
 
 #define CLEVERPUSH_SEEN_STORIES_KEY @"CleverPush_SEEN_STORIES"
 
-#define APP_VERSION_EQUAL_TO(v)                  ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedSame)
-#define APP_VERSION_GREATER_THAN(v)              ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedDescending)
-#define APP_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] != NSOrderedAscending)
-#define APP_VERSION_LESS_THAN(v)                 ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] == NSOrderedAscending)
-#define APP_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"] compare:v options:NSNumericSearch] != NSOrderedDescending)
-#define APP_VERSION [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"]
+#define CHECK_FILTER_EQUAL_TO(key, v)                  ([key compare:v options:NSNumericSearch] == NSOrderedSame)
+#define CHECK_FILTER_GREATER_THAN(key, v)              ([key compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define CHECK_FILTER_GREATER_THAN_OR_EQUAL_TO(key, v)  ([key compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define CHECK_FILTER_LESS_THAN(key, v)                 ([key compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define CHECK_FILTER_LESS_THAN_OR_EQUAL_TO(key, v)     ([key compare:v options:NSNumericSearch] != NSOrderedDescending)

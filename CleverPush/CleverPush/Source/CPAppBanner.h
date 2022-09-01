@@ -14,7 +14,7 @@
 #import "CPAppBannerHTMLBlock.h"
 #import "CPUtils.h"
 #import "CPAppBannerCarouselBlock.h"
-#import "CPAppBannerVersionRelationType.h"
+#import "CPFilterRelationType.h"
 
 @interface CPAppBanner : NSObject
 

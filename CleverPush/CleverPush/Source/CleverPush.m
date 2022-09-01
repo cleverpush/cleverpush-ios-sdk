@@ -351,6 +351,10 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)getDeviceToken:(void(^)(NSString *))callback {
+    [self.CPSharedInstance getDeviceToken:callback];
+}
+
 + (void)trackEvent:(NSString*)eventName {
     [self.CPSharedInstance trackEvent:eventName];
 }
@@ -544,6 +548,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeNotification:(NSString*)notificationId {
     [self.CPSharedInstance removeNotification:notificationId];
+}
+
++ (void)setMaximumNotificationCount:(int)limit {
+    [self.CPSharedInstance setMaximumNotificationCount:limit];
 }
 
 #pragma mark - Singleton shared instance of the cleverpush.

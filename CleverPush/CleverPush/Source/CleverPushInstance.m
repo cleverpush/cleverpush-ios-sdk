@@ -70,7 +70,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.20.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -83,7 +83,7 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
-static const int maximumNotifications = 100;
+int maximumNotifications = 100;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -101,6 +101,7 @@ NSArray* channelTopics;
 
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
+NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* subscriptionTags;
 
@@ -261,6 +262,7 @@ static id isNil(id object) {
     channelConfig = nil;
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
+    pendingDeviceTokenListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
@@ -665,6 +667,28 @@ static id isNil(id object) {
 }
 - (NSString*)getBundleName {
     return [[NSBundle mainBundle] bundleIdentifier];
+}
+
+#pragma mark - Set maximum notification count.
+- (void)setMaximumNotificationCount:(int)limit {
+    maximumNotifications = limit;
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    [userDefaults setInteger:limit forKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT];
+    [userDefaults synchronize];
+}
+
+#pragma mark - getDeviceToken.
+- (void)getDeviceToken:(void(^)(NSString *))callback {
+    if (deviceToken) {
+        callback(deviceToken);
+    } else {
+        [pendingDeviceTokenListeners addObject:[callback copy]];
+    }
+}
+
+- (NSString*)getDeviceToken {
+    return deviceToken;
 }
 
 #pragma mark - getSubscriptionId.
@@ -1081,6 +1105,11 @@ static id isNil(id object) {
     }
 
     deviceToken = newDeviceToken;
+
+    for (id (^listener)() in pendingDeviceTokenListeners) {
+        listener(deviceToken);
+    }
+    pendingDeviceTokenListeners = [NSMutableArray new];
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1526,6 +1555,11 @@ static id isNil(id object) {
     }
     [notifications addObject:notificationMutable];
     NSArray *notificationsArray = [NSArray arrayWithArray:notifications];
+
+    if ([userDefaults objectForKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT] != nil) {
+        maximumNotifications = (int) [userDefaults integerForKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT];
+    }
+
     if (notificationsArray.count > maximumNotifications) {
         notificationsArray = [notificationsArray subarrayWithRange:NSMakeRange(notificationsArray.count - maximumNotifications, maximumNotifications)];
     }
@@ -1572,10 +1606,6 @@ static id isNil(id object) {
 
     }
     return wasSet;
-}
-
-- (NSString*)getDeviceToken {
-    return deviceToken;
 }
 
 #pragma mark - Removed space from 32bytes and convert token in to string.
