@@ -1,3 +1,6 @@
+## 1.21.3
+* Improved `getNotifications` method
+
 ## 1.21.2
 * Improved `setMaximumNotificationCount` method
 

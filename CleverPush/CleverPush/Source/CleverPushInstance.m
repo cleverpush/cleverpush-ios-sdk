@@ -70,7 +70,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.2";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.3";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1554,6 +1554,7 @@ static id isNil(id object) {
         notifications = [[NSMutableArray alloc] init];
     }
     [notifications addObject:notificationMutable];
+    notifications = [self filterDuplicateNotifications:notifications];
     NSArray *notificationsArray = [NSArray arrayWithArray:notifications];
 
     if ([userDefaults objectForKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT] != nil) {
@@ -1563,6 +1564,7 @@ static id isNil(id object) {
     if (notificationsArray.count > maximumNotifications) {
         notificationsArray = [notificationsArray subarrayWithRange:NSMakeRange(notificationsArray.count - maximumNotifications, maximumNotifications)];
     }
+
     [userDefaults setObject:notificationsArray forKey:CLEVERPUSH_NOTIFICATIONS_KEY];
     [userDefaults synchronize];
 }
@@ -2273,7 +2275,7 @@ static id isNil(id object) {
         }];
     } else {
         if (callback) {
-            callback([self convertDictionariesToNotifications:notifications]);
+            callback(notifications);
         }
     }
 }
@@ -2308,6 +2310,20 @@ static id isNil(id object) {
     NSArray *sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
     NSArray *sortedEventArray = [notifications sortedArrayUsingDescriptors:sortDescriptors];
     return sortedEventArray;
+}
+
+#pragma mark - converting objects to CPNotification.
+- (NSMutableArray*)filterDuplicateNotifications:(NSArray*)notifications {
+    NSMutableArray* resultNotifications = [NSMutableArray new];
+    NSMutableArray* notificationIds = [NSMutableArray new];
+    [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL *stop) {
+        NSString* notificationId = [objNotification objectForKey:@"_id"];
+        if (![notificationIds containsObject:notificationId]) {
+            [notificationIds addObject:notificationId];
+            [resultNotifications addObject:objNotification];
+        }
+    }];
+    return resultNotifications;
 }
 
 #pragma mark - converting objects to CPNotification.
