@@ -133,11 +133,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (NSArray<NSString*>*)getSeenStories;
 + (NSMutableArray<NSString*>*)getSubscriptionTopics;
-
 + (void)setMaximumNotificationCount:(int)limit;
-+ (NSArray*)getSeenStories;
-+ (NSMutableArray*)getSubscriptionTopics;
-
 
 + (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 + (NSString*)getSubscriptionId;
