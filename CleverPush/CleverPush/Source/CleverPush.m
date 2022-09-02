@@ -177,7 +177,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
++ (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
     [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
         callback(callbackInner);
     }];
@@ -205,7 +205,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeSubscriptionTopic:topicId];
 }
 
-+ (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
++ (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
     [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
         callback(callbackInner);
     }];

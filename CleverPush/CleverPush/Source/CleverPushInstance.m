@@ -1690,7 +1690,7 @@ static id isNil(id object) {
     [self removeSubscriptionTags:tagIds callback:nil];
 }
 
-- (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
+- (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
@@ -1705,7 +1705,7 @@ static id isNil(id object) {
     });
 }
 
-- (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray <NSString*>*))callback{
+- (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback{
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
