@@ -1,5 +1,6 @@
 ## 1.21.3
 * Improved `getNotifications` method
+* Implemented `getDeviceToken:callback` method
 
 ## 1.21.2
 * Improved `setMaximumNotificationCount` method
