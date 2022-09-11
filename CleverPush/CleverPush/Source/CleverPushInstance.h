@@ -50,6 +50,8 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 
+typedef void (^CPLogListener)(NSString* message);
+
 @class CPChannelTag;
 
 @interface CleverPushInstance : NSObject
@@ -235,5 +237,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)sendSubscriptionTagsToApi:(NSString*)tagId callback:(void (^)(NSString *))callback;
 - (void)removeSubscriptionTagsFromApi:(NSString*)tagId callback:(void (^)(NSString *))callback;
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend;
+
+- (void)setLogListener:(CPLogListener)listener;
 
 @end

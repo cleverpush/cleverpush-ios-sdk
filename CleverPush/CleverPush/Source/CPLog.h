@@ -12,6 +12,8 @@ typedef NS_ENUM(NSUInteger, CP_LOGLEVEL) {
     CP_LOGLEVEL_VERBOSE
 };
 
+typedef void (^CPLogListener)(NSString* message);
+
 + (void)setLogLevel:(CP_LOGLEVEL)logLevel;
 + (void)fatal:(NSString* _Nonnull)format, ... NS_FORMAT_FUNCTION(1, 2);
 + (void)error:(NSString* _Nonnull)format, ... NS_FORMAT_FUNCTION(1, 2);
@@ -19,5 +21,6 @@ typedef NS_ENUM(NSUInteger, CP_LOGLEVEL) {
 + (void)info:(NSString* _Nonnull)format, ... NS_FORMAT_FUNCTION(1, 2);
 + (void)debug:(NSString* _Nonnull)format, ... NS_FORMAT_FUNCTION(1, 2);
 + (void)verbose:(NSString* _Nonnull)format, ... NS_FORMAT_FUNCTION(1, 2);
++ (void)setLogListener:(CPLogListener)listener;
 
 @end

@@ -4,6 +4,7 @@
 @implementation CPLog
 
 static CP_LOGLEVEL _logLevel = CP_LOGLEVEL_INFO;
+static CPLogListener _logListener;
 
 + (void)setLogLevel:(CP_LOGLEVEL)logLevel {
     _logLevel = logLevel;
@@ -51,6 +52,10 @@ static CP_LOGLEVEL _logLevel = CP_LOGLEVEL_INFO;
     va_end(args);
 }
 
++ (void)setLogListener:(CPLogListener)listener {
+    _logListener = listener;
+}
+
 void cleverpushLog(CP_LOGLEVEL logLevel, NSString* format, va_list args) {
     NSString* logLevelPrefix;
     switch (logLevel) {
@@ -78,7 +83,13 @@ void cleverpushLog(CP_LOGLEVEL logLevel, NSString* format, va_list args) {
     }
 
     if (logLevel <= _logLevel) {
-        NSLogv([NSString stringWithFormat:@"[CleverPush] %@: %@", logLevelPrefix, format], args);
+        NSString *logFormat = [NSString stringWithFormat:@"[CleverPush] %@: %@", logLevelPrefix, format];
+        NSLogv(logFormat, args);
+
+        if (_logListener) {
+            NSString *outputString = [[NSString alloc] initWithFormat:format arguments:args];
+            _logListener(outputString);
+        }
     }
 }
 

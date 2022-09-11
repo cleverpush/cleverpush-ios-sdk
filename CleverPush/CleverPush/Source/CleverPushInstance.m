@@ -70,7 +70,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -3139,6 +3139,10 @@ static id isNil(id object) {
 
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback {
     handleSubscribed = subscribedCallback;
+}
+
+- (void)setLogListener:(CPLogListener)listener {
+    [CPLog setLogListener:listener];
 }
 
 #pragma mark - recieved notifications from the Extension.

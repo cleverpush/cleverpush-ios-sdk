@@ -532,6 +532,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getUnsubscribeStatus];
 }
 
++ (void)setLogListener:(CPLogListener)listener {
+    [self.CPSharedInstance setLogListener:listener];
+}
+
 + (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0)) {
     return [self.CPSharedInstance didReceiveNotificationExtensionRequest:request withMutableNotificationContent:replacementContent];
 }

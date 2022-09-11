@@ -1,3 +1,6 @@
+## 1.21.4
+* Added ability to set own log listener via `setLogListener`
+
 ## 1.21.3
 * Improved `getNotifications` method
 * Implemented `getDeviceToken:callback` method
