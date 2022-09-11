@@ -1692,7 +1692,7 @@ static id isNil(id object) {
     [self removeSubscriptionTags:tagIds callback:nil];
 }
 
-- (void)addSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback {
+- (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
@@ -1707,7 +1707,7 @@ static id isNil(id object) {
     });
 }
 
-- (void)removeSubscriptionTags:(NSArray*)tagIds callback:(void(^)(NSArray *))callback{
+- (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback{
     dispatch_group_t group = dispatch_group_create();
     for (NSString* tagId in tagIds) {
         dispatch_group_enter(group);
@@ -1947,7 +1947,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving all the available tags from the channelConfig
-- (NSArray*)getAvailableTags {
+- (NSArray<CPChannelTag*>*)getAvailableTags {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     __block NSArray* channelTags = nil;
@@ -1960,7 +1960,7 @@ static id isNil(id object) {
     return channelTags;
 }
 
-- (void)getAvailableTags:(void(^)(NSArray *))callback {
+- (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTags = [channelConfig arrayForKey:@"channelTags"];
@@ -1979,7 +1979,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving all the available topics from the channelConfig
-- (NSArray*)getAvailableTopics {
+- (NSArray <CPChannelTopic*>*)getAvailableTopics {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     __block NSArray* channelTopics = nil;
@@ -1992,7 +1992,7 @@ static id isNil(id object) {
     return channelTopics;
 }
 
-- (void)getAvailableTopics:(void(^)(NSArray *))callback {
+- (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTopics = [channelConfig arrayForKey:@"channelTopics"];
@@ -2048,7 +2048,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription tag which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TAGS"
-- (NSArray*)getSubscriptionTags {
+- (NSArray<NSString*>*)getSubscriptionTags {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTags = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
     if (!subscriptionTags) {
@@ -2109,7 +2109,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (NSArray*)getSubscriptionTopics {
+- (NSArray<NSString*>*)getSubscriptionTopics {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     if (!subscriptionTopics) {
@@ -2200,7 +2200,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (void)setSubscriptionTopics:(NSMutableArray *)topics {
+- (void)setSubscriptionTopics:(NSMutableArray <NSString*>*)topics {
     [self setDefaultCheckedTopics:topics];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
@@ -2357,7 +2357,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving stories which has been seen by user and stored in NSUserDefaults by key "CleverPush_SEEN_STORIES"
-- (NSArray*)getSeenStories {
+- (NSArray<NSString*>*)getSeenStories {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSArray* seenStories = [userDefaults arrayForKey:CLEVERPUSH_SEEN_STORIES_KEY];
     if (!seenStories) {
@@ -2979,8 +2979,8 @@ static id isNil(id object) {
     [self showAppBanner:bannerId notificationId:nil];
 }
 
-- (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray *))callback {
-    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
+- (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
+    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil completion:^(NSMutableArray<CPAppBanner*> *banners) {
         callback(banners);
     }];
 }
