@@ -1,5 +1,6 @@
 ## 1.21.4
 * Added ability to set own log listener via `setLogListener`
+* Improved NSArray method signatures
 
 ## 1.21.3
 * Improved `getNotifications` method
