@@ -11,7 +11,5 @@ Pod::Spec.new do |s|
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices"
     s.ios.resource_bundle     = { "CleverPushResources" => "CleverPush/CleverPush/Resources/*" }
-    s.ios.vendored_frameworks = "CleverPush/Framework/CleverPush.framework"
-    s.pod_target_xcconfig     = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-    s.user_target_xcconfig    = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.ios.vendored_frameworks = 'CleverPush/CleverPush-XCFramework/CleverPushXCFramework.xcframework'
 end
