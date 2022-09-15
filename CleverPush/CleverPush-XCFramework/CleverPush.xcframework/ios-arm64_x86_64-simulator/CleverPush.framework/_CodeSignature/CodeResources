@@ -4,33 +4,41 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Headers/CleverPushXCFramework.h</key>
+		<key>Headers/CleverPush.h</key>
 		<data>
-		iur3LadXrH06tH3/GqR9h4zGl5E=
+		KNgCqMriefnSvpz04J/FymcK8e8=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		qVIa5uwqY0bVXhFBHJYb3Txzs2c=
+		F3Wq3Cg1EGcaPvjVbuL06VwJMpE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		UFCYH+WqBLtBGNfd7EXhcUn9Chg=
+		ZslSYUhgnuEWTJZZiyubz461tzw=
 		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Headers/CleverPushXCFramework.h</key>
+		<key>Headers/CleverPush.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			KNgCqMriefnSvpz04J/FymcK8e8=
+			</data>
 			<key>hash2</key>
 			<data>
-			nIecN80Kga4KIpLdYcElK8MaKSbNoltsW35mNvnHH4o=
+			KZMaXF1irP3eCKWK4RXFIeqAzlYGk6Mkg3wubdIavo4=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			ZslSYUhgnuEWTJZZiyubz461tzw=
+			</data>
 			<key>hash2</key>
 			<data>
-			0lL/XUMxeenzMk4qA2PXz5AGfJP67v6tc89qhZYU708=
+			Tf6/NCW45x/T0WVK0UqfwQddMSYH8cbMkEnt1RwDjRs=
 			</data>
 		</dict>
 	</dict>
