@@ -477,8 +477,9 @@
 		29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIApplicationDelegate+CleverPush.m"; sourceTree = "<group>"; };
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
+		29F9086528E9EAD500D8D4D8 /* CleverPushExample.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CleverPushExample.xcodeproj; path = CleverPushExample/CleverPushExample.xcodeproj; sourceTree = "<group>"; };
+		29F9086528E9EAD500D8D4D8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		29F9086728E9EB0200D8D4D8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -580,8 +581,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93A9906C28D35E8900F990A4 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
+				93A9906E28D35E8D00F990A4 /* CoreGraphics.framework in Frameworks */,
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
 				2913D82D25141324002BA52C /* WebKit.framework in Frameworks */,
 				29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */,
@@ -668,6 +671,7 @@
 		297B4DEB1E589AFE00BAF990 = {
 			isa = PBXGroup;
 			children = (
+				93A9903D28D35ACD00F990A4 /* CleverPushExample.xcodeproj */,
 				297C34CF23FB70E300314A84 /* CHANGELOG.md */,
 				297B4E351E58A1AA00BAF990 /* CleverPush.podspec */,
 				297B4E201E58A16600BAF990 /* CleverPush */,
@@ -901,6 +905,15 @@
 				297C34D023FB710100314A84 /* CleverPushLocation.m */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		93A9903E28D35ACD00F990A4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				93A9904228D35ACD00F990A4 /* CleverPushExample.app */,
+				93A9906B28D35E8900F990A4 /* CleverPushNotificationServiceExtension.appex */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		CB1B65CC27577B6E0087AC49 /* CleverPushTests */ = {
@@ -1200,6 +1213,12 @@
 			mainGroup = 297B4DEB1E589AFE00BAF990;
 			productRefGroup = 297B4DF61E589AFE00BAF990 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 93A9903E28D35ACD00F990A4 /* Products */;
+					ProjectRef = 93A9903D28D35ACD00F990A4 /* CleverPushExample.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				29DB95E423FC3249008FC985 /* CleverPushXCFramework */,
@@ -1211,6 +1230,23 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		93A9904228D35ACD00F990A4 /* CleverPushExample.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = CleverPushExample.app;
+			remoteRef = 93A9904128D35ACD00F990A4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		93A9906B28D35E8900F990A4 /* CleverPushNotificationServiceExtension.appex */ = {
+			isa = PBXReferenceProxy;
+			fileType = "wrapper.app-extension";
+			path = CleverPushNotificationServiceExtension.appex;
+			remoteRef = 93A9906A28D35E8900F990A4 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		CB1B65C927577B6E0087AC49 /* Resources */ = {

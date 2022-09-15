@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:CleverPushExample.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:CleverPush.xcodeproj">
    </FileRef>
    <FileRef
