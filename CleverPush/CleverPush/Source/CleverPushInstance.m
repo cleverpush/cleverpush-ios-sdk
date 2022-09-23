@@ -94,7 +94,6 @@ static CleverPushInstance* singleInstance = nil;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
-NSString* deviceID;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
 NSArray* appBanners;
@@ -360,8 +359,6 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
-    deviceID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-    
     if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
@@ -1209,10 +1206,9 @@ static id isNil(id object) {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
     }
-    
-    if ([[channelConfig valueForKey:@"preventDuplicatePushesEnabled"] boolValue] == YES) {
-        [dataDic setObject:deviceID forKey:@"device_id"];
-    }
+    if ([channelConfig objectForKey:@"preventDuplicatePushesEnabled"] != nil && [[channelConfig objectForKey:@"preventDuplicatePushesEnabled"] boolValue] == YES) {
+        [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
+      }
 
     [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
 
@@ -1240,8 +1236,8 @@ static id isNil(id object) {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
 
     [self setSyncSubscriptionRequestData:request];
+
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        
         [self setUnsubscribeStatus:NO];
         [self updateDeselectFlag:NO];
 
