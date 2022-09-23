@@ -73,6 +73,7 @@
 NSString * const CLEVERPUSH_SDK_VERSION = @"1.21.4";
 
 static BOOL registeredWithApple = NO;
+static BOOL isDeviceIDUpdated = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
 static BOOL incrementBadge = NO;
@@ -94,6 +95,7 @@ static CleverPushInstance* singleInstance = nil;
 NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
+NSString* deviceID;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
 NSArray* appBanners;
@@ -102,6 +104,7 @@ NSArray* channelTopics;
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
 NSMutableArray* pendingDeviceTokenListeners;
+NSMutableArray* pendingDeviceIdListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* subscriptionTags;
 
@@ -117,6 +120,8 @@ CPChatView* currentChatView;
 CPStoryView* currentStoryView;
 CPResultSuccessBlock cpTokenUpdateSuccessBlock;
 CPFailureBlock cpTokenUpdateFailureBlock;
+CPResultSuccessBlock cpDeviceIdUpdateSuccessBlock;
+CPFailureBlock cpDeviceIdUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
@@ -263,6 +268,7 @@ static id isNil(id object) {
     pendingChannelConfigListeners = [[NSMutableArray alloc] init];
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
     pendingDeviceTokenListeners = [[NSMutableArray alloc] init];
+    pendingDeviceIdListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
@@ -359,6 +365,14 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
+    deviceID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    
+    [self registerDeviceId:deviceID onSuccess:^(NSDictionary *result) {
+        [CPLog info:@"Device id : %@", deviceID];
+    } onFailure:^(NSError *error) {
+        [CPLog error:@"Error in getting device id: %@", error];
+    }];
+    
     if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
@@ -676,6 +690,19 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     [userDefaults setInteger:limit forKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT];
     [userDefaults synchronize];
+}
+
+#pragma mark - getDeviceId.
+- (void)getDeviceId:(void(^)(NSString *))callback {
+    if (deviceID) {
+        callback(deviceID);
+    } else {
+        [pendingDeviceIdListeners addObject:[callback copy]];
+    }
+}
+
+- (NSString*)getDeviceId {
+    return deviceID;
 }
 
 #pragma mark - getDeviceToken.
@@ -1075,6 +1102,22 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - register Device identifier
+- (void)registerDeviceId:(id)deviceIdentifier onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    if (deviceIdentifier != nil) {
+        cpDeviceIdUpdateSuccessBlock = successBlock;
+        cpDeviceIdUpdateFailureBlock = failureBlock;
+        
+        for (id (^listener)() in pendingDeviceIdListeners) {
+            listener(deviceID);
+        }
+        pendingDeviceIdListeners = [NSMutableArray new];
+
+        [[NSUserDefaults standardUserDefaults] setObject:deviceIdentifier forKey:CLEVERPUSH_DEVICE_ID_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
 #pragma mark - register Device Token
 - (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId == nil) {
@@ -1233,8 +1276,20 @@ static id isNil(id object) {
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
 
     [self setSyncSubscriptionRequestData:request];
-
     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        
+        if (channelConfig != nil){
+            NSArray* customAttributesArray = [channelConfig arrayForKey:@"customAttributes"];
+            for (NSDictionary *tag in customAttributesArray) {
+                if ([[tag valueForKey:@"id"] isEqualToString:@"device_id"]) {
+                    if (isDeviceIDUpdated == NO) {
+                        [CleverPush setSubscriptionAttribute:[tag valueForKey:@"id"] value:deviceID];
+                    }
+                    break;;
+                }
+            }
+        }
+            
         [self setUnsubscribeStatus:NO];
         [self updateDeselectFlag:NO];
 
@@ -1837,6 +1892,7 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                isDeviceIDUpdated = YES;
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
                 if (!subscriptionAttributes) {
