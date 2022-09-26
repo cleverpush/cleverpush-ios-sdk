@@ -1195,6 +1195,10 @@ static id isNil(id object) {
     ) {
         [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
     }
+    
+    if ([channelConfig objectForKey:@"preventDuplicatePushesEnabled"] != nil && [[channelConfig objectForKey:@"preventDuplicatePushesEnabled"] boolValue] == YES) {
+          [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
+        }
 
     NSArray* topics = [self getSubscriptionTopics];
     if (topics != nil && [topics count] >= 0) {
