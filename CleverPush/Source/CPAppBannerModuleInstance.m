@@ -2,7 +2,7 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
-
+#import "CPAppVersionComparator.h"
 @interface CPAppBannerModuleInstance()
 
 @end
@@ -270,7 +270,7 @@ long sessions = 0;
                 relation = @"equals";
             }
 
-            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES];
+            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
             if (attributeFilterAllowed) {
                 allowed = YES;
                 break;
@@ -279,38 +279,42 @@ long sessions = 0;
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
-    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed];
+    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     return allowed;
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
-- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed {
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
     return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
+    NSComparisonResult result =  [value CompareToVersion:compareValue];;
+    NSComparisonResult resultFrom = [value CompareToVersion:compareValueFrom];
+    NSComparisonResult resultTo = [value CompareToVersion:compareValueTo];
+    
     if (relation == nil || compareValue == nil) {
         return allowed;
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
-        if (allowed && !CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+        if (allowed && result != NSOrderedSame) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
+        if (result != NSOrderedDescending) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+        if (result != NSOrderedAscending) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if (!CHECK_FILTER_GREATER_THAN_OR_EQUAL_TO(value, compareValueFrom) && !CHECK_FILTER_LESS_THAN_OR_EQUAL_TO(value, compareValueTo)) {
+        if (resultFrom != NSOrderedSame && resultFrom != NSOrderedDescending && resultTo != NSOrderedSame && resultTo != NSOrderedDescending) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+        if (allowed && result == NSOrderedSame) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
