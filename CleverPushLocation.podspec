@@ -5,12 +5,12 @@ Pod::Spec.new do |s|
     s.static_framework        = true
     s.summary                 = "CleverPush Location library for iOS."
     s.homepage                = "https://cleverpush.com"
-    s.license                 = { :type => 'MIT (modified)', :file => 'LICENSE' }
+    s.license                 = { :type => "MIT (modified)", :file => "LICENSE" }
     s.author                  = { "CleverPush" => "support@cleverpush.com" }
     s.ios.deployment_target   = "8.0"
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
     s.platform                = :ios
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "CoreLocation"
-    s.ios.vendored_frameworks = "CleverPush/Framework/CleverPushLocation.framework"
+    s.ios.vendored_frameworks = "CleverPush/CleverPushXCFramework/CleverPushLocation.xcframework"
 end
