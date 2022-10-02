@@ -18,7 +18,7 @@ let package = Package(
     targets: [
         .target(
             name: "CleverPush",
-            path: "CleverPush/CleverPush",
+            path: "CleverPush",
             exclude: [
                 "Info.plist"
             ],
