@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2917E92C28E9F76A00CF6458 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906428D35E7000F990A4 /* JavaScriptCore.framework */; };
+		2917E92D28E9F77600CF6458 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906628D35E7600F990A4 /* SafariServices.framework */; };
+		2917E92E28E9F77C00CF6458 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905628D35E4000F990A4 /* SystemConfiguration.framework */; };
+		2917E92F28E9F78000CF6458 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905C28D35E5000F990A4 /* UIKit.framework */; };
+		2917E93028E9F78400CF6458 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905E28D35E5600F990A4 /* UserNotifications.framework */; };
+		2917E93128E9F78700CF6458 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906028D35E6400F990A4 /* StoreKit.framework */; };
+		2917E93228E9F78B00CF6458 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906228D35E6A00F990A4 /* WebKit.framework */; };
+		2917E93928E9F9FD00CF6458 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; };
+		2917E93A28E9F9FD00CF6458 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2917E94328E9FB6C00CF6458 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; };
+		2917E94428E9FB6C00CF6458 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		93A9902628D35ACB00F990A4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 93A9902528D35ACB00F990A4 /* AppDelegate.m */; };
 		93A9902C28D35ACB00F990A4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93A9902B28D35ACB00F990A4 /* ViewController.m */; };
 		93A9902F28D35ACB00F990A4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93A9902D28D35ACB00F990A4 /* Main.storyboard */; };
@@ -16,8 +27,6 @@
 		93A9904C28D35DF700F990A4 /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 93A9904B28D35DF700F990A4 /* NotificationService.m */; };
 		93A9905028D35DF700F990A4 /* CleverPushNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 93A9904828D35DF700F990A4 /* CleverPushNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		93A9905728D35E4000F990A4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905628D35E4000F990A4 /* SystemConfiguration.framework */; };
-		93A9905928D35E4300F990A4 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; };
-		93A9905A28D35E4300F990A4 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905828D35E4300F990A4 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		93A9905D28D35E5000F990A4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905C28D35E5000F990A4 /* UIKit.framework */; };
 		93A9905F28D35E5600F990A4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9905E28D35E5600F990A4 /* UserNotifications.framework */; };
 		93A9906128D35E6400F990A4 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906028D35E6400F990A4 /* StoreKit.framework */; };
@@ -37,6 +46,28 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2917E93B28E9F9FD00CF6458 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2917E93A28E9F9FD00CF6458 /* CleverPush.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2917E94528E9FB6C00CF6458 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				2917E94428E9FB6C00CF6458 /* CleverPush.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93A9905428D35DF700F990A4 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -48,20 +79,10 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		93A9905B28D35E4300F990A4 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				93A9905A28D35E4300F990A4 /* CleverPush.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2917E93F28E9FB2F00CF6458 /* CleverPush.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CleverPush.framework; path = "../Frameworks/CleverPush.xcframework/ios-arm64/CleverPush.framework"; sourceTree = "<group>"; };
 		93A9902128D35ACB00F990A4 /* CleverPushExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CleverPushExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93A9902428D35ACB00F990A4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		93A9902528D35ACB00F990A4 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -93,11 +114,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				93A9905F28D35E5600F990A4 /* UserNotifications.framework in Frameworks */,
+				2917E93928E9F9FD00CF6458 /* CleverPush.framework in Frameworks */,
 				93A9905728D35E4000F990A4 /* SystemConfiguration.framework in Frameworks */,
 				93A9906328D35E6A00F990A4 /* WebKit.framework in Frameworks */,
 				93A9906128D35E6400F990A4 /* StoreKit.framework in Frameworks */,
 				93A9905D28D35E5000F990A4 /* UIKit.framework in Frameworks */,
-				93A9905928D35E4300F990A4 /* CleverPush.framework in Frameworks */,
 				93A9906728D35E7600F990A4 /* SafariServices.framework in Frameworks */,
 				93A9906528D35E7000F990A4 /* JavaScriptCore.framework in Frameworks */,
 			);
@@ -107,6 +128,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2917E92C28E9F76A00CF6458 /* JavaScriptCore.framework in Frameworks */,
+				2917E94328E9FB6C00CF6458 /* CleverPush.framework in Frameworks */,
+				2917E93128E9F78700CF6458 /* StoreKit.framework in Frameworks */,
+				2917E93228E9F78B00CF6458 /* WebKit.framework in Frameworks */,
+				2917E93028E9F78400CF6458 /* UserNotifications.framework in Frameworks */,
+				2917E92E28E9F77C00CF6458 /* SystemConfiguration.framework in Frameworks */,
+				2917E92D28E9F77600CF6458 /* SafariServices.framework in Frameworks */,
+				2917E92F28E9F78000CF6458 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +191,7 @@
 		93A9905528D35E4000F990A4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2917E93F28E9FB2F00CF6458 /* CleverPush.framework */,
 				93A9906628D35E7600F990A4 /* SafariServices.framework */,
 				93A9906428D35E7000F990A4 /* JavaScriptCore.framework */,
 				93A9906228D35E6A00F990A4 /* WebKit.framework */,
@@ -185,7 +215,7 @@
 				93A9901E28D35ACB00F990A4 /* Frameworks */,
 				93A9901F28D35ACB00F990A4 /* Resources */,
 				93A9905428D35DF700F990A4 /* Embed Foundation Extensions */,
-				93A9905B28D35E4300F990A4 /* Embed Frameworks */,
+				2917E93B28E9F9FD00CF6458 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -204,6 +234,7 @@
 				93A9904428D35DF700F990A4 /* Sources */,
 				93A9904528D35DF700F990A4 /* Frameworks */,
 				93A9904628D35DF700F990A4 /* Resources */,
+				2917E94528E9FB6C00CF6458 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -499,16 +530,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/CleverPush.xcframework/ios-arm64",
+					"$(inherited)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CleverPushNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK.CleverPushNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -524,16 +554,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/../Frameworks/CleverPush.xcframework/ios-arm64",
+					"$(inherited)",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CleverPushNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK.CleverPushNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
