@@ -59,6 +59,7 @@
 		2913D8332514133E002BA52C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D8322514133E002BA52C /* CoreLocation.framework */; };
 		2913D83525141344002BA52C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D83425141344002BA52C /* SystemConfiguration.framework */; };
 		2913D83625141446002BA52C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2913D82C25141324002BA52C /* WebKit.framework */; };
+		2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2917E92428E9F3B800CF6458 /* QuartzCore.framework */; };
 		291FCD242525DC2800F5185E /* DWAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0A2525DC2800F5185E /* DWAlertController.m */; };
 		291FCD252525DC2800F5185E /* DWAlertAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0B2525DC2800F5185E /* DWAlertAction.m */; };
 		291FCD262525DC2800F5185E /* DWAlertDismissalAnimationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 291FCD0E2525DC2800F5185E /* DWAlertDismissalAnimationController.m */; };
@@ -195,7 +196,6 @@
 		29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DC4ABF2182047E0051F6E9 /* UIApplicationDelegate+CleverPush.m */; };
 		29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */; };
 		29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */; };
-		29F9086828E9EB0200D8D4D8 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9086728E9EB0200D8D4D8 /* QuartzCore.framework */; };
 		29F9086928E9EBD900D8D4D8 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		29F9086A28E9EBDA00D8D4D8 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
@@ -353,6 +353,7 @@
 		2913D8302514132F002BA52C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
 		2913D8322514133E002BA52C /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		2913D83425141344002BA52C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		2917E92428E9F3B800CF6458 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		291FCD082525DC2800F5185E /* DWAlertAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWAlertAction.h; sourceTree = "<group>"; };
 		291FCD092525DC2800F5185E /* DWAlertAppearanceMode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DWAlertAppearanceMode.h; sourceTree = "<group>"; };
 		291FCD0A2525DC2800F5185E /* DWAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DWAlertController.m; sourceTree = "<group>"; };
@@ -478,7 +479,6 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
 		29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		29F9086728E9EB0200D8D4D8 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/QuartzCore.framework; sourceTree = DEVELOPER_DIR; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -580,6 +580,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
@@ -588,7 +589,6 @@
 				29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */,
 				29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */,
 				2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */,
-				29F9086828E9EB0200D8D4D8 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -712,7 +712,7 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				29F9086728E9EB0200D8D4D8 /* QuartzCore.framework */,
+				2917E92428E9F3B800CF6458 /* QuartzCore.framework */,
 				29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */,
 				CB1B65F9275780260087AC49 /* Foundation.framework */,
 				CB1B65F72757801D0087AC49 /* UIKit.framework */,
