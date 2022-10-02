@@ -10,6 +10,6 @@ Pod::Spec.new do |s|
     s.platform                = :ios
     s.requires_arc            = true
     s.framework               = "SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices"
-    s.ios.resource_bundle     = { "CleverPushResources" => "CleverPush/CleverPush/Resources/*" }
+    s.ios.resource_bundle     = { "CleverPushResources" => "CleverPush/Resources/*" }
     s.ios.vendored_frameworks = "Frameworks/CleverPush.xcframework"
 end
