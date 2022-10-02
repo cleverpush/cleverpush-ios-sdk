@@ -1,3 +1,8 @@
+## 1.22.0
+* Improved folder structure & added example application into SDK
+* Released as XCFramework for arm64 simulator support
+* Fixed `setLogListener` crash
+
 ## 1.21.4
 * Added ability to set own log listener via `setLogListener`
 * Improved NSArray method signatures
