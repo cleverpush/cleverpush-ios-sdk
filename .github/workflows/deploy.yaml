@@ -1,0 +1,19 @@
+name: CI Deploy
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+  build:
+    name: Deploy new version to CocoaPods
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout SDK
+        uses: actions/checkout@v3
+      - name: Pod Deploy
+        run: pod trunk push CleverPush.podspec --allow-warnings --verbose
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
