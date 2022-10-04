@@ -290,31 +290,28 @@ long sessions = 0;
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
-    NSComparisonResult result =  [value CompareToVersion:compareValue];;
-    NSComparisonResult resultFrom = [value CompareToVersion:compareValueFrom];
-    NSComparisonResult resultTo = [value CompareToVersion:compareValueTo];
     
     if (relation == nil || compareValue == nil) {
         return allowed;
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
-        if (allowed && result != NSOrderedSame) {
+        if (allowed && [value isEqualToVersion:compareValue] == NO) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if (result != NSOrderedDescending) {
+        if ([value isEqualOrOlderThanVersion:compareValue] == TRUE) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if (result != NSOrderedAscending) {
+        if ([value isEqualOrNewerThanVersion:compareValue] == TRUE) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if (resultFrom != NSOrderedSame && resultFrom != NSOrderedDescending && resultTo != NSOrderedSame && resultTo != NSOrderedDescending) {
+        if ([value isEqualToVersion:compareValueFrom] == NO && [value isEqualOrOlderThanVersion:compareValueFrom] == TRUE && [value isEqualToVersion:compareValueTo] == NO && [value isEqualOrOlderThanVersion:compareValueTo] == TRUE) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (allowed && result == NSOrderedSame) {
+        if (allowed && [value isEqualToVersion:compareValue] == TRUE) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
