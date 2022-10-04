@@ -7,6 +7,10 @@
 @implementation CleverPushLocation
 
 CLLocationManager* locationManager;
+NSTimer *geoFencetimer;
+double geoFencetimerValue;
+bool isCompletedGeoFence;
+NSMutableArray *geoFenceArray;
 
 + (void)init {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
@@ -18,6 +22,11 @@ CLLocationManager* locationManager;
                             locationManager = [CLLocationManager new];
                         }
                         locationManager.delegate = (id)self;
+                        [geoFencetimer invalidate];
+                        geoFencetimerValue = 0;
+                        isCompletedGeoFence = false;
+                        [geoFenceArray removeAllObjects];
+                        geoFenceArray = [[NSMutableArray alloc] initWithCapacity:0];
                         
                         NSArray* geoFencesDict = [channelConfig arrayForKey:@"geoFences"];
                         for (NSDictionary *geoFence in geoFencesDict) {
@@ -26,6 +35,12 @@ CLLocationManager* locationManager;
                                 CLRegion *region = [[CLCircularRegion alloc]initWithCenter:center
                                                                                     radius:[[geoFence objectForKey:@"radius"] longValue]
                                                                                 identifier:[geoFence valueForKey:@"_id"]];
+                                double num = [[geoFence objectForKey:@"delay"]doubleValue];
+                                NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                                [NSNumber numberWithDouble:num], @"delay",
+                                                                region, @"region",
+                                                                nil];
+                                [geoFenceArray addObject:dataDic];
                                 [locationManager startMonitoringForRegion:region];
                             }
                         }
@@ -64,7 +79,13 @@ CLLocationManager* locationManager;
         [request setHTTPBody:postData];
         
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* results) {
-            
+            isCompletedGeoFence = false;
+            if (geoFenceArray.count == 0) {
+                [geoFencetimer invalidate];
+                geoFencetimerValue = 0;
+                isCompletedGeoFence = false;
+                [geoFenceArray removeAllObjects];
+            }
         } onFailure:nil];
     });
 }
@@ -82,17 +103,53 @@ CLLocationManager* locationManager;
     [CPLog info:@"LocationManager: LocationManager didDetermineState %@", [region identifier]];
     if (state == CLRegionStateInside) {
         [self locationManager:manager didEnterRegion:region];
+    }  else if (state == CLRegionStateOutside) {
+        [self locationManager:manager didExitRegion:region];
     }
 }
 
 + (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-    [self trackGeoFence:[region identifier] withState:@"enter"];
+    if (isCompletedGeoFence  == false) {
+        [geoFencetimer invalidate];
+        geoFencetimerValue = 0;
+        geoFencetimer = [NSTimer scheduledTimerWithTimeInterval: 1.0
+                                                         target:self
+                                                       selector:@selector(geoFenceHandleTimer:)
+                                                       userInfo:nil
+                                                        repeats:YES];
+    } else {
+        [self trackGeoFence:[region identifier] withState:@"enter"];
+    }
 }
 
 + (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
     [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-    [self trackGeoFence:[region identifier] withState:@"exit"];
+    if (isCompletedGeoFence == false) {
+        [geoFencetimer invalidate];
+        geoFencetimerValue = 0;
+        geoFencetimer = [NSTimer scheduledTimerWithTimeInterval: 1.0
+                                                         target:self
+                                                       selector:@selector(geoFenceHandleTimer:)
+                                                       userInfo:nil
+                                                        repeats:YES];
+    } else {
+        [self trackGeoFence:[region identifier] withState:@"exit"];
+    }
+}
+
++ (void)geoFenceHandleTimer: (NSTimer *) Timer {
+    for (NSMutableDictionary *geoFence in geoFenceArray) {
+        double xD = [[geoFence objectForKey:@"delay"] doubleValue];
+        CLRegion *region1 = [geoFence objectForKey:@"region"];
+        if (geoFencetimerValue == xD) {
+            isCompletedGeoFence = true;
+            [geoFenceArray removeObject:geoFence];
+            [locationManager startMonitoringForRegion:region1];
+            break;
+        }
+    }
+    geoFencetimerValue += 1;
 }
 
 @end
