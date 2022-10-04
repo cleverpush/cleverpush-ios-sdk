@@ -1,13 +1,15 @@
 #import "CPAppVersionComparator.h"
 
+static NSString *versionSeparator = @".";
+
 @implementation NSString (CompareToVersion)
 
 - (NSComparisonResult) CompareToVersion:(NSString *)version {
     if ([self isEqualToString:version])
         return NSOrderedSame;
     
-    NSArray *thisVersion = [self componentsSeparatedByString:@"."];
-    NSArray *compareVersion = [version componentsSeparatedByString:@"."];
+    NSArray *thisVersion = [self componentsSeparatedByString:versionSeparator];
+    NSArray *compareVersion = [version componentsSeparatedByString:versionSeparator];
     NSInteger maxCount = MAX([thisVersion count], [compareVersion count]);
     
     for (NSInteger index = 0; index < maxCount; index++) {
@@ -22,6 +24,26 @@
         }
     }
     return NSOrderedSame;
+}
+
+- (BOOL)isOlderThanVersion:(NSString *)version {
+    return ([self CompareToVersion:version] == NSOrderedAscending);
+}
+
+- (BOOL)isNewerThanVersion:(NSString *)version {
+    return ([self CompareToVersion:version] == NSOrderedDescending);
+}
+
+- (BOOL)isEqualToVersion:(NSString *)version {
+    return ([self CompareToVersion:version] == NSOrderedSame);
+}
+
+- (BOOL)isEqualOrOlderThanVersion:(NSString *)version {
+    return ([self CompareToVersion:version] != NSOrderedDescending);
+}
+
+- (BOOL)isEqualOrNewerThanVersion:(NSString *)version {
+    return ([self CompareToVersion:version] != NSOrderedAscending);
 }
 
 @end
