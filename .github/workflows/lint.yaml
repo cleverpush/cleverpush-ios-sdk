@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Deploy new version to CocoaPods
-    runs-on: macos-latest
+    runs-on: macos-12
 
     steps:
       - name: Checkout SDK
