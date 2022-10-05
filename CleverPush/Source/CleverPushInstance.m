@@ -70,7 +70,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -324,10 +324,6 @@ static id isNil(id object) {
     return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
 }
 
-- (UIViewController*)getTopViewController {
-    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
-}
-
 - (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
     if ([viewController isKindOfClass:[UITabBarController class]]) {
         UITabBarController* tabBarController = (UITabBarController*)viewController;
@@ -353,7 +349,7 @@ static id isNil(id object) {
 
 #pragma mark - syncSubscription by calling initWithChannelId.
 - (void)initWithChannelId {
-    [CPLog info:@"Initializing SDK %@ with channelId: %@", CLEVERPUSH_SDK_VERSION, channelId];
+    [CPLog info:@"Initializing SDK %@ with channelId: %@ and autoRegister: %@", CLEVERPUSH_SDK_VERSION, channelId, autoRegister ? @"YES": @"NO"];
 
     UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -1072,6 +1068,12 @@ static id isNil(id object) {
         [CPLog error:@"iOS Simulator does not support push! Please test on a real iOS device. Error: %@", err];
     } else {
         [CPLog error:@"Error registering for Apple push notifications! Error: %@", err];
+    }
+
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    if ([userDefaults boolForKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY]) {
+        [userDefaults setBool:NO forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
+        [userDefaults synchronize];
     }
 }
 

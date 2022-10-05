@@ -158,7 +158,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setOpenWebViewEnabled:(BOOL)opened;
 - (void)setUnsubscribeStatus:(BOOL)status;
 - (UIViewController*)topViewController;
-- (UIViewController*)getTopViewController;
 - (NSArray<NSString*>*)getSubscriptionTags;
 - (NSArray<CPNotification*>*)getNotifications;
 - (void)removeNotification:(NSString*)notificationId;

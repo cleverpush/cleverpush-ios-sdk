@@ -33,21 +33,21 @@
 }
 
 - (void)testTrackPageViewVerifyCheckTags {
-    OCMStub([self.cleverPush getTopViewController]).andReturn(nil);
+    OCMStub([self.cleverPush topViewController]).andReturn(nil);
     NSDictionary *parameters = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
     [self.cleverPush trackPageView:@"url" params:parameters];
     OCMVerify([self.cleverPush checkTags:@"url" params:parameters]);
 }
 
 - (void)testTrackPageViewVerifyCheckTagsandVerifyAvailableTags {
-    OCMStub([self.cleverPush getTopViewController]).andReturn(nil);
+    OCMStub([self.cleverPush topViewController]).andReturn(nil);
     NSDictionary *parameters = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
     [self.cleverPush trackPageView:@"url" params:parameters];
     OCMVerify([self.cleverPush getAvailableTags:[OCMArg any]]);
 }
 
 - (void)testTrackPageViewVerifyCheckTagsandVerifyAvailableTagsCheckCurrentPageUrl {
-    OCMStub([self.cleverPush getTopViewController]).andReturn(nil);
+    OCMStub([self.cleverPush topViewController]).andReturn(nil);
     NSDictionary *parameters = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
     [self.cleverPush trackPageView:@"url" params:parameters];
     NSString *expectedURL = [self.cleverPush getCurrentPageUrl];

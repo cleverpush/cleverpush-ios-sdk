@@ -1,3 +1,7 @@
+## 1.22.1
+* Improved pending topics dialog behaviour when deviceToken is not available
+* Improved app banner version filters
+
 ## 1.22.0
 * Improved folder structure & added example application into SDK
 * Released as XCFramework for arm64 simulator support
