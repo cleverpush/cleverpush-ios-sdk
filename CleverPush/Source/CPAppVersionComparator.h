@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 
-@interface NSString (CompareToVersion)
+@interface NSString (compareToVersion)
 
-- (NSComparisonResult)CompareToVersion:(NSString *)version;
+- (NSComparisonResult)compareToVersion:(NSString *)version;
 
 - (BOOL)isOlderThanVersion:(NSString *)version;
 - (BOOL)isNewerThanVersion:(NSString *)version;

@@ -2,6 +2,7 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
+
 #import "CPAppVersionComparator.h"
 @interface CPAppBannerModuleInstance()
 
@@ -295,23 +296,23 @@ long sessions = 0;
         return allowed;
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
-        if (allowed && [value isEqualToVersion:compareValue] == NO) {
+        if (allowed && ![value isEqualToVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if ([value isEqualOrOlderThanVersion:compareValue] == YES) {
+        if ([value isEqualOrOlderThanVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if ([value isEqualOrNewerThanVersion:compareValue] == YES) {
+        if ([value isEqualOrNewerThanVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if ([value isEqualToVersion:compareValueFrom] == NO && [value isEqualOrOlderThanVersion:compareValueFrom] == YES && [value isEqualToVersion:compareValueTo] == NO && [value isEqualOrOlderThanVersion:compareValueTo] == YES) {
+        if (![value isEqualToVersion:compareValueFrom] && [value isEqualOrOlderThanVersion:compareValueFrom] && ![value isEqualToVersion:compareValueTo] && [value isEqualOrOlderThanVersion:compareValueTo]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (allowed && [value isEqualToVersion:compareValue] == YES) {
+        if (allowed && [value isEqualToVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
