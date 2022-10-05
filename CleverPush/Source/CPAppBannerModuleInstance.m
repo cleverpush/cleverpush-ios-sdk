@@ -299,19 +299,19 @@ long sessions = 0;
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if ([value isEqualOrOlderThanVersion:compareValue] == TRUE) {
+        if ([value isEqualOrOlderThanVersion:compareValue] == YES) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if ([value isEqualOrNewerThanVersion:compareValue] == TRUE) {
+        if ([value isEqualOrNewerThanVersion:compareValue] == YES) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if ([value isEqualToVersion:compareValueFrom] == NO && [value isEqualOrOlderThanVersion:compareValueFrom] == TRUE && [value isEqualToVersion:compareValueTo] == NO && [value isEqualOrOlderThanVersion:compareValueTo] == TRUE) {
+        if ([value isEqualToVersion:compareValueFrom] == NO && [value isEqualOrOlderThanVersion:compareValueFrom] == YES && [value isEqualToVersion:compareValueTo] == NO && [value isEqualOrOlderThanVersion:compareValueTo] == YES) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (allowed && [value isEqualToVersion:compareValue] == TRUE) {
+        if (allowed && [value isEqualToVersion:compareValue] == YES) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
