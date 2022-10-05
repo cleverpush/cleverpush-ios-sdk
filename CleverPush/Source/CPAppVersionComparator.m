@@ -5,8 +5,9 @@ static NSString *versionSeparator = @".";
 @implementation NSString (compareToVersion)
 
 - (NSComparisonResult)compareToVersion:(NSString *)version {
-    if ([self isEqualToString:version])
+    if ([self isEqualToString:version]) {
         return NSOrderedSame;
+    }
     
     NSArray *thisVersion = [self componentsSeparatedByString:versionSeparator];
     NSArray *compareVersion = [version componentsSeparatedByString:versionSeparator];
@@ -27,23 +28,23 @@ static NSString *versionSeparator = @".";
 }
 
 - (BOOL)isOlderThanVersion:(NSString *)version {
-    return ([self compareToVersion:version] == NSOrderedAscending);
+    return [self compareToVersion:version] == NSOrderedAscending;
 }
 
 - (BOOL)isNewerThanVersion:(NSString *)version {
-    return ([self compareToVersion:version] == NSOrderedDescending);
+    return [self compareToVersion:version] == NSOrderedDescending;
 }
 
 - (BOOL)isEqualToVersion:(NSString *)version {
-    return ([self compareToVersion:version] == NSOrderedSame);
+    return [self compareToVersion:version] == NSOrderedSame;
 }
 
 - (BOOL)isEqualOrOlderThanVersion:(NSString *)version {
-    return ([self compareToVersion:version] != NSOrderedDescending);
+    return [self compareToVersion:version] != NSOrderedDescending;
 }
 
 - (BOOL)isEqualOrNewerThanVersion:(NSString *)version {
-    return ([self compareToVersion:version] != NSOrderedAscending);
+    return [self compareToVersion:version] != NSOrderedAscending;
 }
 
 @end
