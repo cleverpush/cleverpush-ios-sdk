@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Deploy new version to CocoaPods
+    name: Lints CocoaPods
     runs-on: macos-12
 
     steps:
