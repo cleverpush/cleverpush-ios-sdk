@@ -271,6 +271,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTopicsDialogWindow:window];
 }
 
++ (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock {
+    [self.CPSharedInstance setTopicsChangedListener:changedBlock];
+}
+
 + (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
     [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
 }

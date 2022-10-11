@@ -1,8 +1,8 @@
-#import "CPAppVersionComparator.h"
+#import "NSString+VersionComparator.h"
 
 static NSString *versionSeparator = @".";
 
-@implementation NSString (compareToVersion)
+@implementation NSString (VersionComparator)
 
 - (NSComparisonResult)compareToVersion:(NSString *)version {
     if ([self isEqualToString:version]) {

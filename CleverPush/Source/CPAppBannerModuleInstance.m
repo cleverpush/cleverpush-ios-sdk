@@ -2,8 +2,8 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "NSString+VersionComparator.h"
 
-#import "CPAppVersionComparator.h"
 @interface CPAppBannerModuleInstance()
 
 @end

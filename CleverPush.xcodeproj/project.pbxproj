@@ -154,6 +154,8 @@
 		29AD0C5C26682A92009E10D0 /* CPAppBannerHTMLBlock.h in Headers */ = {isa = PBXBuildFile; fileRef = CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */; };
 		29B3BFA227C697E500D52D64 /* NSDictionary+SafeExpectations.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */; };
 		29B3BFA327C697EA00D52D64 /* NSDictionary+SafeExpectations.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B3BFA027C697E500D52D64 /* NSDictionary+SafeExpectations.m */; };
+		29BB7E2028F59B5A0022426E /* NSString+VersionComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */; };
+		29BB7E2128F5A19F0022426E /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF11E58B89500815CD6 /* SystemConfiguration.framework */; };
 		29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29C1BAF31E58B89900815CD6 /* UIKit.framework */; };
 		29D22E70252C8E7500977567 /* CPIntrinsicTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29D22E6F252C8E7500977567 /* CPIntrinsicTableView.m */; };
@@ -198,7 +200,7 @@
 		29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */; };
 		29F9086928E9EBD900D8D4D8 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		29F9086A28E9EBDA00D8D4D8 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		93EB0FAE28E40CD400B464A9 /* CPAppVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* CPAppVersionComparator.m */; };
+		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
@@ -480,8 +482,8 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
 		29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		93EB0FAC28E40CD400B464A9 /* CPAppVersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppVersionComparator.h; sourceTree = "<group>"; };
-		93EB0FAD28E40CD400B464A9 /* CPAppVersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppVersionComparator.m; sourceTree = "<group>"; };
+		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
+		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -893,8 +895,8 @@
 				CB73FFA8272C44610099B648 /* CPAppBannerViewController.m */,
 				2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */,
 				2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */,
-				93EB0FAC28E40CD400B464A9 /* CPAppVersionComparator.h */,
-				93EB0FAD28E40CD400B464A9 /* CPAppVersionComparator.m */,
+				93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */,
+				93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -994,6 +996,7 @@
 				29DB95F023FC3360008FC985 /* CleverPushHTTPClient.h in Headers */,
 				296A136C25BE16DF00A2BEED /* CPChannelTag.h in Headers */,
 				CB73FF96272C3E9B0099B648 /* CPHTMLBlockCell.h in Headers */,
+				29BB7E2028F59B5A0022426E /* NSString+VersionComparator.h in Headers */,
 				CB73FF91272C3E880099B648 /* CPButtonBlockCell.h in Headers */,
 				CB73FF9B272C3EAC0099B648 /* CPImageBlockCell.h in Headers */,
 				296A137625BE16EB00A2BEED /* CPChannelTopic.h in Headers */,
@@ -1323,6 +1326,7 @@
 				2956402D258822F000FE7611 /* CPAppBannerTriggerCondition.m in Sources */,
 				298677902572E60B0002E9F1 /* CPAppBannerModule.m in Sources */,
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
+				29BB7E2128F5A19F0022426E /* NSString+VersionComparator.m in Sources */,
 				2906A2C625857E680078FD61 /* CPUIBlockButton.m in Sources */,
 				297810C52573E44B0083D1A6 /* CPAppBannerBackground.m in Sources */,
 				297810CE2573E44D0083D1A6 /* CPAppBannerButtonBlock.m in Sources */,
@@ -1359,7 +1363,7 @@
 				CBA989BB2679D6A1003DE995 /* CPStoryCell.m in Sources */,
 				CB73FF9F272C3EB80099B648 /* CPTextBlockCell.m in Sources */,
 				29DB95F223FC33C3008FC985 /* UIApplicationDelegate+CleverPush.m in Sources */,
-				93EB0FAE28E40CD400B464A9 /* CPAppVersionComparator.m in Sources */,
+				93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */,
 				CBA989932679D56E003DE995 /* CPStory.m in Sources */,
 				291FCD272525DC2800F5185E /* DWAlertPresentationAnimationController.m in Sources */,
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,

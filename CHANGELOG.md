@@ -1,3 +1,6 @@
+## 1.22.2
+* Added `setTopicsChangedListener` to get notified about changed subscription topics
+
 ## 1.22.1
 * Improved pending topics dialog behaviour when deviceToken is not available
 * Improved app banner version filters

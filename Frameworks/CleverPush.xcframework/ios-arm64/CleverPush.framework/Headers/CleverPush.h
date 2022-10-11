@@ -83,6 +83,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setSubscriptionLanguage:(NSString*)language;
 + (void)setSubscriptionCountry:(NSString*)country;
 + (void)setTopicsDialogWindow:(UIWindow *)window;
++ (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock;
 + (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback;
 + (void)addSubscriptionTopic:(NSString*)topicId;
 + (void)setSubscriptionTopics:(NSMutableArray *)topics;

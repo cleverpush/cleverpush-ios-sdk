@@ -26,6 +26,7 @@
 #import "CPChannelTag.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "NSMutableArray+ContainsString.h"
+#import "NSString+VersionComparator.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -70,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -121,6 +122,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
+CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
@@ -1149,6 +1151,10 @@ static id isNil(id object) {
         }
     } successBlock:^() {
         [self setSubscriptionInProgress:false];
+
+        if (topicsChangedBlock) {
+            topicsChangedBlock();
+        }
     }];
 }
 
@@ -2932,6 +2938,10 @@ static id isNil(id object) {
 
 - (void)setTopicsDialogWindow:(UIWindow *)window {
     topicsDialogWindow = window;
+}
+
+- (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock {
+    topicsChangedBlock = changedBlock;
 }
 
 - (UIColor*)getBrandingColor {
