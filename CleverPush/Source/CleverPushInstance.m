@@ -1081,6 +1081,15 @@ static id isNil(id object) {
 
 #pragma mark - register Device Token
 - (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DEVICE_TOKEN_KEY] != nil) {
+        if (![[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY] isEqualToString:newDeviceToken]) {
+            deviceToken = newDeviceToken;
+            [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+            return;
+        }
+    }
     if (subscriptionId == nil) {
         deviceToken = newDeviceToken;
         cpTokenUpdateSuccessBlock = successBlock;
