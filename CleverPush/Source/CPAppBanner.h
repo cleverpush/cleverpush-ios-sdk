@@ -29,6 +29,7 @@
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
+@property (nonatomic, strong) NSMutableArray<NSString*> *languages;
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString *testId;
 @property (nonatomic, strong) NSString *channel;

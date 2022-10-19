@@ -271,7 +271,7 @@ long sessions = 0;
                 relation = @"equals";
             }
 
-            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion languages:banner.languages];
             if (attributeFilterAllowed) {
                 allowed = YES;
                 break;
@@ -280,20 +280,25 @@ long sessions = 0;
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
-    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion languages:banner.languages];
     return allowed;
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
-- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
-    return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo languages:(NSMutableArray*)languagesValue {
+    return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed languages:languagesValue];
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
-- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed languages:(NSMutableArray*)languagesValue{
     
     if (relation == nil || compareValue == nil) {
         return allowed;
+    }
+    if (languagesValue.count > 0 && [NSLocale preferredLanguages].count > 0) {
+        if (![languagesValue containsObject:[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]]) {
+            allowed = NO;
+        }
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
         if (allowed && ![value isEqualToVersion:compareValue]) {
