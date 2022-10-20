@@ -29,7 +29,7 @@ double geoFenceTimerInterval = 1.0;
                         geoFenceTimerDelay = 0;
                         geoFenceTimeoutCompleted = false;
                         [geoFenceArray removeAllObjects];
-                        geoFenceArray = [[NSMutableArray alloc] initWithCapacity:0];
+                        geoFenceArray = [[NSMutableArray alloc] init];
                         
                         NSArray* geoFencesDict = [channelConfig arrayForKey:@"geoFences"];
                         for (NSDictionary *geoFence in geoFencesDict) {
