@@ -85,7 +85,6 @@ double geoFenceTimerInterval = 1.0;
         [request setHTTPBody:postData];
         
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* results) {
-            geoFenceTimeoutCompleted = false;
             if (geoFenceArray.count == 0) {
                 [geoFenceTimer invalidate];
                 geoFenceTimerDelay = 0;
