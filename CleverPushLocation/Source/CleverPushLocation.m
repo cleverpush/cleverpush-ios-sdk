@@ -89,7 +89,6 @@ double geoFenceTimerInterval = 1.0;
                 [geoFenceTimer invalidate];
                 geoFenceTimerDelay = 0;
                 geoFenceTimeoutCompleted = false;
-                [geoFenceArray removeAllObjects];
             }
         } onFailure:nil];
     });
@@ -147,7 +146,7 @@ double geoFenceTimerInterval = 1.0;
     for (NSMutableDictionary *geoFence in geoFenceArray) {
         double delayValue = [[geoFence objectForKey:@"delay"] doubleValue];
         CLRegion *regionValue = [geoFence objectForKey:@"region"];
-        if (geoFenceTimerDelay == delayValue) {
+        if (geoFenceTimerDelay >= delayValue) {
             geoFenceTimeoutCompleted = true;
             [geoFenceArray removeObject:geoFence];
             [locationManager startMonitoringForRegion:regionValue];
