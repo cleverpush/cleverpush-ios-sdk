@@ -446,6 +446,9 @@ static id isNil(id object) {
 - (void)applicationWillEnterForeground API_AVAILABLE(ios(10.0)) {
     [self updateBadge:nil];
     [self trackSessionStart];
+    if ([self getAutoClearBadge]) {
+        [self clearBadge:true];
+    }
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
