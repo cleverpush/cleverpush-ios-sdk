@@ -213,6 +213,12 @@ long sessions = 0;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
     BOOL allowed = YES;
 
+    if (banner.languages.count > 0 && [NSLocale preferredLanguages].count > 0) {
+        if (![banner.languages containsObject:[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]]) {
+            allowed = NO;
+        }
+    }
+    
     if (banner.subscribedType == CPAppBannerSubscribedTypeSubscribed && ![CleverPush isSubscribed]) {
         allowed = NO;
     }

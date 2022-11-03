@@ -77,6 +77,14 @@
             screensBlock.blocks = self.blocks;
             [self.screens addObject:screensBlock];
         }
+        
+        self.languages = [NSMutableArray new];
+        
+        if ([json objectForKey:@"languages"] != nil) {
+            for (NSString *supportedLanguage in [json objectForKey:@"languages"]) {
+                [self.languages addObject:supportedLanguage];
+            }
+        } 
 
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
             self.startAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"startAt"]];
