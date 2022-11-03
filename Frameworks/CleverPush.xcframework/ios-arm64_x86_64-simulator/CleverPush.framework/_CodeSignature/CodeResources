@@ -86,7 +86,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		TiLjH7jOxTZXY0GUmFFjX9SuPcY=
+		wVrxfi6cee+Oksd0iYL29vORwuM=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		+avuJywH+HfpD/p0D2le1EZXZCE=
+		wD3cD+c9Hp+hNaaUOVAsLL0fxAI=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		7qYZUufu6TO4Gc4TZ/vqVJzyND8=
+		rcIYpsLhZJ7aY5USMN0u9qu+JCk=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -339,11 +339,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			TiLjH7jOxTZXY0GUmFFjX9SuPcY=
+			wVrxfi6cee+Oksd0iYL29vORwuM=
 			</data>
 			<key>hash2</key>
 			<data>
-			SqIepZUROBB5OW0xfKzeH1UheDRkEzLf5L5vQWEkcew=
+			7uR2p5Kc2eOVHcusKuNjO7lIxmz/VMnsABJ3skWZBM0=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -361,11 +361,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			+avuJywH+HfpD/p0D2le1EZXZCE=
+			wD3cD+c9Hp+hNaaUOVAsLL0fxAI=
 			</data>
 			<key>hash2</key>
 			<data>
-			wf+vpNOtVTO22HPBEsHJZa5CayZK9ABwn2C4FgVCpJA=
+			udUqn0+XQuy0nXlP+xTTZ5LJi2b3EPod9YJpJi+Gs7Q=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

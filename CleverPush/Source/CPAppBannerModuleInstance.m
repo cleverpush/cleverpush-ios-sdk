@@ -24,6 +24,7 @@ BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
 BOOL bannersDisabled = NO;
 BOOL isFromNotification = NO;
+BOOL trackingEnabled = YES;
 
 long MIN_SESSION_LENGTH = 30 * 60;
 long MIN_SESSION_LENGTH_DEV = 30;
@@ -535,6 +536,11 @@ long sessions = 0;
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
+    if (!trackingEnabled) {
+        [CPLog debug:@"sendBannerEvent: not sending event because tracking has been disabled."];
+        return;
+    }
+
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
 
     NSString* subscriptionId = nil;
@@ -589,6 +595,10 @@ long sessions = 0;
         [self setPendingBanners:[[NSMutableArray alloc] init]];
         [self scheduleBanners];
     }
+}
+
+- (void)setTrackingEnabled:(BOOL)enabled {
+    trackingEnabled = enabled;
 }
 
 #pragma mark - refactor for testcases

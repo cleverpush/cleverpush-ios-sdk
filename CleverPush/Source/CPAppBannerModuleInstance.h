@@ -51,6 +51,7 @@
 - (void)saveBannersDisabled;
 - (void)disableBanners;
 - (void)enableBanners;
+- (void)setTrackingEnabled:(BOOL)enabled;
 
 #pragma mark - refactor for testcases
 - (void)setBanners:(NSMutableArray*)appBanner;

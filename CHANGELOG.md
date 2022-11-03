@@ -1,3 +1,7 @@
+## 1.22.3
+* Support app banner language filters
+* Implement methods to optionally disable app banner statistic tracking
+
 ## 1.22.2
 * Added `setTopicsChangedListener` to get notified about changed subscription topics
 

@@ -11,7 +11,9 @@
 static CPAppBannerModuleInstance* singletonInstance = nil;
 
 + (CPAppBannerModuleInstance *)moduleInstance {
-    if (singletonInstance == nil) singletonInstance = [[CPAppBannerModuleInstance alloc] init];
+    if (singletonInstance == nil) {
+        singletonInstance = [[CPAppBannerModuleInstance alloc] init];
+    }
     return singletonInstance;
 }
 
@@ -128,6 +130,10 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 
 + (void)enableBanners {
     [self.moduleInstance enableBanners];
+}
+
++ (void)setTrackingEnabled:(BOOL)enabled {
+    [self.moduleInstance setTrackingEnabled:enabled];
 }
 
 @end

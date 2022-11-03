@@ -34,5 +34,6 @@
 + (void)triggerEvent:(NSString *)key value:(NSString *)value;
 + (void)disableBanners;
 + (void)enableBanners;
++ (void)setTrackingEnabled:(BOOL)enabled;
 
 @end

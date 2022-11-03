@@ -90,6 +90,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (void)disableAppBanners;
 - (void)enableAppBanners;
+- (void)setAppBannerTrackingEnabled:(BOOL)enabled;
 - (BOOL)popupVisible;
 - (void)unsubscribe;
 - (void)unsubscribe:(void(^)(BOOL))callback;
