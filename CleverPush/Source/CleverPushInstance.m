@@ -1117,6 +1117,7 @@ static id isNil(id object) {
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
 }
 
 - (BOOL)isSubscriptionInProgress {
