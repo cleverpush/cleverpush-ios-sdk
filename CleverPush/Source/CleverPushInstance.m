@@ -76,6 +76,7 @@ NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.3";
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
+static BOOL isShowDraft = NO;
 static BOOL incrementBadge = NO;
 static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
@@ -468,7 +469,7 @@ static id isNil(id object) {
         [self showTopicDialogOnNewAdded];
         [self initAppReview];
 
-        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:NO];
+        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
         [CPAppBannerModule initSession:channelId afterInit:NO];
     });
 }
@@ -2953,6 +2954,10 @@ static id isNil(id object) {
     autoClearBadge = autoClear;
 }
 
+- (void)setAppBannerDraftsEnabled:(BOOL)showDraft {
+    isShowDraft = showDraft;
+}
+
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     ignoreDisabledNotificationPermission = ignore;
 }
@@ -3008,7 +3013,7 @@ static id isNil(id object) {
 
 - (void)showAppBanner:(NSString *)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
     BOOL fromNotification = notificationId != nil;
-    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:developmentMode fromNotification:fromNotification];
+    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
