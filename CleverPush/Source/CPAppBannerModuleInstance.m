@@ -376,7 +376,7 @@ long sessions = 0;
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
-        if (banner.status == CPAppBannerStatusDraft && ![self getShowDraftsFlag]) {
+        if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
             continue;
         }
         if (![self bannerTargetingAllowed:banner]) {

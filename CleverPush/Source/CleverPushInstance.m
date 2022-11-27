@@ -3037,6 +3037,10 @@ static id isNil(id object) {
     [CPAppBannerModule setTrackingEnabled:enabled];
 }
 
+- (BOOL)getAppBannerDraftsEnabled {
+    return isShowDraft;
+}
+
 - (BOOL)popupVisible {
     if ([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY] != nil) {
         if (![[NSUserDefaults standardUserDefaults] boolForKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY]) {

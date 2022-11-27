@@ -150,6 +150,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSDictionary*)getSubscriptionAttributes;
 
 + (BOOL)isDevelopmentModeEnabled;
++ (BOOL)getAppBannerDraftsEnabled;
 + (BOOL)isSubscribed;
 + (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;

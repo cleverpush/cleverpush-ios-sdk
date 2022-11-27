@@ -519,6 +519,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance isDevelopmentModeEnabled];
 }
 
++ (BOOL)getAppBannerDraftsEnabled {
+    return [self.CPSharedInstance getAppBannerDraftsEnabled];
+}
+
 + (BOOL)isSubscribed {
     return [self.CPSharedInstance isSubscribed];
 }
