@@ -287,17 +287,56 @@ long sessions = 0;
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
-    allowed = [self checkRelationFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     return allowed;
 }
 
-#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+#pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
     return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
 }
 
-#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+#pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
+
+    if (relation == nil || compareValue == nil) {
+        return allowed;
+    }
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
+        if ([value rangeOfString:compareValue].location == NSNotFound) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
+        if ([value rangeOfString:compareValue].location != NSNotFound) {
+            allowed = NO;
+        }
+    }
+    return allowed;
+}
+
+#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+- (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
+    return [self checkRelationAppVersionFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
+}
+
+#pragma mark - check the banner triggering allowed as per selected version match with app version or not.
+- (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
     
     if (relation == nil || compareValue == nil) {
         return allowed;
@@ -337,7 +376,7 @@ long sessions = 0;
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
-        if (banner.status == CPAppBannerStatusDraft && ![self getShowDraftsFlag]) {
+        if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
             continue;
         }
         if (![self bannerTargetingAllowed:banner]) {

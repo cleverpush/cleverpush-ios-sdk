@@ -311,6 +311,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
 
++ (void)setAppBannerDraftsEnabled:(BOOL)showDraft {
+    [self.CPSharedInstance setAppBannerDraftsEnabled:showDraft];
+}
+
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
 }
@@ -513,6 +517,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)isDevelopmentModeEnabled {
     return [self.CPSharedInstance isDevelopmentModeEnabled];
+}
+
++ (BOOL)getAppBannerDraftsEnabled {
+    return [self.CPSharedInstance getAppBannerDraftsEnabled];
 }
 
 + (BOOL)isSubscribed {

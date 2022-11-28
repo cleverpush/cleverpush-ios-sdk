@@ -94,7 +94,7 @@
         cell.btnCPBanner.backgroundColor = [UIColor colorWithHexString:block.background];
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
-        cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 1.2;
+        cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 

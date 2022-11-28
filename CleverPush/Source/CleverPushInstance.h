@@ -131,6 +131,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (UIColor*)getNormalTintColor;
 - (void)setChatBackgroundColor:(UIColor *)color;
 - (void)setAutoClearBadge:(BOOL)autoClear;
+- (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 - (void)setIncrementBadge:(BOOL)increment;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
@@ -185,6 +186,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSDictionary*)getSubscriptionAttributes;
 
 - (BOOL)isDevelopmentModeEnabled;
+- (BOOL)getAppBannerDraftsEnabled;
 - (BOOL)isSubscribed;
 - (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 - (BOOL)hasSubscriptionTag:(NSString*)tagId;
