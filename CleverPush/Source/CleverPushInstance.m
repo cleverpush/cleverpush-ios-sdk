@@ -1794,6 +1794,28 @@ static id isNil(id object) {
     });
 }
 
+#pragma mark - Live Activity
+- (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token {
+    [self startLiveActivity:activityName pushToken:token onSuccess:nil onFailure:nil];
+}
+- (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    if (subscriptionId != nil) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 activityName, @"activityName",
+                                 token, @"token",
+                                 subscriptionId, @"subscriptionId",
+                                 nil];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        } onFailure:nil];
+    } else {
+        
+    }
+}
+
 #pragma mark - Remove subscription tag by calling api. subscription/untag
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
     [self waitForTrackingConsent:^{

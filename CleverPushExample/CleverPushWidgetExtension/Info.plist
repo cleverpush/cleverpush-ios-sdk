@@ -5,11 +5,9 @@
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
-		<string>com.apple.usernotifications.service</string>
-		<key>NSExtensionPrincipalClass</key>
-		<string>NotificationService</string>
+		<string>com.apple.widgetkit-extension</string>
 	</dict>
 	<key>NSSupportsLiveActivities</key>
-	<true/>
+	<false/>
 </dict>
 </plist>

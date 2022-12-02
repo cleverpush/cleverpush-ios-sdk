@@ -15,7 +15,7 @@ static CGFloat const CPConstraints = 30.0;
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self initialisedTableView];
+   // [self initialisedTableView];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

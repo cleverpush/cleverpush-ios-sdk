@@ -64,6 +64,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*)error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
++ (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token;
++ (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
 + (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
 + (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds;

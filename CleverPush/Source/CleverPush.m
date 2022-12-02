@@ -177,6 +177,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
 }
 
++ (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token {
+    [self.CPSharedInstance startLiveActivity:activityName pushToken:token];
+}
+
++ (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance startLiveActivity:activityName pushToken:token onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [self.CPSharedInstance handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
 }
