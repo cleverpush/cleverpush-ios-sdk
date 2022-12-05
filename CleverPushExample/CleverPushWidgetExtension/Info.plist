@@ -8,6 +8,6 @@
 		<string>com.apple.widgetkit-extension</string>
 	</dict>
 	<key>NSSupportsLiveActivities</key>
-	<false/>
+	<true/>
 </dict>
 </plist>
