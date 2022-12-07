@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1763,35 +1763,37 @@ static id isNil(id object) {
     }];
 }
 
-- (void)sendSubscriptionTagsToApi:(NSString*)tagId callback:(void (^)(NSString *))callback{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 tagId, @"tagId",
-                                 [self getSubscriptionId], @"subscriptionId",
-                                 nil];
+- (void)sendSubscriptionTagsToApi:(NSString*)tagId callback:(void (^)(NSString *))callback {
+    [self getSubscriptionId:^(NSString *subscriptionId) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     tagId, @"tagId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
 
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
 
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-            if (!subscriptionTags) {
-                subscriptionTags = [[NSMutableArray alloc] init];
-            }
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                if (!subscriptionTags) {
+                    subscriptionTags = [[NSMutableArray alloc] init];
+                }
 
-            if (![subscriptionTags containsObject:tagId]) {
-                [subscriptionTags addObject:tagId];
-            }
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
-            [userDefaults synchronize];
+                if (![subscriptionTags containsObject:tagId]) {
+                    [subscriptionTags addObject:tagId];
+                }
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
+                [userDefaults synchronize];
 
-            if (callback) {
-                callback(tagId);
-            }
-        } onFailure:nil];
-    });
+                if (callback) {
+                    callback(tagId);
+                }
+            } onFailure:nil];
+        });
+    }];
 }
 
 #pragma mark - Remove subscription tag by calling api. subscription/untag
@@ -1806,143 +1808,151 @@ static id isNil(id object) {
 }
 
 - (void)removeSubscriptionTagsFromApi:(NSString *)tagId callback:(void (^)(NSString *))callback {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 tagId, @"tagId",
-                                 [self getSubscriptionId], @"subscriptionId",
-                                 nil];
-
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
-
-            if (!subscriptionTags) {
-                subscriptionTags = [[NSMutableArray alloc] init];
-            }
-            [subscriptionTags removeObject:tagId];
-
-            [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
-            [userDefaults synchronize];
-
-            if (callback) {
-                callback(tagId);
-            }
-        } onFailure:nil];
-    });
-}
-
-#pragma mark - Set subscription attribute tag by calling api. subscription/attribute
-- (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
-    [self waitForTrackingConsent:^{
+    [self getSubscriptionId:^(NSString *subscriptionId) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
-                                     attributeId, @"attributeId",
-                                     value, @"value",
-                                     [self getSubscriptionId], @"subscriptionId",
+                                     tagId, @"tagId",
+                                     subscriptionId, @"subscriptionId",
                                      nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                if (!subscriptionAttributes) {
-                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
+
+                if (!subscriptionTags) {
+                    subscriptionTags = [[NSMutableArray alloc] init];
                 }
-                [subscriptionAttributes setObject:value forKey:attributeId];
-                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [subscriptionTags removeObject:tagId];
+
+                [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
                 [userDefaults synchronize];
+
+                if (callback) {
+                    callback(tagId);
+                }
             } onFailure:nil];
         });
+    }];
+}
+
+#pragma mark - Set subscription attribute tag by calling api. subscription/attribute
+- (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
+    [self waitForTrackingConsent:^{
+        [self getSubscriptionId:^(NSString *subscriptionId) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
+
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                    if (!subscriptionAttributes) {
+                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                    }
+                    [subscriptionAttributes setObject:value forKey:attributeId];
+                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                    [userDefaults synchronize];
+                } onFailure:nil];
+            });
+        }];
     }];
 }
 
 #pragma mark - Push subscription array attribute value.
 - (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-        if (!subscriptionAttributes) {
-            subscriptionAttributes = [[NSMutableDictionary alloc] init];
-        }
+        [self getSubscriptionId:^(NSString *subscriptionId) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+            if (!subscriptionAttributes) {
+                subscriptionAttributes = [[NSMutableDictionary alloc] init];
+            }
 
-        NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-        if (!arrayValue) {
-            arrayValue = [NSMutableArray new];
-        } else {
-            arrayValue = [arrayValue mutableCopy];
-        }
-        if (![arrayValue containsString:value]) {
-            [arrayValue addObject:value];
-        }
+            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+            if (!arrayValue) {
+                arrayValue = [NSMutableArray new];
+            } else {
+                arrayValue = [arrayValue mutableCopy];
+            }
+            if (![arrayValue containsString:value]) {
+                [arrayValue addObject:value];
+            }
 
-        [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-        [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-        [userDefaults synchronize];
+            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+            [userDefaults synchronize];
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
-            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     attributeId, @"attributeId",
-                                     value, @"value",
-                                     [self getSubscriptionId], @"subscriptionId",
-                                     nil];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
 
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
-            } onFailure:nil];
-        });
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                    [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
+                } onFailure:nil];
+            });
+        }];
     }];
 }
 
 #pragma mark - Pull subscription array attribute value.
 - (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-        if (!subscriptionAttributes) {
-            subscriptionAttributes = [[NSMutableDictionary alloc] init];
-        }
+        [self getSubscriptionId:^(NSString *subscriptionId) {
+            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+            if (!subscriptionAttributes) {
+                subscriptionAttributes = [[NSMutableDictionary alloc] init];
+            }
 
-        NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
-        if (!arrayValue) {
-            arrayValue = [NSMutableArray new];
-        } else {
-            arrayValue = [arrayValue mutableCopy];
-        }
-        [arrayValue removeObject:value];
+            NSMutableArray *arrayValue = [subscriptionAttributes objectForKey:attributeId];
+            if (!arrayValue) {
+                arrayValue = [NSMutableArray new];
+            } else {
+                arrayValue = [arrayValue mutableCopy];
+            }
+            [arrayValue removeObject:value];
 
-        [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-        [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-        [userDefaults synchronize];
+            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+            [userDefaults synchronize];
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
-            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     attributeId, @"attributeId",
-                                     value, @"value",
-                                     [self getSubscriptionId], @"subscriptionId",
-                                     nil];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
 
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [CPLog debug:@"Attribute value pulled successfully: %@ %@", attributeId, value];
-            } onFailure:nil];
-        });
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                    [CPLog debug:@"Attribute value pulled successfully: %@ %@", attributeId, value];
+                } onFailure:nil];
+            });
+        }];
     }];
 }
 
@@ -2157,7 +2167,7 @@ static id isNil(id object) {
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
                                      topicId, @"topicId",
-                                     [self getSubscriptionId], @"subscriptionId",
+                                     subscriptionId, @"subscriptionId",
                                      nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -2194,7 +2204,7 @@ static id isNil(id object) {
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
                                      topicId, @"topicId",
-                                     [self getSubscriptionId], @"subscriptionId",
+                                     subscriptionId, @"subscriptionId",
                                      nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -2406,20 +2416,22 @@ static id isNil(id object) {
             NSDictionary *event = [channelEvents objectAtIndex:eventIndex];
             NSString *eventId = [event stringForKey:@"_id"];
 
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
-            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     eventId, @"eventId",
-                                     isNil(amount), @"amount",
-                                     [self getSubscriptionId], @"subscriptionId",
-                                     nil];
+            [self getSubscriptionId:^(NSString* subscriptionId) {
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         eventId, @"eventId",
+                                         isNil(amount), @"amount",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
 
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
 
-            } onFailure:nil];
+                } onFailure:nil];
+            }];
         }];
     });
 }
@@ -2431,20 +2443,22 @@ static id isNil(id object) {
 - (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self waitForTrackingConsent:^{
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
-            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     eventName, @"name",
-                                     isNil(parameters), @"parameters",
-                                     [self getSubscriptionId], @"subscriptionId",
-                                     nil];
+            [self getSubscriptionId:^(NSString* subscriptionId) {
+                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         channelId, @"channelId",
+                                         eventName, @"name",
+                                         isNil(parameters), @"parameters",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
+                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                [request setHTTPBody:postData];
 
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
 
-            } onFailure:nil];
+                } onFailure:nil];
+            }];
         }];
     });
 }

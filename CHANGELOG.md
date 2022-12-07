@@ -1,3 +1,7 @@
+## 1.22.4
+* Support calling various methods before a subscription has been created (e.g. call addSubscriptionTag and subscribe at the same time).
+* Optimized app banner attribute targeting
+
 ## 1.22.3
 * Support app banner language filters
 * Implement methods to optionally disable app banner statistic tracking
