@@ -97,7 +97,8 @@ NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
-NSString* apiEndpoint = @"https://api.cleverpush.com";
+//NSString* apiEndpoint = @"https://api.cleverpush.com";
+NSString* apiEndpoint = @"https://api-manav-dev.cleverpush.com";
 NSArray* appBanners;
 NSArray* channelTopics;
 
@@ -1795,15 +1796,12 @@ static id isNil(id object) {
 }
 
 #pragma mark - Live Activity
-- (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token {
-    [self startLiveActivity:activityName pushToken:token onSuccess:nil onFailure:nil];
-}
-- (void)startLiveActivity:(NSString*)activityName pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
-                                 activityName, @"activityName",
+                                 activityId, @"activityId",
                                  token, @"token",
                                  subscriptionId, @"subscriptionId",
                                  nil];
@@ -1811,8 +1809,6 @@ static id isNil(id object) {
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         } onFailure:nil];
-    } else {
-        
     }
 }
 

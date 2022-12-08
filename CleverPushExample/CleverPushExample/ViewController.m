@@ -26,16 +26,16 @@
     if (@available(iOS 13.0, *)) {
         NSString *activityName = [_txtLiveActivityName text];
         if (activityName && activityName.length) {
-            [CPLiveActivityVC createActivityWithCompletionHandler:^(NSString * token) {
-                if(token){
-                    NSLog(@"Push Type Token = %@",token);
-                    [CleverPush startLiveActivity:activityName pushToken:token];
+            [CPLiveActivityVC createActivityWithCompletionHandler:^(NSDictionary * liveActivityData) {
+                if (liveActivityData != nil) {
+                    [CleverPush startLiveActivity:[liveActivityData valueForKey:@"activityId"] pushToken:[liveActivityData valueForKey:@"activityPushToken"]];
                 }
             }];
         }
     }
 }
 - (IBAction)btnHandlerEndLiveActivity:(id)sender {
+   // [CPLiveActivityVC endEvent];
 }
 
 - (IBAction)btnHandlergetSubscriptionID:(id)sender {

@@ -4,6 +4,7 @@ import UserNotifications
 
 struct CleverPushWidgetExtensionAttributes: ActivityAttributes, Identifiable {
     public typealias LiveDeliveryData = ContentState
+    
     public struct ContentState: Codable, Hashable {
         var message: String
     }
@@ -11,20 +12,19 @@ struct CleverPushWidgetExtensionAttributes: ActivityAttributes, Identifiable {
     var title: String
 }
 
-
 @objc
 class CPLiveActivityVC: NSObject {
-    static var counter = 0
+    
     @available(iOS 13.0, *)
     @objc
-    static func createActivity() async -> String? {
+    static func createActivity() async -> NSDictionary? {
         let center = UNUserNotificationCenter.current()
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
+                return
             }
         }
         if #available(iOS 16.1, *) {
-            counter += 1;
             let attributes = CleverPushWidgetExtensionAttributes(title: "CleverPush ")
             let contentState = CleverPushWidgetExtensionAttributes.LiveDeliveryData(message: "Live Activity Stared")
             do {
@@ -33,8 +33,9 @@ class CPLiveActivityVC: NSObject {
                     contentState: contentState,
                     pushType: .token)
                 for await data in activity.pushTokenUpdates {
-                    let myToken = data.map {String(format: "%02x", $0)}.joined()
-                    return myToken
+                    let actvityToken = data.map {String(format: "%02x", $0)}.joined()
+                    let liveActivityData:NSDictionary = ["activityId" : activity.id,"activityPushToken":actvityToken]
+                    return liveActivityData
                 }
             } catch (let error) {
                 print(error.localizedDescription)

@@ -705,7 +705,7 @@
 				INFOPLIST_FILE = CleverPushWidgetExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushWidgetExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSSupportsLiveActivities = NO;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -737,7 +737,7 @@
 				INFOPLIST_FILE = CleverPushWidgetExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushWidgetExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSSupportsLiveActivities = NO;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
