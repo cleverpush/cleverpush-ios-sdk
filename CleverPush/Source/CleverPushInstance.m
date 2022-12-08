@@ -1796,6 +1796,9 @@ static id isNil(id object) {
 }
 
 #pragma mark - Live Activity
+- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
+    [self startLiveActivity:activityId pushToken:token onSuccess:nil onFailure:nil];
+}
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
@@ -1809,6 +1812,8 @@ static id isNil(id object) {
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
         } onFailure:nil];
+    } else {
+        
     }
 }
 

@@ -229,6 +229,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeSubscriptionTag:tagId];
 }
 
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
+    [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
+}
+
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance startLiveActivity:activityId pushToken:token onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value];
 }
@@ -243,10 +251,6 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     return [self.CPSharedInstance hasSubscriptionAttributeValue:attributeId value:value];
-}
-
-+ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    [self.CPSharedInstance startLiveActivity:activityId pushToken:token onSuccess:successBlock onFailure:failureBlock];
 }
 
 + (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback {
