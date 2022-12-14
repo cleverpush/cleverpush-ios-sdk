@@ -268,6 +268,11 @@ long sessions = 0;
 
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
         allowed = NO;
+
+        if (![CleverPush isSubscribed]) {
+            return allowed;
+        }
+
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute stringForKey:@"id"];
             NSString *compareAttributeValue = [attribute stringForKey:@"value"];
@@ -376,17 +381,7 @@ long sessions = 0;
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
-        if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
-            continue;
-        }
-        if (![self bannerTargetingAllowed:banner]) {
-            continue;
-        }
-
         if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
-            continue;
-        }
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
             continue;
         }
 
@@ -477,6 +472,21 @@ long sessions = 0;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
+        if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
+            [CPLog debug:@"Skipping banner because: status is draft"];
+            return;
+        }
+
+        if (![self bannerTargetingAllowed:banner]) {
+            [CPLog debug:@"Skipping banner because: targeting not allowed"];
+            return;
+        }
+
+        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedAscending) {
+            [CPLog debug:@"Skipping banner because: date is after stop date"];
+            return;
+        }
+
         NSBundle *bundle = [CPUtils getAssetsBundle];
         CPAppBannerViewController *appBannerViewController;
         if (bundle) {
@@ -538,15 +548,7 @@ long sessions = 0;
             [self setBannerIsShown:banner.id];
         }
 
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
-            if ([banner.stopAt compare:[NSDate date]] == NSOrderedDescending) {
-                [self presentAppBanner:appBannerViewController banner:banner];
-            } else {
-                [CPLog info:@"Banner display date has been elapsed"];
-            }
-        } else {
-            [self presentAppBanner:appBannerViewController banner:banner];
-        }
+        [self presentAppBanner:appBannerViewController banner:banner];
     });
 }
 
