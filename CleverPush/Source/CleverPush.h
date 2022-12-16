@@ -157,6 +157,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
 + (void)setConfirmAlertShown;
++ (void)areNotificationsEnabled:(void(^)(BOOL))callback;
 
 + (void)setLogListener:(CPLogListener)listener;
 

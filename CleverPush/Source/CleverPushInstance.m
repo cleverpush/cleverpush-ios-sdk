@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.22.5";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.23.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -770,7 +770,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Returns if the user has currently given the notification permission
-- (void)areNotificationsEnabled:(void(^)(BOOL))callback{
+- (void)areNotificationsEnabled:(void(^)(BOOL))callback {
     __block BOOL isEnabled = NO;
 
     if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {

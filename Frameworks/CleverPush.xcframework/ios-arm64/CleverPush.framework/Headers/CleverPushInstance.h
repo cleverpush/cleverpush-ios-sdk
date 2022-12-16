@@ -194,6 +194,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getDeselectValue;
 - (BOOL)getUnsubscribeStatus;
 - (void)setConfirmAlertShown;
+- (void)areNotificationsEnabled:(void(^)(BOOL))callback;
 
 - (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 - (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

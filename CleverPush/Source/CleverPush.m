@@ -443,6 +443,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setConfirmAlertShown];
 }
 
++ (void)areNotificationsEnabled:(void(^)(BOOL))callback {
+    [self.CPSharedInstance areNotificationsEnabled:callback];
+}
+
 + (UIViewController*)topViewController {
     return [self.CPSharedInstance topViewController];
 }

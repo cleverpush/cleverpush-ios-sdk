@@ -1,3 +1,6 @@
+## 1.23.0
+* Make `areNotificationsEnabled` method public
+
 ## 1.22.5
 * Optimized app banner behaviour when delays are used
 
