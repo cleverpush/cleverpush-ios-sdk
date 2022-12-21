@@ -9,7 +9,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [CleverPush initWithLaunchOptions:launchOptions
-      channelId:@"7zFmbh83Rcv5xm7Zz"
+      channelId:@"YOUR_CHANNEL_ID_HERE"
       handleNotificationOpened:^(CPNotificationOpenedResult *result) {
         NSLog(@"Received Notification with URL: %@", [result.notification valueForKey:@"url"]);
     } handleSubscribed:^(NSString *subscriptionId) {
