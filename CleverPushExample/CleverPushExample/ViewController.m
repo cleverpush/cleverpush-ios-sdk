@@ -28,14 +28,11 @@
         if (activityName && activityName.length) {
             [CPLiveActivityVC createActivityWithCompletionHandler:^(NSDictionary * liveActivityData) {
                 if (liveActivityData != nil) {
-                    [CleverPush startLiveActivity:[liveActivityData valueForKey:@"activityId"] pushToken:[liveActivityData valueForKey:@"activityPushToken"]];
+                    [CleverPush startLiveActivity:[liveActivityData valueForKey:@"iosLiveActivityId"] pushToken:[liveActivityData valueForKey:@"iosLiveActivityToken"]];
                 }
             }];
         }
     }
-}
-- (IBAction)btnHandlerEndLiveActivity:(id)sender {
-   // [CPLiveActivityVC endEvent];
 }
 
 - (IBAction)btnHandlergetSubscriptionID:(id)sender {

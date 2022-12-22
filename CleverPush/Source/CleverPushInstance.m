@@ -1804,16 +1804,16 @@ static id isNil(id object) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
-                                 activityId, @"activityId",
-                                 token, @"token",
+                                 activityId, @"iosLiveActivityId",
+                                 token, @"iosLiveActivityToken",
                                  subscriptionId, @"subscriptionId",
                                  nil];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        } onFailure:nil];
-    } else {
-        
+        } onFailure:^(NSError* error) {
+            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+        }];
     }
 }
 

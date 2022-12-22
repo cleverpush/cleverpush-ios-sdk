@@ -37,18 +37,6 @@
                                             <action selector="btnHandlerStartLiveActivity:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UDn-c9-nqd"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="li9-u6-GLv">
-                                        <rect key="frame" x="0.0" y="145" width="330" height="50"/>
-                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="ryD-BO-NFa"/>
-                                        </constraints>
-                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                        <state key="normal" title="End Live Activity"/>
-                                        <connections>
-                                            <action selector="btnHandlerEndLiveActivity:" destination="BYZ-38-t0r" eventType="touchUpInside" id="cbj-ig-zhH"/>
-                                        </connections>
-                                    </button>
                                     <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1vf-Iu-g0i">
                                         <rect key="frame" x="0.0" y="160" width="330" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>

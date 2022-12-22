@@ -25,8 +25,8 @@ class CPLiveActivityVC: NSObject {
             }
         }
         if #available(iOS 16.1, *) {
-            let attributes = CleverPushWidgetExtensionAttributes(title: "CleverPush ")
-            let contentState = CleverPushWidgetExtensionAttributes.LiveDeliveryData(message: "Live Activity Stared")
+            let attributes = CleverPushWidgetExtensionAttributes(title: "CleverPush")
+            let contentState = CleverPushWidgetExtensionAttributes.LiveDeliveryData(message: "Live Activity Started")
             do {
                 let activity = try Activity<CleverPushWidgetExtensionAttributes>.request(
                     attributes: attributes,
@@ -34,7 +34,7 @@ class CPLiveActivityVC: NSObject {
                     pushType: .token)
                 for await data in activity.pushTokenUpdates {
                     let actvityToken = data.map {String(format: "%02x", $0)}.joined()
-                    let liveActivityData:NSDictionary = ["activityId" : activity.id,"activityPushToken":actvityToken]
+                    let liveActivityData:NSDictionary = ["iosLiveActivityId" : activity.id,"iosLiveActivityToken":actvityToken]
                     return liveActivityData
                 }
             } catch (let error) {
