@@ -229,6 +229,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeSubscriptionTag:tagId];
 }
 
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
+    [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
+}
+
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance startLiveActivity:activityId pushToken:token onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value];
 }

@@ -33,6 +33,16 @@
 		93A9906328D35E6A00F990A4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906228D35E6A00F990A4 /* WebKit.framework */; };
 		93A9906528D35E7000F990A4 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906428D35E7000F990A4 /* JavaScriptCore.framework */; };
 		93A9906728D35E7600F990A4 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A9906628D35E7600F990A4 /* SafariServices.framework */; };
+		93AEEB85293A2B3700A137F5 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AEEB84293A2B3700A137F5 /* WidgetKit.framework */; };
+		93AEEB87293A2B3700A137F5 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93AEEB86293A2B3700A137F5 /* SwiftUI.framework */; };
+		93AEEB8A293A2B3700A137F5 /* CleverPushWidgetExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEB89293A2B3700A137F5 /* CleverPushWidgetExtensionBundle.swift */; };
+		93AEEB8C293A2B3700A137F5 /* CleverPushWidgetExtensionLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEB8B293A2B3700A137F5 /* CleverPushWidgetExtensionLiveActivity.swift */; };
+		93AEEB91293A2B3800A137F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93AEEB90293A2B3800A137F5 /* Assets.xcassets */; };
+		93AEEB93293A2B3800A137F5 /* CleverPushWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEB8F293A2B3700A137F5 /* CleverPushWidgetExtension.intentdefinition */; };
+		93AEEB94293A2B3800A137F5 /* CleverPushWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEB8F293A2B3700A137F5 /* CleverPushWidgetExtension.intentdefinition */; };
+		93AEEB97293A2B3800A137F5 /* CleverPushWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 93AEEB83293A2B3700A137F5 /* CleverPushWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		93AEEBA1293A323900A137F5 /* CPLiveActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */; };
+		93AEEBA2293A323900A137F5 /* CPLiveActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +52,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 93A9904728D35DF700F990A4;
 			remoteInfo = CleverPushNotificationServiceExtension;
+		};
+		93AEEB95293A2B3800A137F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 93A9901928D35ACB00F990A4 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 93AEEB82293A2B3700A137F5;
+			remoteInfo = CleverPushWidgetExtensionExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -75,6 +92,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				93A9905028D35DF700F990A4 /* CleverPushNotificationServiceExtension.appex in Embed Foundation Extensions */,
+				93AEEB97293A2B3800A137F5 /* CleverPushWidgetExtensionExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -106,6 +124,17 @@
 		93A9906228D35E6A00F990A4 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		93A9906428D35E7000F990A4 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		93A9906628D35E7600F990A4 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
+		93AEEB83293A2B3700A137F5 /* CleverPushWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CleverPushWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		93AEEB84293A2B3700A137F5 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		93AEEB86293A2B3700A137F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		93AEEB89293A2B3700A137F5 /* CleverPushWidgetExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleverPushWidgetExtensionBundle.swift; sourceTree = "<group>"; };
+		93AEEB8B293A2B3700A137F5 /* CleverPushWidgetExtensionLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleverPushWidgetExtensionLiveActivity.swift; sourceTree = "<group>"; };
+		93AEEB8F293A2B3700A137F5 /* CleverPushWidgetExtension.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = CleverPushWidgetExtension.intentdefinition; sourceTree = "<group>"; };
+		93AEEB90293A2B3800A137F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		93AEEB92293A2B3800A137F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CPLiveActivityVC.swift; sourceTree = "<group>"; };
+		93AEEBA3293A325900A137F5 /* CleverPushExample-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CleverPushExample-Bridging-Header.h"; sourceTree = "<group>"; };
+		93AEEBA4293A371900A137F5 /* CleverPushWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CleverPushWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,14 +168,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93AEEB80293A2B3700A137F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93AEEB87293A2B3700A137F5 /* SwiftUI.framework in Frameworks */,
+				93AEEB85293A2B3700A137F5 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		93A9901828D35ACB00F990A4 = {
 			isa = PBXGroup;
 			children = (
+				93AEEBA4293A371900A137F5 /* CleverPushWidgetExtensionExtension.entitlements */,
 				93A9902328D35ACB00F990A4 /* CleverPushExample */,
 				93A9904928D35DF700F990A4 /* CleverPushNotificationServiceExtension */,
+				93AEEB88293A2B3700A137F5 /* CleverPushWidgetExtension */,
 				93A9902228D35ACB00F990A4 /* Products */,
 				93A9905528D35E4000F990A4 /* Frameworks */,
 			);
@@ -157,6 +197,7 @@
 			children = (
 				93A9902128D35ACB00F990A4 /* CleverPushExample.app */,
 				93A9904828D35DF700F990A4 /* CleverPushNotificationServiceExtension.appex */,
+				93AEEB83293A2B3700A137F5 /* CleverPushWidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -174,6 +215,8 @@
 				93A9903228D35ACD00F990A4 /* LaunchScreen.storyboard */,
 				93A9903528D35ACD00F990A4 /* Info.plist */,
 				93A9903628D35ACD00F990A4 /* main.m */,
+				93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */,
+				93AEEBA3293A325900A137F5 /* CleverPushExample-Bridging-Header.h */,
 			);
 			path = CleverPushExample;
 			sourceTree = "<group>";
@@ -200,8 +243,22 @@
 				93A9905C28D35E5000F990A4 /* UIKit.framework */,
 				93A9905828D35E4300F990A4 /* CleverPush.framework */,
 				93A9905628D35E4000F990A4 /* SystemConfiguration.framework */,
+				93AEEB84293A2B3700A137F5 /* WidgetKit.framework */,
+				93AEEB86293A2B3700A137F5 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		93AEEB88293A2B3700A137F5 /* CleverPushWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				93AEEB89293A2B3700A137F5 /* CleverPushWidgetExtensionBundle.swift */,
+				93AEEB8B293A2B3700A137F5 /* CleverPushWidgetExtensionLiveActivity.swift */,
+				93AEEB8F293A2B3700A137F5 /* CleverPushWidgetExtension.intentdefinition */,
+				93AEEB90293A2B3800A137F5 /* Assets.xcassets */,
+				93AEEB92293A2B3800A137F5 /* Info.plist */,
+			);
+			path = CleverPushWidgetExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,6 +278,7 @@
 			);
 			dependencies = (
 				93A9904F28D35DF700F990A4 /* PBXTargetDependency */,
+				93AEEB96293A2B3800A137F5 /* PBXTargetDependency */,
 			);
 			name = CleverPushExample;
 			productName = CleverPushExample;
@@ -245,6 +303,23 @@
 			productReference = 93A9904828D35DF700F990A4 /* CleverPushNotificationServiceExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		93AEEB82293A2B3700A137F5 /* CleverPushWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 93AEEB9A293A2B3900A137F5 /* Build configuration list for PBXNativeTarget "CleverPushWidgetExtensionExtension" */;
+			buildPhases = (
+				93AEEB7F293A2B3700A137F5 /* Sources */,
+				93AEEB80293A2B3700A137F5 /* Frameworks */,
+				93AEEB81293A2B3700A137F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CleverPushWidgetExtensionExtension;
+			productName = CleverPushWidgetExtensionExtension;
+			productReference = 93AEEB83293A2B3700A137F5 /* CleverPushWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -252,13 +327,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1410;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
 					93A9902028D35ACB00F990A4 = {
 						CreatedOnToolsVersion = 14.0;
+						LastSwiftMigration = 1410;
 					};
 					93A9904728D35DF700F990A4 = {
 						CreatedOnToolsVersion = 14.0;
+					};
+					93AEEB82293A2B3700A137F5 = {
+						CreatedOnToolsVersion = 14.1;
 					};
 				};
 			};
@@ -277,6 +357,7 @@
 			targets = (
 				93A9902028D35ACB00F990A4 /* CleverPushExample */,
 				93A9904728D35DF700F990A4 /* CleverPushNotificationServiceExtension */,
+				93AEEB82293A2B3700A137F5 /* CleverPushWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -299,6 +380,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93AEEB81293A2B3700A137F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93AEEB91293A2B3800A137F5 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -307,7 +396,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				93A9902C28D35ACB00F990A4 /* ViewController.m in Sources */,
+				93AEEB94293A2B3800A137F5 /* CleverPushWidgetExtension.intentdefinition in Sources */,
 				93A9902628D35ACB00F990A4 /* AppDelegate.m in Sources */,
+				93AEEBA1293A323900A137F5 /* CPLiveActivityVC.swift in Sources */,
 				93A9903728D35ACD00F990A4 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -320,6 +411,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93AEEB7F293A2B3700A137F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93AEEBA2293A323900A137F5 /* CPLiveActivityVC.swift in Sources */,
+				93AEEB93293A2B3800A137F5 /* CleverPushWidgetExtension.intentdefinition in Sources */,
+				93AEEB8A293A2B3700A137F5 /* CleverPushWidgetExtensionBundle.swift in Sources */,
+				93AEEB8C293A2B3700A137F5 /* CleverPushWidgetExtensionLiveActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -327,6 +429,11 @@
 			isa = PBXTargetDependency;
 			target = 93A9904728D35DF700F990A4 /* CleverPushNotificationServiceExtension */;
 			targetProxy = 93A9904E28D35DF700F990A4 /* PBXContainerItemProxy */;
+		};
+		93AEEB96293A2B3800A137F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 93AEEB82293A2B3700A137F5 /* CleverPushWidgetExtensionExtension */;
+			targetProxy = 93AEEB95293A2B3800A137F5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -463,14 +570,17 @@
 		93A9903B28D35ACD00F990A4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleverPushExample/CleverPushExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KWJDGZUQ72;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CleverPushExample/Info.plist;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -482,12 +592,15 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPushExample/CleverPushExample-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -495,14 +608,17 @@
 		93A9903C28D35ACD00F990A4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CleverPushExample/CleverPushExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KWJDGZUQ72;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CleverPushExample/Info.plist;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -514,12 +630,14 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "CleverPushExample/CleverPushExample-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -538,9 +656,10 @@
 				INFOPLIST_FILE = CleverPushNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK.CleverPushNotificationServiceExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI.CleverPushNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -562,12 +681,77 @@
 				INFOPLIST_FILE = CleverPushNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CleverPushNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Cleverpush.iOSExampleSDK.CleverPushNotificationServiceExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI.CleverPushNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		93AEEB98293A2B3900A137F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CleverPushWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CleverPushWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CleverPushWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		93AEEB99293A2B3900A137F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = CleverPushWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CleverPushWidgetExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CleverPushWidgetExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushExampleSwiftUI.WidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -598,6 +782,15 @@
 			buildConfigurations = (
 				93A9905228D35DF700F990A4 /* Debug */,
 				93A9905328D35DF700F990A4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		93AEEB9A293A2B3900A137F5 /* Build configuration list for PBXNativeTarget "CleverPushWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93AEEB98293A2B3900A137F5 /* Debug */,
+				93AEEB99293A2B3900A137F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

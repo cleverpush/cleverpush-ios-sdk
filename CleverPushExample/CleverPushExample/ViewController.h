@@ -7,5 +7,6 @@
 - (IBAction)btnHandlergetSubscriptionID:(id)sender;
  
 @property (weak, nonatomic) IBOutlet UILabel *lblStatusDisplay;
+@property (weak, nonatomic) IBOutlet UITextField *txtLiveActivityName;
 
 @end

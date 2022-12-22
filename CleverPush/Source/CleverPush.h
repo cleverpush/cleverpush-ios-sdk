@@ -78,6 +78,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
 + (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
 + (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token;
++ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
 + (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback;
 + (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;
