@@ -1,3 +1,6 @@
+## 1.24.0
+* Added Live Activities Support. See [our docs](https://developers.cleverpush.com/docs/sdks/ios/liveactivity) for more information.
+
 ## 1.23.0
 * Make `areNotificationsEnabled` method public
 
