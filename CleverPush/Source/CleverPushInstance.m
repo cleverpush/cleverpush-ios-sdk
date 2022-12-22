@@ -97,8 +97,7 @@ NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
-//NSString* apiEndpoint = @"https://api.cleverpush.com";
-NSString* apiEndpoint = @"https://api-manav-dev.cleverpush.com";
+NSString* apiEndpoint = @"https://api.cleverpush.com";
 NSArray* appBanners;
 NSArray* channelTopics;
 
