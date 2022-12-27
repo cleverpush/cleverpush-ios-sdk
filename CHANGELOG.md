@@ -1,3 +1,6 @@
+## 1.24.1
+* Fixed app banner text align bug
+
 ## 1.24.0
 * Added Live Activities Support. See [our docs](https://developers.cleverpush.com/docs/sdks/ios/live-activities) for more information.
 
