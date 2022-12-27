@@ -30,8 +30,8 @@
         self.alignment = CPAppBannerAlignmentCenter;
         if ([[json stringForKey:@"alignment"] isEqual:@"right"]) {
             self.alignment = CPAppBannerAlignmentRight;
-        } else if ([[json stringForKey:@"alignment"] isEqual:@"right"]) {
-            self.alignment = CPAppBannerAlignmentRight;
+        } else if ([[json stringForKey:@"alignment"] isEqual:@"left"]) {
+            self.alignment = CPAppBannerAlignmentLeft;
         }
     }
     return self;
