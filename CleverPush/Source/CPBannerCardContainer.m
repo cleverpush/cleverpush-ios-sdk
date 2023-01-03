@@ -156,7 +156,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.data.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
+    if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
         [self actionCallback:block.action from:NO];
     }
