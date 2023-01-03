@@ -1,3 +1,6 @@
+## 1.24.2
+* Fixed a potential crash when tapping an image in app banners
+
 ## 1.24.1
 * Fixed app banner text align bug
 

@@ -143,13 +143,13 @@ double geoFenceTimerInterval = 1.0;
 }
 
 + (void)geoFenceHandleTimer:(NSTimer *)timer {
-    for (NSMutableDictionary *geoFence in geoFenceArray) {
+    for (NSMutableDictionary *geoFence in delayedGeoFences) {
         if ([geoFence objectForKey:@"delay"] != nil) {
             double delayValue = [[geoFence objectForKey:@"delay"] doubleValue];
             CLRegion *regionValue = [geoFence objectForKey:@"region"];
             if (geoFenceTimerDelay >= delayValue) {
                 geoFenceTimeoutCompleted = true;
-                [geoFenceArray removeObject:geoFence];
+                [delayedGeoFences removeObject:geoFence];
                 [locationManager startMonitoringForRegion:regionValue];
                 break;
             }
