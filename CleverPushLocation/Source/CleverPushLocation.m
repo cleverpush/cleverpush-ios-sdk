@@ -142,7 +142,7 @@ double geoFenceTimerInterval = 1.0;
     }
 }
 
-+ (void)geoFenceHandleTimer: (NSTimer *) Timer {
++ (void)geoFenceHandleTimer:(NSTimer *)timer {
     for (NSMutableDictionary *geoFence in geoFenceArray) {
         if ([geoFence objectForKey:@"delay"] != nil) {
             double delayValue = [[geoFence objectForKey:@"delay"] doubleValue];
