@@ -461,9 +461,6 @@ long sessions = 0;
             double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
             double totalDelay = startAtDelay + banner.delaySeconds;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
-                    return;
-                }
                 [self showBanner:banner];
             });
         }
