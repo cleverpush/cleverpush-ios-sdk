@@ -165,7 +165,6 @@ long sessions = 0;
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
     if (notificationId == nil) {
-
         [pendingBannerListeners addObject:callback];
         if ([self getPendingBannerRequest]) {
             return;
@@ -303,7 +302,6 @@ long sessions = 0;
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
-
     if (relation == nil || compareValue == nil) {
         return allowed;
     }
@@ -342,7 +340,6 @@ long sessions = 0;
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
 - (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
-    
     if (relation == nil || compareValue == nil) {
         return allowed;
     }
@@ -450,7 +447,7 @@ long sessions = 0;
     }
 
     for (CPAppBanner* banner in [self getActiveBanners]) {
-        if ([banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
+        if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                     [self showBanner:banner];
@@ -461,8 +458,9 @@ long sessions = 0;
                 });
             }
         } else {
-            double delay = [[NSDate date] timeIntervalSinceDate:banner.startAt] + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
+            double totalDelay = startAtDelay + banner.delaySeconds;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 [self showBanner:banner];
             });
         }
