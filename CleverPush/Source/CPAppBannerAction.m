@@ -5,6 +5,7 @@
 #pragma mark - wrapping the data of the bannerAction in to CPAppBannerAction NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
+    self.blockId = @"";
     if (self && json && ![json isKindOfClass:[NSNull class]]) {
         if ([json objectForKey:@"url"] && [[json objectForKey:@"url"] isKindOfClass:[NSString class]]) {
             self.url= [NSURL URLWithString:[[json objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:
@@ -57,6 +58,9 @@
             self.customData = [json mutableCopy];
         }
 
+        if ([json objectForKey:@"blockId"] && [[json objectForKey:@"blockId"] isKindOfClass:[NSString class]]) {
+            self.blockId = [json objectForKey:@"blockId"];
+        }
     }
     return self;
 }
