@@ -7,7 +7,8 @@
     self = [super init];
     if (self && json && ![json isKindOfClass:[NSNull class]]) {
         if ([json objectForKey:@"url"] && [[json objectForKey:@"url"] isKindOfClass:[NSString class]]) {
-            self.url = [NSURL URLWithString:[json objectForKey:@"url"]];
+            self.url= [NSURL URLWithString:[[json objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:
+                                                        NSUTF8StringEncoding]];
         }
         
         if ([json objectForKey:@"urlType"] && [[json objectForKey:@"urlType"] isKindOfClass:[NSString class]]) {
