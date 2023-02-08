@@ -191,14 +191,22 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.data.screens.count;
+    if (self.data.screens.count == 0) {
+        return  1;
+    } else {
+        return self.data.screens.count;
+    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-    cell.blocks = self.data.screens[indexPath.item].blocks;
+    if (self.data.screens.count == 0) {
+        cell.blocks = self.data.blocks;
+    } else {
+        cell.blocks = self.data.screens[indexPath.item].blocks;
+    }
     NSBundle *bundle = [CPUtils getAssetsBundle];
     if (bundle) {
         [cell.tblCPBanner registerNib:[UINib nibWithNibName:@"CPImageBlockCell" bundle:bundle] forCellReuseIdentifier:@"CPImageBlockCell"];

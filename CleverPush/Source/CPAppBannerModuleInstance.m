@@ -146,7 +146,7 @@ long sessions = 0;
     [self loadBannersDisabled];
     [self updateShowDraftsFlag:showDraftsParam];
     [self setSessions:[self getSessions]];
-    [self updateInitialisedFlag:YES];
+    [self updateInitialisedFlag:NO];
     [self setFromNotification:fromNotification];
     if (![self isFromNotification]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
