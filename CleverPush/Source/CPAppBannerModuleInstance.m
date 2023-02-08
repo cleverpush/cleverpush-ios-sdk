@@ -275,6 +275,9 @@ long sessions = 0;
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute stringForKey:@"id"];
             NSString *compareAttributeValue = [attribute stringForKey:@"value"];
+            if (!compareAttributeValue || [compareAttributeValue isKindOfClass:[NSNull class]]) {
+                compareAttributeValue = @"";
+            }
 
             NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
             NSString *relation = [attribute stringForKey:@"relation"];
