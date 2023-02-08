@@ -52,6 +52,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance startup];
 }
 
+#pragma mark - Resets the initialization, e.g. when channel ID has been changed
++ (void)resetInitialization {
+    [self.moduleInstance resetInitialization];
+}
+
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
 + (NSMutableArray*)shownAppBanners {
     return [self.moduleInstance shownAppBanners];

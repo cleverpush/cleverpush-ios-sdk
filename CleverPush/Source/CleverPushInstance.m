@@ -293,6 +293,7 @@ static id isNil(id object) {
         } else if ([self isChannelIdChanged:channelId]) {
             [self addOrUpdateChannelId:channelId];
             [self clearSubscriptionData];
+            [CPAppBannerModule resetInitialization];
         }
 
         if (!channelId) {
