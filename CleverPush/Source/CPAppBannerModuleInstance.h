@@ -71,6 +71,7 @@
 - (void)updateShowDraftsFlag:(BOOL)value;
 - (void)updateInitialisedFlag:(BOOL)value;
 - (BOOL)isInitialized;
+- (void)resetInitialization;
 - (void)setFromNotification:(BOOL)value;
 - (BOOL)isFromNotification;
 - (void)setBannersDisabled:(BOOL)value;

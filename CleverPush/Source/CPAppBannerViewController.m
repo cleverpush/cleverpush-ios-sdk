@@ -192,7 +192,7 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     if (self.data.screens.count == 0) {
-        return  1;
+        return 1;
     } else {
         return self.data.screens.count;
     }
@@ -202,7 +202,8 @@
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-    if (self.data.screens.count == 0) {
+
+    if ((!self.data.carouselEnabled && !self.data.multipleScreensEnabled) || self.data.screens.count == 0) {
         cell.blocks = self.data.blocks;
     } else {
         cell.blocks = self.data.screens[indexPath.item].blocks;

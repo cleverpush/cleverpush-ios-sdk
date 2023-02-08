@@ -35,5 +35,6 @@
 + (void)disableBanners;
 + (void)enableBanners;
 + (void)setTrackingEnabled:(BOOL)enabled;
++ (void)resetInitialization;
 
 @end
