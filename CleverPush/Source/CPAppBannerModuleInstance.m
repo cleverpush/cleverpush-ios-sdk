@@ -275,6 +275,9 @@ long sessions = 0;
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute stringForKey:@"id"];
             NSString *compareAttributeValue = [attribute stringForKey:@"value"];
+            if (!compareAttributeValue || [compareAttributeValue isKindOfClass:[NSNull class]]) {
+                compareAttributeValue = @"";
+            }
 
             NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
             NSString *relation = [attribute stringForKey:@"relation"];
@@ -302,8 +305,8 @@ long sessions = 0;
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
-    if (relation == nil || compareValue == nil) {
-        return allowed;
+    if (relation == nil || compareValue == nil || value == nil) {
+        allowed = NO;
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
         if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
