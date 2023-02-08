@@ -1,3 +1,6 @@
+## 1.24.4
+* Fixes for app banner attribute conditions + small optimizations for an edge case where app banners had screens enabled previously and was then showing the wrong contents.
+
 ## 1.24.3
 * Fixed the start date option for app banners
 
