@@ -68,8 +68,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 }
 
 #pragma mark - update/set the NSUserDefaults of key CleverPush_SHOWN_APP_BANNERS
-+ (void)setBannerIsShown:(NSString*)bannerId {
-    [self.moduleInstance setBannerIsShown:bannerId];
++ (void)setBannerIsShown:(CPAppBanner*)banner {
+    [self.moduleInstance setBannerIsShown:banner];
 }
 
 #pragma mark - Initialised a session

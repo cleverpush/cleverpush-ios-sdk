@@ -1,3 +1,6 @@
+## 1.25.0
+* Support app banner dark mode settings + connected banners (see app banner settings in CleverPush for more information)
+
 ## 1.24.4
 * Fixes for app banner attribute conditions + small optimizations for an edge case where app banners had screens enabled previously and was then showing the wrong contents.
 

@@ -51,12 +51,24 @@
 
 #pragma mark - setup background image
 - (void)setBackground {
+    [self.backGroundImage setContentMode:UIViewContentModeScaleAspectFill];
+
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]]) {
+        [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+        return;
+    }
+
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+        [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.darkColor]];
+        return;
+    }
+
     if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
         [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
-    } else {
-        [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        return;
     }
-    [self.backGroundImage setContentMode:UIViewContentModeScaleAspectFill];
+
+    [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
 }
 
 #pragma mark - setting up the popup shadow
@@ -97,7 +109,14 @@
 
 #pragma mark - dynamic hide and show top button from top right corner
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled {
-    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    UIColor *backgroundColor;
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+        backgroundColor = [UIColor colorWithHexString:self.data.background.darkColor];
+    } else {
+        backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+    }
+    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
+
     if (@available(iOS 13.0, *)) {
         [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
         self.btnClose.tintColor = color;

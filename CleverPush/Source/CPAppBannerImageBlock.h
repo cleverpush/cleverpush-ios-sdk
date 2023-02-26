@@ -8,6 +8,7 @@
 #pragma mark - Class Variables
 @property (nonatomic, strong) CPAppBannerAction* action;
 @property (nonatomic, strong) NSString *imageUrl;
+@property (nonatomic, strong) NSString *darkImageUrl;
 @property (nonatomic) int scale;
 
 #pragma mark - Class Methods

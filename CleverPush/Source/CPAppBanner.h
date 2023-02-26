@@ -30,6 +30,7 @@
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
 @property (nonatomic, strong) NSMutableArray<NSString*> *languages;
+@property (nonatomic, strong) NSMutableArray<NSString*> *connectedBanners;
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString *testId;
 @property (nonatomic, strong) NSString *channel;
@@ -49,11 +50,13 @@
 @property (nonatomic) BOOL carouselEnabled;
 @property (nonatomic) BOOL marginEnabled;
 @property (nonatomic) BOOL closeButtonEnabled;
+@property (nonatomic) BOOL darkModeEnabled;
 @property (nonatomic, strong) NSString *appVersionFilterRelation;
 @property (nonatomic, strong) NSString *appVersionFilterValue;
 @property (nonatomic, strong) NSString *fromVersion;
 @property (nonatomic, strong) NSString *toVersion;
 
 - (id)initWithJson:(NSDictionary*)json;
+- (BOOL)darkModeEnabled:(UITraitCollection*)traitCollection;
 
 @end

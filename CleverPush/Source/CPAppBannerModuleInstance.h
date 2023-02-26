@@ -36,7 +36,7 @@
 - (void)startup;
 - (NSMutableArray*)shownAppBanners;
 - (BOOL)isBannerShown:(NSString*)bannerId;
-- (void)setBannerIsShown:(NSString*)bannerId;
+- (void)setBannerIsShown:(CPAppBanner*)banner;
 - (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit;
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification;
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;

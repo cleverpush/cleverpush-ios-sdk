@@ -99,12 +99,19 @@ long sessions = 0;
 }
 
 #pragma mark - update/set the NSUserDefaults of key CleverPush_SHOWN_APP_BANNERS
-- (void)setBannerIsShown:(NSString*)bannerId {
-    NSMutableArray* bannerIds = [self shownAppBanners];
-    [bannerIds addObject:bannerId];
-
+- (void)setBannerIsShown:(CPAppBanner*)banner {
     NSMutableArray* shownAppBanners = [self shownAppBanners];
-    [shownAppBanners addObject:bannerId];
+    [shownAppBanners addObject:banner.id];
+
+    if (banner.connectedBanners != nil) {
+        for (NSString *connectedBannerId in banner.connectedBanners) {
+            if ([shownAppBanners containsObject:connectedBannerId]) {
+                continue;
+            }
+            [shownAppBanners addObject:connectedBannerId];
+        }
+    }
+
     [[NSUserDefaults standardUserDefaults] setObject:shownAppBanners forKey:ShownAppBannersDefaultsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -473,6 +480,11 @@ long sessions = 0;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
+        if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
+            [CPLog debug:@"Skipping banner because: already shown"];
+            return;
+        }
+
         if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
             [CPLog debug:@"Skipping banner because: status is draft"];
             return;
@@ -546,7 +558,7 @@ long sessions = 0;
         [appBannerViewController setActionCallback:callbackBlock];
 
         if (banner.frequency == CPAppBannerFrequencyOnce) {
-            [self setBannerIsShown:banner.id];
+            [self setBannerIsShown:banner];
         }
 
         [self presentAppBanner:appBannerViewController banner:banner];

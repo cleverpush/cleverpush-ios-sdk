@@ -18,6 +18,9 @@
         } else {
             self.color = @"#000000";
         }
+        if ([json stringForKey:@"darkColor"] && ![[json stringForKey:@"darkColor"] isEqual:@""]) {
+            self.darkColor = [json stringForKey:@"darkColor"];
+        }
 
         if ([json stringForKey:@"family"] && ![[json stringForKey:@"family"] isEqual:@""]) {
             self.family = [json stringForKey:@"family"];
@@ -27,6 +30,9 @@
             self.background = [json stringForKey:@"background"];
         } else {
             self.background = @"#FFFFFF";
+        }
+        if ([json stringForKey:@"darkBackground"] && ![[json stringForKey:@"darkBackground"] isEqual:@""]) {
+            self.darkBackground = [json stringForKey:@"darkBackground"];
         }
 
         self.size = 18;

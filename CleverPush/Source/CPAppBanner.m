@@ -77,14 +77,25 @@
             screensBlock.blocks = self.blocks;
             [self.screens addObject:screensBlock];
         }
-        
+
         self.languages = [NSMutableArray new];
-        
+
         if ([json objectForKey:@"languages"] != nil) {
             for (NSString *supportedLanguage in [json objectForKey:@"languages"]) {
                 [self.languages addObject:supportedLanguage];
             }
-        } 
+        }
+
+        self.connectedBanners = [NSMutableArray new];
+        if (
+            [json objectForKey:@"connectedBannersEnabled"] != nil
+            && [[json objectForKey:@"connectedBannersEnabled"] isEqual:[NSNumber numberWithBool:true]]
+            && [json objectForKey:@"connectedBanners"] != nil
+        ) {
+            for (NSString *connectedBanner in [json objectForKey:@"connectedBanners"]) {
+                [self.connectedBanners addObject:connectedBanner];
+            }
+        }
 
         if ([[json objectForKey:@"startAt"] isKindOfClass:[NSString class]]) {
             self.startAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"startAt"]];
@@ -141,6 +152,11 @@
             self.multipleScreensEnabled = YES;
         }
 
+        self.darkModeEnabled = NO;
+        if ([[json objectForKey:@"darkModeEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.darkModeEnabled = YES;
+        }
+
         self.marginEnabled = YES;
         if ([json objectForKey:@"marginEnabled"] != nil && ![[json objectForKey:@"marginEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"marginEnabled"] boolValue]) {
             if ([json objectForKey:@"marginEnabled"] == false) {
@@ -178,6 +194,13 @@
         }
     }
     return self;
+}
+
+- (BOOL)darkModeEnabled:(UITraitCollection*)traitCollection {
+    if (@available(iOS 12.0, *)) {
+        return [traitCollection userInterfaceStyle] == UIUserInterfaceStyleDark && self.darkModeEnabled;
+    }
+    return NO;
 }
 
 @end

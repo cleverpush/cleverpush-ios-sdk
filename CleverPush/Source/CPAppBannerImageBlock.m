@@ -1,4 +1,5 @@
 #import "CPAppBannerImageBlock.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPAppBannerImageBlock
 
@@ -7,13 +8,16 @@
     self = [super init];
     if (self) {
         self.type = CPAppBannerBlockTypeImage;
-        
-        if ([json objectForKey:@"imageUrl"]) {
-            self.imageUrl = [json objectForKey:@"imageUrl"];
+
+        if ([json stringForKey:@"imageUrl"]) {
+            self.imageUrl = [json stringForKey:@"imageUrl"];
         }
-        
+        if ([json stringForKey:@"darkImageUrl"] && ![[json stringForKey:@"darkImageUrl"] isEqual:@""]) {
+            self.darkImageUrl = [json stringForKey:@"darkImageUrl"];
+        }
+
         self.action = [[CPAppBannerAction alloc] initWithJson:[json objectForKey:@"action"]];
-        
+
         self.scale = 100;
         if ([json objectForKey:@"scale"] && [[json objectForKey:@"scale"] intValue]) {
             self.scale = [[json objectForKey:@"scale"] intValue];

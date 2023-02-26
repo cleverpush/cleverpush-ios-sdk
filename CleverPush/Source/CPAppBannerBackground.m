@@ -1,4 +1,5 @@
 #import "CPAppBannerBackground.h"
+#import "NSDictionary+SafeExpectations.h"
 
 @implementation CPAppBannerBackground
 
@@ -8,12 +9,20 @@
     if (self) {
         self.dismiss = YES;
         self.color = @"#FFFFFF";
-        
+
         if (json) {
             self.imageUrl = [json objectForKey:@"imageUrl"];
+            if ([json objectForKey:@"darkImageUrl"] != nil) {
+                self.darkImageUrl = [json objectForKey:@"darkImageUrl"];
+            }
+
             if ([json objectForKey:@"color"] != nil) {
                 self.color = [json objectForKey:@"color"];
             }
+            if ([json stringForKey:@"darkColor"] && ![[json stringForKey:@"darkColor"] isEqual:@""]) {
+                self.darkColor = [json stringForKey:@"darkColor"];
+            }
+
             if ([json objectForKey:@"dismiss"] == false) {
                 self.dismiss = NO;
             }

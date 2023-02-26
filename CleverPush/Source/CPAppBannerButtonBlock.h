@@ -10,7 +10,9 @@
 @property (nonatomic, strong) CPAppBannerAction* action;
 @property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *color;
+@property (nonatomic, strong) NSString *darkColor;
 @property (nonatomic, strong) NSString *background;
+@property (nonatomic, strong) NSString *darkBackground;
 @property (nonatomic, strong) NSString *family;
 @property (nonatomic) int size;
 @property (nonatomic) int radius;

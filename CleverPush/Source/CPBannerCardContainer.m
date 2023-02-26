@@ -51,8 +51,16 @@
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
-        if (block.imageUrl != nil && ![block.imageUrl isKindOfClass:[NSNull class]]) {
-            [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:block.imageUrl]callback:^(BOOL callback) {
+
+        NSString *imageUrl;
+        if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkImageUrl != nil) {
+            imageUrl = block.darkImageUrl;
+        } else {
+            imageUrl = block.imageUrl;
+        }
+
+        if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
+            [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
                 if (callback) {
                     [cell setNeedsLayout];
                     [cell layoutIfNeeded];
@@ -68,7 +76,14 @@
         CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
 
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
-        [cell.btnCPBanner setTitleColor:[UIColor colorWithHexString:block.color] forState:UIControlStateNormal];
+
+        UIColor *titleColor;
+        if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
+            titleColor = [UIColor colorWithHexString:block.darkColor];
+        } else {
+            titleColor = [UIColor colorWithHexString:block.color];
+        }
+        [cell.btnCPBanner setTitleColor:titleColor forState:UIControlStateNormal];
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         if ([CPUtils fontFamilyExists:block.family]) {
@@ -91,7 +106,15 @@
                 cell.btnCPBanner.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
                 break;
         }
-        cell.btnCPBanner.backgroundColor = [UIColor colorWithHexString:block.background];
+
+        UIColor *backgroundColor;
+        if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkBackground != nil) {
+            backgroundColor = [UIColor colorWithHexString:block.darkBackground];
+        } else {
+            backgroundColor = [UIColor colorWithHexString:block.background];
+        }
+        cell.btnCPBanner.backgroundColor = backgroundColor;
+
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
@@ -104,11 +127,18 @@
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
-        CPAppBannerTextBlock *block = (CPAppBannerTextBlock*)self.blocks[indexPath.row];
+        CPAppBannerTextBlock *block = (CPAppBannerTextBlock*) self.blocks[indexPath.row];
 
         cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
-        cell.txtCPBanner.textColor = [UIColor colorWithHexString:block.color];
+
+        UIColor *textColor;
+        if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
+            textColor = [UIColor colorWithHexString:block.darkColor];
+        } else {
+            textColor = [UIColor colorWithHexString:block.color];
+        }
+        cell.txtCPBanner.textColor = textColor;
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         if ([CPUtils fontFamilyExists:block.family]) {

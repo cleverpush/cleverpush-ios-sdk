@@ -15,9 +15,13 @@
         }
 
         self.color = @"#000000";
-        if ([json stringForKey:@"color"]) {
+        if ([json stringForKey:@"color"] && ![[json stringForKey:@"family"] isEqual:@""]) {
             self.color = [json stringForKey:@"color"];
         }
+        if ([json stringForKey:@"darkColor"] && ![[json stringForKey:@"darkColor"] isEqual:@""]) {
+            self.darkColor = [json stringForKey:@"darkColor"];
+        }
+
         if ([json stringForKey:@"family"] && ![[json stringForKey:@"family"] isEqual:@""]) {
             self.family = [json stringForKey:@"family"];
         }
