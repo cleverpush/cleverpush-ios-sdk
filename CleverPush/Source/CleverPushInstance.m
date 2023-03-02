@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.25.0";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.25.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1737,100 +1737,26 @@ static id isNil(id object) {
     });
 }
 
+#pragma mark - Remove subscription tag by calling api. subscription/untag
 - (void)removeSubscriptionTag:(NSString*)tagId {
     [self removeSubscriptionTag:tagId callback:nil];
 }
 
-- (void)addSubscriptionTag:(NSString*)tagId {
-    [self addSubscriptionTag:tagId callback:nil];
-}
-
-- (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
-    [self waitForTrackingConsent:^{
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
-
-        if ([subscriptionTags containsObject:tagId]) {
-            if (callback) {
-                callback(tagId);
-            }
-            return;
-        }
-        [self sendSubscriptionTagsToApi:tagId callback:^(NSString *tagId) {
-            if (callback) {
-                callback(tagId);
-            }
-        }];
-    }];
-}
-
-- (void)sendSubscriptionTagsToApi:(NSString*)tagId callback:(void (^)(NSString *))callback {
-    [self getSubscriptionId:^(NSString *subscriptionId) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
-            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     tagId, @"tagId",
-                                     subscriptionId, @"subscriptionId",
-                                     nil];
-
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
-
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                if (!subscriptionTags) {
-                    subscriptionTags = [[NSMutableArray alloc] init];
-                }
-
-                if (![subscriptionTags containsObject:tagId]) {
-                    [subscriptionTags addObject:tagId];
-                }
-                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
-                [userDefaults synchronize];
-
-                if (callback) {
-                    callback(tagId);
-                }
-            } onFailure:nil];
-        });
-    }];
-}
-
-#pragma mark - Live Activity
-- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
-    [self startLiveActivity:activityId pushToken:token onSuccess:nil onFailure:nil];
-}
-- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    if (subscriptionId != nil) {
-        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 activityId, @"iosLiveActivityId",
-                                 token, @"iosLiveActivityToken",
-                                 subscriptionId, @"subscriptionId",
-                                 nil];
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        } onFailure:^(NSError* error) {
-            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
-        }];
-    }
-}
-
-#pragma mark - Remove subscription tag by calling api. subscription/untag
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
+    [self removeSubscriptionTag:tagId callback:callback onFailure:nil];
+}
+
+- (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self waitForTrackingConsent:^{
-        [self removeSubscriptionTagsFromApi:tagId callback:^(NSString *tag) {
+        [self removeSubscriptionTagFromApi:tagId callback:^(NSString *tag) {
             if (callback) {
                 callback(tagId);
             }
-        }];
+        } onFailure:failureBlock];
     }];
 }
 
-- (void)removeSubscriptionTagsFromApi:(NSString *)tagId callback:(void (^)(NSString *))callback {
+- (void)removeSubscriptionTagFromApi:(NSString *)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString *subscriptionId) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
@@ -1858,9 +1784,101 @@ static id isNil(id object) {
                 if (callback) {
                     callback(tagId);
                 }
-            } onFailure:nil];
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"Error removing subscription tag: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
         });
     }];
+}
+
+- (void)addSubscriptionTag:(NSString*)tagId {
+    [self addSubscriptionTag:tagId callback:nil];
+}
+
+- (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback {
+    [self addSubscriptionTag:tagId callback:callback onFailure:nil];
+}
+
+- (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self waitForTrackingConsent:^{
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
+
+        if ([subscriptionTags containsObject:tagId]) {
+            if (callback) {
+                callback(tagId);
+            }
+            return;
+        }
+        [self addSubscriptionTagToApi:tagId callback:^(NSString *tagId) {
+            if (callback) {
+                callback(tagId);
+            }
+        } onFailure:failureBlock];
+    }];
+}
+
+- (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self getSubscriptionId:^(NSString *subscriptionId) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     tagId, @"tagId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                if (!subscriptionTags) {
+                    subscriptionTags = [[NSMutableArray alloc] init];
+                }
+
+                if (![subscriptionTags containsObject:tagId]) {
+                    [subscriptionTags addObject:tagId];
+                }
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback(tagId);
+                }
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"Error adding subscription tag: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
+}
+
+#pragma mark - Live Activity
+- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
+    [self startLiveActivity:activityId pushToken:token onSuccess:nil onFailure:nil];
+}
+- (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    if (subscriptionId != nil) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 activityId, @"iosLiveActivityId",
+                                 token, @"iosLiveActivityToken",
+                                 subscriptionId, @"subscriptionId",
+                                 nil];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        } onFailure:^(NSError* error) {
+            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+        }];
+    }
 }
 
 #pragma mark - Set subscription attribute tag by calling api. subscription/attribute
@@ -2172,7 +2190,15 @@ static id isNil(id object) {
     return subscriptionTopics ? YES : NO;
 }
 
+- (void)addSubscriptionTopic:(NSString*)topicId {
+    [self addSubscriptionTopic:topicId callback:nil];
+}
+
 - (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
+    [self addSubscriptionTopic:topicId callback:callback onFailure:nil];
+}
+
+- (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString* subscriptionId) {
         NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
         if ([topics containsObject:topicId]) {
@@ -2200,16 +2226,25 @@ static id isNil(id object) {
                 if (callback) {
                     callback(topicId);
                 }
-            } onFailure:nil];
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"Failed adding subscription topic %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
         });
     }];
 }
 
-- (void)addSubscriptionTopic:(NSString*)topicId {
-    [self addSubscriptionTopic:topicId callback:nil];
+- (void)removeSubscriptionTopic:(NSString*)topicId {
+    [self removeSubscriptionTopic:topicId callback:nil];
 }
 
 - (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
+    [self removeSubscriptionTopic:topicId callback:callback onFailure:nil];
+}
+
+- (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString* subscriptionId) {
         NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
         if (![topics containsObject:topicId]) {
@@ -2237,13 +2272,14 @@ static id isNil(id object) {
                 if (callback) {
                     callback(topicId);
                 }
-            } onFailure:nil];
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"Failed removing subscription topic %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
         });
     }];
-}
-
-- (void)removeSubscriptionTopic:(NSString*)topicId {
-    [self removeSubscriptionTopic:topicId callback:nil];
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"

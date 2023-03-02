@@ -1,3 +1,6 @@
+## 1.25.1
+* Added optional `onFailure` callbacks for `addSubscriptionTag`, `removeSubscriptionTag`, `addSubscriptionTopic` and `removeSubscriptionTopic`
+
 ## 1.25.0
 * Support app banner dark mode settings + connected banners (see app banner settings in CleverPush for more information)
 

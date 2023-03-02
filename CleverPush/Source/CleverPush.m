@@ -181,10 +181,32 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
-    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
-        callback(callbackInner);
-    }];
++ (void)addSubscriptionTopic:(NSString*)topicId {
+    [self.CPSharedInstance addSubscriptionTopic:topicId];
+}
+
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
+    [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
+}
+
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback onFailure:failureBlock];
+}
+
++ (void)removeSubscriptionTopic:(NSString*)topicId {
+    [self.CPSharedInstance removeSubscriptionTopic:topicId];
+}
+
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
+    [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback];
+}
+
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback onFailure:failureBlock];
+}
+
++ (void)addSubscriptionTag:(NSString*)tagId {
+    [self.CPSharedInstance addSubscriptionTag:tagId];
 }
 
 + (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
@@ -193,26 +215,25 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString *callbackInner) {
+        callback(callbackInner);
+    } onFailure:failureBlock];
+}
+
 + (void)addSubscriptionTags:(NSArray*)tagIds {
     [self.CPSharedInstance addSubscriptionTags:tagIds];
 }
 
-+ (void)addSubscriptionTag:(NSString*)tagId {
-    [self.CPSharedInstance addSubscriptionTag:tagId];
-}
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback];
-}
-
-+ (void)removeSubscriptionTopic:(NSString*)topicId {
-    [self.CPSharedInstance removeSubscriptionTopic:topicId];
-}
-
-+ (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
-    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
++ (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
+    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
         callback(callbackInner);
     }];
+}
+
++ (void)removeSubscriptionTag:(NSString*)tagId {
+    [self.CPSharedInstance removeSubscriptionTag:tagId];
 }
 
 + (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
@@ -221,12 +242,20 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString *callbackInner) {
+        callback(callbackInner);
+    } onFailure:failureBlock];
+}
+
 + (void)removeSubscriptionTags:(NSArray*)tagIds {
     [self.CPSharedInstance removeSubscriptionTags:tagIds];
 }
 
-+ (void)removeSubscriptionTag:(NSString*)tagId {
-    [self.CPSharedInstance removeSubscriptionTag:tagId];
++ (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
+    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
+        callback(callbackInner);
+    }];
 }
 
 + (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
@@ -285,14 +314,6 @@ static CleverPush* singleInstance = nil;
 
 + (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock {
     [self.CPSharedInstance setTopicsChangedListener:changedBlock];
-}
-
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
-}
-
-+ (void)addSubscriptionTopic:(NSString*)topicId {
-    [self.CPSharedInstance addSubscriptionTopic:topicId];
 }
 
 + (void)setSubscriptionTopics:(NSMutableArray *)topics {
