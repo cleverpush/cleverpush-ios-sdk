@@ -392,18 +392,15 @@ long sessions = 0;
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
     BOOL conditionTrue = NO;
-    [CPLog info:@"checkEventTriggerCondition"];
 
     for (NSDictionary* triggeredEvent in events) {
         if (![[triggeredEvent stringForKey:@"id"] isEqualToString:condition.event]) {
-            [CPLog info:@"checkEventTriggerCondition continue 1"];
             continue;
         }
 
         conditionTrue = YES;
 
         if (condition.eventProperties == nil || condition.eventProperties.count == 0) {
-            [CPLog info:@"checkEventTriggerCondition continue 2"];
             continue;
         }
 
@@ -412,11 +409,7 @@ long sessions = 0;
             NSString *propertyValue = [properties stringForKey:eventProperty.property];
             NSString *comparePropertyValue = eventProperty.value;
 
-            [CPLog info:@"checkEventTriggerCondition propertyValue %@", propertyValue];
-            [CPLog info:@"checkEventTriggerCondition comparePropertyValue %@", comparePropertyValue];
-            [CPLog info:@"checkEventTriggerCondition relation %@", eventProperty.relation];
             BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue compareWith:comparePropertyValue relation:eventProperty.relation isAllowed:YES compareWithFrom:comparePropertyValue compareWithTo:comparePropertyValue];
-            [CPLog info:@"checkEventTriggerCondition eventPropertiesMatching %@", eventPropertiesMatching ? @"yes" : @"no"];
             if (!eventPropertiesMatching) {
                 return NO;
             }
