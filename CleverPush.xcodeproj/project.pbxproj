@@ -106,6 +106,9 @@
 		296068A125744665002159D0 /* CPAspectKeepImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2960688F2574452B002159D0 /* CPAspectKeepImageView.m */; };
 		296068AC25744C89002159D0 /* CPAppBannerAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 296068AA25744C89002159D0 /* CPAppBannerAction.m */; };
 		296068B625744C92002159D0 /* CPAppBannerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 296068B525744C92002159D0 /* CPAppBannerAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2965AF3D29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */; };
+		2965AF3E29B7E4EA00D52B75 /* CPAppBannerTriggerConditionEventProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 2965AF3B29B7E4A100D52B75 /* CPAppBannerTriggerConditionEventProperty.h */; };
+		2965AF3F29B7E4F100D52B75 /* CPAppBannerTriggerConditionEventProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */; };
 		29660B8C2693A591001231C8 /* UIImageView+CleverPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676B42572CF790002E9F1 /* UIImageView+CleverPush.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29660B8D2693A5BF001231C8 /* CPWKWebView.h in Headers */ = {isa = PBXBuildFile; fileRef = CB8129ED267B6F3B002B8A3D /* CPWKWebView.h */; };
 		29660B8E2693A5DD001231C8 /* CPWKWebView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB8129EE267B6F3B002B8A3D /* CPWKWebView.m */; };
@@ -409,6 +412,8 @@
 		2960688F2574452B002159D0 /* CPAspectKeepImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAspectKeepImageView.m; sourceTree = "<group>"; };
 		296068AA25744C89002159D0 /* CPAppBannerAction.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerAction.m; sourceTree = "<group>"; };
 		296068B525744C92002159D0 /* CPAppBannerAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerAction.h; sourceTree = "<group>"; };
+		2965AF3B29B7E4A100D52B75 /* CPAppBannerTriggerConditionEventProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerTriggerConditionEventProperty.h; sourceTree = "<group>"; };
+		2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerTriggerConditionEventProperty.m; sourceTree = "<group>"; };
 		2969757824C0FD8F009563C6 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		296A132425BE124900A2BEED /* CPNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPNotification.h; sourceTree = "<group>"; };
 		296A132E25BE125900A2BEED /* CPSubscription.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPSubscription.h; sourceTree = "<group>"; };
@@ -815,6 +820,8 @@
 				295640422588230E00FE7611 /* CPAppBannerTriggerCondition.h */,
 				2956402C258822F000FE7611 /* CPAppBannerTriggerCondition.m */,
 				29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */,
+				2965AF3B29B7E4A100D52B75 /* CPAppBannerTriggerConditionEventProperty.h */,
+				2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */,
 				295640002588224100FE7611 /* CPAppBannerTriggerType.h */,
 				298676F62572D08B0002E9F1 /* CPAppBannerType.h */,
 				18B5BD83283FB14C0046577F /* CPFilterRelationType.h */,
@@ -1022,6 +1029,7 @@
 				CBA989B52679D675003DE995 /* CPWidgetDisplay.h in Headers */,
 				CB73FFAA272C44640099B648 /* CPAppBannerViewController.h in Headers */,
 				29D71E792380743000C48ACA /* CPChatView.h in Headers */,
+				2965AF3E29B7E4EA00D52B75 /* CPAppBannerTriggerConditionEventProperty.h in Headers */,
 				2960687325743748002159D0 /* UIColor+HexString.h in Headers */,
 				2906A0992585546F0078FD61 /* CPAppBannerModule.h in Headers */,
 				2906A149258557B20078FD61 /* CPAppBannerBlockType.h in Headers */,
@@ -1288,6 +1296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2965AF3F29B7E4F100D52B75 /* CPAppBannerTriggerConditionEventProperty.m in Sources */,
 				CBA1906A26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCF05252B670A00F5185E /* DWAlertViewActionButton.m in Sources */,
 				29DB578923D75C8A0040E823 /* CPiCarousel.m in Sources */,
@@ -1414,6 +1423,7 @@
 				CBA9898D2679D553003DE995 /* CPWidgetsStories.m in Sources */,
 				CBA989B82679D68A003DE995 /* CPStoryView.m in Sources */,
 				291FCD242525DC2800F5185E /* DWAlertController.m in Sources */,
+				2965AF3D29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m in Sources */,
 				CBA9899C2679D59A003DE995 /* CPStoryContentPreview.m in Sources */,
 				291FCD2F2525DC2800F5185E /* DWAlertPresentationController.m in Sources */,
 				296A135725BE16C100A2BEED /* CPChannelTopic.m in Sources */,

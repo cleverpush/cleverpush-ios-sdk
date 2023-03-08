@@ -16,7 +16,7 @@ NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
 NSMutableArray* pendingBannerListeners;
-NSMutableDictionary *events;
+NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 
 BOOL initialized = NO;
@@ -50,9 +50,14 @@ long sessions = 0;
 }
 
 #pragma mark - load the events
-- (void)triggerEvent:(NSString *)key value:(NSString *)value {
+- (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
     if ([self getEvents] != nil) {
-        [self setEventsValueForKey:value key:key];
+        [events addObject:@{
+            @"id": eventId,
+            @"properties": properties ?: [NSDictionary new]
+        }];
+    } else {
+        [CPLog debug:@"triggerEvent - events are nil"];
     }
     [self startup];
 }
@@ -149,7 +154,7 @@ long sessions = 0;
     [self setPendingBannerListeners:[NSMutableArray new]];
     [self setActiveBanners:[NSMutableArray new]];
     [self setPendingBanners:[NSMutableArray new]];
-    [self setEvents:[NSMutableDictionary new]];
+    [self setEvents:[NSMutableArray new]];
     [self loadBannersDisabled];
     [self updateShowDraftsFlag:showDraftsParam];
     [self setSessions:[self getSessions]];
@@ -385,6 +390,42 @@ long sessions = 0;
     return allowed;
 }
 
+- (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
+    BOOL conditionTrue = NO;
+    [CPLog info:@"checkEventTriggerCondition"];
+
+    for (NSDictionary* triggeredEvent in events) {
+        if (![[triggeredEvent stringForKey:@"id"] isEqualToString:condition.event]) {
+            [CPLog info:@"checkEventTriggerCondition continue 1"];
+            continue;
+        }
+
+        conditionTrue = YES;
+
+        if (condition.eventProperties == nil || condition.eventProperties.count == 0) {
+            [CPLog info:@"checkEventTriggerCondition continue 2"];
+            continue;
+        }
+
+        NSDictionary *properties = (NSDictionary*) [triggeredEvent objectForKey:@"properties"];
+        for (CPAppBannerTriggerConditionEventProperty* eventProperty in condition.eventProperties) {
+            NSString *propertyValue = [properties stringForKey:eventProperty.property];
+            NSString *comparePropertyValue = eventProperty.value;
+
+            [CPLog info:@"checkEventTriggerCondition propertyValue %@", propertyValue];
+            [CPLog info:@"checkEventTriggerCondition comparePropertyValue %@", comparePropertyValue];
+            [CPLog info:@"checkEventTriggerCondition relation %@", eventProperty.relation];
+            BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue compareWith:comparePropertyValue relation:eventProperty.relation isAllowed:YES compareWithFrom:comparePropertyValue compareWithTo:comparePropertyValue];
+            [CPLog info:@"checkEventTriggerCondition eventPropertiesMatching %@", eventPropertiesMatching ? @"yes" : @"no"];
+            if (!eventPropertiesMatching) {
+                return NO;
+            }
+        }
+    }
+
+    return conditionTrue;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     for (CPAppBanner* banner in banners) {
@@ -408,9 +449,8 @@ long sessions = 0;
                         } else {
                             conditionTrue = sessions > condition.sessions;
                         }
-                    } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && events != nil) {
-                        NSString *event = [events objectForKey:condition.key];
-                        conditionTrue = event != nil && [event isEqualToString:condition.value];
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
+                        conditionTrue = [self checkEventTriggerCondition:condition];
                     } else {
                         conditionTrue = NO;
                     }
@@ -709,14 +749,15 @@ long sessions = 0;
     pendingBanners = banners;
 }
 
-- (void)setEvents:(NSMutableDictionary*)event {
+- (void)setEvents:(NSMutableArray<NSDictionary*>*)event {
     events = event;
 }
 
-- (void)setEventsValueForKey:(NSString*)value key:(NSString*)key{
+- (void)setEventsValueForKey:(NSString*)value key:(NSString*)key {
     [events setValue:value forKey:key];
 }
-- (NSMutableDictionary*)getEvents {
+
+- (NSMutableArray<NSDictionary*>*)getEvents {
     return events;
 }
 

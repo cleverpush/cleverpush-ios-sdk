@@ -33,8 +33,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 }
 
 #pragma mark - load the events
-+ (void)triggerEvent:(NSString *)key value:(NSString *)value {
-    [self.moduleInstance triggerEvent:key value:value];
++ (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
+    [self.moduleInstance triggerEvent:eventId properties:properties];
 }
 
 #pragma mark - Show banners by channel-id and banner-id

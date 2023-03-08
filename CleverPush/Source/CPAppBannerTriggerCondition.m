@@ -17,23 +17,26 @@
                 self.type = CPAppBannerTriggerConditionTypeDuration;
             }
         }
-        
-        if ([json objectForKey:@"key"] && [[json objectForKey:@"key"] isKindOfClass:[NSString class]]) {
-            self.key = [json objectForKey:@"key"];
+
+        if ([json objectForKey:@"event"] && [[json objectForKey:@"event"] isKindOfClass:[NSString class]]) {
+            self.event = [json objectForKey:@"event"];
         }
-        
-        if ([json objectForKey:@"value"] && [[json objectForKey:@"value"] isKindOfClass:[NSString class]]) {
-            self.value = [json objectForKey:@"value"];
+
+        self.eventProperties = [NSMutableArray new];
+        if ([json objectForKey:@"eventProperties"] != nil) {
+            for (NSDictionary *eventPropertyJson in [json objectForKey:@"eventProperties"]) {
+                [self.eventProperties addObject:[[CPAppBannerTriggerConditionEventProperty alloc] initWithJson:eventPropertyJson]];
+            }
         }
-        
+
         if ([json objectForKey:@"operator"] && [[json objectForKey:@"operator"] isKindOfClass:[NSString class]]) {
             self.relation = [json objectForKey:@"operator"];
         }
-        
+
         if ([json objectForKey:@"sessions"]) {
             self.sessions = [[json objectForKey:@"sessions"] intValue];
         }
-        
+
         if ([json objectForKey:@"seconds"]) {
             self.seconds = [[json objectForKey:@"seconds"] intValue];
         }

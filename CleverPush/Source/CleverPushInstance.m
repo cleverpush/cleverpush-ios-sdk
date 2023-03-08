@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.25.1";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.26.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -2450,10 +2450,18 @@ static id isNil(id object) {
 }
 
 - (void)trackEvent:(NSString*)eventName {
-    return [self trackEvent:eventName amount:nil];
+    return [self trackEvent:eventName properties:nil];
 }
 
+
 - (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount {
+    NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys:
+                             isNil(amount), @"amount",
+                             nil];
+    return [self trackEvent:eventName properties:properties];
+}
+
+- (void)trackEvent:(NSString*)eventName properties:(NSDictionary*)properties {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             NSArray* channelEvents = [channelConfig arrayForKey:@"channelEvents"];
@@ -2480,7 +2488,7 @@ static id isNil(id object) {
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
                                          eventId, @"eventId",
-                                         isNil(amount), @"amount",
+                                         isNil(properties), @"properties",
                                          subscriptionId, @"subscriptionId",
                                          nil];
 
@@ -2491,6 +2499,8 @@ static id isNil(id object) {
 
                 } onFailure:nil];
             }];
+
+            [CPAppBannerModule triggerEvent:eventId properties:properties];
         }];
     });
 }
@@ -3090,10 +3100,6 @@ static id isNil(id object) {
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
-- (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value {
-    [CPAppBannerModule triggerEvent:key value:value];
-}
-
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
@@ -3125,6 +3131,7 @@ static id isNil(id object) {
         return NO;
     }
 }
+
 #pragma mark - refactor for testcases
 - (NSString*)getChannelIdFromBundle {
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:CLEVERPUSH_CHANNEL_ID_KEY];

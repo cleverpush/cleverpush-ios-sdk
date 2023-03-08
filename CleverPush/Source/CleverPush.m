@@ -404,6 +404,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance trackEvent:eventName amount:amount];
 }
 
++ (void)trackEvent:(NSString*)eventName properties:(NSDictionary*)properties {
+    [self.CPSharedInstance trackEvent:eventName properties:properties];
+}
+
 + (void)triggerFollowUpEvent:(NSString*)eventName {
     [self.CPSharedInstance triggerFollowUpEvent:eventName];
 }
@@ -438,10 +442,6 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance getAppBanners:channelId callback:^(NSArray *callbackInner) {
         callback(callbackInner);
     }];
-}
-
-+ (void)triggerAppBannerEvent:(NSString *)key value:(NSString *)value {
-    [self.CPSharedInstance triggerAppBannerEvent:key value:value];
 }
 
 + (void)setApiEndpoint:(NSString*)apiEndpoint {
