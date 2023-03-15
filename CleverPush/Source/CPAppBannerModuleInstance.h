@@ -67,7 +67,7 @@
 - (void)setPendingBannerListeners:(NSMutableArray*)listeners;
 - (void)setActiveBanners:(NSMutableArray*)banners;
 - (void)setPendingBanners:(NSMutableArray*)banners;
-- (void)setEvents:(NSMutableDictionary*)event;
+- (void)setEvents:(NSMutableArray<NSDictionary*>*)event;
 - (void)updateShowDraftsFlag:(BOOL)value;
 - (void)updateInitialisedFlag:(BOOL)value;
 - (BOOL)isInitialized;

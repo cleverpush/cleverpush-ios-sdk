@@ -391,18 +391,16 @@ long sessions = 0;
 }
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
-    BOOL conditionTrue = NO;
-
     for (NSDictionary* triggeredEvent in events) {
         if (![[triggeredEvent stringForKey:@"id"] isEqualToString:condition.event]) {
             continue;
         }
 
-        conditionTrue = YES;
-
         if (condition.eventProperties == nil || condition.eventProperties.count == 0) {
-            continue;
+            return YES;
         }
+
+        BOOL conditionTrue = YES;
 
         NSDictionary *properties = (NSDictionary*) [triggeredEvent objectForKey:@"properties"];
         for (CPAppBannerTriggerConditionEventProperty* eventProperty in condition.eventProperties) {
@@ -411,12 +409,17 @@ long sessions = 0;
 
             BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue compareWith:comparePropertyValue relation:eventProperty.relation isAllowed:YES compareWithFrom:comparePropertyValue compareWithTo:comparePropertyValue];
             if (!eventPropertiesMatching) {
-                return NO;
+                conditionTrue = NO;
+                break;
             }
+        }
+
+        if (conditionTrue) {
+            return YES;
         }
     }
 
-    return conditionTrue;
+    return NO;
 }
 
 #pragma mark - Create banners based on conditional attributes within the objects
