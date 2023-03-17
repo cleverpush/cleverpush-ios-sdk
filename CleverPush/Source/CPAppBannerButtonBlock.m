@@ -9,7 +9,6 @@
         self.type = CPAppBannerBlockTypeButton;
 
         self.text = @"";
-        self.isButtonClicked = false;
         if ([json stringForKey:@"text"]) {
             self.text = [json stringForKey:@"text"];
         }

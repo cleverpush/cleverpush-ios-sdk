@@ -555,7 +555,10 @@ long sessions = 0;
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             CPAppBannerCarouselBlock *screens = [[CPAppBannerCarouselBlock alloc] init];
             CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
+            CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
+            NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
+            NSString *type;
             
             for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                 if (!screensList.isScreenClicked) {
@@ -566,17 +569,33 @@ long sessions = 0;
             for (CPAppBannerBlock *bannerBlock in screens.blocks) {
                 if (bannerBlock.type == CPAppBannerBlockTypeButton) {
                     [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
+                    [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
                 }
             }
             for (CPAppBannerButtonBlock *button in buttonBlocks) {
                 if ([button.id isEqualToString:action.blockId]) {
                     buttons = (CPAppBannerButtonBlock*)button;
+                    type = @"button";
+                    break;
+                }
+            }
+            for (CPAppBannerImageBlock *image in imageBlocks) {
+                if ([image.id isEqualToString:action.blockId]) {
+                    images = (CPAppBannerImageBlock*)image;
+                    type = @"image";
                     break;
                 }
             }
             
-            if (screens != nil && buttons != nil) {
-                [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forBlock:buttons];
+            if ([type isEqualToString:@"button"]) {
+                if (screens != nil && buttons != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:buttons forImageBlock:nil blockType:type];
+                }
+            } else if ([type isEqualToString:@"image"]) {
+                if (screens != nil && images != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:nil forImageBlock:images blockType:type];
+                }
             }
 
             if (handleBannerOpened && action) {
@@ -657,11 +676,11 @@ long sessions = 0;
             [appBannerViewController onDismiss];
         });
     }
-    [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forBlock:nil];
+    [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
-- (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forBlock:(CPAppBannerButtonBlock*)block {
+- (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
     if (!trackingEnabled) {
         [CPLog debug:@"sendBannerEvent: not sending event because tracking has been disabled."];
         return;
@@ -690,19 +709,30 @@ long sessions = 0;
     }
     
     if ([event isEqualToString:@"clicked"]) {
-        if (block != nil) {
-            if (block.id != nil) {
-                [dataDic setObject:block.id forKey:@"blockId"];
+        if ([type isEqualToString:@"button"]) {
+            if (block != nil) {
+                if (block.id != nil) {
+                    [dataDic setObject:block.id forKey:@"blockId"];
+                }
+                if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
+                    [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                }
             }
-            if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
-                [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+        } else  if ([type isEqualToString:@"image"]) {
+            if (image != nil) {
+                if (image.id != nil) {
+                    [dataDic setObject:image.id forKey:@"blockId"];
+                }
+                if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
+                    [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                }
             }
         }
+        
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-            block.isButtonClicked = true;
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
