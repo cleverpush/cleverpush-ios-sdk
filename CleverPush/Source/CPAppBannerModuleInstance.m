@@ -68,8 +68,8 @@ long sessions = 0;
 }
 
 #pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [self getBanners:channelId bannerId:bannerId notificationId:notificationId completion:^(NSMutableArray<CPAppBanner *> *banners) {
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId{
+    [self getBanners:channelId bannerId:bannerId notificationId:notificationId categoryId:categoryId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
                 if ([self getBannersDisabled]) {
@@ -171,11 +171,11 @@ long sessions = 0;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [self getBanners:channelId bannerId:nil notificationId:nil completion:callback];
+    [self getBanners:channelId bannerId:nil notificationId:nil categoryId:nil completion:callback];
 }
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
-- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
     if (notificationId == nil) {
         [pendingBannerListeners addObject:callback];
         if ([self getPendingBannerRequest]) {
@@ -196,7 +196,17 @@ long sessions = 0;
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSArray *jsonBanners = [result objectForKey:@"banners"];
+        NSMutableArray *jsonBanners = [[NSMutableArray alloc]init];
+        if(categoryId != nil && ![categoryId isEqualToString:@""]) {
+            for(NSDictionary *json in [result objectForKey:@"banners"]) {
+                if([json objectForKey:@"categoryID"] != nil && [[json objectForKey:@"categoryID"] isEqualToString:categoryId]) {
+                    [jsonBanners addObject:json];
+                }
+            }
+        } else {
+            jsonBanners = [[result objectForKey:@"banners"] mutableCopy];
+        }
+        
         if (jsonBanners != nil) {
             [self setBanners:[NSMutableArray new]];
             for (NSDictionary* json in jsonBanners) {

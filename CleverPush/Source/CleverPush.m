@@ -444,6 +444,12 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)getAppBannersByCategory:(NSString*)categoryId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
+    [self.CPSharedInstance getAppBannersByCategory:categoryId callback:^(NSArray *callbackInner) {
+        callback(callbackInner);
+    }];
+}
+
 + (void)setApiEndpoint:(NSString*)apiEndpoint {
     [self.CPSharedInstance setApiEndpoint:apiEndpoint];
 }

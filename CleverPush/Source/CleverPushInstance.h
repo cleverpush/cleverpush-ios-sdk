@@ -161,6 +161,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)increaseSessionVisits;
 - (void)showAppBanner:(NSString*)bannerId;
 - (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray <CPAppBanner*>*))callback;
+- (void)getAppBannersByCategory:(NSString*)categoryId callback:(void(^)(NSArray <CPAppBanner*>*))callback;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

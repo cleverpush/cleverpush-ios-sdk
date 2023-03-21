@@ -40,7 +40,7 @@
 - (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit;
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification;
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
-- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
+- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner;
 - (void)createBanners:(NSMutableArray*)banners;
 - (void)scheduleBanners;
