@@ -47,6 +47,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnTopConstraints;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControllTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerTraillingConstraint;
 
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;

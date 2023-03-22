@@ -21,7 +21,15 @@
 #pragma mark - Custom UI Functions
 - (void)conditionalPresentation {
     if (![self.data carouselEnabled] && [self.data.contentType isEqualToString:@"html"]) {
-        [self initWithHTMLBanner:self.data];
+        if (self.data.multipleScreensEnabled == true) {
+            if (self.data.screens.count > 0) {
+                if ([self.data.screens objectAtIndex:0].content != nil && ![[self.data.screens objectAtIndex:0].content isEqualToString:@""]) {
+                    [self composeHTML:[self.data.screens objectAtIndex:0].content];
+                }
+            }
+        } else {
+            [self initWithHTMLBanner:self.data];
+        }
         [self contentVisibility:true background:true htmlContent:false];
     } else {
         [self initWithBanner:self.data];
@@ -335,6 +343,12 @@
                 } else {
                     self.popupHeight.constant = height;
                     self.webBannerHeight.constant = height;
+                    if (self.data.type == CPAppBannerTypeFull) {
+                        self.webBannerLeadingConstraint.constant = 0;
+                        self.webBannerTraillingConstraint.constant = 0;
+                        self.popupHeight.constant = UIScreen.mainScreen.bounds.size.height;
+                        self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
+                    }
                 }
             }
         }];
