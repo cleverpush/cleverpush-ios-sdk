@@ -301,20 +301,34 @@
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:self name:@"close"];
+    [userController addScriptMessageHandler:self name:@"subscribe"];
+    [userController addScriptMessageHandler:self name:@"unsubscribe"];
+    [userController addScriptMessageHandler:self name:@"closeBanner"];
+    [userController addScriptMessageHandler:self name:@"trackEvent"];
+    [userController addScriptMessageHandler:self name:@"setSubscriptionAttribute"];
+    [userController addScriptMessageHandler:self name:@"addSubscriptionTag"];
+    [userController addScriptMessageHandler:self name:@"removeSubscriptionTag"];
+    [userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
+    [userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
+    [userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
+    [userController addScriptMessageHandler:self name:@"trackClick"];
+    [userController addScriptMessageHandler:self name:@"openWebView"];
     config.userContentController = userController;
 
+    self.webBanner = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:config];
     self.webBanner.scrollView.scrollEnabled = true;
     self.webBanner.scrollView.bounces = false;
     self.webBanner.allowsBackForwardNavigationGestures = false;
     self.webBanner.contentMode = UIViewContentModeScaleToFill;
     self.webBanner.navigationDelegate = self;
     self.webBanner.layer.cornerRadius = 15.0;
-
+    [self.view addSubview:self.webBanner];
+    
     if ([content containsString:@"</body></html>"]) {
         content = [content stringByReplacingOccurrencesOfString:@"</body></html>" withString:@""];
     }
 
-    NSString *script = @"<script type=\"text/javascript\">var keyword = 'close';function onCloseClick() {try {window.webkit.messageHandlers.close.postMessage(null);} catch (error) {console.log('Caught error on closeBTN click', error);}}var elemsWithId = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.id && item.id.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}var elemsWithClass = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.className && item.className.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}</script>";
+    NSString *script = @"<script type=\"text/javascript\">var keyword = 'close';function onCloseClick() {try {window.webkit.messageHandlers.close.postMessage(null);} catch (error) {console.log('Caught error on closeBTN click', error);}}var elemsWithId = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.id && item.id.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}var elemsWithClass = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.className && item.className.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}; if (typeof window.CleverPush === 'undefined') { window.CleverPush = {}; };                                                                                           window.CleverPush.subscribe = function subscribe(){ window.webkit.messageHandlers.subscribe.postMessage(null) };                                                                            window.CleverPush.unsubscribe = function unsubscribe(){ window.webkit.messageHandlers.unsubscribe.postMessage(null) };                                                   window.CleverPush.closeBanner = function closeBanner(){ window.webkit.messageHandlers.closeBanner.postMessage(null) };                                               window.CleverPush.trackEvent = function trackEvent(ID, properties){ window.webkit.messageHandlers.trackEvent.postMessage({eventId:ID, properties:properties}) };                             window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value){ window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({attributeKey:attributeId, attributeValue:value}) };                                                                     window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId){ window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId) };         window.CleverPush.removeSubscriptionTag = function removeSubscriptionTag(tagId){ window.webkit.messageHandlers.removeSubscriptionTag.postMessage(tagId) };                                  window.CleverPush.setSubscriptionTopics = function setSubscriptionTopics(topicIds){ window.webkit.messageHandlers.setSubscriptionTopics.postMessage(topicIds) }; window.CleverPush.addSubscriptionTopic = function addSubscriptionTopic(topicId){ window.webkit.messageHandlers.addSubscriptionTopic.postMessage(topicId) };  window.CleverPush.removeSubscriptionTopic = function removeSubscriptionTopic(topicId){ window.webkit.messageHandlers.removeSubscriptionTopic.postMessage(topicId) };  window.CleverPush.openWebView = function openWebView(url){ window.webkit.messageHandlers.openWebView.postMessage(url) };                                               window.CleverPush.trackClick = function trackClick(ID, properties){ window.webkit.messageHandlers.trackClick.postMessage({buttonId:ID, properties:properties}) };                                                                               </script>";
     NSString *bodyText = @"</body></html>";
     NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, bodyText];
 
@@ -327,8 +341,42 @@
 #pragma mark - UIWebView Delgate Method
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
-    if ([message.name isEqualToString:@"close"]) {
-        [self onDismiss];
+    if (message != nil && message.body != nil && message.name != nil) {
+        if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
+            [self onDismiss];
+        } else if ([message.name isEqualToString:@"subscribe"]) {
+            [CleverPush subscribe];
+        } else if ([message.name isEqualToString:@"unsubscribe"]) {
+            [CleverPush unsubscribe];
+        } else if ([message.name isEqualToString:@"trackEvent"]) {
+            [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
+        } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
+            [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
+        } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
+            [CleverPush addSubscriptionTag:message.body];
+        } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
+            [CleverPush removeSubscriptionTag:message.body];
+        } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
+            [CleverPush setSubscriptionTopics:message.body];
+        } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
+            [CleverPush addSubscriptionTopic:message.body];
+        } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
+            [CleverPush removeSubscriptionTopic:message.body];
+        } else if ([message.name isEqualToString:@"trackClick"]) {
+            CPAppBannerAction* action;
+            NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
+            buttonBlockDic = [message.body mutableCopy];
+            buttonBlockDic[@"bannerAction"] = @"type";
+            action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
+            [self actionCallback:action];
+        } else if ([message.name isEqualToString:@"openWebView"]) {
+            NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
+            if (webUrl && webUrl.scheme && webUrl.host) {
+                [CPUtils openSafari:webUrl dismissViewController:CleverPush.topViewController];
+            }
+        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
+            [CleverPush showTopicsDialog];
+        }
     }
 }
 
@@ -353,6 +401,11 @@
             }
         }];
     }];
+}
+
+#pragma mark - Callback event for tracking clicks
+- (void)actionCallback:(CPAppBannerAction*)action{
+    self.actionCallback(action);
 }
 
 #pragma mark - Animations
