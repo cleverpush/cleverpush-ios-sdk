@@ -197,9 +197,9 @@ long sessions = 0;
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
+        
         if (groupId != nil && ![groupId isEqualToString:@""]) {
-            NSString *expression=[NSString stringWithFormat:@"SELF contains '%@'",groupId];
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:expression];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'",groupId]];
             jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
         } else {
             jsonBanners = [[result objectForKey:@"banners"] mutableCopy];

@@ -3090,7 +3090,7 @@ static id isNil(id object) {
     }];
 }
 
-- (void)getAppBannersByCategory:(NSString*)groupId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
+- (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
     [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil groupId:groupId completion:^(NSMutableArray<CPAppBanner*> *banners) {
         callback(banners);
     }];
