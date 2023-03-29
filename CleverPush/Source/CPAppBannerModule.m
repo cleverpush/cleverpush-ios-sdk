@@ -88,8 +88,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 }
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
-+ (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [self.moduleInstance getBanners:channelId bannerId:bannerId notificationId:notificationId categoryId:categoryId completion:callback];
++ (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    [self.moduleInstance getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:groupId completion:callback];
 }
 
 #pragma mark - check the banner triggering allowed or not.

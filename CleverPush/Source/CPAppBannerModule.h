@@ -28,7 +28,7 @@
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
-+ (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
++ (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 + (void)presentAppBanner:(UIViewController*)controller banner:(CPAppBanner*)banner;
 + (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit;
 + (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties;

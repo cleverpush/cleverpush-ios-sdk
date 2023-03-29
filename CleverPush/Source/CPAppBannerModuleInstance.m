@@ -68,8 +68,8 @@ long sessions = 0;
 }
 
 #pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId{
-    [self getBanners:channelId bannerId:bannerId notificationId:notificationId categoryId:categoryId completion:^(NSMutableArray<CPAppBanner *> *banners) {
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId{
+    [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:groupId completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
                 if ([self getBannersDisabled]) {
@@ -171,11 +171,11 @@ long sessions = 0;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [self getBanners:channelId bannerId:nil notificationId:nil categoryId:nil completion:callback];
+    [self getBanners:channelId bannerId:nil notificationId:nil groupId:nil completion:callback];
 }
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
-- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId categoryId:(NSString*)categoryId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
     if (notificationId == nil) {
         [pendingBannerListeners addObject:callback];
         if ([self getPendingBannerRequest]) {
@@ -197,8 +197,8 @@ long sessions = 0;
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
-        if (categoryId != nil && ![categoryId isEqualToString:@""]) {
-            NSString *expression=[NSString stringWithFormat:@"SELF contains '%@'",categoryId];
+        if (groupId != nil && ![groupId isEqualToString:@""]) {
+            NSString *expression=[NSString stringWithFormat:@"SELF contains '%@'",groupId];
             NSPredicate *predicate = [NSPredicate predicateWithFormat:expression];
             jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
         } else {

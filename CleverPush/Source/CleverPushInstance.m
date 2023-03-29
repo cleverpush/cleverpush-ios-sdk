@@ -3085,13 +3085,13 @@ static id isNil(id object) {
 }
 
 - (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
-    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil categoryId:nil completion:^(NSMutableArray<CPAppBanner*> *banners) {
+    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil groupId:nil completion:^(NSMutableArray<CPAppBanner*> *banners) {
         callback(banners);
     }];
 }
 
-- (void)getAppBannersByCategory:(NSString*)categoryId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
-    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil categoryId:categoryId completion:^(NSMutableArray<CPAppBanner*> *banners) {
+- (void)getAppBannersByCategory:(NSString*)groupId callback:(void(^)(NSArray <CPAppBanner*>*))callback {
+    [CPAppBannerModule getBanners:channelId bannerId:nil notificationId:nil groupId:groupId completion:^(NSMutableArray<CPAppBanner*> *banners) {
         callback(banners);
     }];
 }
