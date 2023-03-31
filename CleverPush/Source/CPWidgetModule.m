@@ -11,9 +11,9 @@
 + (void)getWidgetsStories:(NSString*)widgetId completion:(void(^)(CPWidgetsStories *))callback {
     NSString* widgetsPath = [NSString stringWithFormat:@"story-widget/%@/config", widgetId];
     if ([CleverPush isDevelopmentModeEnabled]) {
-        widgetsPath = [NSString stringWithFormat:@"%@&t=%f", widgetsPath, NSDate.date.timeIntervalSince1970];
+        widgetsPath = [NSString stringWithFormat:@"%@?t=%f", widgetsPath, NSDate.date.timeIntervalSince1970];
     }
-    
+
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:widgetsPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
@@ -27,5 +27,5 @@
         [CPLog error:@"Failed getting widgets stories %@", error];
     }];
 }
-@end
 
+@end
