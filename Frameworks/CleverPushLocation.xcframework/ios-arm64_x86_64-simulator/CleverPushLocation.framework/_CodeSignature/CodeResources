@@ -6,7 +6,7 @@
 	<dict>
 		<key>Frameworks/CleverPush.framework/CPAppBannerViewController.nib</key>
 		<data>
-		cylKpGIcFWvei+he9qmOUVCBc6Y=
+		7ZOCVcdrthmM2Wj90wyCAwvb2uo=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		42NgztzmDHIXw3fZtyLnd79hwrI=
+		1a9yCUScp1cJow8IjBwy2pNsfQ0=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		62wfRmxUuWfryyxhzGbDpR0vq9I=
+		V5Depf7QMLbJ+00484WzKcl/gDk=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -62,7 +62,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		wyxDvncSckTxxbVGJkvj4krKe1I=
+		TGlfEoUmTBGdBbZFBTjTfkyKgWs=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -83,11 +83,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			cylKpGIcFWvei+he9qmOUVCBc6Y=
+			7ZOCVcdrthmM2Wj90wyCAwvb2uo=
 			</data>
 			<key>hash2</key>
 			<data>
-			JQ76gWhssscsioZFRBdMJh/yedXlAZQK25Le2lE1mNM=
+			n05pUBLSG2Bcfw6xvOrBZaKKVqK7JKtF90yeOBpW8KY=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
@@ -193,11 +193,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			42NgztzmDHIXw3fZtyLnd79hwrI=
+			1a9yCUScp1cJow8IjBwy2pNsfQ0=
 			</data>
 			<key>hash2</key>
 			<data>
-			pJe+DEgLqYj7i4fcC0XvmsOmRs6W4qjAnDij82Y85IU=
+			PXWWljQhopktRacM7ukPr0OCrOTjE8tH6V9ANu27+uw=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
@@ -215,11 +215,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			62wfRmxUuWfryyxhzGbDpR0vq9I=
+			V5Depf7QMLbJ+00484WzKcl/gDk=
 			</data>
 			<key>hash2</key>
 			<data>
-			p/9bMU3quWXCeRaWQ48nT87WJBmpu7eGS8894UFt8Mo=
+			VviTuGILS12OXVHNj7xv64KeQwD5z47jykSN48sZcoM=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -237,11 +237,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wyxDvncSckTxxbVGJkvj4krKe1I=
+			TGlfEoUmTBGdBbZFBTjTfkyKgWs=
 			</data>
 			<key>hash2</key>
 			<data>
-			7fOK5GXv50RV6lmet3zFTDLbJG5Bog9o3hCLkwJCYGs=
+			O4dtC+l2/iy7pO3kih9G4qZV3HL9odVDRvzsdz8rTP4=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>

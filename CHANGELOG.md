@@ -1,3 +1,6 @@
+## 1.26.2
+* Optimizations for HTML app banners
+
 ## 1.26.1
 * Fixed logic for app banner conditions when using properties
 

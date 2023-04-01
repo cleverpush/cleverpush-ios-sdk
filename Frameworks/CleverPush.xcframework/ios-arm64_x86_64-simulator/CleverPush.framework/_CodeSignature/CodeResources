@@ -6,7 +6,7 @@
 	<dict>
 		<key>CPAppBannerViewController.nib</key>
 		<data>
-		cylKpGIcFWvei+he9qmOUVCBc6Y=
+		7ZOCVcdrthmM2Wj90wyCAwvb2uo=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
@@ -46,7 +46,7 @@
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
-		Nr1v8SLBmrIcaSq8dcBP1uBL+JM=
+		7yZI01geudViJZTJOc+f58zxBgI=
 		</data>
 		<key>Headers/CPChannelTag.h</key>
 		<data>
@@ -126,7 +126,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		WN6GGXHh5acqvLaA0PPiabUGJOM=
+		gG8FFU+kUEoNk+wBjol4xHVYEIE=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -134,7 +134,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		wyxDvncSckTxxbVGJkvj4krKe1I=
+		TGlfEoUmTBGdBbZFBTjTfkyKgWs=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -159,11 +159,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			cylKpGIcFWvei+he9qmOUVCBc6Y=
+			7ZOCVcdrthmM2Wj90wyCAwvb2uo=
 			</data>
 			<key>hash2</key>
 			<data>
-			JQ76gWhssscsioZFRBdMJh/yedXlAZQK25Le2lE1mNM=
+			n05pUBLSG2Bcfw6xvOrBZaKKVqK7JKtF90yeOBpW8KY=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
@@ -269,11 +269,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Nr1v8SLBmrIcaSq8dcBP1uBL+JM=
+			7yZI01geudViJZTJOc+f58zxBgI=
 			</data>
 			<key>hash2</key>
 			<data>
-			0vOuUQ1buKgDYbwbKu6CBbfB29nQf/gJt01JwVpyhrg=
+			cqVVkWrwc3g5pbO7QpJvyH45YeF+3JFF58wxzEWSFbM=
 			</data>
 		</dict>
 		<key>Headers/CPChannelTag.h</key>
@@ -489,11 +489,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			WN6GGXHh5acqvLaA0PPiabUGJOM=
+			gG8FFU+kUEoNk+wBjol4xHVYEIE=
 			</data>
 			<key>hash2</key>
 			<data>
-			Ib4e4417U6uiGSELO+9bj7Rw01ZhLTrpc49Uzv8Ccc4=
+			hiTtU+5myE97g1Yo3vzLcuU60FIcYiIociq1DWOsyT8=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -511,11 +511,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wyxDvncSckTxxbVGJkvj4krKe1I=
+			TGlfEoUmTBGdBbZFBTjTfkyKgWs=
 			</data>
 			<key>hash2</key>
 			<data>
-			7fOK5GXv50RV6lmet3zFTDLbJG5Bog9o3hCLkwJCYGs=
+			O4dtC+l2/iy7pO3kih9G4qZV3HL9odVDRvzsdz8rTP4=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
