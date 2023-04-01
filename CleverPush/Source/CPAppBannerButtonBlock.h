@@ -14,6 +14,7 @@
 @property (nonatomic, strong) NSString *background;
 @property (nonatomic, strong) NSString *darkBackground;
 @property (nonatomic, strong) NSString *family;
+@property (nonatomic, strong) NSString *id;
 @property (nonatomic) int size;
 @property (nonatomic) int radius;
 

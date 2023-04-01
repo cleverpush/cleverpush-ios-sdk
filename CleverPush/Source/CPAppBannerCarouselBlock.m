@@ -10,6 +10,8 @@
 
         self.blocks = [NSMutableArray new];
         self.content = [json objectForKey:@"content"];
+        self.isScreenClicked = NO;
+
         if ([json objectForKey:@"blocks"] != nil) {
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {
                 CPAppBannerBlock* block;

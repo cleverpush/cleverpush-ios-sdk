@@ -16,12 +16,20 @@
             self.darkImageUrl = [json stringForKey:@"darkImageUrl"];
         }
 
-        self.action = [[CPAppBannerAction alloc] initWithJson:[json objectForKey:@"action"]];
-
         self.scale = 100;
         if ([json objectForKey:@"scale"] && [[json objectForKey:@"scale"] intValue]) {
             self.scale = [[json objectForKey:@"scale"] intValue];
         }
+        
+        self.id = @"";
+        if ([json objectForKey:@"id"]) {
+            self.id = [json objectForKey:@"id"];
+        }
+        
+        NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
+        buttonBlockDic = [[json objectForKey:@"action"] mutableCopy];
+        buttonBlockDic[@"blockId"] = self.id;
+        self.action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
     }
     return self;
 }

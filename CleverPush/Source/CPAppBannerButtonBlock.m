@@ -47,12 +47,20 @@
             self.alignment = CPAppBannerAlignmentLeft;
         }
 
-        self.action = [[CPAppBannerAction alloc] initWithJson:[json objectForKey:@"action"]];
-
         self.radius = 0;
         if ([json objectForKey:@"radius"]) {
             self.radius = [[json objectForKey:@"radius"] intValue];
         }
+        
+        self.id = @"";
+        if ([json objectForKey:@"id"]) {
+            self.id = [json objectForKey:@"id"];
+        }
+        
+        NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
+        buttonBlockDic = [[json objectForKey:@"action"] mutableCopy];
+        buttonBlockDic[@"blockId"] = self.id;
+        self.action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
     }
     return self;
 }
