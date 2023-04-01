@@ -1,4 +1,5 @@
 #import "CPAppBannerViewController.h"
+#import "CPLog.h"
 
 @interface CPAppBannerViewController()
 @end
@@ -20,31 +21,27 @@
 
 #pragma mark - Custom UI Functions
 - (void)conditionalPresentation {
-    if (![self.data carouselEnabled] && [self.data.contentType isEqualToString:@"html"]) {
-        if (self.data.multipleScreensEnabled == true) {
-            if (self.data.screens.count > 0) {
-                if ([self.data.screens objectAtIndex:0].content != nil && ![[self.data.screens objectAtIndex:0].content isEqualToString:@""]) {
-                    [self composeHTML:[self.data.screens objectAtIndex:0].content];
-                }
-            }
-        } else {
-            [self initWithHTMLBanner:self.data];
-        }
-        [self contentVisibility:true background:true htmlContent:false];
+    if ([self.data.contentType isEqualToString:@"html"]) {
+        [self initWithHTMLBanner:self.data];
+        [self setContentVisibility:true];
+        [self setDynamicBannerConstraints:NO];
     } else {
         [self initWithBanner:self.data];
         [self delagates];
-        [self contentVisibility:false background:false htmlContent:true];
+        [self setContentVisibility:false];
+        [self setDynamicBannerConstraints:self.data.marginEnabled];
+        [self setDynamicCloseButton:self.data.closeButtonEnabled];
     }
-    [self setDynamicBannerConstraints:self.data.marginEnabled];
-    [self setDynamicCloseButton:self.data.closeButtonEnabled];
 }
 
 #pragma mark - dynamic hide and shows the layer of the view heirarchy.
-- (void)contentVisibility:(BOOL)collection background:(BOOL)background htmlContent:(BOOL)htmlContent {
-    self.cardCollectionView.hidden = collection;
-    self.backGroundImage.hidden = background;
-    self.webBanner.hidden = htmlContent;
+- (void)setContentVisibility:(BOOL)isHtml {
+    self.cardCollectionView.hidden = isHtml;
+    self.backGroundImage.hidden = isHtml;
+    self.bannerContainer.hidden = isHtml;
+    self.btnClose.hidden = isHtml;
+    self.pageControl.hidden = isHtml;
+    self.webView.hidden = !isHtml;
 }
 
 #pragma mark - native delegates and registration of the nib.
@@ -150,7 +147,7 @@
     }
     self.bottomConstraint.constant = 34;
     self.leadingConstraint.constant = 25;
-    self.trailingConstraint.constant = 25;
+    self.trailingConstraint.constant = -25;
     [self.bannerContainer.layer setCornerRadius:15.0];
     [self.bannerContainer.layer setMasksToBounds:YES];
     self.pageControllTopConstraint.constant = 3;
@@ -298,8 +295,8 @@
 
 #pragma mark - compose HTML Banner
 - (void)composeHTML:(NSString*)content {
-    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc]init];
-    WKUserContentController* userController = [[WKUserContentController alloc]init];
+    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+    WKUserContentController* userController = [[WKUserContentController alloc] init];
     [userController addScriptMessageHandler:self name:@"close"];
     [userController addScriptMessageHandler:self name:@"subscribe"];
     [userController addScriptMessageHandler:self name:@"unsubscribe"];
@@ -311,30 +308,100 @@
     [userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
     [userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
     [userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
+    [userController addScriptMessageHandler:self name:@"showTopicsDialog"];
     [userController addScriptMessageHandler:self name:@"trackClick"];
     [userController addScriptMessageHandler:self name:@"openWebView"];
     config.userContentController = userController;
 
-    self.webBanner = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:config];
-    self.webBanner.scrollView.scrollEnabled = true;
-    self.webBanner.scrollView.bounces = false;
-    self.webBanner.allowsBackForwardNavigationGestures = false;
-    self.webBanner.contentMode = UIViewContentModeScaleToFill;
-    self.webBanner.navigationDelegate = self;
-    self.webBanner.layer.cornerRadius = 15.0;
-    [self.view addSubview:self.webBanner];
-    
-    if ([content containsString:@"</body></html>"]) {
-        content = [content stringByReplacingOccurrencesOfString:@"</body></html>" withString:@""];
+    self.webView = [[WKWebView alloc] initWithFrame:UIScreen.mainScreen.bounds configuration:config];
+    self.webView.scrollView.scrollEnabled = true;
+    self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    self.webView.scrollView.bounces = false;
+    self.webView.allowsBackForwardNavigationGestures = false;
+    self.webView.contentMode = UIViewContentModeScaleToFill;
+    self.webView.navigationDelegate = self;
+    self.webView.backgroundColor = [UIColor clearColor];
+    self.webView.scrollView.backgroundColor = [UIColor redColor];
+    self.webView.opaque = false;
+    self.webView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
+
+    [self.view addSubview:self.webView];
+
+    // remove </body> and </html> which will get added later again
+    if ([content containsString:@"</body>"]) {
+        content = [content stringByReplacingOccurrencesOfString:@"</body>" withString:@""];
+    }
+    if ([content containsString:@"</html>"]) {
+        content = [content stringByReplacingOccurrencesOfString:@"</html>" withString:@""];
     }
 
-    NSString *script = @"<script type=\"text/javascript\">var keyword = 'close';function onCloseClick() {try {window.webkit.messageHandlers.close.postMessage(null);} catch (error) {console.log('Caught error on closeBTN click', error);}}var elemsWithId = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.id && item.id.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}var elemsWithClass = document.getElementsByTagName(\"*\"), item;for (var i = 0, len = elemsWithId.length; i < len; i++) {item = elemsWithId[i];if (item.className && item.className.indexOf(\"close\") == 0) {item.addEventListener('click', onCloseClick);}}; if (typeof window.CleverPush === 'undefined') { window.CleverPush = {}; };                                                                                           window.CleverPush.subscribe = function subscribe(){ window.webkit.messageHandlers.subscribe.postMessage(null) };                                                                            window.CleverPush.unsubscribe = function unsubscribe(){ window.webkit.messageHandlers.unsubscribe.postMessage(null) };                                                   window.CleverPush.closeBanner = function closeBanner(){ window.webkit.messageHandlers.closeBanner.postMessage(null) };                                               window.CleverPush.trackEvent = function trackEvent(ID, properties){ window.webkit.messageHandlers.trackEvent.postMessage({eventId:ID, properties:properties}) };                             window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value){ window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({attributeKey:attributeId, attributeValue:value}) };                                                                     window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId){ window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId) };         window.CleverPush.removeSubscriptionTag = function removeSubscriptionTag(tagId){ window.webkit.messageHandlers.removeSubscriptionTag.postMessage(tagId) };                                  window.CleverPush.setSubscriptionTopics = function setSubscriptionTopics(topicIds){ window.webkit.messageHandlers.setSubscriptionTopics.postMessage(topicIds) }; window.CleverPush.addSubscriptionTopic = function addSubscriptionTopic(topicId){ window.webkit.messageHandlers.addSubscriptionTopic.postMessage(topicId) };  window.CleverPush.removeSubscriptionTopic = function removeSubscriptionTopic(topicId){ window.webkit.messageHandlers.removeSubscriptionTopic.postMessage(topicId) };  window.CleverPush.openWebView = function openWebView(url){ window.webkit.messageHandlers.openWebView.postMessage(url) };                                               window.CleverPush.trackClick = function trackClick(ID, properties){ window.webkit.messageHandlers.trackClick.postMessage({buttonId:ID, properties:properties}) };                                                                               </script>";
-    NSString *bodyText = @"</body></html>";
-    NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, bodyText];
+    NSString *script = @"\
+    <script>\
+        /*function onCloseClick() {\
+            try {\
+                window.webkit.messageHandlers.close.postMessage(null);\
+            } catch (error) {\
+                console.log('Caught error on closeBTN click', error);\
+            }\
+        }\
+        var closeElements = document.getElementsByTagName(\"*\");\
+        for (var i = 0, len = closeElements.length; i < len; i++) {\
+            var item = closeElements[i];\
+            if (item.id && item.id.indexOf && item.id.indexOf(\"close\") == 0 || item.className && item.className.indexOf && item.className.indexOf(\"close\") == 0) {\
+                item.addEventListener('click', onCloseClick);\
+            }\
+        }*/\
+        if (typeof window.CleverPush === 'undefined') {\
+            window.CleverPush = {};\
+        }\
+        window.CleverPush.subscribe = function subscribe() {\
+            window.webkit.messageHandlers.subscribe.postMessage(null);\
+        };\
+        window.CleverPush.unsubscribe = function unsubscribe() {\
+            window.webkit.messageHandlers.unsubscribe.postMessage(null);\
+        };\
+        window.CleverPush.closeBanner = function closeBanner() {\
+            window.webkit.messageHandlers.closeBanner.postMessage(null);\
+        };\
+        window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
+            window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
+        };\
+        window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
+            window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
+        };\
+        window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId) {\
+            window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId);\
+        };\
+        window.CleverPush.removeSubscriptionTag = function removeSubscriptionTag(tagId) {\
+            window.webkit.messageHandlers.removeSubscriptionTag.postMessage(tagId);\
+        };\
+        window.CleverPush.setSubscriptionTopics = function setSubscriptionTopics(topicIds) {\
+            window.webkit.messageHandlers.setSubscriptionTopics.postMessage(topicIds);\
+        };\
+        window.CleverPush.addSubscriptionTopic = function addSubscriptionTopic(topicId) {\
+            window.webkit.messageHandlers.addSubscriptionTopic.postMessage(topicId);\
+        };\
+        window.CleverPush.removeSubscriptionTopic = function removeSubscriptionTopic(topicId) {\
+            window.webkit.messageHandlers.removeSubscriptionTopic.postMessage(topicId);\
+        };\
+        window.CleverPush.showTopicsDialog = function showTopicsDialog() {\
+            window.webkit.messageHandlers.showTopicsDialog.postMessage(null);\
+        };\
+        window.CleverPush.openWebView = function openWebView(url) {\
+            window.webkit.messageHandlers.openWebView.postMessage(url);\
+        };\
+        window.CleverPush.trackClick = function trackClick(ID, properties) {\
+            window.webkit.messageHandlers.trackClick.postMessage({ buttonId: ID, properties: properties });\
+        };\
+    </script>";
+
+    NSString *closingBodyHtmlTag = @"</body></html>";
+    NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, closingBodyHtmlTag];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
-        [self.webBanner loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+        [self.webView loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
     });
 }
 
@@ -362,6 +429,8 @@
             [CleverPush addSubscriptionTopic:message.body];
         } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
             [CleverPush removeSubscriptionTopic:message.body];
+        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
+            [CleverPush showTopicsDialog];
         } else if ([message.name isEqualToString:@"trackClick"]) {
             CPAppBannerAction* action;
             NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
@@ -374,33 +443,23 @@
             if (webUrl && webUrl.scheme && webUrl.host) {
                 [CPUtils openSafari:webUrl dismissViewController:CleverPush.topViewController];
             }
-        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
-            [CleverPush showTopicsDialog];
         }
     }
 }
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        [webView evaluateJavaScript:@"document.body.scrollHeight" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-            CGFloat height = [result floatValue];
-            if (webView == self.webBanner) {
-                if (height > UIScreen.mainScreen.bounds.size.height) {
-                    self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
-                    self.webBannerHeight.constant = [CPUtils frameHeightWithoutSafeArea];
-                } else {
-                    self.popupHeight.constant = height;
-                    self.webBannerHeight.constant = height;
-                    if (self.data.type == CPAppBannerTypeFull) {
-                        self.webBannerLeadingConstraint.constant = 0;
-                        self.webBannerTraillingConstraint.constant = 0;
-                        self.popupHeight.constant = UIScreen.mainScreen.bounds.size.height;
-                        self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
-                    }
-                }
-            }
-        }];
-    }];
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    if (navigationAction.targetFrame && !navigationAction.targetFrame.isMainFrame) {
+        decisionHandler(WKNavigationActionPolicyAllow);
+        return;
+    }
+
+    if ([navigationAction.request.URL.absoluteString isEqualToString:@"about:blank"] || [navigationAction.request.URL.absoluteString isEqualToString:@"about:blank%23"]) {
+        decisionHandler(WKNavigationActionPolicyAllow);
+        return;
+    }
+
+    decisionHandler(WKNavigationActionPolicyCancel);
+    [[UIApplication sharedApplication] openURL:navigationAction.request.URL];
 }
 
 #pragma mark - Callback event for tracking clicks

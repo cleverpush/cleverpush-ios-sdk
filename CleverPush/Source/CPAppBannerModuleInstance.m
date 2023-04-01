@@ -68,8 +68,8 @@ long sessions = 0;
 }
 
 #pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId{
-    [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:groupId completion:^(NSMutableArray<CPAppBanner *> *banners) {
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
+    [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
                 if ([self getBannersDisabled]) {
@@ -604,6 +604,10 @@ long sessions = 0;
         if (banner.frequency == CPAppBannerFrequencyOnce) {
             [self setBannerIsShown:banner];
         }
+
+        // remove banner so it will not show again this session
+        [banners removeObject:banner];
+        [activeBanners removeObject:banner];
 
         [self presentAppBanner:appBannerViewController banner:banner];
     });

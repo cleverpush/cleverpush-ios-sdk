@@ -159,11 +159,9 @@
             self.darkModeEnabled = YES;
         }
 
-        self.marginEnabled = YES;
-        if ([json objectForKey:@"marginEnabled"] != nil && ![[json objectForKey:@"marginEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"marginEnabled"] boolValue]) {
-            if ([json objectForKey:@"marginEnabled"] == false) {
-                self.marginEnabled = NO;
-            }
+        self.marginEnabled = NO;
+        if ([[json objectForKey:@"marginEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.marginEnabled = YES;
         }
 
         self.closeButtonEnabled = NO;

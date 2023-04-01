@@ -24,10 +24,8 @@
                 <outlet property="topConstraint" destination="9ng-cm-mdZ" id="WRR-wc-SX0"/>
                 <outlet property="trailingConstraint" destination="aPi-J1-MG0" id="3X2-7w-Pbp"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="nJc-Zy-lIx"/>
-                <outlet property="webBanner" destination="UcH-Vj-ipE" id="yrb-Jj-faw"/>
                 <outlet property="webBannerHeight" destination="Sy9-gp-kDZ" id="jxZ-73-b01"/>
-                <outlet property="webBannerLeadingConstraint" destination="OSv-h9-gwP" id="LuZ-n8-hKb"/>
-                <outlet property="webBannerTraillingConstraint" destination="9CJ-tg-XNd" id="krz-70-JAn"/>
+                <outlet property="webView" destination="UcH-Vj-ipE" id="Ai4-12-F3Y"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -43,14 +41,14 @@
                     </connections>
                 </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MUU-Pe-ICL">
-                    <rect key="frame" x="25" y="44" width="364" height="818"/>
+                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                     <subviews>
                         <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Cyo-o7-W9S">
-                            <rect key="frame" x="0.0" y="0.0" width="364" height="818"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         </imageView>
                         <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" bouncesZoom="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="52o-O1-DCC">
-                            <rect key="frame" x="0.0" y="0.0" width="364" height="818"/>
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="YZ7-Ii-f51">
                                 <size key="itemSize" width="128" height="128"/>
@@ -59,22 +57,37 @@
                                 <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                             </collectionViewFlowLayout>
                         </collectionView>
+                        <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UcH-Vj-ipE">
+                            <rect key="frame" x="0.0" y="384" width="414" height="50"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="Sy9-gp-kDZ"/>
+                            </constraints>
+                            <wkWebViewConfiguration key="configuration">
+                                <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                <wkPreferences key="preferences"/>
+                            </wkWebViewConfiguration>
+                        </wkWebView>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="52o-O1-DCC" secondAttribute="bottom" id="1gj-3x-Pud"/>
                         <constraint firstAttribute="height" constant="818" id="51d-Zu-Lus"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="centerY" secondItem="MUU-Pe-ICL" secondAttribute="centerY" id="6Yq-Ee-aSR"/>
                         <constraint firstItem="52o-O1-DCC" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="8B1-Uq-FKe"/>
                         <constraint firstItem="Cyo-o7-W9S" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="K4c-lt-Kl9"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="leading" secondItem="MUU-Pe-ICL" secondAttribute="leading" id="Ptg-gQ-t56"/>
                         <constraint firstAttribute="bottom" secondItem="Cyo-o7-W9S" secondAttribute="bottom" id="Ujm-e8-B9M"/>
                         <constraint firstAttribute="trailing" secondItem="52o-O1-DCC" secondAttribute="trailing" id="Ylj-4d-ZDH"/>
                         <constraint firstAttribute="trailing" secondItem="Cyo-o7-W9S" secondAttribute="trailing" id="faf-RT-z4x"/>
                         <constraint firstItem="52o-O1-DCC" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" id="oiP-I0-WrN"/>
                         <constraint firstItem="Cyo-o7-W9S" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" id="rMf-dl-tIP"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="centerX" secondItem="MUU-Pe-ICL" secondAttribute="centerX" id="vkK-HA-lLf"/>
+                        <constraint firstItem="UcH-Vj-ipE" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" id="zFs-G0-EVg"/>
                     </constraints>
                 </view>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1xX-fz-waW">
-                    <rect key="frame" x="325" y="64" width="44" height="44"/>
+                    <rect key="frame" x="370" y="64" width="44" height="44"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="44" id="4G0-bb-2mR"/>
                         <constraint firstAttribute="height" constant="44" id="Qqf-4c-aH7"/>
@@ -85,17 +98,6 @@
                         <action selector="btnClose:" destination="-1" eventType="touchUpInside" id="0QU-Ed-EvC"/>
                     </connections>
                 </button>
-                <wkWebView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UcH-Vj-ipE">
-                    <rect key="frame" x="25" y="423" width="364" height="50"/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="50" id="Sy9-gp-kDZ"/>
-                    </constraints>
-                    <wkWebViewConfiguration key="configuration">
-                        <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                        <wkPreferences key="preferences"/>
-                    </wkWebViewConfiguration>
-                </wkWebView>
                 <pageControl opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" hidesForSinglePage="YES" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="kLE-T5-04L">
                     <rect key="frame" x="149" y="865" width="116.5" height="20"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -116,21 +118,18 @@
             <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstItem="UcH-Vj-ipE" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="15u-ci-oA8"/>
                 <constraint firstItem="Fq8-yd-VF1" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="4Cn-ef-Olj"/>
                 <constraint firstItem="1xX-fz-waW" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="top" constant="20" id="4Sw-DF-3BQ"/>
-                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="UcH-Vj-ipE" secondAttribute="trailing" constant="25" id="9CJ-tg-XNd"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="44" identifier="topNotch" id="9ng-cm-mdZ"/>
-                <constraint firstItem="UcH-Vj-ipE" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="25" id="OSv-h9-gwP"/>
-                <constraint firstItem="MUU-Pe-ICL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="25" id="TS0-sf-eSN"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="TS0-sf-eSN"/>
                 <constraint firstItem="Fq8-yd-VF1" firstAttribute="trailing" secondItem="Q5M-cg-NOt" secondAttribute="trailing" id="TzE-Oh-IKQ"/>
-                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="25" id="aPi-J1-MG0"/>
+                <constraint firstItem="MUU-Pe-ICL" firstAttribute="trailing" secondItem="Q5M-cg-NOt" secondAttribute="trailing" id="aPi-J1-MG0"/>
                 <constraint firstItem="kLE-T5-04L" firstAttribute="top" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="3" id="bhS-yn-aSv"/>
                 <constraint firstAttribute="bottom" secondItem="Fq8-yd-VF1" secondAttribute="bottom" id="c5O-UG-fqz"/>
                 <constraint firstItem="kLE-T5-04L" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="d4Q-Hy-89c"/>
                 <constraint firstItem="Fq8-yd-VF1" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="gk7-o3-z9K"/>
                 <constraint firstItem="MUU-Pe-ICL" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="hzI-rQ-9FU"/>
-                <constraint firstItem="1xX-fz-waW" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" constant="-20" id="l1Q-aE-Rig"/>
+                <constraint firstItem="1xX-fz-waW" firstAttribute="trailing" secondItem="MUU-Pe-ICL" secondAttribute="trailing" id="l1Q-aE-Rig"/>
                 <constraint firstAttribute="bottom" secondItem="MUU-Pe-ICL" secondAttribute="bottom" constant="34" identifier="bottomNotch" id="rre-Iy-Udo"/>
             </constraints>
             <point key="canvasLocation" x="-436.23188405797106" y="41.517857142857139"/>
