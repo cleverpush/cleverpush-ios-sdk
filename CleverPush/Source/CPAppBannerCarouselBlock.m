@@ -9,6 +9,7 @@
         self.id = [json objectForKey:@"id"];
 
         self.blocks = [NSMutableArray new];
+        self.content = [json objectForKey:@"content"];
         if ([json objectForKey:@"blocks"] != nil) {
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {
                 CPAppBannerBlock* block;

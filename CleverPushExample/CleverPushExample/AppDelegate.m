@@ -8,6 +8,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [CleverPush enableDevelopmentMode];
     [CleverPush initWithLaunchOptions:launchOptions
       channelId:@"YOUR_CHANNEL_ID_HERE"
       handleNotificationOpened:^(CPNotificationOpenedResult *result) {

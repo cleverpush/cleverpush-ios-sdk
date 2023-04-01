@@ -17,6 +17,7 @@
 @interface CPAppBannerCarouselBlock : NSObject
 
 @property (nonatomic, strong) NSString *id;
+@property (nonatomic, strong) NSString *content;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 
 - (id)initWithJson:(NSDictionary*)json;

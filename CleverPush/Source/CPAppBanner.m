@@ -11,8 +11,10 @@
         self.id = [json stringForKey:@"_id"];
         self.channel = [json stringForKey:@"channel"];
         self.name = [json stringForKey:@"name"];
-        self.HTMLContent = [json stringForKey:@"content"];
         self.contentType = [json stringForKey:@"contentType"];
+        if ([self.contentType isEqualToString:@"html"]) {
+            self.HTMLContent = [json stringForKey:@"content"];
+        }
         self.appVersionFilterRelation = [json stringForKey:@"appVersionFilterRelation"];
         self.appVersionFilterValue = [json stringForKey:@"appVersionFilterValue"];
         self.fromVersion = [json stringForKey:@"fromVersion"];
@@ -157,11 +159,9 @@
             self.darkModeEnabled = YES;
         }
 
-        self.marginEnabled = YES;
-        if ([json objectForKey:@"marginEnabled"] != nil && ![[json objectForKey:@"marginEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"marginEnabled"] boolValue]) {
-            if ([json objectForKey:@"marginEnabled"] == false) {
-                self.marginEnabled = NO;
-            }
+        self.marginEnabled = NO;
+        if ([[json objectForKey:@"marginEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.marginEnabled = YES;
         }
 
         self.closeButtonEnabled = NO;

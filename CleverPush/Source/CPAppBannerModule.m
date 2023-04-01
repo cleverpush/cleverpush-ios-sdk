@@ -116,8 +116,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance presentAppBanner:appBannerViewController banner:banner];
 }
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
-+ (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner {
-    [self.moduleInstance sendBannerEvent:event forBanner:banner];
++ (void)sendBannerEvent:(NSString*)event customAttributes:(NSDictionary*)attributes forBanner:(CPAppBanner*)banner {
+    [self.moduleInstance sendBannerEvent:event customAttributes:attributes forBanner:banner];
 }
 
 #pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)

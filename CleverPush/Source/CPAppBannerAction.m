@@ -52,6 +52,10 @@
         if ([json objectForKey:@"attributeValue"] && [[json objectForKey:@"attributeValue"] isKindOfClass:[NSString class]]) {
             self.attributeValue = [json objectForKey:@"attributeValue"];
         }
+        
+        if ([json objectForKey:@"bannerAction"] && [[json objectForKey:@"bannerAction"] isKindOfClass:[NSString class]] && [[json objectForKey:@"bannerAction"] isEqualToString:@"html"]) {
+            self.customData = [json mutableCopy];
+        }
 
     }
     return self;

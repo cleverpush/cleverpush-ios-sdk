@@ -11,6 +11,7 @@
 @property (nonatomic, strong) NSArray *topics;
 @property (nonatomic, strong) NSString *attributeId;
 @property (nonatomic, strong) NSString *attributeValue;
+@property (nonatomic, strong) NSDictionary *customData;
 @property (nonatomic) BOOL dismiss;
 @property (nonatomic) BOOL openInWebview;
 @property (nonatomic) BOOL openBySystem;
