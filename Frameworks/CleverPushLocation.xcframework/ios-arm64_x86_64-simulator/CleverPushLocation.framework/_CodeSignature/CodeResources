@@ -6,7 +6,7 @@
 	<dict>
 		<key>Frameworks/CleverPush.framework/CPAppBannerViewController.nib</key>
 		<data>
-		7ZOCVcdrthmM2Wj90wyCAwvb2uo=
+		+o68eNH7A8vvWp8P8UUgDXAgI1E=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
-		KwQ+rDS/mC26DdwFGEG6+JeumPY=
+		DP3bBadNjKsHoAY30y+OWLIMa8I=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
 		<data>
@@ -46,15 +46,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		1a9yCUScp1cJow8IjBwy2pNsfQ0=
+		gPxJ2CC9zP2D0oYKbv7Qjaz/oN4=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		LKCHn4ReZQV1QJ9fBqcONWdNhas=
+		1wgY6Ykzy4EtRSRm5D4n4wWG0Rc=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		V5Depf7QMLbJ+00484WzKcl/gDk=
+		pbYHAE5yz5QxonKU4fsXEbSBrNs=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		4RaNqIPzoN6m35R2HqLOCgOP188=
+		/k/kBAWYYGAhGPSJD9I9bZIzSQE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -83,11 +83,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			7ZOCVcdrthmM2Wj90wyCAwvb2uo=
+			+o68eNH7A8vvWp8P8UUgDXAgI1E=
 			</data>
 			<key>hash2</key>
 			<data>
-			n05pUBLSG2Bcfw6xvOrBZaKKVqK7JKtF90yeOBpW8KY=
+			wUscQAJLI2K02Uo0WvvjUNMfXFaF65+bnlDzPiBttuQ=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
@@ -138,11 +138,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			KwQ+rDS/mC26DdwFGEG6+JeumPY=
+			DP3bBadNjKsHoAY30y+OWLIMa8I=
 			</data>
 			<key>hash2</key>
 			<data>
-			5qyWf+w+HwFuOjWi55z3bKQJ6H3MK2RC/cKSj6W8E0U=
+			nGU1MKZQW7RdlsMFC4773J5IMjV1MMIsi21heJZP4qg=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
@@ -193,33 +193,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			1a9yCUScp1cJow8IjBwy2pNsfQ0=
+			gPxJ2CC9zP2D0oYKbv7Qjaz/oN4=
 			</data>
 			<key>hash2</key>
 			<data>
-			PXWWljQhopktRacM7ukPr0OCrOTjE8tH6V9ANu27+uw=
+			Z74Tmxf6PzqwcZfsR26YgK0vf+GOD3yI16IQYSn9xgQ=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			LKCHn4ReZQV1QJ9fBqcONWdNhas=
+			1wgY6Ykzy4EtRSRm5D4n4wWG0Rc=
 			</data>
 			<key>hash2</key>
 			<data>
-			Vu0UW1/PHncPkY5WpbMzouVBnjnoCpttCumwhUwqNXg=
+			HeSmyHHjN3owqMZHY1koMh8arts7Nb0jmDjRQMDZkTk=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			V5Depf7QMLbJ+00484WzKcl/gDk=
+			pbYHAE5yz5QxonKU4fsXEbSBrNs=
 			</data>
 			<key>hash2</key>
 			<data>
-			VviTuGILS12OXVHNj7xv64KeQwD5z47jykSN48sZcoM=
+			JjNxnNLHtmKf3GMOcbHnDRAAybU2QB0J5RKOY0LrmkI=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>

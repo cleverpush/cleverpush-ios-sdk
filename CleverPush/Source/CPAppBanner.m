@@ -20,6 +20,10 @@
         self.fromVersion = [json stringForKey:@"fromVersion"];
         self.toVersion = [json stringForKey:@"toVersion"];
 
+        self.title = [json stringForKey:@"title"];
+        self.description = [json stringForKey:@"description"];
+        self.mediaUrl = [json stringForKey:@"mediaUrl"];
+
         if ([json stringForKey:@"testId"] != nil) {
             self.testId = [json stringForKey:@"testId"];
         }

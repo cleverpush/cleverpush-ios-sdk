@@ -1,3 +1,6 @@
+## 1.26.3
+* Added support for `title`, `description` and `mediaUrl` fields for banners
+
 ## 1.26.2
 * Optimizations for HTML app banners
 
