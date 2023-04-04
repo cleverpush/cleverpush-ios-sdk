@@ -9,11 +9,11 @@
     if (self) {
         self.type = CPAppBannerBlockTypeImage;
 
-        if ([json stringForKey:@"imageUrl"]) {
-            self.imageUrl = [json stringForKey:@"imageUrl"];
+        if ([json cleverPushStringForKey:@"imageUrl"]) {
+            self.imageUrl = [json cleverPushStringForKey:@"imageUrl"];
         }
-        if ([json stringForKey:@"darkImageUrl"] && ![[json stringForKey:@"darkImageUrl"] isEqual:@""]) {
-            self.darkImageUrl = [json stringForKey:@"darkImageUrl"];
+        if ([json cleverPushStringForKey:@"darkImageUrl"] && ![[json cleverPushStringForKey:@"darkImageUrl"] isEqual:@""]) {
+            self.darkImageUrl = [json cleverPushStringForKey:@"darkImageUrl"];
         }
 
         self.scale = 100;

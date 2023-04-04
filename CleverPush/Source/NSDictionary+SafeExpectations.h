@@ -11,7 +11,7 @@
  @param key The key for which to return the corresponding value
  @returns the resulting string. If the result is not a NSString and can't converted to one, it returns nil
  */
-- (NSString *)stringForKey:(id)key;
+- (NSString *)cleverPushStringForKey:(id)key;
 
 /**
  Returns a NSNumber value for the specified key.
@@ -20,7 +20,7 @@
  @param key The key for which to return the corresponding value
  @returns the resulting number. If the result is not a NSNumber and can't converted to one, it returns nil
  */
-- (NSNumber *)numberForKey:(id)key;
+- (NSNumber *)cleverPushNumberForKey:(id)key;
 
 /**
  Returns a NSNumber value for the specified key.
@@ -36,15 +36,15 @@
  @param key The key for which to return the corresponding value
  @returns the resulting array. If the result is not a NSArray, it returns nil
  */
-- (NSArray *)arrayForKey:(id)key;
+- (NSArray *)cleverPushArrayForKey:(id)key;
 
 /**
- Returns a NSDictionary value for the specified key. 
+ Returns a NSDictionary value for the specified key.
  
  @param key The key for which to return the corresponding value
  @returns the resulting dictionary. If the result is not a NSDictionary, it returns nil
  */
-- (NSDictionary *)dictionaryForKey:(id)key;
+- (NSDictionary *)cleverPushDictionaryForKey:(id)key;
 
 /**
  Returns an object for the specified keyPath

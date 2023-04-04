@@ -452,7 +452,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         topicsDialogShowWhenNewAdded = [[config objectForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
     }
 
-    NSArray* channelTopics = [config arrayForKey:@"channelTopics"];
+    NSArray* channelTopics = [config cleverPushArrayForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         for (id channelTopic in channelTopics) {
             if (channelTopic != nil && ([channelTopic stringForKey:@"createdAt"] == nil || [[channelTopic stringForKey:@"createdAt"] isKindOfClass:[NSString class]])) {

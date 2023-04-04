@@ -293,14 +293,14 @@ long sessions = 0;
         }
 
         for (NSDictionary *attribute in banner.attributes) {
-            NSString *attributeId = [attribute stringForKey:@"id"];
-            NSString *compareAttributeValue = [attribute stringForKey:@"value"];
+            NSString *attributeId = [attribute cleverPushStringForKey:@"id"];
+            NSString *compareAttributeValue = [attribute cleverPushStringForKey:@"value"];
             if (!compareAttributeValue || [compareAttributeValue isKindOfClass:[NSNull class]]) {
                 compareAttributeValue = @"";
             }
 
             NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
-            NSString *relation = [attribute stringForKey:@"relation"];
+            NSString *relation = [attribute cleverPushStringForKey:@"relation"];
             if (!relation || [relation isKindOfClass:[NSNull class]]) {
                 relation = @"equals";
             }
@@ -400,7 +400,7 @@ long sessions = 0;
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
     for (NSDictionary* triggeredEvent in events) {
-        if (![[triggeredEvent stringForKey:@"id"] isEqualToString:condition.event]) {
+        if (![[triggeredEvent cleverPushStringForKey:@"id"] isEqualToString:condition.event]) {
             continue;
         }
 
@@ -412,7 +412,7 @@ long sessions = 0;
 
         NSDictionary *properties = (NSDictionary*) [triggeredEvent objectForKey:@"properties"];
         for (CPAppBannerTriggerConditionEventProperty* eventProperty in condition.eventProperties) {
-            NSString *propertyValue = [properties stringForKey:eventProperty.property];
+            NSString *propertyValue = [properties cleverPushStringForKey:eventProperty.property];
             NSString *comparePropertyValue = eventProperty.value;
 
             BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue compareWith:comparePropertyValue relation:eventProperty.relation isAllowed:YES compareWithFrom:comparePropertyValue compareWithTo:comparePropertyValue];
