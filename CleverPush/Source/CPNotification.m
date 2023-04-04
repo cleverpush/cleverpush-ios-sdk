@@ -52,17 +52,17 @@
             NSMutableDictionary* action = [[NSMutableDictionary alloc] init];
             
             [action setObject:actionId forKey:@"id"];
-            if ([item stringForKey:@"title"]) {
-                [action setObject:[item stringForKey:@"title"] forKey:@"title"];
+            if ([item cleverPushStringForKey:@"title"]) {
+                [action setObject:[item cleverPushStringForKey:@"title"] forKey:@"title"];
             }
-            if ([item stringForKey:@"url"]) {
-                [action setObject:[item stringForKey:@"url"] forKey:@"url"];
+            if ([item cleverPushStringForKey:@"url"]) {
+                [action setObject:[item cleverPushStringForKey:@"url"] forKey:@"url"];
             }
-            if ([item stringForKey:@"type"]) {
-                [action setObject:[item stringForKey:@"type"] forKey:@"type"];
+            if ([item cleverPushStringForKey:@"type"]) {
+                [action setObject:[item cleverPushStringForKey:@"type"] forKey:@"type"];
             }
-            if ([item dictionaryForKey:@"customData"]) {
-                [action setObject:[item dictionaryForKey:@"customData"] forKey:@"customData"];
+            if ([item cleverPushDictionaryForKey:@"customData"]) {
+                [action setObject:[item cleverPushDictionaryForKey:@"customData"] forKey:@"customData"];
             }
             
             [actionArray addObject:action];

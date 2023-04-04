@@ -19,8 +19,8 @@
             if ([json objectForKey:@"color"] != nil) {
                 self.color = [json objectForKey:@"color"];
             }
-            if ([json stringForKey:@"darkColor"] && ![[json stringForKey:@"darkColor"] isEqual:@""]) {
-                self.darkColor = [json stringForKey:@"darkColor"];
+            if ([json cleverPushStringForKey:@"darkColor"] && ![[json cleverPushStringForKey:@"darkColor"] isEqual:@""]) {
+                self.darkColor = [json cleverPushStringForKey:@"darkColor"];
             }
 
             if ([json objectForKey:@"dismiss"] == false) {

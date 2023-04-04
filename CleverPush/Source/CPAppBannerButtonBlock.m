@@ -9,30 +9,30 @@
         self.type = CPAppBannerBlockTypeButton;
 
         self.text = @"";
-        if ([json stringForKey:@"text"]) {
-            self.text = [json stringForKey:@"text"];
+        if ([json cleverPushStringForKey:@"text"]) {
+            self.text = [json cleverPushStringForKey:@"text"];
         }
 
-        if ([json stringForKey:@"color"] && ![[json stringForKey:@"color"] isEqual:@""]) {
-            self.color = [json stringForKey:@"color"];
+        if ([json cleverPushStringForKey:@"color"] && ![[json cleverPushStringForKey:@"color"] isEqual:@""]) {
+            self.color = [json cleverPushStringForKey:@"color"];
         } else {
             self.color = @"#000000";
         }
-        if ([json stringForKey:@"darkColor"] && ![[json stringForKey:@"darkColor"] isEqual:@""]) {
-            self.darkColor = [json stringForKey:@"darkColor"];
+        if ([json cleverPushStringForKey:@"darkColor"] && ![[json cleverPushStringForKey:@"darkColor"] isEqual:@""]) {
+            self.darkColor = [json cleverPushStringForKey:@"darkColor"];
         }
 
-        if ([json stringForKey:@"family"] && ![[json stringForKey:@"family"] isEqual:@""]) {
-            self.family = [json stringForKey:@"family"];
+        if ([json cleverPushStringForKey:@"family"] && ![[json cleverPushStringForKey:@"family"] isEqual:@""]) {
+            self.family = [json cleverPushStringForKey:@"family"];
         }
 
-        if ([json stringForKey:@"background"] && ![[json stringForKey:@"background"] isEqual:@""]) {
-            self.background = [json stringForKey:@"background"];
+        if ([json cleverPushStringForKey:@"background"] && ![[json cleverPushStringForKey:@"background"] isEqual:@""]) {
+            self.background = [json cleverPushStringForKey:@"background"];
         } else {
             self.background = @"#FFFFFF";
         }
-        if ([json stringForKey:@"darkBackground"] && ![[json stringForKey:@"darkBackground"] isEqual:@""]) {
-            self.darkBackground = [json stringForKey:@"darkBackground"];
+        if ([json cleverPushStringForKey:@"darkBackground"] && ![[json cleverPushStringForKey:@"darkBackground"] isEqual:@""]) {
+            self.darkBackground = [json cleverPushStringForKey:@"darkBackground"];
         }
 
         self.size = 18;
@@ -41,9 +41,9 @@
         }
 
         self.alignment = CPAppBannerAlignmentCenter;
-        if ([[json stringForKey:@"alignment"] isEqual:@"right"]) {
+        if ([[json cleverPushStringForKey:@"alignment"] isEqual:@"right"]) {
             self.alignment = CPAppBannerAlignmentRight;
-        } else if ([[json stringForKey:@"alignment"] isEqual:@"left"]) {
+        } else if ([[json cleverPushStringForKey:@"alignment"] isEqual:@"left"]) {
             self.alignment = CPAppBannerAlignmentLeft;
         }
 

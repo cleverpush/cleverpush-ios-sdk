@@ -78,7 +78,7 @@ CPNotificationClickBlock handleClick;
                     }
 
                     [CleverPush getChannelConfig:^(NSDictionary *config) {
-                        NSString *channelIcon = [config stringForKey:@"channelIcon"];
+                        NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
                         if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
                             self.notificationThumbnail = channelIcon;
                         }

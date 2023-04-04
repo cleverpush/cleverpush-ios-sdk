@@ -10,12 +10,12 @@
 
 @implementation NSDictionary (SafeExpectations)
 
-- (NSString *)stringForKey:(id)key {
+- (NSString *)cleverPushStringForKey:(id)key {
     id obj = [self safeObjectForKey:key];
     return [self stringWithObject:obj];
 }
 
-- (NSNumber *)numberForKey:(id)key {
+- (NSNumber *)cleverPushNumberForKey:(id)key {
     id obj = [self safeObjectForKey:key];
     return [self numberWithObject:obj usingFormatter:[[self class] posixNumberFormatter]];
 }
@@ -25,12 +25,12 @@
     return [self numberWithObject:obj usingFormatter:numberFormatter];
 }
 
-- (NSArray *)arrayForKey:(id)key {
+- (NSArray *)cleverPushArrayForKey:(id)key {
     id obj = [self safeObjectForKey:key];
     return [self arrayWithObject:obj];
 }
 
-- (NSDictionary *)dictionaryForKey:(id)key {
+- (NSDictionary *)cleverPushDictionaryForKey:(id)key {
     id obj = [self safeObjectForKey:key];
     return [self dictionaryWithObject:obj];
 }

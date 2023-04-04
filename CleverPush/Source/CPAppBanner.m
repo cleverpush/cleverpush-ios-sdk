@@ -8,37 +8,37 @@
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
-        self.id = [json stringForKey:@"_id"];
-        self.channel = [json stringForKey:@"channel"];
-        self.name = [json stringForKey:@"name"];
-        self.contentType = [json stringForKey:@"contentType"];
+        self.id = [json cleverPushStringForKey:@"_id"];
+        self.channel = [json cleverPushStringForKey:@"channel"];
+        self.name = [json cleverPushStringForKey:@"name"];
+        self.contentType = [json cleverPushStringForKey:@"contentType"];
         if ([self.contentType isEqualToString:@"html"]) {
-            self.HTMLContent = [json stringForKey:@"content"];
+            self.HTMLContent = [json cleverPushStringForKey:@"content"];
         }
-        self.appVersionFilterRelation = [json stringForKey:@"appVersionFilterRelation"];
-        self.appVersionFilterValue = [json stringForKey:@"appVersionFilterValue"];
-        self.fromVersion = [json stringForKey:@"fromVersion"];
-        self.toVersion = [json stringForKey:@"toVersion"];
+        self.appVersionFilterRelation = [json cleverPushStringForKey:@"appVersionFilterRelation"];
+        self.appVersionFilterValue = [json cleverPushStringForKey:@"appVersionFilterValue"];
+        self.fromVersion = [json cleverPushStringForKey:@"fromVersion"];
+        self.toVersion = [json cleverPushStringForKey:@"toVersion"];
 
-        self.title = [json stringForKey:@"title"];
-        self.description = [json stringForKey:@"description"];
-        self.mediaUrl = [json stringForKey:@"mediaUrl"];
+        self.title = [json cleverPushStringForKey:@"title"];
+        self.description = [json cleverPushStringForKey:@"description"];
+        self.mediaUrl = [json cleverPushStringForKey:@"mediaUrl"];
 
-        if ([json stringForKey:@"testId"] != nil) {
-            self.testId = [json stringForKey:@"testId"];
+        if ([json cleverPushStringForKey:@"testId"] != nil) {
+            self.testId = [json cleverPushStringForKey:@"testId"];
         }
 
-        if ([[json stringForKey:@"type"] isEqual:@"top"]) {
+        if ([[json cleverPushStringForKey:@"type"] isEqual:@"top"]) {
             self.type = CPAppBannerTypeTop;
-        } else if ([[json stringForKey:@"type"] isEqualToString:@"full"]) {
+        } else if ([[json cleverPushStringForKey:@"type"] isEqualToString:@"full"]) {
             self.type = CPAppBannerTypeFull;
-        } else if ([[json stringForKey:@"type"] isEqualToString:@"bottom"]) {
+        } else if ([[json cleverPushStringForKey:@"type"] isEqualToString:@"bottom"]) {
             self.type = CPAppBannerTypeBottom;
         } else {
             self.type = CPAppBannerTypeCenter;
         }
 
-        if ([[json stringForKey:@"status"] isEqualToString:@"draft"]) {
+        if ([[json cleverPushStringForKey:@"status"] isEqualToString:@"draft"]) {
             self.status = CPAppBannerStatusDraft;
         } else {
             self.status = CPAppBannerStatusPublished;
@@ -53,13 +53,13 @@
 
                 CPAppBannerBlock* block;
 
-                if ([[blockJson stringForKey:@"type"] isEqual:@"button"]) {
+                if ([[blockJson cleverPushStringForKey:@"type"] isEqual:@"button"]) {
                     block = [[CPAppBannerButtonBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson stringForKey:@"type"] isEqual:@"text"]) {
+                } else if ([[blockJson cleverPushStringForKey:@"type"] isEqual:@"text"]) {
                     block = [[CPAppBannerTextBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson stringForKey:@"type"] isEqual:@"image"]) {
+                } else if ([[blockJson cleverPushStringForKey:@"type"] isEqual:@"image"]) {
                     block = [[CPAppBannerImageBlock alloc] initWithJson:blockJson];
-                } else if ([[blockJson stringForKey:@"type"] isEqual:@"html"]) {
+                } else if ([[blockJson cleverPushStringForKey:@"type"] isEqual:@"html"]) {
                     block = [[CPAppBannerHTMLBlock alloc] initWithJson:blockJson];
                 } else {
                     continue;
@@ -110,27 +110,27 @@
             self.stopAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"stopAt"]];
         }
 
-        if ([[json stringForKey:@"dismissType"] isEqual:@"timeout"]) {
+        if ([[json cleverPushStringForKey:@"dismissType"] isEqual:@"timeout"]) {
             self.dismissType = CPAppBannerDismissTypeTimeout;
-        } else if ([[json stringForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
+        } else if ([[json cleverPushStringForKey:@"dismissType"] isEqual:@"till_dismissed"]) {
             self.dismissType = CPAppBannerDismissTypeTillDismissed;
         }
 
-        if ([json stringForKey:@"dismissTimeout"] != nil) {
-            self.dismissTimeout = [[json stringForKey:@"dismissTimeout"] intValue];
+        if ([json cleverPushStringForKey:@"dismissTimeout"] != nil) {
+            self.dismissTimeout = [[json cleverPushStringForKey:@"dismissTimeout"] intValue];
         } else {
             self.dismissTimeout = 60;
         }
 
-        if ([[json stringForKey:@"stopAtType"] isEqual:@"forever"]) {
+        if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"forever"]) {
             self.stopAtType = CPAppBannerStopAtTypeForever;
-        } else if ([[json stringForKey:@"stopAtType"] isEqual:@"specific_time"]) {
+        } else if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"specific_time"]) {
             self.stopAtType = CPAppBannerStopAtTypeSpecificTime;
         }
 
-        if ([[json stringForKey:@"frequency"] isEqual:@"once"]) {
+        if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"once"]) {
             self.frequency = CPAppBannerFrequencyOnce;
-        } else if ([[json stringForKey:@"frequency"] isEqual:@"once_per_session"]) {
+        } else if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"once_per_session"]) {
             self.frequency = CPAppBannerFrequencyOncePerSession;
         }
 
@@ -142,7 +142,7 @@
             }
         }
 
-        if ([[json stringForKey:@"triggerType"] isEqual:@"conditions"]) {
+        if ([[json cleverPushStringForKey:@"triggerType"] isEqual:@"conditions"]) {
             self.triggerType = CPAppBannerTriggerTypeConditions;
         } else {
             self.triggerType = CPAppBannerTriggerTypeAppOpen;
@@ -173,9 +173,9 @@
             self.closeButtonEnabled = YES;
         }
 
-        if ([json stringForKey:@"subscribedType"] != nil && [[json stringForKey:@"subscribedType"] isEqual:@"subscribed"]) {
+        if ([json cleverPushStringForKey:@"subscribedType"] != nil && [[json cleverPushStringForKey:@"subscribedType"] isEqual:@"subscribed"]) {
             self.subscribedType = CPAppBannerSubscribedTypeSubscribed;
-        } else if ([json stringForKey:@"subscribedType"] != nil && [[json stringForKey:@"subscribedType"] isEqual:@"unsubscribed"]) {
+        } else if ([json cleverPushStringForKey:@"subscribedType"] != nil && [[json cleverPushStringForKey:@"subscribedType"] isEqual:@"unsubscribed"]) {
             self.subscribedType = CPAppBannerSubscribedTypeUnsubscribed;
         } else {
             self.subscribedType = CPAppBannerSubscribedTypeAll;
