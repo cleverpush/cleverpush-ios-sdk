@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.26.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.26.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -90,6 +90,7 @@ int maximumNotifications = 100;
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
+static NSString* lastClickedSessionNotificationId;
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
 
@@ -462,6 +463,8 @@ static id isNil(id object) {
 - (void)applicationDidEnterBackground API_AVAILABLE(ios(10.0)) {
     [self updateBadge:nil];
     [self trackSessionEnd];
+
+    lastClickedSessionNotificationId = nil;
 }
 
 #pragma mark - Initialised Features.
@@ -1438,6 +1441,7 @@ static id isNil(id object) {
         return;
     }
     lastNotificationOpenedId = notificationId;
+    lastClickedSessionNotificationId = notificationId;
 
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
@@ -2488,8 +2492,9 @@ static id isNil(id object) {
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
                                          eventId, @"eventId",
-                                         isNil(properties), @"properties",
                                          subscriptionId, @"subscriptionId",
+                                         isNil(properties), @"properties",
+                                         isNil(lastClickedSessionNotificationId), @"notificationId",
                                          nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];

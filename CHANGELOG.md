@@ -1,3 +1,6 @@
+## 1.26.5
+* Fixed notification tracking for conversion events
+
 ## 1.26.4
 * Fixed potential conflict with other `NSDictionary` Obj-C categories which used `stringForKey`
 * Renamed app banner `description` property to `bannerDescription` to avoid a conflict with `NSObject` description
