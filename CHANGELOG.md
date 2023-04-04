@@ -1,3 +1,7 @@
+## 1.26.4
+* Fixed potential conflict with other `NSDictionary` Obj-C categories which used `stringForKey`
+* Renamed app banner `description` property to `bannerDescription` to avoid a conflict with `NSObject` description
+
 ## 1.26.3
 * Added support for `title`, `description` and `mediaUrl` fields for banners
 

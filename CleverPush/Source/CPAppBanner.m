@@ -21,7 +21,7 @@
         self.toVersion = [json cleverPushStringForKey:@"toVersion"];
 
         self.title = [json cleverPushStringForKey:@"title"];
-        self.description = [json cleverPushStringForKey:@"description"];
+        self.bannerDescription = [json cleverPushStringForKey:@"bannerDescription"];
         self.mediaUrl = [json cleverPushStringForKey:@"mediaUrl"];
 
         if ([json cleverPushStringForKey:@"testId"] != nil) {

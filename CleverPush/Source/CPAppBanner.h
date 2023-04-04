@@ -56,7 +56,7 @@
 @property (nonatomic, strong) NSString *fromVersion;
 @property (nonatomic, strong) NSString *toVersion;
 @property (nonatomic, strong) NSString *title;
-@property (nonatomic, strong) NSString *description;
+@property (nonatomic, strong) NSString *bannerDescription;
 @property (nonatomic, strong) NSString *mediaUrl;
 
 - (id)initWithJson:(NSDictionary*)json;

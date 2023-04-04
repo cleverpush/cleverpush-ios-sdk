@@ -20,7 +20,7 @@ double geoFenceTimerInterval = 1.0;
         [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (channelConfig != nil && [channelConfig arrayForKey:@"geoFences"] != nil) {
+                    if (channelConfig != nil && [channelConfig cleverPushArrayForKey:@"geoFences"] != nil) {
                         if (!locationManager) {
                             locationManager = [CLLocationManager new];
                         }
@@ -31,7 +31,7 @@ double geoFenceTimerInterval = 1.0;
                         [delayedGeoFences removeAllObjects];
                         delayedGeoFences = [[NSMutableArray alloc] init];
                         
-                        NSArray* geoFencesDict = [channelConfig arrayForKey:@"geoFences"];
+                        NSArray* geoFencesDict = [channelConfig cleverPushArrayForKey:@"geoFences"];
                         for (NSDictionary *geoFence in geoFencesDict) {
                             if (geoFence != nil) {
                                 CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[geoFence objectForKey:@"latitude"] doubleValue], [[geoFence objectForKey:@"longitude"] doubleValue]);

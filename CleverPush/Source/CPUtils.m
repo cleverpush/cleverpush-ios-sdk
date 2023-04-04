@@ -455,8 +455,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSArray* channelTopics = [config cleverPushArrayForKey:@"channelTopics"];
     if (channelTopics != nil && [channelTopics count] > 0) {
         for (id channelTopic in channelTopics) {
-            if (channelTopic != nil && ([channelTopic stringForKey:@"createdAt"] == nil || [[channelTopic stringForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
-                NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic stringForKey:@"createdAt"]];
+            if (channelTopic != nil && ([channelTopic cleverPushStringForKey:@"createdAt"] == nil || [[channelTopic cleverPushStringForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
+                NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic cleverPushStringForKey:@"createdAt"]];
                 NSDate *addedCacheDelay = [createdAt dateByAddingTimeInterval:+60*60];
                 NSComparisonResult result;
                 result = [addedCacheDelay compare:[CPUtils getLastTopicCheckedTime]];

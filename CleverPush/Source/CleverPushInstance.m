@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.26.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.26.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1405,8 +1405,8 @@ static id isNil(id object) {
     [CPLog debug:@"handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict];
 
     [self setNotificationDelivered:notification
-                     withChannelId:[messageDict stringForKeyPath:@"channel._id"]
-                withSubscriptionId:[messageDict stringForKeyPath:@"subscription._id"]
+                     withChannelId:[messageDict cleverPushStringForKeyPath:@"channel._id"]
+                withSubscriptionId:[messageDict cleverPushStringForKeyPath:@"subscription._id"]
     ];
 
     if (isActive && notification != nil && [notification objectForKey:@"chatNotification"] != nil && ![[notification objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"chatNotification"] boolValue]) {
@@ -1426,7 +1426,7 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    NSString* notificationId = [payload stringForKeyPath:@"notification._id"];
+    NSString* notificationId = [payload cleverPushStringForKeyPath:@"notification._id"];
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
     NSString* action = actionIdentifier;
 
@@ -1445,8 +1445,8 @@ static id isNil(id object) {
     [CPLog debug:@"handleNotificationOpened, %@, %@", action, payload];
 
     [self setNotificationClicked:notificationId
-                   withChannelId:[payload stringForKeyPath:@"channel._id"]
-              withSubscriptionId:[payload stringForKeyPath:@"subscription._id"]
+                   withChannelId:[payload cleverPushStringForKeyPath:@"channel._id"]
+              withSubscriptionId:[payload cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
     ];
 
@@ -1467,7 +1467,7 @@ static id isNil(id object) {
         }
     }
     if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload stringForKeyPath:@"channel._id"] notificationId:notificationId];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
     }
 
     CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
@@ -3352,7 +3352,7 @@ static id isNil(id object) {
             [actionArray addObject:action];
         }];
 
-        NSString* newCategoryIdentifier = [CPNotificationCategoryController.sharedInstance registerNotificationCategoryForNotificationId:[payload stringForKeyPath:@"notification._id"]];
+        NSString* newCategoryIdentifier = [CPNotificationCategoryController.sharedInstance registerNotificationCategoryForNotificationId:[payload cleverPushStringForKeyPath:@"notification._id"]];
 
         UNNotificationCategory* category = [UNNotificationCategory categoryWithIdentifier:newCategoryIdentifier
                                                                                   actions:actionArray

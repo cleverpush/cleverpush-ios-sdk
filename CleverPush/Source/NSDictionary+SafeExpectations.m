@@ -11,36 +11,36 @@
 @implementation NSDictionary (SafeExpectations)
 
 - (NSString *)cleverPushStringForKey:(id)key {
-    id obj = [self safeObjectForKey:key];
+    id obj = [self cleverPushSafeObjectForKey:key];
     return [self stringWithObject:obj];
 }
 
 - (NSNumber *)cleverPushNumberForKey:(id)key {
-    id obj = [self safeObjectForKey:key];
+    id obj = [self cleverPushSafeObjectForKey:key];
     return [self numberWithObject:obj usingFormatter:[[self class] posixNumberFormatter]];
 }
 
-- (NSNumber *)numberForKey:(id)key usingFormatter:(NSNumberFormatter *)numberFormatter {
-    id obj = [self safeObjectForKey:key];
+- (NSNumber *)cleverPushNumberForKey:(id)key usingFormatter:(NSNumberFormatter *)numberFormatter {
+    id obj = [self cleverPushSafeObjectForKey:key];
     return [self numberWithObject:obj usingFormatter:numberFormatter];
 }
 
 - (NSArray *)cleverPushArrayForKey:(id)key {
-    id obj = [self safeObjectForKey:key];
+    id obj = [self cleverPushSafeObjectForKey:key];
     return [self arrayWithObject:obj];
 }
 
 - (NSDictionary *)cleverPushDictionaryForKey:(id)key {
-    id obj = [self safeObjectForKey:key];
+    id obj = [self cleverPushSafeObjectForKey:key];
     return [self dictionaryWithObject:obj];
 }
 
-- (id)safeObjectForKey:(id)key {
+- (id)cleverPushSafeObjectForKey:(id)key {
     NSAssert(key != nil, @"nil key");
     return [self objectForKey:key];
 }
 
-- (id)objectForKeyPath:(NSString *)keyPath {
+- (id)cleverPushObjectForKeyPath:(NSString *)keyPath {
     id object = self;
     NSArray *keyPaths = [keyPath componentsSeparatedByString:@"."];
     for (NSString *currentKeyPath in keyPaths) {
@@ -55,29 +55,29 @@
     return object;
 }
 
-- (NSString *)stringForKeyPath:(id)keyPath {
-    id obj = [self objectForKeyPath:keyPath];
+- (NSString *)cleverPushStringForKeyPath:(id)keyPath {
+    id obj = [self cleverPushObjectForKeyPath:keyPath];
     return [self stringWithObject:obj];
 
 }
 
-- (NSNumber *)numberForKeyPath:(id)keyPath {
-    id obj = [self objectForKeyPath:keyPath];
+- (NSNumber *)cleverPushNumberForKeyPath:(id)keyPath {
+    id obj = [self cleverPushObjectForKeyPath:keyPath];
     return [self numberWithObject:obj usingFormatter:[[self class] posixNumberFormatter]];
 }
 
-- (NSNumber *)numberForKeyPath:(id)keyPath usingFormatter:(NSNumberFormatter *)numberFormatter{
-    id obj = [self objectForKeyPath:keyPath];
+- (NSNumber *)cleverPushNumberForKeyPath:(id)keyPath usingFormatter:(NSNumberFormatter *)numberFormatter{
+    id obj = [self cleverPushObjectForKeyPath:keyPath];
     return [self numberWithObject:obj usingFormatter:numberFormatter];
 }
 
-- (NSArray *)arrayForKeyPath:(id)keyPath {
-    id obj = [self objectForKeyPath:keyPath];
+- (NSArray *)cleverPushArrayForKeyPath:(id)keyPath {
+    id obj = [self cleverPushObjectForKeyPath:keyPath];
     return [self arrayWithObject:obj];
 }
 
-- (NSDictionary *)dictionaryForKeyPath:(id)keyPath {
-    id obj = [self objectForKeyPath:keyPath];
+- (NSDictionary *)cleverPushDictionaryForKeyPath:(id)keyPath {
+    id obj = [self cleverPushObjectForKeyPath:keyPath];
     return [self dictionaryWithObject:obj];
 }
 
