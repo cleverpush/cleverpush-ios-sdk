@@ -1,3 +1,6 @@
+## 1.26.6
+* Changed that HTML banners will not go outside of the safe area
+
 ## 1.26.5
 * Fixed notification tracking for conversion events
 
