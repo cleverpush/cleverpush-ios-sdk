@@ -315,13 +315,14 @@
 
     self.webView = [[WKWebView alloc] initWithFrame:UIScreen.mainScreen.bounds configuration:config];
     self.webView.scrollView.scrollEnabled = true;
-    self.webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.webView.scrollView.bounces = false;
     self.webView.allowsBackForwardNavigationGestures = false;
     self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.navigationDelegate = self;
     self.webView.backgroundColor = [UIColor clearColor];
-    self.webView.scrollView.backgroundColor = [UIColor redColor];
+    if (self.data.background.color != nil) {
+        self.webView.backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+    }
     self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
