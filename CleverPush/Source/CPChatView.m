@@ -98,16 +98,49 @@ NSString* lastSubscriptionId;
                 jsonConfig = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
             }
         }
-
-        NSString* brandingColor;
-        NSString* backgroundColor;
+        
+        NSString* brandingColor = @"";
+        NSString* backgroundColor = @"";
+        NSString* chatInputContainerBackgroundColor = @"";
+        NSString* chatInputBackgroundColor = @"";
+        NSString* chatInputTextColor = @"";
+        NSString* chatSenderBubbleTextColor = @"";
+        NSString* chatReceiverBubbleBackgroundColor = @"";
+        NSString* chatReceiverBubbleTextColor = @"";
+        NSString* chatSendButtonBackgroundColor = @"";
+        NSString* chatTimestampTextColor = @"";
+        
         if ([CleverPush getBrandingColor]) {
             brandingColor = [CPUtils hexStringFromColor:[CleverPush getBrandingColor]];
         }
         if ([CleverPush getChatBackgroundColor]) {
             backgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatBackgroundColor]];
         }
-
+        if ([CleverPush getChatSenderBubbleTextColor]) {
+            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:[CleverPush getChatSenderBubbleTextColor]];
+        }
+        if ([CleverPush getChatSendButtonBackgroundColor]) {
+            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatSendButtonBackgroundColor]];
+        }
+        if ([CleverPush getChatInputBackgroundColor]) {
+            chatInputBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatInputBackgroundColor]];
+        }
+        if ([CleverPush getChatInputTextColor]) {
+            chatInputTextColor = [CPUtils hexStringFromColor:[CleverPush getChatInputTextColor]];
+        }
+        if ([CleverPush getChatReceiverBubbleBackgroundColor]) {
+            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatReceiverBubbleBackgroundColor]];
+        }
+        if ([CleverPush getChatInputContainerBackgroundColor]) {
+            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatInputContainerBackgroundColor]];
+        }
+        if ([CleverPush getChatTimestampTextColor]) {
+            chatTimestampTextColor = [CPUtils hexStringFromColor:[CleverPush getChatTimestampTextColor]];
+        }
+        if ([CleverPush getChatReceiverBubbleTextColor]) {
+            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:[CleverPush getChatReceiverBubbleTextColor]];
+        }
+        
         if (!headerCodes) {
             headerCodes = @"";
         }
@@ -126,7 +159,7 @@ NSString* lastSubscriptionId;
                    <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
                    <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
                    <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
-                   <script>var cleverpushConfig = %@; var cleverpushSubscriptionId = '%@'; (cleverpushConfig || {}).nativeApp = true; (cleverpushConfig || {}).brandingColor = '%@'; (cleverpushConfig || {}).chatBackgroundColor = '%@';</script>\
+                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@'; (cleverpushConfig || {}).nativeApp = true;     (cleverpushConfig || {}).brandingColor = '%@';                                                                                                                          (cleverpushConfig || {}).chatBackgroundColor = '%@';                                                                                                                (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';                                                                                                     (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';                                                                                         (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';                                                                                     (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';                                                                                    (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';                                                                                     (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';                                                                                          (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';                                                                                                       (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';</script>\
                    <script>\
                    function showErrorView() {\
                    document.body.innerHTML = `\
@@ -169,7 +202,7 @@ NSString* lastSubscriptionId;
                    </script>\
                    <script onerror='showErrorView()' src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
                    </body>\
-                   </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor];
+                   </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor, chatSenderBubbleTextColor, chatSendButtonBackgroundColor, chatInputBackgroundColor, chatInputTextColor, chatReceiverBubbleBackgroundColor, chatInputContainerBackgroundColor, chatTimestampTextColor, chatReceiverBubbleTextColor];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.webView loadHTMLString:content baseURL:[[NSBundle mainBundle] resourceURL]];

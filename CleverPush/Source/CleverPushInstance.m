@@ -113,6 +113,16 @@ WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* normalTintColor = nil;
 UIColor* chatBackgroundColor;
+UIColor* chatInputContainerBackgroundColor;
+UIColor* chatInputBackgroundColor;
+UIColor* chatInputTextColor;
+UIColor* chatSenderBubbleBackgroundColor;
+UIColor* chatSenderBubbleTextColor;
+UIColor* chatReceiverBubbleBackgroundColor;
+UIColor* chatReceiverBubbleTextColor;
+UIColor* chatSendButtonBackgroundColor;
+UIColor* chatTimestampTextColor;
+
 UIWindow* topicsDialogWindow;
 
 CPChatView* currentChatView;
@@ -3053,8 +3063,80 @@ static id isNil(id object) {
     chatBackgroundColor = color;
 }
 
+- (void)setChatInputContainerBackgroundColor:(UIColor *)color {
+    chatInputContainerBackgroundColor = color;
+}
+
+- (void)setChatInputBackgroundColor:(UIColor *)color {
+    chatInputBackgroundColor = color;
+}
+
+- (void)setChatInputTextColor:(UIColor *)color {
+    chatInputTextColor = color;
+}
+
+- (void)setChatSenderBubbleBackgroundColor:(UIColor *)color {
+    chatSenderBubbleBackgroundColor = color;
+}
+
+- (void)setChatSenderBubbleTextColor:(UIColor *)color {
+    chatSenderBubbleTextColor = color;
+}
+
+- (void)setChatReceiverBubbleBackgroundColor:(UIColor *)color {
+    chatReceiverBubbleBackgroundColor = color;
+}
+
+- (void)setChatReceiverBubbleTextColor:(UIColor *)color {
+    chatReceiverBubbleTextColor = color;
+}
+
+- (void)setChatSendButtonBackgroundColor:(UIColor *)color {
+    chatSendButtonBackgroundColor = color;
+}
+
+- (void)setChatTimestampTextColor:(UIColor *)color {
+    chatTimestampTextColor = color;
+}
+
 - (UIColor*)getChatBackgroundColor {
     return chatBackgroundColor;
+}
+
+- (UIColor*)getChatInputContainerBackgroundColor {
+    return chatInputContainerBackgroundColor;
+}
+
+- (UIColor*)getChatInputBackgroundColor {
+    return chatInputBackgroundColor;
+}
+
+- (UIColor*)getChatInputTextColor {
+    return chatInputTextColor;
+}
+
+- (UIColor*)getChatSenderBubbleBackgroundColor {
+    return chatSenderBubbleBackgroundColor;
+}
+
+- (UIColor*)getChatSenderBubbleTextColor {
+    return chatSenderBubbleTextColor;
+}
+
+- (UIColor*)getChatReceiverBubbleBackgroundColor {
+    return chatReceiverBubbleBackgroundColor;
+}
+
+- (UIColor*)getChatReceiverBubbleTextColor {
+    return chatReceiverBubbleTextColor;
+}
+
+- (UIColor*)getChatSendButtonBackgroundColor {
+    return chatSendButtonBackgroundColor;
+}
+
+- (UIColor*)getChatTimestampTextColor {
+    return chatTimestampTextColor;
 }
 
 - (void)addStoryView:(CPStoryView*)storyView {
