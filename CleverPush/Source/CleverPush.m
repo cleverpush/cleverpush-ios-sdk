@@ -336,41 +336,6 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setChatBackgroundColor:color];
 }
 
-+ (void)setChatInputContainerBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatInputContainerBackgroundColor:color];
-}
-
-+ (void)setChatInputBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatInputBackgroundColor:color];
-}
-
-+ (void)setChatInputTextColor:(UIColor *)color {
-    [self.CPSharedInstance setChatInputTextColor:color];
-}
-
-+ (void)setChatSenderBubbleBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatSenderBubbleBackgroundColor:color];
-}
-
-+ (void)setChatSenderBubbleTextColor:(UIColor *)color {
-    [self.CPSharedInstance setChatSenderBubbleTextColor:color];
-}
-
-+ (void)setChatReceiverBubbleBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatReceiverBubbleBackgroundColor:color];
-}
-
-+ (void)setChatReceiverBubbleTextColor:(UIColor *)color {
-    [self.CPSharedInstance setChatReceiverBubbleTextColor:color];
-}
-
-+ (void)setChatSendButtonBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatSendButtonBackgroundColor:color];
-}
-
-+ (void)setChatTimestampTextColor:(UIColor *)color {
-    [self.CPSharedInstance setChatTimestampTextColor:color];
-}
 
 + (void)setAutoClearBadge:(BOOL)autoClear {
     [self.CPSharedInstance setAutoClearBadge:autoClear];
@@ -574,42 +539,6 @@ static CleverPush* singleInstance = nil;
 
 + (UIColor*)getChatBackgroundColor {
     return [self.CPSharedInstance getChatBackgroundColor];
-}
-
-+ (UIColor*)getChatInputContainerBackgroundColor {
-    return [self.CPSharedInstance getChatInputContainerBackgroundColor];
-}
-
-+ (UIColor*)getChatInputBackgroundColor {
-    return [self.CPSharedInstance getChatInputBackgroundColor];
-}
-
-+ (UIColor*)getChatInputTextColor {
-    return [self.CPSharedInstance getChatInputTextColor];
-}
-
-+ (UIColor*)getChatSenderBubbleBackgroundColor {
-    return [self.CPSharedInstance getChatSenderBubbleBackgroundColor];
-}
-
-+ (UIColor*)getChatSenderBubbleTextColor {
-    return [self.CPSharedInstance getChatSenderBubbleTextColor];
-}
-
-+ (UIColor*)getChatReceiverBubbleBackgroundColor {
-    return [self.CPSharedInstance getChatReceiverBubbleBackgroundColor];
-}
-
-+ (UIColor*)getChatReceiverBubbleTextColor {
-    return [self.CPSharedInstance getChatReceiverBubbleTextColor];
-}
-
-+ (UIColor*)getChatSendButtonBackgroundColor {
-    return [self.CPSharedInstance getChatSendButtonBackgroundColor];
-}
-
-+ (UIColor*)getChatTimestampTextColor {
-    return [self.CPSharedInstance getChatTimestampTextColor];
 }
 
 + (NSDictionary*)getAvailableAttributes __attribute__((deprecated)) {

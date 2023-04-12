@@ -116,31 +116,30 @@ NSString* lastSubscriptionId;
         if ([CleverPush getChatBackgroundColor]) {
             backgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatBackgroundColor]];
         }
-        if ([CleverPush getChatSenderBubbleTextColor]) {
-            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:[CleverPush getChatSenderBubbleTextColor]];
+        if (self.chatSenderBubbleTextColor != nil) {
+            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:self.chatSenderBubbleTextColor];
         }
-        if ([CleverPush getChatSendButtonBackgroundColor]) {
-            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatSendButtonBackgroundColor]];
+        if (self.chatSendButtonBackgroundColor != nil) {
+            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:self.chatSendButtonBackgroundColor];
         }
-        if ([CleverPush getChatInputBackgroundColor]) {
-            chatInputBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatInputBackgroundColor]];
+        if (self.chatInputBackgroundColor != nil) {
+            chatInputBackgroundColor = [CPUtils hexStringFromColor:self.chatInputBackgroundColor];
         }
-        if ([CleverPush getChatInputTextColor]) {
-            chatInputTextColor = [CPUtils hexStringFromColor:[CleverPush getChatInputTextColor]];
+        if (self.chatInputTextColor != nil) {
+            chatInputTextColor = [CPUtils hexStringFromColor:self.chatInputTextColor];
         }
-        if ([CleverPush getChatReceiverBubbleBackgroundColor]) {
-            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatReceiverBubbleBackgroundColor]];
+        if (self.chatReceiverBubbleBackgroundColor != nil) {
+            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:self.chatReceiverBubbleBackgroundColor];
         }
-        if ([CleverPush getChatInputContainerBackgroundColor]) {
-            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatInputContainerBackgroundColor]];
+        if (self.chatInputContainerBackgroundColor != nil) {
+            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:self.chatInputContainerBackgroundColor];
         }
-        if ([CleverPush getChatTimestampTextColor]) {
-            chatTimestampTextColor = [CPUtils hexStringFromColor:[CleverPush getChatTimestampTextColor]];
+        if (self.chatTimestampTextColor != nil) {
+            chatTimestampTextColor = [CPUtils hexStringFromColor:self.chatTimestampTextColor];
         }
-        if ([CleverPush getChatReceiverBubbleTextColor]) {
-            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:[CleverPush getChatReceiverBubbleTextColor]];
+        if (self.chatReceiverBubbleTextColor != nil) {
+            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:self.chatReceiverBubbleTextColor];
         }
-        
         if (!headerCodes) {
             headerCodes = @"";
         }
