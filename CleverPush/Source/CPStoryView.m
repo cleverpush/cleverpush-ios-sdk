@@ -8,7 +8,7 @@
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
-- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyWidgetId:(NSString *)id {
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
     self = [super initWithFrame:frame];
     if (self) {
         if (id != nil && id.length != 0) {
