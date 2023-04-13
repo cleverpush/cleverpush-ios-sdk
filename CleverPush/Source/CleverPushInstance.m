@@ -114,6 +114,7 @@ WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* normalTintColor = nil;
 UIColor* chatBackgroundColor;
+
 UIWindow* topicsDialogWindow;
 
 CPChatView* currentChatView;
