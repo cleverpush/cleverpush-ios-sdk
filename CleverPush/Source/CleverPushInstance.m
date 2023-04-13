@@ -3054,11 +3054,9 @@ static id isNil(id object) {
     chatBackgroundColor = color;
 }
 
-
 - (UIColor*)getChatBackgroundColor {
     return chatBackgroundColor;
 }
-
 
 - (void)addStoryView:(CPStoryView*)storyView {
     if (currentStoryView != nil) {

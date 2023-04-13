@@ -336,7 +336,6 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setChatBackgroundColor:color];
 }
 
-
 + (void)setAutoClearBadge:(BOOL)autoClear {
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
