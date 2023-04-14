@@ -15,5 +15,14 @@ typedef void (^CPChatSubscribeCallback)(void);
 - (void)loadChat;
 - (void)loadChatWithSubscriptionId:(NSString*)subscriptionId;
 - (void)lockChat;
+@property (nonatomic, assign) UIColor* chatInputContainerBackgroundColor;
+@property (nonatomic, assign) UIColor* chatInputBackgroundColor;
+@property (nonatomic, assign) UIColor* chatInputTextColor;
+@property (nonatomic, assign) UIColor* chatSenderBubbleTextColor;
+@property (nonatomic, assign) UIColor* chatReceiverBubbleBackgroundColor;
+@property (nonatomic, assign) UIColor* chatReceiverBubbleTextColor;
+@property (nonatomic, assign) UIColor* chatSendButtonBackgroundColor;
+@property (nonatomic, assign) UIColor* chatTimestampTextColor;
+
 
 @end

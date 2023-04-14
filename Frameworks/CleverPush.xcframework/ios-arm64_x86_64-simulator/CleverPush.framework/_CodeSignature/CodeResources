@@ -58,7 +58,7 @@
 		</data>
 		<key>Headers/CPChatView.h</key>
 		<data>
-		HmZX50IN2+5ZnczMJkDERe5Omg0=
+		k3hT8dSKewF+KzXM4/LrdL3QWSs=
 		</data>
 		<key>Headers/CPInboxView.h</key>
 		<data>
@@ -126,7 +126,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		gG8FFU+kUEoNk+wBjol4xHVYEIE=
+		XVOHlqj7nWnkNSG65V8mDCRktOk=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -134,7 +134,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		TGlfEoUmTBGdBbZFBTjTfkyKgWs=
+		VYyFZ24I9K1JerOiAyf5mwwxsk8=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -302,11 +302,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HmZX50IN2+5ZnczMJkDERe5Omg0=
+			k3hT8dSKewF+KzXM4/LrdL3QWSs=
 			</data>
 			<key>hash2</key>
 			<data>
-			V5gTyKvhq8tIIiD3e0hMcY8EGY1s70xqqefluAbE8mQ=
+			t8fxs9AGB6A06LMywVXYKJjKHeOHv9T1wm1GuECJWQQ=
 			</data>
 		</dict>
 		<key>Headers/CPInboxView.h</key>
@@ -489,11 +489,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			gG8FFU+kUEoNk+wBjol4xHVYEIE=
+			XVOHlqj7nWnkNSG65V8mDCRktOk=
 			</data>
 			<key>hash2</key>
 			<data>
-			hiTtU+5myE97g1Yo3vzLcuU60FIcYiIociq1DWOsyT8=
+			Lek3MOLZoYegDHoyZPld2Ak6OvEgdb9rL1+/ClI1cXU=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -511,11 +511,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			TGlfEoUmTBGdBbZFBTjTfkyKgWs=
+			VYyFZ24I9K1JerOiAyf5mwwxsk8=
 			</data>
 			<key>hash2</key>
 			<data>
-			O4dtC+l2/iy7pO3kih9G4qZV3HL9odVDRvzsdz8rTP4=
+			KTIMdcFHuDEp67e4DKArlharq00CsQcLseIg1uEZXIQ=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

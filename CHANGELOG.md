@@ -1,3 +1,7 @@
+## 1.26.7
+* Various app banner fixes
+* Support color options for CPChatView
+
 ## 1.26.6
 * Changed that HTML banners will not go outside of the safe area
 
