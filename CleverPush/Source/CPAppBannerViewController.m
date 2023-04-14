@@ -320,9 +320,6 @@
     self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.navigationDelegate = self;
     self.webView.backgroundColor = [UIColor clearColor];
-    if (self.data.background.color != nil) {
-        self.webView.backgroundColor = [UIColor colorWithHexString:self.data.background.color];
-    }
     self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
