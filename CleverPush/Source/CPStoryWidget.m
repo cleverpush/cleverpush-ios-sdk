@@ -58,10 +58,10 @@ NS_ASSUME_NONNULL_BEGIN
             self.display = CPWidgetDisplayMobile;
         }
 
-        self.selectedStories = [NSMutableArray new];
+        self.selectedStories = [[NSMutableArray alloc] init];
         if ([json objectForKey:@"selectedStories"] != nil) {
             for (NSDictionary *story in [json objectForKey:@"selectedStories"]) {
-                [self.selectedStories addObject:[[CPStory alloc] initWithJson:story]];
+               [self.selectedStories addObject:story];
             }
         }
     }
