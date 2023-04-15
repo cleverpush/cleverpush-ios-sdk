@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *storyHeight;
 @property (nonatomic, strong) NSString *margin;
 @property (nonatomic, strong) NSDate *createdAt;
-@property (nonatomic, strong) NSMutableArray<CPStory*> *selectedStories;
+@property (nonatomic, strong) NSMutableArray *selectedStories;
 
 - (id)initWithJson:(NSDictionary*)json;
 
