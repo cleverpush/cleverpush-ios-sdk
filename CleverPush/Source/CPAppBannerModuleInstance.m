@@ -206,6 +206,8 @@ long sessions = 0;
         }
         
         if (jsonBanners != nil) {
+            NSArray *sortedArray = [self sortArrayByDateAndAlphabet:jsonBanners];
+            jsonBanners = [sortedArray mutableCopy];
             [self setBanners:[NSMutableArray new]];
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
@@ -774,6 +776,26 @@ long sessions = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+#pragma mark - Group array of objects by dates and alphabets.
+- (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+    
+    NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+    NSDate *date1 = [dateFormatter dateFromString:obj1[@"createdAt"]];
+    NSDate *date2 = [dateFormatter dateFromString:obj2[@"createdAt"]];
+        
+    NSComparisonResult result = [date1 compare:date2];
+        if (result == NSOrderedSame) {
+            NSString *string1 = obj1[@"name"];
+            NSString *string2 = obj2[@"name"];
+            result = [string1 compare:string2];
+        }
+        return result;
+    }];
+    return sortedArray;
 }
 
 #pragma mark - refactor for testcases
