@@ -33,7 +33,7 @@
 		2905218C276B8C6500D81148 /* CPAppBannerModuleInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */; };
 		2905218D276B8C6700D81148 /* CPAppBannerModuleInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */; };
 		2906A0992585546F0078FD61 /* CPAppBannerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 2986766F2572CC340002E9F1 /* CPAppBannerModule.h */; };
-		2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676B52572CFE50002E9F1 /* CPAppBanner.h */; };
+		2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676B52572CFE50002E9F1 /* CPAppBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676CA2572CFFF0002E9F1 /* CPAppBannerDismissType.h */; };
 		2906A114258557640078FD61 /* CPAppBannerFrequency.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676CB2572D00A0002E9F1 /* CPAppBannerFrequency.h */; };
 		2906A11D258557660078FD61 /* CPAppBannerStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676E02572D0340002E9F1 /* CPAppBannerStatus.h */; };

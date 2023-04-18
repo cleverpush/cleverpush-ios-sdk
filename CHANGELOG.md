@@ -1,3 +1,6 @@
+## 1.26.9
+* Make `CPAppBanner` header public
+
 ## 1.26.8
 * Fixed crash in `CPStoryView`
 

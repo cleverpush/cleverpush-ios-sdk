@@ -44,6 +44,10 @@
 		<data>
 		OAZ+lvUr/uJ3S+sSWTsUsqpeleg=
 		</data>
+		<key>Headers/CPAppBanner.h</key>
+		<data>
+		ytmQfXhpYAXcxN8egZE9+FtdFzo=
+		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
 		7yZI01geudViJZTJOc+f58zxBgI=
@@ -263,6 +267,17 @@
 			<key>hash2</key>
 			<data>
 			bh7Ht9rjMOl1+wzBqRT9EwuBDOBmNkV8rnPI7VakhCc=
+			</data>
+		</dict>
+		<key>Headers/CPAppBanner.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			ytmQfXhpYAXcxN8egZE9+FtdFzo=
+			</data>
+			<key>hash2</key>
+			<data>
+			IkkCspNTVWPxZv40atvxe/r9PF79SpaR/rK86h2l9ds=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
