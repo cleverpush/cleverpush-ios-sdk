@@ -13,6 +13,7 @@
 #import "CPNotificationViewController.h"
 #import "CleverPushHTTPClient.h"
 #import "CPAppBannerAction.h"
+#import "CPAppBanner.h"
 #import "CPNotification.h"
 #import "CPSubscription.h"
 #import "CPChannelTag.h"

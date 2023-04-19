@@ -1,4 +1,17 @@
 #import "CPAppBannerCarouselBlock.h"
+#import "CPAppBannerDismissType.h"
+#import "CPAppBannerFrequency.h"
+#import "CPAppBannerStatus.h"
+#import "CPAppBannerStopAtType.h"
+#import "CPAppBannerType.h"
+#import "CPAppBannerBackground.h"
+#import "CPAppBannerTextBlock.h"
+#import "CPAppBannerButtonBlock.h"
+#import "CPAppBannerImageBlock.h"
+#import "CPAppBannerTrigger.h"
+#import "CPAppBannerTriggerType.h"
+#import "CPAppBannerHTMLBlock.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerCarouselBlock
 

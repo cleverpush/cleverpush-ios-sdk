@@ -8,13 +8,13 @@
 #import "CPAppBannerTextBlock.h"
 #import "CPAppBannerButtonBlock.h"
 #import "CPAppBannerImageBlock.h"
+#import "CPAppBannerCarouselBlock.h"
 #import "CPAppBannerSubscribedType.h"
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerType.h"
 #import "CPAppBannerHTMLBlock.h"
-#import "CPUtils.h"
-#import "CPAppBannerCarouselBlock.h"
 #import "CPFilterRelationType.h"
+#import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
 

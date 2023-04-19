@@ -1,3 +1,6 @@
+## 1.26.10
+* Make more headers used by `CPAppBanner` public
+
 ## 1.26.9
 * Make `CPAppBanner` header public
 
