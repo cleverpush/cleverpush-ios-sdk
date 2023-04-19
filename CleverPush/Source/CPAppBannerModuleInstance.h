@@ -46,6 +46,7 @@
 - (void)scheduleBanners;
 - (void)showBanner:(CPAppBanner*)banner;
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner;
+- (void)showNextActivePendingBanner:(CPAppBanner*)banner;
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type;
 - (void)loadBannersDisabled;
 - (void)saveBannersDisabled;

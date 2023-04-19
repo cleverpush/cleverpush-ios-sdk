@@ -15,6 +15,7 @@ NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
+NSMutableArray<CPAppBanner*> *activePendingBanners;
 NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
@@ -154,6 +155,7 @@ long sessions = 0;
     [self setPendingBannerListeners:[NSMutableArray new]];
     [self setActiveBanners:[NSMutableArray new]];
     [self setPendingBanners:[NSMutableArray new]];
+    activePendingBanners = [NSMutableArray new];
     [self setEvents:[NSMutableArray new]];
     [self loadBannersDisabled];
     [self updateShowDraftsFlag:showDraftsParam];
@@ -206,6 +208,8 @@ long sessions = 0;
         }
         
         if (jsonBanners != nil) {
+            NSArray *sortedArray = [self sortArrayByDateAndAlphabet:jsonBanners];
+            jsonBanners = [sortedArray mutableCopy];
             [self setBanners:[NSMutableArray new]];
             for (NSDictionary* json in jsonBanners) {
                 [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
@@ -656,6 +660,13 @@ long sessions = 0;
     });
 }
 
+- (void)showNextActivePendingBanner:(CPAppBanner*)banner {
+    [activeBanners removeObject:banner];
+    if (activeBanners.count != 0) {
+        [self showBanner:activeBanners.firstObject];
+    }
+}
+
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
     if ([CleverPush popupVisible]) {
         [CPLog info:@"You can not present two banners at the same time"];
@@ -774,6 +785,26 @@ long sessions = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+#pragma mark - Group array of objects by dates and alphabets.
+- (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+    
+    NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
+    NSDate *bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
+    NSDate *bannerStartdate2 = [dateFormatter dateFromString:bannerElement2[@"startAt"]];
+        
+    NSComparisonResult result = [bannerStartdate1 compare:bannerStartdate2];
+        if (result == NSOrderedSame) {
+            NSString *bannerName1 = bannerElement1[@"name"];
+            NSString *bannerName2 = bannerElement2[@"name"];
+            result = [bannerName1 compare:bannerName2];
+        }
+        return result;
+    }];
+    return sortedArray;
 }
 
 #pragma mark - refactor for testcases

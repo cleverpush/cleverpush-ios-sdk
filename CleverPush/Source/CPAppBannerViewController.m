@@ -489,6 +489,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self dismissViewControllerAnimated:NO completion:nil];
+        [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }
 
