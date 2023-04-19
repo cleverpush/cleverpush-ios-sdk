@@ -1,3 +1,6 @@
+## 1.26.11
+* Fixed Swift Package Manager (added missing headers)
+
 ## 1.26.10
 * Make more headers used by `CPAppBanner` public
 
