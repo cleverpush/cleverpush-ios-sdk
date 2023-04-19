@@ -115,6 +115,12 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 + (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
     [self.moduleInstance presentAppBanner:appBannerViewController banner:banner];
 }
+
+#pragma mark - show next banner with sort by date and alphabetically
++ (void)showNextActivePendingBanner:(CPAppBanner*)banner {
+    [self.moduleInstance showNextActivePendingBanner:banner];
+}
+
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
     [self.moduleInstance sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:button forImageBlock:image blockType:type];
