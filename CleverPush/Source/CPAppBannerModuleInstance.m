@@ -661,15 +661,15 @@ long sessions = 0;
 }
 
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner {
-    [activeBanners removeObject:banner];
-    if (activeBanners.count != 0) {
-        [self showBanner:activeBanners.firstObject];
+    [activePendingBanners removeObject:banner];
+    if (activePendingBanners.count != 0) {
+        [self showBanner:activePendingBanners.firstObject];
     }
 }
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
     if ([CleverPush popupVisible]) {
-        [CPLog info:@"You can not present two banners at the same time"];
+        [activePendingBanners addObject:banner];
         return;
     }
 
