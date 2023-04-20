@@ -1,3 +1,6 @@
+## 1.26.12
+* Bug fixes for showing of multiple app banners at the same time
+
 ## 1.26.11
 * Fixed Swift Package Manager (added missing headers)
 
