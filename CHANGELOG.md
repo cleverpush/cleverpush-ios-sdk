@@ -1,3 +1,6 @@
+## 1.26.13
+* Fixed crash for app banners when tapping buttons
+
 ## 1.26.12
 * Bug fixes for showing of multiple app banners at the same time
 
