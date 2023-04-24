@@ -793,14 +793,31 @@ long sessions = 0;
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
     
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
-    NSDate *bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
-    NSDate *bannerStartdate2 = [dateFormatter dateFromString:bannerElement2[@"startAt"]];
+        NSDate *bannerStartdate1;
+        NSDate *bannerStartdate2;
+        NSComparisonResult result;
         
-    NSComparisonResult result = [bannerStartdate1 compare:bannerStartdate2];
-        if (result == NSOrderedSame) {
-            NSString *bannerName1 = bannerElement1[@"name"];
-            NSString *bannerName2 = bannerElement2[@"name"];
-            result = [bannerName1 compare:bannerName2];
+        if (bannerElement1[@"startAt"] != nil && ![bannerElement1[@"startAt"] isKindOfClass:[NSNull class]]) {
+            bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
+        }
+        if (bannerElement2[@"startAt"] != nil && ![bannerElement2[@"startAt"] isKindOfClass:[NSNull class]]) {
+            bannerStartdate2 = [dateFormatter dateFromString:bannerElement2[@"startAt"]];
+        }
+        if (bannerStartdate1 != nil && bannerStartdate2 != nil) {
+            result = [bannerStartdate1 compare:bannerStartdate2];
+            NSString *bannerName1;
+            NSString *bannerName2;
+            if (result == NSOrderedSame) {
+                if  (bannerElement1[@"name"] != nil && ![bannerElement1[@"name"] isKindOfClass:[NSNull class]]) {
+                    bannerName1 = bannerElement1[@"name"];
+                }
+                if (bannerElement2[@"name"] != nil && ![bannerElement2[@"name"] isKindOfClass:[NSNull class]]) {
+                    bannerName2 = bannerElement2[@"name"];
+                }
+                if (bannerName1 != nil && bannerName2 != nil) {
+                    result = [bannerName1 compare:bannerName2];
+                }
+            }
         }
         return result;
     }];
