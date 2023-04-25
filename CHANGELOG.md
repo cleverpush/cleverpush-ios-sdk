@@ -1,3 +1,6 @@
+## 1.26.14
+* Only return banners with status `published` in `getAppBannersByGroup`
+
 ## 1.26.13
 * Fixed crash for app banners when tapping buttons
 
