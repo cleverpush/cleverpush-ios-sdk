@@ -201,7 +201,7 @@ long sessions = 0;
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
         
         if (groupId != nil && ![groupId isEqualToString:@""]) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", groupId]];
+            NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", groupId]], [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains 'published'"]]]];
             jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
         } else {
             jsonBanners = [[result objectForKey:@"banners"] mutableCopy];
