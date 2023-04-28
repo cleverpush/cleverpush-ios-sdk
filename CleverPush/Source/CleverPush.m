@@ -332,10 +332,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getNormalTintColor];
 }
 
-+ (void)setChatBackgroundColor:(UIColor *)color {
-    [self.CPSharedInstance setChatBackgroundColor:color];
-}
-
 + (void)setAutoClearBadge:(BOOL)autoClear {
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
@@ -542,9 +538,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getBrandingColor];
 }
 
-+ (UIColor*)getChatBackgroundColor {
-    return [self.CPSharedInstance getChatBackgroundColor];
-}
 
 + (NSDictionary*)getAvailableAttributes __attribute__((deprecated)) {
     return [self.CPSharedInstance getAvailableAttributes];

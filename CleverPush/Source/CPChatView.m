@@ -13,6 +13,16 @@ CPChatURLOpenedCallback urlOpenedCallback;
 CPChatSubscribeCallback subscribeCallback;
 NSString* headerCodes;
 NSString* lastSubscriptionId;
+UIColor* chatBrandingColor;
+UIColor* chatBackgroundColor;
+UIColor* chatSenderBubbleTextColor;
+UIColor* chatSendButtonBackgroundColor;
+UIColor* chatInputTextColor;
+UIColor* chatInputBackgroundColor;
+UIColor* chatReceiverBubbleBackgroundColor;
+UIColor* chatInputContainerBackgroundColor;
+UIColor* chatTimestampTextColor;
+UIColor* chatReceiverBubbleTextColor;
 
 #pragma mark - Load chat with subscription id
 - (void)loadChat {
@@ -110,35 +120,35 @@ NSString* lastSubscriptionId;
         NSString* chatSendButtonBackgroundColor = @"";
         NSString* chatTimestampTextColor = @"";
         
-        if ([CleverPush getBrandingColor]) {
-            brandingColor = [CPUtils hexStringFromColor:[CleverPush getBrandingColor]];
+        if (self.getChatBrandingColor) {
+            brandingColor = [CPUtils hexStringFromColor:self.getChatbrandingColor];
         }
-        if ([CleverPush getChatBackgroundColor]) {
-            backgroundColor = [CPUtils hexStringFromColor:[CleverPush getChatBackgroundColor]];
+        if (self.getChatBackgroundColor) {
+            backgroundColor = [CPUtils hexStringFromColor:self.getChatBackgroundColor];
         }
-        if (self.chatSenderBubbleTextColor != nil) {
-            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:self.chatSenderBubbleTextColor];
+        if (self.getChatSenderBubbleTextColor) {
+            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:self.getChatSenderBubbleTextColor];
         }
-        if (self.chatSendButtonBackgroundColor != nil) {
-            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:self.chatSendButtonBackgroundColor];
+        if (self.getChatSendButtonBackgroundColor) {
+            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:self.getChatSendButtonBackgroundColor];
         }
-        if (self.chatInputBackgroundColor != nil) {
-            chatInputBackgroundColor = [CPUtils hexStringFromColor:self.chatInputBackgroundColor];
+        if (self.getChatInputBackgroundColor) {
+            chatInputBackgroundColor = [CPUtils hexStringFromColor:self.getChatInputBackgroundColor];
         }
-        if (self.chatInputTextColor != nil) {
-            chatInputTextColor = [CPUtils hexStringFromColor:self.chatInputTextColor];
+        if (self.getChatInputTextColor) {
+            chatInputTextColor = [CPUtils hexStringFromColor:self.getChatInputTextColor];
         }
-        if (self.chatReceiverBubbleBackgroundColor != nil) {
-            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:self.chatReceiverBubbleBackgroundColor];
+        if (self.getChatReceiverBubbleBackgroundColor) {
+            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:self.getChatReceiverBubbleBackgroundColor];
         }
-        if (self.chatInputContainerBackgroundColor != nil) {
-            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:self.chatInputContainerBackgroundColor];
+        if (self.getChatInputContainerBackgroundColor) {
+            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:self.getChatInputContainerBackgroundColor];
         }
-        if (self.chatTimestampTextColor != nil) {
-            chatTimestampTextColor = [CPUtils hexStringFromColor:self.chatTimestampTextColor];
+        if (self.getChatTimestampTextColor) {
+            chatTimestampTextColor = [CPUtils hexStringFromColor:self.getChatTimestampTextColor];
         }
-        if (self.chatReceiverBubbleTextColor != nil) {
-            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:self.chatReceiverBubbleTextColor];
+        if (self.getChatReceiverBubbleTextColor) {
+            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:self.getChatReceiverBubbleTextColor];
         }
         if (!headerCodes) {
             headerCodes = @"";
@@ -245,6 +255,87 @@ NSString* lastSubscriptionId;
             [self loadChat];
         }
     }
+}
+
+#pragma mark - Chatview color get and set methods.
+- (void)setChatBrandingColor:(UIColor *)color {
+    chatBrandingColor = color;
+}
+
+- (UIColor *)getChatBrandingColor {
+    return chatBrandingColor;
+}
+
+- (void)setChatBackgroundColor:(UIColor *)color {
+    chatBackgroundColor = color;
+}
+
+- (UIColor *)getChatBackgroundColor {
+    return chatBackgroundColor;
+}
+
+- (void)setChatSenderBubbleTextColor:(UIColor *)color {
+    chatSenderBubbleTextColor = color;
+}
+
+- (UIColor *)getChatSenderBubbleTextColor {
+    return chatSenderBubbleTextColor;
+}
+
+- (void)setChatSendButtonBackgroundColor:(UIColor *)color {
+    chatSendButtonBackgroundColor = color;
+}
+
+- (UIColor *)getChatSendButtonBackgroundColor {
+    return chatSendButtonBackgroundColor;
+}
+
+- (void)setChatInputTextColor:(UIColor *)color {
+    chatInputTextColor = color;
+}
+
+- (UIColor *)getChatInputTextColor {
+    return chatInputTextColor;
+}
+
+- (void)setChatInputBackgroundColor:(UIColor *)color {
+    chatInputBackgroundColor = color;
+}
+
+- (UIColor *)getChatInputBackgroundColor {
+    return chatInputBackgroundColor;
+}
+
+- (void)setChatReceiverBubbleBackgroundColor:(UIColor *)color {
+    chatReceiverBubbleBackgroundColor = color;
+}
+
+- (UIColor *)getChatReceiverBubbleBackgroundColor {
+    return chatReceiverBubbleBackgroundColor;
+}
+
+- (void)setChatInputContainerBackgroundColor:(UIColor *)color {
+    chatInputContainerBackgroundColor = color;
+}
+
+- (UIColor *)getChatInputContainerBackgroundColor {
+    return chatInputContainerBackgroundColor;
+}
+
+- (void)setChatTimestampTextColor:(UIColor *)color {
+    chatTimestampTextColor = color;
+}
+
+- (UIColor *)getChatTimestampTextColor {
+    return chatTimestampTextColor;
+}
+
+- (void)setChatReceiverBubbleTextColor:(UIColor *)color {
+    chatReceiverBubbleTextColor = color;
+}
+
+- (UIColor *)getChatReceiverBubbleTextColor {
+    return chatReceiverBubbleTextColor;
 }
 
 @end

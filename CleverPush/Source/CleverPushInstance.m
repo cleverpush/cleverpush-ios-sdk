@@ -113,7 +113,6 @@ UIBackgroundTaskIdentifier mediaBackgroundTask;
 WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* normalTintColor = nil;
-UIColor* chatBackgroundColor;
 
 UIWindow* topicsDialogWindow;
 
@@ -3053,14 +3052,6 @@ static id isNil(id object) {
 
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
     keepTargetingDataOnUnsubscribe = keepData;
-}
-
-- (void)setChatBackgroundColor:(UIColor *)color {
-    chatBackgroundColor = color;
-}
-
-- (UIColor*)getChatBackgroundColor {
-    return chatBackgroundColor;
 }
 
 - (void)addStoryView:(CPStoryView*)storyView {
