@@ -1,3 +1,6 @@
+## 1.26.15
+* Add support for app baners copy to clipboard action
+
 ## 1.26.14
 * Only return banners with status `published` in `getAppBannersByGroup`
 

@@ -645,6 +645,11 @@ long sessions = 0;
             if (action && [action.type isEqualToString:@"setAttribute"]) {
                 [CleverPush setSubscriptionAttribute:action.attributeId value:action.attributeValue];
             }
+
+            if (action && [action.type isEqualToString:@"copyToClipboard"]) {
+                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                pasteboard.string = action.name;
+            }
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
