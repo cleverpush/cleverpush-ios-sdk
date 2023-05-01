@@ -13,9 +13,9 @@ CPChatURLOpenedCallback urlOpenedCallback;
 CPChatSubscribeCallback subscribeCallback;
 NSString* headerCodes;
 NSString* lastSubscriptionId;
-UIColor* chatBrandingColor;
 UIColor* chatBackgroundColor;
 UIColor* chatSenderBubbleTextColor;
+UIColor* chatSenderBubbleBackgroundColor;
 UIColor* chatSendButtonBackgroundColor;
 UIColor* chatInputTextColor;
 UIColor* chatInputBackgroundColor;
@@ -119,36 +119,40 @@ UIColor* chatReceiverBubbleTextColor;
         NSString* chatReceiverBubbleTextColor = @"";
         NSString* chatSendButtonBackgroundColor = @"";
         NSString* chatTimestampTextColor = @"";
+        NSString* chatSenderBubbleBackgroundColor = @"";
         
-        if (self.getChatBrandingColor) {
-            brandingColor = [CPUtils hexStringFromColor:self.getChatbrandingColor];
+        if ([CleverPush getBrandingColor]) {
+            brandingColor = [CPUtils hexStringFromColor:[CleverPush getBrandingColor]];
         }
-        if (self.getChatBackgroundColor) {
-            backgroundColor = [CPUtils hexStringFromColor:self.getChatBackgroundColor];
+        if ([self getChatBackgroundColor]) {
+            backgroundColor = [CPUtils hexStringFromColor:[self getChatBackgroundColor]];
         }
-        if (self.getChatSenderBubbleTextColor) {
-            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:self.getChatSenderBubbleTextColor];
+        if ([self getChatSenderBubbleTextColor]) {
+            chatSenderBubbleTextColor = [CPUtils hexStringFromColor:[self getChatSenderBubbleTextColor]];
         }
-        if (self.getChatSendButtonBackgroundColor) {
-            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:self.getChatSendButtonBackgroundColor];
+        if ([self getChatSendButtonBackgroundColor]) {
+            chatSendButtonBackgroundColor = [CPUtils hexStringFromColor:[self getChatSendButtonBackgroundColor]];
         }
-        if (self.getChatInputBackgroundColor) {
-            chatInputBackgroundColor = [CPUtils hexStringFromColor:self.getChatInputBackgroundColor];
+        if ([self getChatInputBackgroundColor]) {
+            chatInputBackgroundColor = [CPUtils hexStringFromColor:[self getChatInputBackgroundColor]];
         }
-        if (self.getChatInputTextColor) {
-            chatInputTextColor = [CPUtils hexStringFromColor:self.getChatInputTextColor];
+        if ([self getChatInputTextColor]) {
+            chatInputTextColor = [CPUtils hexStringFromColor:[self getChatInputTextColor]];
         }
-        if (self.getChatReceiverBubbleBackgroundColor) {
-            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:self.getChatReceiverBubbleBackgroundColor];
+        if ([self getChatReceiverBubbleBackgroundColor]) {
+            chatReceiverBubbleBackgroundColor = [CPUtils hexStringFromColor:[self getChatReceiverBubbleBackgroundColor]];
         }
-        if (self.getChatInputContainerBackgroundColor) {
-            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:self.getChatInputContainerBackgroundColor];
+        if ([self getChatInputContainerBackgroundColor]) {
+            chatInputContainerBackgroundColor = [CPUtils hexStringFromColor:[self getChatInputContainerBackgroundColor]];
         }
-        if (self.getChatTimestampTextColor) {
-            chatTimestampTextColor = [CPUtils hexStringFromColor:self.getChatTimestampTextColor];
+        if ([self getChatTimestampTextColor]) {
+            chatTimestampTextColor = [CPUtils hexStringFromColor:[self getChatTimestampTextColor]];
         }
-        if (self.getChatReceiverBubbleTextColor) {
-            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:self.getChatReceiverBubbleTextColor];
+        if ([self getChatReceiverBubbleTextColor]) {
+            chatReceiverBubbleTextColor = [CPUtils hexStringFromColor:[self getChatReceiverBubbleTextColor]];
+        }
+        if ([self getChatSenderBubbleBackgroundColor]) {
+            chatSenderBubbleBackgroundColor = [CPUtils hexStringFromColor:[self getChatSenderBubbleBackgroundColor]];
         }
         if (!headerCodes) {
             headerCodes = @"";
@@ -168,7 +172,7 @@ UIColor* chatReceiverBubbleTextColor;
                    <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
                    <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
                    <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
-                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@'; (cleverpushConfig || {}).nativeApp = true;     (cleverpushConfig || {}).brandingColor = '%@';                                                                                                                          (cleverpushConfig || {}).chatBackgroundColor = '%@';                                                                                                                (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';                                                                                                     (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';                                                                                         (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';                                                                                     (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';                                                                                    (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';                                                                                     (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';                                                                                          (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';                                                                                                       (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';</script>\
+                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@';                                (cleverpushConfig || {}).nativeApp = true;                                                                                                    (cleverpushConfig || {}).brandingColor = '%@';                                                                                                  (cleverpushConfig || {}).chatBackgroundColor = '%@';                                                                                            (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';                                                                             (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';                                                                             (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';                                                                         (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';                                                                        (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';                                                                         (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';                                                                              (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';                                                                                   (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';                                                                               (cleverpushConfig || {}).chatStylingOptions.chatSenderBubbleBackgroundColor = '%@';</script>\
                    <script>\
                    function showErrorView() {\
                    document.body.innerHTML = `\
@@ -211,7 +215,7 @@ UIColor* chatReceiverBubbleTextColor;
                    </script>\
                    <script onerror='showErrorView()' src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
                    </body>\
-                   </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor, chatSenderBubbleTextColor, chatSendButtonBackgroundColor, chatInputBackgroundColor, chatInputTextColor, chatReceiverBubbleBackgroundColor, chatInputContainerBackgroundColor, chatTimestampTextColor, chatReceiverBubbleTextColor];
+                   </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor, chatSenderBubbleTextColor, chatSendButtonBackgroundColor, chatInputBackgroundColor, chatInputTextColor, chatReceiverBubbleBackgroundColor, chatInputContainerBackgroundColor, chatTimestampTextColor, chatReceiverBubbleTextColor, chatSenderBubbleBackgroundColor];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.webView loadHTMLString:content baseURL:[[NSBundle mainBundle] resourceURL]];
@@ -258,84 +262,84 @@ UIColor* chatReceiverBubbleTextColor;
 }
 
 #pragma mark - Chatview color get and set methods.
-- (void)setChatBrandingColor:(UIColor *)color {
-    chatBrandingColor = color;
-}
-
-- (UIColor *)getChatBrandingColor {
-    return chatBrandingColor;
-}
-
 - (void)setChatBackgroundColor:(UIColor *)color {
     chatBackgroundColor = color;
-}
-
-- (UIColor *)getChatBackgroundColor {
-    return chatBackgroundColor;
-}
-
-- (void)setChatSenderBubbleTextColor:(UIColor *)color {
-    chatSenderBubbleTextColor = color;
-}
-
-- (UIColor *)getChatSenderBubbleTextColor {
-    return chatSenderBubbleTextColor;
 }
 
 - (void)setChatSendButtonBackgroundColor:(UIColor *)color {
     chatSendButtonBackgroundColor = color;
 }
 
-- (UIColor *)getChatSendButtonBackgroundColor {
-    return chatSendButtonBackgroundColor;
+- (void)setChatSenderBubbleTextColor:(UIColor *)color {
+    chatSenderBubbleTextColor = color;
 }
 
 - (void)setChatInputTextColor:(UIColor *)color {
     chatInputTextColor = color;
 }
 
-- (UIColor *)getChatInputTextColor {
-    return chatInputTextColor;
-}
-
 - (void)setChatInputBackgroundColor:(UIColor *)color {
     chatInputBackgroundColor = color;
-}
-
-- (UIColor *)getChatInputBackgroundColor {
-    return chatInputBackgroundColor;
 }
 
 - (void)setChatReceiverBubbleBackgroundColor:(UIColor *)color {
     chatReceiverBubbleBackgroundColor = color;
 }
 
-- (UIColor *)getChatReceiverBubbleBackgroundColor {
-    return chatReceiverBubbleBackgroundColor;
-}
-
 - (void)setChatInputContainerBackgroundColor:(UIColor *)color {
     chatInputContainerBackgroundColor = color;
-}
-
-- (UIColor *)getChatInputContainerBackgroundColor {
-    return chatInputContainerBackgroundColor;
 }
 
 - (void)setChatTimestampTextColor:(UIColor *)color {
     chatTimestampTextColor = color;
 }
 
-- (UIColor *)getChatTimestampTextColor {
-    return chatTimestampTextColor;
-}
-
 - (void)setChatReceiverBubbleTextColor:(UIColor *)color {
     chatReceiverBubbleTextColor = color;
 }
 
-- (UIColor *)getChatReceiverBubbleTextColor {
+- (void)setChatSenderBubbleBackgroundColor:(UIColor *)color {
+    chatSenderBubbleBackgroundColor = color;
+}
+
+- (UIColor*)getChatBackgroundColor {
+    return chatBackgroundColor;
+}
+
+- (UIColor*)getChatSenderBubbleTextColor {
+    return chatSenderBubbleTextColor;
+}
+
+- (UIColor*)getChatSendButtonBackgroundColor {
+    return chatSendButtonBackgroundColor;
+}
+
+- (UIColor*)getChatInputTextColor {
+    return chatInputTextColor;
+}
+
+- (UIColor*)getChatInputBackgroundColor {
+    return chatInputBackgroundColor;
+}
+
+- (UIColor*)getChatReceiverBubbleBackgroundColor {
+    return chatReceiverBubbleBackgroundColor;
+}
+
+- (UIColor*)getChatInputContainerBackgroundColor {
+    return chatInputContainerBackgroundColor;
+}
+
+- (UIColor*)getChatTimestampTextColor {
+    return chatTimestampTextColor;
+}
+
+- (UIColor*)getChatReceiverBubbleTextColor {
     return chatReceiverBubbleTextColor;
+}
+
+- (UIColor*)getChatSenderBubbleBackgroundColor {
+    return chatSenderBubbleBackgroundColor;
 }
 
 @end
