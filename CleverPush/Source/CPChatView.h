@@ -15,14 +15,26 @@ typedef void (^CPChatSubscribeCallback)(void);
 - (void)loadChat;
 - (void)loadChatWithSubscriptionId:(NSString*)subscriptionId;
 - (void)lockChat;
-@property (nonatomic, assign) UIColor* chatInputContainerBackgroundColor;
-@property (nonatomic, assign) UIColor* chatInputBackgroundColor;
-@property (nonatomic, assign) UIColor* chatInputTextColor;
-@property (nonatomic, assign) UIColor* chatSenderBubbleTextColor;
-@property (nonatomic, assign) UIColor* chatReceiverBubbleBackgroundColor;
-@property (nonatomic, assign) UIColor* chatReceiverBubbleTextColor;
-@property (nonatomic, assign) UIColor* chatSendButtonBackgroundColor;
-@property (nonatomic, assign) UIColor* chatTimestampTextColor;
+- (void)setChatBackgroundColor:(UIColor *)color;
+- (void)setChatSenderBubbleTextColor:(UIColor *)color;
+- (void)setChatSenderBubbleBackgroundColor:(UIColor *)color;
+- (void)setChatSendButtonBackgroundColor:(UIColor *)color;
+- (void)setChatInputTextColor:(UIColor *)color;
+- (void)setChatInputBackgroundColor:(UIColor *)color;
+- (void)setChatReceiverBubbleBackgroundColor:(UIColor *)color;
+- (void)setChatInputContainerBackgroundColor:(UIColor *)color;
+- (void)setChatTimestampTextColor:(UIColor *)color;
+- (void)setChatReceiverBubbleTextColor:(UIColor *)color;
 
+- (UIColor*)getChatbackgroundColor;
+- (UIColor*)getChatSenderBubbleTextColor;
+- (UIColor*)getChatSenderBubbleBackgroundColor;
+- (UIColor*)getChatSendButtonBackgroundColor;
+- (UIColor*)getChatInputBackgroundColor;
+- (UIColor*)getChatInputTextColor;
+- (UIColor*)getChatReceiverBubbleBackgroundColor;
+- (UIColor*)getChatInputContainerBackgroundColor;
+- (UIColor*)getChatTimestampTextColor;
+- (UIColor*)getChatReceiverBubbleTextColor;
 
 @end
