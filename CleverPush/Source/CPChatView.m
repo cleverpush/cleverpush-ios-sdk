@@ -172,7 +172,19 @@ UIColor* chatReceiverBubbleTextColor;
                    <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
                    <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
                    <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
-                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@';                                (cleverpushConfig || {}).nativeApp = true;                                                                                                    (cleverpushConfig || {}).brandingColor = '%@';                                                                                                  (cleverpushConfig || {}).chatBackgroundColor = '%@';                                                                                            (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';                                                                             (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';                                                                             (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';                                                                         (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';                                                                        (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';                                                                         (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';                                                                              (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';                                                                                   (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';                                                                               (cleverpushConfig || {}).chatStylingOptions.chatSenderBubbleBackgroundColor = '%@';</script>\
+                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@';\
+                   (cleverpushConfig || {}).nativeApp = true;\
+                   (cleverpushConfig || {}).brandingColor = '%@';\
+                   (cleverpushConfig || {}).chatBackgroundColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';\
+                   (cleverpushConfig || {}).chatStylingOptions.chatSenderBubbleBackgroundColor = '%@';</script>\
                    <script>\
                    function showErrorView() {\
                    document.body.innerHTML = `\
