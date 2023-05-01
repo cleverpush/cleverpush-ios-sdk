@@ -1,5 +1,9 @@
+## 1.27.0
+* Optimized `CPChatView` methods
+* `getAppBannersByGroup`: filter by targeting and time
+
 ## 1.26.15
-* Add support for app baners copy to clipboard action
+* Add support for app banners copy to clipboard action
 
 ## 1.26.14
 * Only return banners with status `published` in `getAppBannersByGroup`

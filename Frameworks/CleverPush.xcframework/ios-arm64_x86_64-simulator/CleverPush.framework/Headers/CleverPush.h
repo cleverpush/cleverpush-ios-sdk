@@ -98,7 +98,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setBrandingColor:(UIColor *)color;
 + (void)setNormalTintColor:(UIColor *)color;
 + (UIColor*)getNormalTintColor;
-+ (void)setChatBackgroundColor:(UIColor *)color;
 + (void)setAutoClearBadge:(BOOL)autoClear;
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 + (void)setIncrementBadge:(BOOL)increment;
@@ -152,7 +151,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)channelId;
 
 + (UIColor*)getBrandingColor;
-+ (UIColor*)getChatBackgroundColor;
 
 + (NSDictionary*)getAvailableAttributes __attribute__((deprecated));
 + (NSDictionary*)getSubscriptionAttributes;

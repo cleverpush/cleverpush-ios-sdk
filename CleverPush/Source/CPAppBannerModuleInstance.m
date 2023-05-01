@@ -199,8 +199,9 @@ long sessions = 0;
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
-        
-        if (groupId != nil && ![groupId isEqualToString:@""]) {
+        BOOL useGroupId = groupId != nil && ![groupId isEqualToString:@""];
+
+        if (useGroupId) {
             NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", groupId]], [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains 'published'"]]]];
             jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
         } else {
@@ -212,7 +213,19 @@ long sessions = 0;
             jsonBanners = [sortedArray mutableCopy];
             [self setBanners:[NSMutableArray new]];
             for (NSDictionary* json in jsonBanners) {
-                [banners addObject:[[CPAppBanner alloc] initWithJson:json]];
+                CPAppBanner* banner = [[CPAppBanner alloc] initWithJson:json];
+
+                if (useGroupId) {
+                    if (![self bannerTargetingAllowed:banner]) {
+                        continue;
+                    }
+
+                    if (![self bannerTimeAllowed:banner]) {
+                        continue;
+                    }
+                }
+
+                [banners addObject:banner];
             }
 
             if (notificationId && callback) {
@@ -320,6 +333,10 @@ long sessions = 0;
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
     allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     return allowed;
+}
+
+- (BOOL)bannerTimeAllowed:(CPAppBanner*)banner {
+    return banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedAscending;
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
@@ -543,7 +560,7 @@ long sessions = 0;
             return;
         }
 
-        if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedAscending) {
+        if (![self bannerTimeAllowed:banner]) {
             [CPLog debug:@"Skipping banner because: date is after stop date"];
             return;
         }
