@@ -62,10 +62,12 @@
         if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
             [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
                 if (callback) {
-                    [cell setNeedsLayout];
-                    [cell layoutIfNeeded];
-                    [tableView beginUpdates];
-                    [tableView endUpdates];
+                    [UIView performWithoutAnimation:^{
+                                            [cell setNeedsLayout];
+                                            [cell layoutIfNeeded];
+                                           [tableView beginUpdates];
+                                           [tableView endUpdates];
+                                        }];
                 }
             }];
         }
