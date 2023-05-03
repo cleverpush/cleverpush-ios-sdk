@@ -1,3 +1,7 @@
+## 1.27.1
+* App Banners: disable animations for images
+* Fixed edge case with device token when migrating from old to new device
+
 ## 1.27.0
 * Optimized `CPChatView` methods
 * `getAppBannersByGroup`: filter by targeting and time
