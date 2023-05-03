@@ -384,6 +384,9 @@ static id isNil(id object) {
                 [CPLog debug:@"syncSubscription called from initWithChannelId"];
                 [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
             } else {
+                [self ensureMainThreadSync:^{
+                           [[UIApplication sharedApplication] registerForRemoteNotifications];
+                       }];
                 if ([self getSubscribeHandler] && ![self getHandleSubscribedCalled]) {
                     [self getSubscribeHandler](subscriptionId);
                     [self setHandleSubscribedCalled:YES];
