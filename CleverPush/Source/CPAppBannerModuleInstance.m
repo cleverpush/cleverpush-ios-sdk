@@ -336,7 +336,15 @@ long sessions = 0;
 }
 
 - (BOOL)bannerTimeAllowed:(CPAppBanner*)banner {
-    return banner.stopAtType == CPAppBannerStopAtTypeSpecificTime && [banner.stopAt compare:[NSDate date]] == NSOrderedAscending;
+    if (banner.stopAtType == CPAppBannerStopAtTypeSpecificTime) {
+        if ([banner.stopAt compare:[NSDate date]] == NSOrderedAscending) {
+            return NO;
+        } else {
+            return YES;
+        }
+    } else {
+        return YES;
+    }
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
