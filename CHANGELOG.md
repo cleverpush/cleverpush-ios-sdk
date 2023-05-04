@@ -1,3 +1,6 @@
+## 1.27.2
+* Hotfix: app banners were incorrectly filtered
+
 ## 1.27.1
 * App Banners: disable animations for images
 * Fixed edge case with device token when migrating from old to new device
