@@ -202,13 +202,27 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  General function to get the color from hex string
 + (NSString *)hexStringFromColor:(UIColor *)color {
+    CGColorSpaceModel colorSpace = CGColorSpaceGetModel(CGColorGetColorSpace(color.CGColor));
     const CGFloat *components = CGColorGetComponents(color.CGColor);
+    CGFloat r, g, b, a;
 
-    CGFloat r = components[0];
-    CGFloat g = components[1];
-    CGFloat b = components[2];
-
-    return [NSString stringWithFormat:@"#%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255)];
+    if (colorSpace == kCGColorSpaceModelMonochrome) {
+        r = components[0];
+        g = components[0];
+        b = components[0];
+        a = components[1];
+    }
+    else if (colorSpace == kCGColorSpaceModelRGB) {
+        r = components[0];
+        g = components[1];
+        b = components[2];
+        a = components[3];
+    }
+    return [NSString stringWithFormat:@"#%02lX%02lX%02lX%02lX",
+            lroundf(r * 255),
+            lroundf(g * 255),
+            lroundf(b * 255),
+            lroundf(a * 255)];
 }
 
 #pragma mark -  Check the font family has been exist in the UIBundle or not.
