@@ -1,3 +1,6 @@
+## 1.27.3
+* Fixed `CPChatView` colors
+
 ## 1.27.2
 * Hotfix: app banners were incorrectly filtered
 
