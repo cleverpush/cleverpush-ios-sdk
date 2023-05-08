@@ -1,3 +1,6 @@
+## 1.27.4
+* Fixed `bannerDescription` property changes
+
 ## 1.27.3
 * Fixed `CPChatView` colors
 

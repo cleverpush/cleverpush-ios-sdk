@@ -46,15 +46,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		p7g0K5GCRtg8oJOf0XdQscN4YM0=
+		6gevBc51kngSxZYlH/e5+BT7Yk8=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		1wgY6Ykzy4EtRSRm5D4n4wWG0Rc=
+		L5DDn/TFT16ryXIDzcydcp6f0mI=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		pbYHAE5yz5QxonKU4fsXEbSBrNs=
+		1CJERnHOUFI2UTq6taWt5iTBASs=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		/k/kBAWYYGAhGPSJD9I9bZIzSQE=
+		ZzVVK8ecPwyurvZSxadTBkkQbPM=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -193,33 +193,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			p7g0K5GCRtg8oJOf0XdQscN4YM0=
+			6gevBc51kngSxZYlH/e5+BT7Yk8=
 			</data>
 			<key>hash2</key>
 			<data>
-			mILY0ciRtzR5zUnltTRAH6kkZ/g4rTGdJp7MYXGsdLo=
+			0gg7DJb/+eoXOlNSpz+vOPBi/aBayIQ3zQEWC6mVg6g=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			1wgY6Ykzy4EtRSRm5D4n4wWG0Rc=
+			L5DDn/TFT16ryXIDzcydcp6f0mI=
 			</data>
 			<key>hash2</key>
 			<data>
-			HeSmyHHjN3owqMZHY1koMh8arts7Nb0jmDjRQMDZkTk=
+			d7Nw+0nUdr8tkfaaS9On4mMmr9CfaMCIuiWiZODsPEA=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			pbYHAE5yz5QxonKU4fsXEbSBrNs=
+			1CJERnHOUFI2UTq6taWt5iTBASs=
 			</data>
 			<key>hash2</key>
 			<data>
-			JjNxnNLHtmKf3GMOcbHnDRAAybU2QB0J5RKOY0LrmkI=
+			U3pC6jkXqiF9eSobgG+JXBUlz7XRB9b2YYmFRIJEQ04=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
