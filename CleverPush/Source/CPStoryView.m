@@ -8,7 +8,7 @@
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
-- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     self = [super initWithFrame:frame];
     if (self) {
         if (id != nil && id.length != 0) {
@@ -37,6 +37,27 @@
                     } else {
                         self.fontStyle = @"AppleSDGothicNeo-Regular";
                     }
+
+                    self.titleVisibility = TRUE;
+                    if (titleVisibility == false) {
+                        self.titleVisibility = titleVisibility;
+                    }
+
+                    self.titleTextSize = 10;
+                    if (titleTextSize > 0) {
+                        self.titleTextSize = titleTextSize;
+                    }
+
+                    self.storyIconHeight = 75;
+                    if (storyIconHeight > 0) {
+                        self.storyIconHeight = storyIconHeight;
+                    }
+
+                    self.storyIconWidth = 105;
+                    if (storyIconWidth > 0) {
+                        self.storyIconWidth = storyIconWidth;
+                    }
+
                     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
                     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
                     self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0) collectionViewLayout:layout];
@@ -81,10 +102,10 @@
     cell.name.textAlignment = NSTextAlignmentCenter;
     cell.name.numberOfLines = 0;
     if (self.fontStyle && [self.fontStyle length] > 0 && [CPUtils fontFamilyExists:self.fontStyle]) {
-        [cell.name setFont:[UIFont fontWithName:self.fontStyle size:(CGFloat)(10.0)]];
+        [cell.name setFont:[UIFont fontWithName:self.fontStyle size:(CGFloat)(self.titleTextSize)]];
     } else {
         [CPLog error:@"Font Family not found: %@", self.fontStyle];
-        [cell.name setFont:[UIFont systemFontOfSize:(CGFloat)(10.0) weight:UIFontWeightSemibold]];
+        [cell.name setFont:[UIFont systemFontOfSize:(CGFloat)(self.titleTextSize) weight:UIFontWeightSemibold]];
     }
 
     if (self.stories[indexPath.item].content.preview.posterPortraitSrc != nil && ![self.stories[indexPath.item].content.preview.posterPortraitSrc isKindOfClass:[NSNull class]]) {
@@ -105,7 +126,15 @@
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(75, 105);
+    CGFloat width = 75;
+    CGFloat height = 105;
+    if (self.storyIconWidth > 0) {
+        width = self.storyIconWidth;
+    }
+    if (self.storyIconHeight > 0) {
+        height = self.storyIconHeight;
+    }
+    return CGSizeMake(width, height);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
