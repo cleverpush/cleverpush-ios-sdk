@@ -124,6 +124,8 @@
     webview.backgroundColor = [UIColor clearColor];
     webview.scrollView.backgroundColor = [UIColor clearColor];
     webview.opaque = false;
+    self.openUrlDelegate = webview;
+    [self.openUrlDelegate openUrl:false];
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
     

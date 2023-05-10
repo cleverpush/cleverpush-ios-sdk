@@ -1,6 +1,7 @@
 #import "CPWKWebView.h"
-
-@interface CPWKWebView () <WKNavigationDelegate, WKUIDelegate>
+#import "CPStoriesController.h"
+#import "CPLog.h"
+@interface CPWKWebView () <WKNavigationDelegate, WKUIDelegate, storyViewOpenedListener>
 @end
 
 @implementation CPWKWebView
@@ -41,7 +42,11 @@
     if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
         if (navigationAction.request.URL) {
             if ([[UIApplication sharedApplication] canOpenURL:navigationAction.request.URL]) {
-                [CPUtils openSafari:navigationAction.request.URL];
+                if (self.isUrlTracked == true) {
+                    [self redirectUrl:navigationAction.request.URL];
+                } else {
+                    [CPUtils openSafari:navigationAction.request.URL];
+                }
                 decisionHandler(WKNavigationActionPolicyCancel);
             } else {
                 decisionHandler(WKNavigationActionPolicyAllow);
@@ -49,6 +54,17 @@
         }
     } else {
         decisionHandler(WKNavigationActionPolicyAllow);
+    }
+}
+
+#pragma mark - 
+- (void)openUrl:(BOOL)isOpened {
+    self.isUrlTracked = isOpened;
+}
+
+- (void)redirectUrl:(NSURL *)url {
+    if (url && url.scheme && url.host) {
+        [CPLog info:@"Redirected Url= %@",url];
     }
 }
 

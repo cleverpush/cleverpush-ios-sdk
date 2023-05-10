@@ -7,6 +7,7 @@ typedef void(^ __nullable WebViewFinishLoadBlock)(WKWebView *, NSError *);
 @interface CPWKWebView : WKWebView
 
 @property(nonatomic, copy) WebViewFinishLoadBlock webViewFinishLoadBlock;
+@property (assign) BOOL isUrlTracked;
 
 - (void)loadRequest:(NSURLRequest *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
 - (void)loadHTML:(NSString *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
