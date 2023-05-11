@@ -313,7 +313,7 @@
     [userController addScriptMessageHandler:self name:@"openWebView"];
     config.userContentController = userController;
 
-    self.webView = [[WKWebView alloc] initWithFrame:UIScreen.mainScreen.bounds configuration:config];
+    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height) configuration:config];
     self.webView.scrollView.scrollEnabled = true;
     self.webView.scrollView.bounces = false;
     self.webView.allowsBackForwardNavigationGestures = false;
@@ -322,7 +322,7 @@
     self.webView.backgroundColor = [UIColor clearColor];
     self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
+    self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     [self.view addSubview:self.webView];
 
