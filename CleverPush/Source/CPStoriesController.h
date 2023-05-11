@@ -10,10 +10,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadReadStories:(NSArray *)array;
 @end
 
-@protocol storyViewOpenedListener <NSObject>
-- (void)openUrl:(BOOL)isOpened;
-@end
-
 @interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>
 
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
@@ -21,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) NSMutableArray *readStories;
 @property (nonatomic, assign) id delegate;
-@property (nonatomic, assign) id<storyViewOpenedListener> openUrlDelegate;
 
 @end
 NS_ASSUME_NONNULL_END
