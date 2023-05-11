@@ -322,7 +322,7 @@
     self.webView.backgroundColor = [UIColor clearColor];
     self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.webBannerHeight.constant = UIScreen.mainScreen.bounds.size.height;
+    self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     [self.view addSubview:self.webView];
 
