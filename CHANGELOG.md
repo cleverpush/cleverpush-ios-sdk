@@ -1,3 +1,7 @@
+## 1.27.5
+* Fixed app banner sizes when changing rootViewController size
+* More customization options for `CPStoryView`
+
 ## 1.27.4
 * Fixed `bannerDescription` property changes
 
