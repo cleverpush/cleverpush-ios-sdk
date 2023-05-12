@@ -8,8 +8,14 @@
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:id];
+}
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
-    self = [super initWithFrame:frame];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
+}
+
+- (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     if (self) {
         if (id != nil && id.length != 0) {
             [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget) {
@@ -19,19 +25,19 @@
                     } else {
                         self.backgroundColor = UIColor.whiteColor;
                     }
-                    
+
                     if (borderColor != nil) {
                         self.ringBorderColor = borderColor;
                     } else {
                         self.ringBorderColor = UIColor.darkGrayColor;
                     }
-                    
+
                     if (textColor != nil) {
                         self.textColor = textColor;
                     } else {
                         self.textColor = UIColor.blackColor;
                     }
-                    
+
                     if (fontFamily != nil && fontFamily.length != 0) {
                         self.fontStyle = fontFamily;
                     } else {
