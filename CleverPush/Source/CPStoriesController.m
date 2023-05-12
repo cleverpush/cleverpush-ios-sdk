@@ -1,4 +1,6 @@
 #import "CPStoriesController.h"
+#import "CPLog.h"
+
 @interface CPStoriesController ()
 @end
 
@@ -124,9 +126,9 @@
     webview.backgroundColor = [UIColor clearColor];
     webview.scrollView.backgroundColor = [UIColor clearColor];
     webview.opaque = false;
-    webview.urlOpenedListener = ^(NSURL *url) {
-        NSLog(@"Tracked Url = %@",url);
-    };
+    [webview trackUrlOpenedCallback:^(NSURL * _Nonnull url) {
+        [CPLog info:@"Tracked Url: %@ ",[NSString stringWithFormat:@"%@",url]];
+    }];
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
     
