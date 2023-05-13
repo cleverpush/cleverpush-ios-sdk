@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) NSMutableArray *readStories;
 @property (nonatomic, assign) id delegate;
+@property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
 
 @end
 NS_ASSUME_NONNULL_END

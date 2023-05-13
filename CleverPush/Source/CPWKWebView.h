@@ -10,6 +10,7 @@ typedef void(^ __nullable WebViewFinishLoadBlock)(WKWebView *, NSError *);
 
 - (void)loadRequest:(NSURLRequest *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
 - (void)loadHTML:(NSString *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
+- (void)setUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock;
 
 @end
 NS_ASSUME_NONNULL_END

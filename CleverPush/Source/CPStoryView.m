@@ -5,6 +5,10 @@
 #import "CPStoriesController.h"
 #import "CPLog.h"
 
+#define DEFAULT_TEXT_SIZE 10
+#define DEFAULT_ICON_SIZE 75
+#define TEXT_HEIGHT 30
+
 @implementation CPStoryView
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
@@ -49,24 +53,24 @@
                         self.titleVisibility = titleVisibility;
                     }
 
-                    self.titleTextSize = 10;
+                    self.titleTextSize = DEFAULT_TEXT_SIZE;
                     if (titleTextSize > 0) {
                         self.titleTextSize = titleTextSize;
                     }
 
-                    self.storyIconHeight = 75;
-                    if (storyIconHeight > 0) {
-                        self.storyIconHeight = storyIconHeight;
-                    }
-
-                    self.storyIconWidth = 105;
+                    self.storyIconWidth = DEFAULT_ICON_SIZE;
                     if (storyIconWidth > 0) {
                         self.storyIconWidth = storyIconWidth;
                     }
 
+                    self.storyIconHeight = DEFAULT_ICON_SIZE;
+                    if (storyIconHeight > 0) {
+                        self.storyIconHeight = storyIconHeight;
+                    }
+
                     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
                     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-                    self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0) collectionViewLayout:layout];
+                    self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 125.0) collectionViewLayout:layout];
                     [self.storyCollection registerClass:[CPStoryCell class] forCellWithReuseIdentifier:@"CPStoryCell"];
                     self.storyCollection.backgroundColor = UIColor.clearColor;
                     self.storyCollection.directionalLockEnabled = YES;
@@ -80,8 +84,8 @@
                 });
             }];
         } else {
-            self.emptyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
-            UILabel *emptyString = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , 125.0)];
+            self.emptyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 125.0)];
+            UILabel *emptyString = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 125.0)];
             self.emptyView.backgroundColor = backgroundColor;
             emptyString.text = @"Please enter a valid story ID.";
             [emptyString setFont:[UIFont fontWithName:@"AppleSDGothicNeo-Bold" size:(CGFloat)(17.0)]];
@@ -96,17 +100,32 @@
 
 #pragma mark - UICollectionView delegate
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return  self.stories.count;
+    return self.stories.count;
+}
+
+- (NSInteger)numberOfSectionsInCollectionView: (UICollectionView *)collectionView {
+    return 1;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CPStoryCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPStoryCell" forIndexPath:indexPath];
+
+    if (!cell.image) {
+        cell.outerRing = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.storyIconWidth, self.storyIconHeight)];
+        [cell addSubview:cell.outerRing];
+        cell.image = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, self.storyIconWidth - 10, self.storyIconHeight - 10)];
+        [cell.outerRing addSubview:cell.image];
+        cell.name = [[UILabel alloc] initWithFrame:CGRectMake(0, cell.outerRing.frame.size.height, self.storyIconWidth, TEXT_HEIGHT)];
+        [cell addSubview:cell.name];
+    }
+
     cell.image.contentMode = UIViewContentModeScaleAspectFill;
     cell.image.clipsToBounds = YES;
     cell.name.text = self.stories[indexPath.item].title;
     cell.name.textColor = self.textColor;
     cell.name.textAlignment = NSTextAlignmentCenter;
-    cell.name.numberOfLines = 0;
+    cell.name.numberOfLines = 1;
+    
     if (self.fontStyle && [self.fontStyle length] > 0 && [CPUtils fontFamilyExists:self.fontStyle]) {
         [cell.name setFont:[UIFont fontWithName:self.fontStyle size:(CGFloat)(self.titleTextSize)]];
     } else {
@@ -117,7 +136,7 @@
     if (self.stories[indexPath.item].content.preview.posterPortraitSrc != nil && ![self.stories[indexPath.item].content.preview.posterPortraitSrc isKindOfClass:[NSNull class]]) {
         [cell.image setImageWithURL:[NSURL URLWithString:self.stories[indexPath.item].content.preview.posterPortraitSrc]];
     }
-    cell.image.layer.cornerRadius = cell.image.frame.size.height/2;
+    cell.image.layer.cornerRadius = cell.image.frame.size.height / 2;
     cell.outerRing.layer.cornerRadius = cell.outerRing.frame.size.height / 2;
     cell.outerRing.backgroundColor = UIColor.whiteColor;
 
@@ -132,15 +151,7 @@
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CGFloat width = 75;
-    CGFloat height = 105;
-    if (self.storyIconWidth > 0) {
-        width = self.storyIconWidth;
-    }
-    if (self.storyIconHeight > 0) {
-        height = self.storyIconHeight;
-    }
-    return CGSizeMake(width, height);
+    return CGSizeMake(self.storyIconWidth, self.storyIconHeight + TEXT_HEIGHT);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -157,11 +168,12 @@
     UIViewController* topController = [CleverPush topViewController];
     storiesController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     storiesController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    storiesController.openedCallback = self.openedCallback;
     [topController presentViewController:storiesController animated:YES completion:nil];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(0, 10, 0, 10);
+    return UIEdgeInsetsMake(10, 10, 0, 10);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {

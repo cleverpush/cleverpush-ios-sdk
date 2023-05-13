@@ -5,6 +5,8 @@
 
 @implementation CPWKWebView
 
+CPStoryViewOpenedBlock urlOpenedListener;
+
 - (void)loadRequest:(NSURLRequest *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler
 {
     self.navigationDelegate = self;
@@ -41,7 +43,11 @@
     if (navigationAction.navigationType == WKNavigationTypeLinkActivated) {
         if (navigationAction.request.URL) {
             if ([[UIApplication sharedApplication] canOpenURL:navigationAction.request.URL]) {
-                [CPUtils openSafari:navigationAction.request.URL];
+                if (urlOpenedListener != nil) {
+                    urlOpenedListener(navigationAction.request.URL);
+                } else {
+                    [CPUtils openSafari:navigationAction.request.URL];
+                }
                 decisionHandler(WKNavigationActionPolicyCancel);
             } else {
                 decisionHandler(WKNavigationActionPolicyAllow);
@@ -50,6 +56,11 @@
     } else {
         decisionHandler(WKNavigationActionPolicyAllow);
     }
+}
+
+#pragma mark - Track the storyview callback listener
+- (void)setUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock {
+    urlOpenedListener = urlOpenedBlock;
 }
 
 @end
