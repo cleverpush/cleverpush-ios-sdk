@@ -3,7 +3,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 typedef void(^ __nullable WebViewFinishLoadBlock)(WKWebView *, NSError *);
-typedef void (^CPStoryViewOpenedBlock)(NSURL* url);
 
 @interface CPWKWebView : WKWebView
 
@@ -11,7 +10,7 @@ typedef void (^CPStoryViewOpenedBlock)(NSURL* url);
 
 - (void)loadRequest:(NSURLRequest *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
 - (void)loadHTML:(NSString *)request withCompletionHandler:(WebViewFinishLoadBlock)completionHandler;
-- (id)trackUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock;
+- (void)setUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock;
 
 @end
 NS_ASSUME_NONNULL_END

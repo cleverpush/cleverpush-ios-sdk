@@ -7,6 +7,8 @@
 @implementation CPStoriesController
 @synthesize delegate;
 
+#define IMAGEVIEW_BORDER_LENGTH 50
+
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -126,9 +128,10 @@
     webview.backgroundColor = [UIColor clearColor];
     webview.scrollView.backgroundColor = [UIColor clearColor];
     webview.opaque = false;
-    [webview trackUrlOpenedCallback:^(NSURL * _Nonnull url) {
-        [CPLog info:@"Tracked Url: %@ ",[NSString stringWithFormat:@"%@",url]];
-    }];
+
+    if (self.openedCallback != nil) {
+      [webview setUrlOpenedCallback:self.openedCallback];
+    }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
     
@@ -152,7 +155,7 @@
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
         CGFloat topPadding = window.safeAreaInsets.top;
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10 , 40, 40))];
+        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10, 40, 40))];
     } else {
         closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
     }

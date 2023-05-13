@@ -59,9 +59,8 @@ CPStoryViewOpenedBlock urlOpenedListener;
 }
 
 #pragma mark - Track the storyview callback listener
-- (id)trackUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock {
+- (void)setUrlOpenedCallback:(CPStoryViewOpenedBlock)urlOpenedBlock {
     urlOpenedListener = urlOpenedBlock;
-    return urlOpenedListener;
 }
 
 @end
