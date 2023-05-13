@@ -1,3 +1,6 @@
+## 1.27.6
+* Various optimizations for `CPStoryView`
+
 ## 1.27.5
 * Fixed app banner sizes when changing rootViewController size
 * More customization options for `CPStoryView`
