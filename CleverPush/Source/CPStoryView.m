@@ -15,6 +15,11 @@
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
     return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:id];
 }
+
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
+}
+
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
 }
@@ -70,7 +75,7 @@
 
                     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
                     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-                    self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, 125.0) collectionViewLayout:layout];
+                    self.storyCollection = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, self.storyIconHeight + TEXT_HEIGHT) collectionViewLayout:layout];
                     [self.storyCollection registerClass:[CPStoryCell class] forCellWithReuseIdentifier:@"CPStoryCell"];
                     self.storyCollection.backgroundColor = UIColor.clearColor;
                     self.storyCollection.directionalLockEnabled = YES;
@@ -173,7 +178,7 @@
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(10, 10, 0, 10);
+    return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -194,8 +199,7 @@
         NSMutableArray<CPStory *> *seenArray = [NSMutableArray array];
         NSMutableArray<CPStory *> *unSeenArray = [NSMutableArray array];
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            for(int cp = 0; cp < self.stories.count; cp++)
-            {
+            for (int cp = 0; cp < self.stories.count; cp++) {
                 if ([self.readStories containsObject:self.stories[cp].id]) {
                     [seenArray addObject:self.stories[cp]];
                 } else {

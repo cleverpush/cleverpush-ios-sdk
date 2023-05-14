@@ -1,3 +1,6 @@
+## 1.27.7
+* Spacing optimizations for `CPStoryView`
+
 ## 1.27.6
 * Various optimizations for `CPStoryView`
 
