@@ -53,9 +53,9 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat asceptRatio = cell.imgCPBanner.frame.size.width/block.imageWidth;
-            CGFloat asceptHeight = block.imageHeight * asceptRatio;
-            cell.imgCPBannerHeightConstraint.constant = asceptHeight;
+            CGFloat aspectRatio = cell.imgCPBanner.frame.size.width / block.imageWidth;
+            CGFloat calculatedHeight = block.imageHeight * aspectRatio;
+            cell.imgCPBannerHeightConstraint.constant = calculatedHeight;
         }
 
         cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
