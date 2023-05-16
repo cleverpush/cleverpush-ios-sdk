@@ -11,6 +11,8 @@
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString *darkImageUrl;
 @property (nonatomic) int scale;
+@property (nonatomic) int imageWidth;
+@property (nonatomic) int imageHeight;
 
 #pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;
