@@ -1,3 +1,6 @@
+## 1.27.8
+* Added loading spinner for app banner images
+
 ## 1.27.7
 * Spacing optimizations for `CPStoryView`
 
