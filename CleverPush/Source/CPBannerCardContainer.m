@@ -52,6 +52,15 @@
         CPImageBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPImageBlockCell" forIndexPath:indexPath];
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
+        if (block.imageWidth > 0 && block.imageHeight > 0) {
+            CGFloat asceptRatio = cell.imgCPBanner.frame.size.width/block.imageWidth;
+            CGFloat asceptHeight = block.imageHeight * asceptRatio;
+            cell.imgCPBannerHeightConstraint.constant = asceptHeight;
+        }
+
+        cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
+        [cell.activitydata startAnimating];
+
         NSString *imageUrl;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkImageUrl != nil) {
             imageUrl = block.darkImageUrl;
@@ -63,11 +72,12 @@
             [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
                 if (callback) {
                     [UIView performWithoutAnimation:^{
-                                            [cell setNeedsLayout];
-                                            [cell layoutIfNeeded];
-                                           [tableView beginUpdates];
-                                           [tableView endUpdates];
-                                        }];
+                        [cell setNeedsLayout];
+                        [cell layoutIfNeeded];
+                        [tableView beginUpdates];
+                        [tableView endUpdates];
+                        [cell.activitydata stopAnimating];
+                    }];
                 }
             }];
         }
