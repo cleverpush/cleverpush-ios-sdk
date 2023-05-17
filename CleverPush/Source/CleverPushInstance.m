@@ -1890,7 +1890,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Set subscription attribute tag by calling api. subscription/attribute
-- (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
+- (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -1913,6 +1913,10 @@ static id isNil(id object) {
                     [subscriptionAttributes setObject:value forKey:attributeId];
                     [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                     [userDefaults synchronize];
+                    
+                    if (callback) {
+                        callback();
+                    }
                 } onFailure:nil];
             });
         }];
