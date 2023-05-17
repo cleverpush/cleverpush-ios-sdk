@@ -1,3 +1,6 @@
+## 1.27.9
+* Added callback function to `setSubscriptionAttribute`
+
 ## 1.27.8
 * Added loading spinner for app banner images
 
