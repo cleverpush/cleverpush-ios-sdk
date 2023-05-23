@@ -23,6 +23,25 @@
 
 #pragma mark - Button Actions
 - (IBAction)btnHandlerStartLiveActivity:(id)sender {
+
+    NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:0 diskPath:nil];
+    [NSURLCache setSharedURLCache:sharedCache];
+
+    CPStoryView *storyView = [[CPStoryView alloc]
+       initWithFrame:CGRectMake(0.0, 83.0, self.view.frame.size.width, 125.0)
+                                   backgroundColor:[UIColor greenColor]
+                                   textColor:[UIColor blackColor]
+                                   fontFamily:@"AppleSDGothicNeo-Bold"
+                                   borderColor:[UIColor redColor]
+                                   titleVisibility:true
+                                   titleTextSize:10
+                                   storyIconHeight:75
+                                   storyIconWidth:75
+                                   widgetId:@"fSs24ggBjeZWjTWHZ"];
+
+       [self.view addSubview:storyView];
+
+
     if (@available(iOS 13.0, *)) {
         NSString *activityName = [_txtLiveActivityName text];
         if (activityName && activityName.length) {

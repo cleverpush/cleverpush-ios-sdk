@@ -10,14 +10,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadReadStories:(NSArray *)array;
 @end
 
-@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>
+@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler, WKUIDelegate, WKNavigationDelegate>
 
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
 @property (nonatomic, assign) NSInteger storyIndex;
+@property (nonatomic, assign) NSInteger WebContentindex;
 @property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) NSMutableArray *readStories;
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
-
+@property (nonatomic, strong) WKWebView *dataWebView;
 @end
 NS_ASSUME_NONNULL_END

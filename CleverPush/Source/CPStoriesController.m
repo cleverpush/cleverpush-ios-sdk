@@ -15,6 +15,9 @@
     if (self.stories == nil) {
         return;
     }
+
+    self.carousel.autoscroll = false;
+
     [self ConfigureCPCarousel];
     [self initialisePanGesture];
 }
@@ -95,7 +98,7 @@
     self.carousel.pagingEnabled = YES;
     self.carousel.bounces = NO;
     self.carousel.currentItemIndex = self.storyIndex;
-    self.carousel.backgroundColor = [UIColor blackColor];
+    self.carousel.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.carousel];
 }
 
@@ -109,8 +112,11 @@
     indicator.color = UIColor.redColor;
     [indicator hidesWhenStopped];
     [indicator startAnimating];
-    
-    WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+
+
+    WKWebViewConfiguration *configuration = [WKWebViewConfiguration new];
+    configuration.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
@@ -119,6 +125,9 @@
     [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
 
     CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
+
+    
+
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
     webview.allowsBackForwardNavigationGestures = false;
@@ -129,18 +138,45 @@
     webview.scrollView.backgroundColor = [UIColor clearColor];
     webview.opaque = false;
 
+
+
+/*
+        WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+        WKUserContentController* userController = [[WKUserContentController alloc] init];
+    [userController addScriptMessageHandler:self name:@"previous"];
+    [userController addScriptMessageHandler:self name:@"next"];
+        config.userContentController = userController;
+
+        self.dataWebView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:config];
+        self.dataWebView.scrollView.scrollEnabled = true;
+        self.dataWebView.scrollView.bounces = false;
+        self.dataWebView.allowsBackForwardNavigationGestures = false;
+        self.dataWebView.contentMode = UIViewContentModeScaleToFill;
+        self.dataWebView.navigationDelegate = self;
+        self.dataWebView.backgroundColor = [UIColor clearColor];
+        self.dataWebView.opaque = false;
+        self.dataWebView.translatesAutoresizingMaskIntoConstraints = NO;
+
+ */
+
     if (self.openedCallback != nil) {
       [webview setUrlOpenedCallback:self.openedCallback];
     }
 
+
+
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
-    
+
     CGFloat frameHeight;
     frameHeight = [CPUtils frameHeightWithoutSafeArea];
-    
+
     NSString *content = [NSString stringWithFormat:@"<!DOCTYPE html><html><head><script async src=\"https://cdn.ampproject.org/v0.js\"></script><script async custom-element=\"amp-story-player\" src=\"https://cdn.ampproject.org/v0/amp-story-player-0.1.js\"></script></head><body><amp-story-player layout=\"fixed\" width=\"%f\" height=\"%f\"><a href=\"%@\">\"%@\"</a></amp-story-player><script>var player = document.querySelector('amp-story-player');player.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});player.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});</script></body></html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
-    
+
     view = webview;
+
+
+
+
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
             [indicator stopAnimating];
@@ -150,7 +186,7 @@
             webview.scrollView.hidden = NO;
         }
     }];
-    
+
     UIButton *closeButton = [[UIButton alloc]init];
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
@@ -175,11 +211,11 @@
     [webview addSubview:closeButton];
     indicator.center = webview.center;
     [webview addSubview:indicator];
-    
+
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
     swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
     [webview addGestureRecognizer:swipeDown];
-    
+
     return view;
 }
 
@@ -222,6 +258,9 @@
 
 #pragma mark Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+
+    NSLog(@"Javascript Function Called = %@",message.name);
+
     if ([message.name isEqualToString:@"previous"]) {
         [self previous];
     } else {
