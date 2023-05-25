@@ -1,3 +1,6 @@
+## 1.27.10
+* Fixed potential crash in App Banners
+
 ## 1.27.9
 * Added callback function to `setSubscriptionAttribute`
 
