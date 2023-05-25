@@ -1,3 +1,6 @@
+## 1.27.11
+* Optimized StoryView behaviour
+
 ## 1.27.10
 * Fixed potential crash in App Banners
 
