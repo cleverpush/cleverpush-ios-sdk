@@ -461,7 +461,9 @@ long sessions = 0;
 
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
-    for (CPAppBanner* banner in banners) {
+    NSMutableArray *bannersCopy = [banners mutableCopy];
+
+    for (CPAppBanner* banner in bannersCopy) {
         if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
             continue;
         }
