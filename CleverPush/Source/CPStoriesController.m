@@ -133,7 +133,7 @@
       [webview setUrlOpenedCallback:self.openedCallback];
     }
 
-    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", self.stories[index].channel, self.stories[index].id];
+    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
     
     CGFloat frameHeight;
     frameHeight = [CPUtils frameHeightWithoutSafeArea];
