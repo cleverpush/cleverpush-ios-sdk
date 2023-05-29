@@ -555,20 +555,6 @@ long sessions = 0;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if (banner.frequency == CPAppBannerFrequencyOnce) {
-            if([CleverPush getAppBannerId] == nil || [[CleverPush getAppBannerId] isKindOfClass:[NSNull class]] || [CleverPush getAppBannerId].length == 0) {
-                if ([self isBannerShown:banner.id]) {
-                    [CPLog debug:@"Skipping banner because: already shown"];
-                    return;
-                }
-            } else {
-                if (![banner.id isEqualToString:[CleverPush getAppBannerId]]) {
-                    [CPLog debug:@"Skipping banner because: banner ids are different"];
-                    return;
-                }
-            }
-        }
-
         if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
             [CPLog debug:@"Skipping banner because: status is draft"];
             return;

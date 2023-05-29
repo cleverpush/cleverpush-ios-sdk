@@ -538,10 +538,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance channelId];
 }
 
-+ (NSString*)getAppBannerId {
-    return [self.CPSharedInstance getAppBannerId];
-}
-
 + (UIColor*)getBrandingColor {
     return [self.CPSharedInstance getBrandingColor];
 }

@@ -99,7 +99,6 @@ NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
-NSString* appBannerId;
 NSArray* appBanners;
 NSArray* channelTopics;
 
@@ -3085,14 +3084,8 @@ static id isNil(id object) {
     return apiEndpoint;
 }
 
-- (NSString*)getAppBannerId {
-    return appBannerId;
-}
-
 #pragma mark - App Banner methods
 - (void)showAppBanner:(NSString *)bannerId {
-    appBannerId = bannerId;
-    
     [self showAppBanner:bannerId notificationId:nil];
 }
 
