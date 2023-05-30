@@ -559,7 +559,7 @@ long sessions = 0;
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner force:(BOOL)force {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if (force == false) {
+        if (!force) {
             if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
                 [CPLog debug:@"Skipping banner because: already shown"];
                 return;
