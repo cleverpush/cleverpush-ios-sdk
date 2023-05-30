@@ -42,9 +42,17 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil];
 }
 
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force {
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil force:force];
+}
+
 #pragma mark - Show banners by channel-id and banner-id
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
     [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId];
+}
+
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId force:force];
 }
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners

@@ -32,7 +32,9 @@
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId;
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force;
 - (void)startup;
 - (NSMutableArray*)shownAppBanners;
 - (BOOL)isBannerShown:(NSString*)bannerId;

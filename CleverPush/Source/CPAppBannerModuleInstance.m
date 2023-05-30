@@ -65,11 +65,15 @@ long sessions = 0;
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:false];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force{
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force];
 }
 
 #pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
         for (CPAppBanner* banner in banners) {
             if ([banner.id isEqualToString:bannerId]) {
@@ -77,7 +81,7 @@ long sessions = 0;
                     [pendingBanners addObject:banner];
                     break;
                 }
-                [self showBanner:banner];
+                [self showBanner:banner force:force];
                 break;
             }
         }
@@ -535,39 +539,46 @@ long sessions = 0;
         if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner];
+                    [self showBanner:banner force:false];
                 });
             } else {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner];
+                    [self showBanner:banner force:false];
                 });
             }
         } else {
             double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
             double totalDelay = startAtDelay + banner.delaySeconds;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self showBanner:banner];
+                [self showBanner:banner force:false];
             });
         }
     }
 }
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
-- (void)showBanner:(CPAppBanner*)banner {
+- (void)showBanner:(CPAppBanner*)banner force:(BOOL)force {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
-            [CPLog debug:@"Skipping banner because: status is draft"];
-            return;
-        }
+        if (force == false) {
+            if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
+                [CPLog debug:@"Skipping banner because: already shown"];
+                return;
+            }
 
-        if (![self bannerTargetingAllowed:banner]) {
-            [CPLog debug:@"Skipping banner because: targeting not allowed"];
-            return;
-        }
+            if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
+                [CPLog debug:@"Skipping banner because: status is draft"];
+                return;
+            }
 
-        if (![self bannerTimeAllowed:banner]) {
-            [CPLog debug:@"Skipping banner because: date is after stop date"];
-            return;
+            if (![self bannerTargetingAllowed:banner]) {
+                [CPLog debug:@"Skipping banner because: targeting not allowed"];
+                return;
+            }
+
+            if (![self bannerTimeAllowed:banner]) {
+                [CPLog debug:@"Skipping banner because: date is after stop date"];
+                return;
+            }
         }
 
         NSBundle *bundle = [CPUtils getAssetsBundle];
@@ -690,7 +701,7 @@ long sessions = 0;
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner {
     [activePendingBanners removeObject:banner];
     if (activePendingBanners.count != 0) {
-        [self showBanner:activePendingBanners.firstObject];
+        [self showBanner:activePendingBanners.firstObject force:false];
     }
 }
 
