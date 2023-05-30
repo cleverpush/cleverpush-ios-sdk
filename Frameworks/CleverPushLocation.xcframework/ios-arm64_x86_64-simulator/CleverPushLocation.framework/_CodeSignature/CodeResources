@@ -46,15 +46,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		EO+A5jR5AUvAH1OBA9k7fxkQZvs=
+		cS9VDjQxnT5rMh9tz+wlSX6l2OE=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		3VJvmA9RP8i0XlHgAzeuqGPRgWg=
+		L5DDn/TFT16ryXIDzcydcp6f0mI=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		iU3Sjdjq+qLZfyhllnMvjA1/mmA=
+		j0EcusFQUr+VuJztAVQFlTiV9nQ=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -62,7 +62,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		wa/hixY01J2Tv6bwiZ1f/IXbW2U=
+		i571heBiw62iRS8Pncqs1WbexAY=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		SKD8kg2eP24n0oxS2gttMiBP3e8=
+		ZzVVK8ecPwyurvZSxadTBkkQbPM=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -193,33 +193,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			EO+A5jR5AUvAH1OBA9k7fxkQZvs=
+			cS9VDjQxnT5rMh9tz+wlSX6l2OE=
 			</data>
 			<key>hash2</key>
 			<data>
-			ct1h29Sf+kEBOxnrgawQvy9YIN9uuxGPg2qjh2BEdCg=
+			fY+0O3CQaKfijPYNLIpjEBJlAX42QclsPy6eZAWB20Y=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			3VJvmA9RP8i0XlHgAzeuqGPRgWg=
+			L5DDn/TFT16ryXIDzcydcp6f0mI=
 			</data>
 			<key>hash2</key>
 			<data>
-			Cgo8Q3PPJJ7fdy42wKm4kA8nEhIevggCrxvpTj4PA90=
+			d7Nw+0nUdr8tkfaaS9On4mMmr9CfaMCIuiWiZODsPEA=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			iU3Sjdjq+qLZfyhllnMvjA1/mmA=
+			j0EcusFQUr+VuJztAVQFlTiV9nQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			Q+4Ne24PU0iTsZDvp4yY7q1ddrRHj2+E+7SDsLEDT+k=
+			FQ6Qtu+57PLjMRX3KsdRrXubTFtlnyLtP+6l3+VLal4=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -237,11 +237,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			wa/hixY01J2Tv6bwiZ1f/IXbW2U=
+			i571heBiw62iRS8Pncqs1WbexAY=
 			</data>
 			<key>hash2</key>
 			<data>
-			KCLT5bM47wcPn8G8j2ik+52K/UNwTRxg+kyu7Xr1gs4=
+			GJivNBz/qnMUoOhqxWDNfw8muOg31LNTFeAFpcPuF3Y=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>
