@@ -65,7 +65,7 @@ long sessions = 0;
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:false];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO];
 }
 
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force{
@@ -539,18 +539,18 @@ long sessions = 0;
         if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
             if (banner.delaySeconds > 0) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:false];
+                    [self showBanner:banner force:NO];
                 });
             } else {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:false];
+                    [self showBanner:banner force:NO];
                 });
             }
         } else {
             double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
             double totalDelay = startAtDelay + banner.delaySeconds;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self showBanner:banner force:false];
+                [self showBanner:banner force:NO];
             });
         }
     }
@@ -701,7 +701,7 @@ long sessions = 0;
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner {
     [activePendingBanners removeObject:banner];
     if (activePendingBanners.count != 0) {
-        [self showBanner:activePendingBanners.firstObject force:false];
+        [self showBanner:activePendingBanners.firstObject force:NO];
     }
 }
 
