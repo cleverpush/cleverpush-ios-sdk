@@ -1,5 +1,5 @@
 ## 1.27.12
-* 
+* Optimized `showAppBanner` method behaviour
 
 ## 1.27.11
 * Optimized StoryView behaviour
