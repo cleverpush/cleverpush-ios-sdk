@@ -44,11 +44,10 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (self.blocks.count == 0 || self.blocks == nil ) {
+    if (self.blocks == nil) {
         return 0;
-    } else {
-        return self.blocks.count;
     }
+    return self.blocks.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
