@@ -173,6 +173,9 @@ CPNotificationClickBlock handleClick;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.notifications == nil || self.notifications.count == 0) {
+        return 0;
+    }
     return self.notifications.count;
 }
 
