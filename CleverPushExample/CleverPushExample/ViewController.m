@@ -22,6 +22,23 @@
 }
 
 #pragma mark - Button Actions
+
+- (IBAction)btnHandlerSeeStories:(id)sender {
+    CPStoryView *storyView = [[CPStoryView alloc]
+    initWithFrame:CGRectMake(0.0, 83.0, self.view.frame.size.width, 125.0)
+                                backgroundColor:[UIColor greenColor]
+                                textColor:[UIColor blackColor]
+                                fontFamily:@"AppleSDGothicNeo-Bold"
+                                borderColor:[UIColor redColor]
+                                titleVisibility:true
+                                titleTextSize:10
+                                storyIconHeight:75
+                                storyIconWidth:75
+                                widgetId:@"fSs24ggBjeZWjTWHZ"];
+
+    [self.view addSubview:storyView];
+}
+
 - (IBAction)btnHandlerStartLiveActivity:(id)sender {
     if (@available(iOS 13.0, *)) {
         NSString *activityName = [_txtLiveActivityName text];
