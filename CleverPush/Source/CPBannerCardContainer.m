@@ -44,7 +44,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (self.blocks == nil) {
+    if (self.blocks == nil || self.blocks.count == 0) {
         return 0;
     }
     return self.blocks.count;
