@@ -173,7 +173,11 @@ CPNotificationClickBlock handleClick;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.notifications.count;
+    if (self.notifications.count == 0 || self.notifications == nil ) {
+        return 0;
+    } else {
+        return self.notifications.count;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
