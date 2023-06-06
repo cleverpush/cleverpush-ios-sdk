@@ -141,12 +141,10 @@
 #pragma mark - set app banner with margin
 - (void)setAppBannerWithMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    CGFloat topPadding = 0;
     if (@available(iOS 11.0, *)) {
-        CGFloat topPadding = window.safeAreaInsets.top;
+        topPadding = window.safeAreaInsets.top;
         self.topConstraint.constant = topPadding;
-        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-            self.topConstraint.constant = topPadding + 40;
-        }
     }
     self.bottomConstraint.constant = 34;
     self.leadingConstraint.constant = 25;
@@ -155,6 +153,10 @@
     [self.bannerContainer.layer setMasksToBounds:YES];
     self.pageControllTopConstraint.constant = 3;
     self.btnTopConstraints.constant = 0;
+    if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
+        self.topConstraint.constant = topPadding + 40;
+        self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y - 40;
+    }
 }
 
 #pragma mark - set app banner without margin padding from all of the edges will be zero
