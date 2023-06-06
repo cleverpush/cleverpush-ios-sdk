@@ -144,6 +144,9 @@
     if (@available(iOS 11.0, *)) {
         CGFloat topPadding = window.safeAreaInsets.top;
         self.topConstraint.constant = topPadding;
+        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
+            self.topConstraint.constant = topPadding + 40;
+        }
     }
     self.bottomConstraint.constant = 34;
     self.leadingConstraint.constant = 25;
@@ -168,6 +171,10 @@
         [self.bannerContainer.layer setMasksToBounds:YES];
         self.pageControllTopConstraint.constant = - bottomPadding;
         self.btnTopConstraints.constant = topPadding;
+        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
+            self.topConstraint.constant = topPadding + 40;
+            self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y - 40;
+        }
     }
 }
 
@@ -194,6 +201,9 @@
         self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
     } else {
         self.popupHeight.constant = value.height + 20;
+        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
+            self.popupHeight.constant = value.height + 60;
+        }
         [self.cardCollectionView layoutIfNeeded];
     }
 }
@@ -324,6 +334,50 @@
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
+    if (self.data.closeButtonEnabled) {
+        UIColor *backgroundColor;
+        UIButton *closeButton = [[UIButton alloc]init];
+        UIWindow *window = [UIApplication sharedApplication].keyWindow;
+        CGRect frame = window.rootViewController.view.frame;
+        CGFloat width = frame.size.width;
+        CGFloat height = frame.size.height;
+        CGFloat topPadding = 0;
+
+        if (@available(iOS 11.0, *)) {
+            topPadding = window.safeAreaInsets.top;
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, topPadding, 40, 40))];
+            if (self.data.closeButtonPositionStaticEnabled) {
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, self.view.safeAreaInsets.top - 40, 40, 40))];
+            }
+        } else {
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, 10, 40, 40))];
+            if (self.data.closeButtonPositionStaticEnabled) {
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, [UIApplication sharedApplication].statusBarFrame.size.height - 40, 40, 40))];
+            }
+        }
+
+        if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+            backgroundColor = [UIColor colorWithHexString:self.data.background.darkColor];
+        } else {
+            backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+        }
+        UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
+
+        if (@available(iOS 13.0, *)) {
+            [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+            closeButton.tintColor = color;
+        } else {
+            [closeButton setTitle:@"X" forState:UIControlStateNormal];
+            [closeButton setTitleColor:color forState:UIControlStateNormal];
+        }
+
+        [closeButton.layer setMasksToBounds:false];
+        [closeButton addTarget:self action:@selector(onDismiss)
+              forControlEvents:UIControlEventTouchUpInside];
+        [self.webView addSubview:closeButton];
+    }
     [self.view addSubview:self.webView];
 
     // remove </body> and </html> which will get added later again
