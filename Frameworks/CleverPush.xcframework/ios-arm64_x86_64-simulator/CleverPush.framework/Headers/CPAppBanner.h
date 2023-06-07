@@ -50,6 +50,7 @@
 @property (nonatomic) BOOL carouselEnabled;
 @property (nonatomic) BOOL marginEnabled;
 @property (nonatomic) BOOL closeButtonEnabled;
+@property (nonatomic) BOOL closeButtonPositionStaticEnabled;
 @property (nonatomic) BOOL darkModeEnabled;
 @property (nonatomic, strong) NSString *appVersionFilterRelation;
 @property (nonatomic, strong) NSString *appVersionFilterValue;

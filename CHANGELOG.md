@@ -1,3 +1,7 @@
+## 1.27.13
+* App Banners: Fixed a potential crash when the color was empty
+* App Banners: Added the ability to place the close (X) button statically
+
 ## 1.27.12
 * Optimized `showAppBanner` method behaviour
 
