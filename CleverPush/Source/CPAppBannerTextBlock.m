@@ -15,7 +15,7 @@
         }
 
         self.color = @"#000000";
-        if ([json cleverPushStringForKey:@"color"] && ![[json cleverPushStringForKey:@"family"] isEqual:@""]) {
+        if ([json cleverPushStringForKey:@"color"] && ![[json cleverPushStringForKey:@"color"] isEqual:@""]) {
             self.color = [json cleverPushStringForKey:@"color"];
         }
         if ([json cleverPushStringForKey:@"darkColor"] && ![[json cleverPushStringForKey:@"darkColor"] isEqual:@""]) {

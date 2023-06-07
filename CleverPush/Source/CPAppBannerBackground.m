@@ -16,8 +16,8 @@
                 self.darkImageUrl = [json objectForKey:@"darkImageUrl"];
             }
 
-            if ([json objectForKey:@"color"] != nil) {
-                self.color = [json objectForKey:@"color"];
+            if ([json cleverPushStringForKey:@"color"] && ![[json cleverPushStringForKey:@"color"] isEqual:@""]) {
+                self.color = [json cleverPushStringForKey:@"color"];
             }
             if ([json cleverPushStringForKey:@"darkColor"] && ![[json cleverPushStringForKey:@"darkColor"] isEqual:@""]) {
                 self.darkColor = [json cleverPushStringForKey:@"darkColor"];
