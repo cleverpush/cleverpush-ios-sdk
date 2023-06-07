@@ -173,6 +173,11 @@
             self.closeButtonEnabled = YES;
         }
 
+        self.closeButtonPositionStaticEnabled = NO;
+        if ([[json objectForKey:@"closeButtonPositionStaticEnabled"] isEqual:[NSNumber numberWithBool:true]]) {
+            self.closeButtonPositionStaticEnabled = YES;
+        }
+
         if ([json cleverPushStringForKey:@"subscribedType"] != nil && [[json cleverPushStringForKey:@"subscribedType"] isEqual:@"subscribed"]) {
             self.subscribedType = CPAppBannerSubscribedTypeSubscribed;
         } else if ([json cleverPushStringForKey:@"subscribedType"] != nil && [[json cleverPushStringForKey:@"subscribedType"] isEqual:@"unsubscribed"]) {
