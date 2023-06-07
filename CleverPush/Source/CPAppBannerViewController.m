@@ -173,9 +173,8 @@
         [self.bannerContainer.layer setMasksToBounds:YES];
         self.pageControllTopConstraint.constant = - bottomPadding;
         self.btnTopConstraints.constant = topPadding;
-        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-            self.topConstraint.constant = topPadding + 40;
-            self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y - 40;
+        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled ) {
+            self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y + 30;
         }
     }
 }
