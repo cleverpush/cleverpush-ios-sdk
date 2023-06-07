@@ -154,8 +154,8 @@
     self.pageControllTopConstraint.constant = 3;
     self.btnTopConstraints.constant = 0;
     if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-        self.topConstraint.constant = topPadding + 40;
-        self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y - 40;
+        self.topConstraint.constant = topPadding + 10;
+        self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y;
     }
 }
 
