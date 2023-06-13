@@ -31,4 +31,5 @@
 
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled;
+
 @end
