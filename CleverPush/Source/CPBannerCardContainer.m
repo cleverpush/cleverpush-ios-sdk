@@ -21,6 +21,10 @@
     self.tblCPBanner.delegate = self;
     self.tblCPBanner.dataSource = self;
     [self.tblCPBanner addObserver:self forKeyPath:@"contentSize" options:0 context:NULL];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self backgroundPopupShadow];
+        [self setBackground];
+    });
 }
 
 - (void)dynamicHeight:(CGSize)value {
@@ -40,7 +44,7 @@
             self.tblCPBanner.frame = frame;
         }
     }
-    [self dynamicHeight:frame.size];
+    self.tblCPBannerHeightConstraint.constant = frame.size.height;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -246,6 +250,74 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.controller dismissViewControllerAnimated:NO completion:nil];
     });
+}
+
+#pragma mark - setting up the popup shadow
+- (void)backgroundPopupShadow {
+    if (self.data.type != CPAppBannerTypeFull) {
+        float shadowSize = 10.0f;
+        UIBezierPath *shadowPath = [UIBezierPath bezierPathWithRect:CGRectMake(self.viewBannerCardContainer.frame.origin.x - shadowSize / 2, self.viewBannerCardContainer.frame.origin.y - shadowSize / 2, self.viewBannerCardContainer.frame.size.width + shadowSize, self.viewBannerCardContainer.frame.size.height + shadowSize)];
+        self.viewBannerCardContainer.layer.shadowColor = [UIColor blackColor].CGColor;
+        self.viewBannerCardContainer.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+        self.viewBannerCardContainer.layer.shadowOpacity = 0.8f;
+        self.viewBannerCardContainer.layer.shadowPath = shadowPath.CGPath;
+        [self.viewBannerCardContainer.layer setCornerRadius:15.0];
+        [self.viewBannerCardContainer.layer setMasksToBounds:YES];
+    }
+}
+
+#pragma mark - dynamic hide and shows the layer of the view heirarchy.
+- (void)setDynamicCloseButton:(BOOL)closeButtonEnabled {
+    UIColor *backgroundColor;
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+        backgroundColor = [UIColor colorWithHexString:self.data.background.darkColor];
+    } else {
+        backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+    }
+    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
+
+    if (@available(iOS 13.0, *)) {
+        [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        self.btnClose.tintColor = color;
+    } else {
+        [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:color forState:UIControlStateNormal];
+    }
+
+    [self.btnClose.layer setMasksToBounds:false];
+    [self.btnClose addTarget:self action:@selector(onDismiss) forControlEvents:UIControlEventTouchUpInside];
+    if (closeButtonEnabled) {
+        self.btnClose.hidden = NO;
+    } else {
+        self.btnClose.hidden = YES;
+    }
+
+    self.tblviewTopBannerConstraint.constant = - 35;
+    if (self.data.closeButtonPositionStaticEnabled) {
+        self.tblviewTopBannerConstraint.constant =  0;
+    }
+}
+
+#pragma mark - setup background image
+- (void)setBackground {
+    [self.imgviewBackground setContentMode:UIViewContentModeScaleAspectFill];
+
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]]) {
+        [self.imgviewBackground setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+        return;
+    }
+
+    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+        [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.darkColor]];
+        return;
+    }
+
+    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
+        [self.imgviewBackground setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+        return;
+    }
+
+    [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
 }
 
 @end
