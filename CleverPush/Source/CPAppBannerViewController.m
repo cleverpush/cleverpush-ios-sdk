@@ -10,10 +10,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self conditionalPresentation];
-    [self setBackground];
-    [self backgroundPopupShadow];
     [self setOrientation];
     [self setUpPageControl];
+    self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
     if (self.data == nil) {
         return;
     }
@@ -30,7 +29,7 @@
         [self delagates];
         [self setContentVisibility:false];
         [self setDynamicBannerConstraints:self.data.marginEnabled];
-        [self setDynamicCloseButton:self.data.closeButtonEnabled];
+        [self setDynamicCloseButton:NO];
     }
 }
 
@@ -151,12 +150,8 @@
     self.trailingConstraint.constant = -25;
     [self.bannerContainer.layer setCornerRadius:15.0];
     [self.bannerContainer.layer setMasksToBounds:YES];
-    self.pageControllTopConstraint.constant = 3;
+    self.pageControllTopConstraint.constant = - 20;
     self.btnTopConstraints.constant = 0;
-    if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-        self.topConstraint.constant = topPadding + 10;
-        self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y;
-    }
 }
 
 #pragma mark - set app banner without margin padding from all of the edges will be zero
@@ -164,18 +159,13 @@
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     if (@available(iOS 11.0, *)) {
         CGFloat topPadding = window.safeAreaInsets.top;
-        CGFloat bottomPadding = window.safeAreaInsets.bottom;
-        self.topConstraint.constant = 0;
-        self.bottomConstraint.constant = 0;
+        CGFloat bottomPadding = window.safeAreaInsets.bottom + 20;
         self.leadingConstraint.constant = 0;
         self.trailingConstraint.constant = 0;
         [self.bannerContainer.layer setCornerRadius:0.0];
         [self.bannerContainer.layer setMasksToBounds:YES];
         self.pageControllTopConstraint.constant = - bottomPadding;
         self.btnTopConstraints.constant = topPadding;
-        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled ) {
-            self.btnTopConstraints.constant = self.cardCollectionView.frame.origin.y + 30;
-        }
     }
 }
 
@@ -255,6 +245,23 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
+    [cell setDynamicCloseButton:self.data.closeButtonEnabled];
+
+    cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
+    cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
+    cell.centerViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
+    if (self.data.type == CPAppBannerTypeTop) {
+        cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+    } else if (self.data.type == CPAppBannerTypeCenter) {
+        cell.centerViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+    } else if (self.data.type == CPAppBannerTypeBottom) {
+        cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+    } else {
+        cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+        cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+    }
+
+    [cell layoutIfNeeded];
     return cell;
 }
 
