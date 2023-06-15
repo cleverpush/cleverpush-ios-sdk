@@ -1017,6 +1017,8 @@ static id isNil(id object) {
     [self unsubscribe:^(BOOL success) {
         if (success) {
             [CPLog info:@"unsubscribe success"];
+
+            [CPAppBannerModule triggerEvent:CLEVERPUSH_APP_BANNER_UNSUBSCRIBE_EVENT properties:nil];
         }
     } onFailure:^(NSError* error) {
         [CPLog info:@"unsubscribe failure: %@", error];
