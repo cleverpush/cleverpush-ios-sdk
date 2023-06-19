@@ -12,6 +12,7 @@
 
 #pragma mark - Class Variables
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
+NSString *appBannerVoucherCode;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
@@ -860,6 +861,15 @@ long sessions = 0;
         return result;
     }];
     return sortedArray;
+}
+
+#pragma mark - Get voucher code from appBanner
++ (void)setAppBannerVoucherCode:(NSString*)voucherCode {
+    appBannerVoucherCode = voucherCode;
+}
+
++  (NSString*)getAppBannerVoucherCode {
+    return appBannerVoucherCode;
 }
 
 #pragma mark - refactor for testcases

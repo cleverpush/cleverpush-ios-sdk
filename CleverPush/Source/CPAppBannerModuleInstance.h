@@ -79,5 +79,7 @@
 - (BOOL)isFromNotification;
 - (void)setBannersDisabled:(BOOL)value;
 - (BOOL)getBannersDisabled;
++ (void)setAppBannerVoucherCode:(NSString*)voucherCode;
++ (NSString*)getAppBannerVoucherCode;
 
 @end

@@ -95,6 +95,9 @@
         CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
 
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
+        if ([CPAppBannerModuleInstance getAppBannerVoucherCode] != nil) {
+            [cell.btnCPBanner setTitle:[CPAppBannerModuleInstance getAppBannerVoucherCode] forState:UIControlStateNormal];
+        }
 
         UIColor *titleColor;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
@@ -150,6 +153,9 @@
 
         cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
+        if ([CPAppBannerModuleInstance getAppBannerVoucherCode] != nil) {
+            cell.txtCPBanner.text = [CPAppBannerModuleInstance getAppBannerVoucherCode];
+        }
 
         UIColor *textColor;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
