@@ -112,6 +112,8 @@
 
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
+    [userController removeScriptMessageHandlerForName:@"previous"];
+    [userController removeScriptMessageHandlerForName:@"next"];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
     configuration.userContentController = userController;
@@ -134,7 +136,7 @@
     }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
-    
+    NSString* currentIndex = [NSString stringWithFormat:@"%ld",index];
     CGFloat frameHeight;
     frameHeight = [CPUtils frameHeightWithoutSafeArea];
 
@@ -155,12 +157,12 @@
                         <script>\
                         var playerEl = document.querySelector('amp-story-player');\
                         var player = new AmpStoryPlayer(window, playerEl);\
-                        playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});\
-                        playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});\
-                        player.go(0, 0);\
+                        playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
+                        playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
+                        player.go(%@);\
                         </script>\
                         </body>\
-                        </html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
+                        </html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex];
 
     view = webview;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
@@ -250,6 +252,11 @@
 
 #pragma mark Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+    NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
+    NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
+    if (![currentIndex isEqualToString:scriptMessageIndex]) {
+      return;
+    }
     if ([message.name isEqualToString:@"previous"]) {
         [self previous];
     } else {
