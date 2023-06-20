@@ -95,7 +95,7 @@
     self.carousel.pagingEnabled = YES;
     self.carousel.bounces = NO;
     self.carousel.currentItemIndex = self.storyIndex;
-    self.carousel.backgroundColor = [UIColor blackColor];
+    self.carousel.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.carousel];
 }
 
@@ -109,9 +109,11 @@
     indicator.color = UIColor.redColor;
     [indicator hidesWhenStopped];
     [indicator startAnimating];
-    
+
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
+    [userController removeScriptMessageHandlerForName:@"previous"];
+    [userController removeScriptMessageHandlerForName:@"next"];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
     configuration.userContentController = userController;
@@ -134,12 +136,34 @@
     }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
-    
+    NSString* currentIndex = [NSString stringWithFormat:@"%ld",index];
     CGFloat frameHeight;
     frameHeight = [CPUtils frameHeightWithoutSafeArea];
-    
-    NSString *content = [NSString stringWithFormat:@"<!DOCTYPE html><html><head><script async src=\"https://cdn.ampproject.org/v0.js\"></script><script async custom-element=\"amp-story-player\" src=\"https://cdn.ampproject.org/v0/amp-story-player-0.1.js\"></script></head><body><amp-story-player layout=\"fixed\" width=\"%f\" height=\"%f\"><a href=\"%@\">\"%@\"</a></amp-story-player><script>var player = document.querySelector('amp-story-player');player.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(null);});player.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(null);});</script></body></html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title];
-    
+
+    NSString *content = [NSString stringWithFormat:@"\
+                        <!DOCTYPE html>\
+                        <html>\
+                        <head>\
+                        <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\">\
+                        </script>\
+                        <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
+                        </script>\
+                        </head>\
+                        <body>\
+                        <amp-story-player style=\"width: %f; height: %f;\">\
+                        <a href=\"%@\">\"%@\"\
+                        </a>\
+                        </amp-story-player>\
+                        <script>\
+                        var playerEl = document.querySelector('amp-story-player');\
+                        var player = new AmpStoryPlayer(window, playerEl);\
+                        playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
+                        playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
+                        player.go(%@);\
+                        </script>\
+                        </body>\
+                        </html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex];
+
     view = webview;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
@@ -190,6 +214,10 @@
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     self.storyIndex = carousel.currentItemIndex;
+    [self.carousel reloadItemAtIndex:carousel.currentItemIndex animated:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.carousel scrollToItemAtIndex:carousel.currentItemIndex animated:YES];
+    });
 }
 
 - (CGFloat)carousel:(CleverPushiCarousel *)carousel valueForOption:(iCarouselOption)option withDefault:(CGFloat)value {
@@ -204,6 +232,7 @@
     if (self.storyIndex == self.stories.count - 1) {
         [self onDismiss];
     } else if (self.storyIndex >= 0) {
+        [self.carousel reloadItemAtIndex:self.storyIndex + 1 animated:NO];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
         });
@@ -214,6 +243,7 @@
     if (self.storyIndex == 0)  {
         self.carousel.currentItemIndex = 0;
     } else if (self.storyIndex >= 0) {
+        [self.carousel reloadItemAtIndex:self.storyIndex - 1 animated:NO];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
         });
@@ -222,6 +252,11 @@
 
 #pragma mark Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+    NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
+    NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
+    if (![currentIndex isEqualToString:scriptMessageIndex]) {
+      return;
+    }
     if ([message.name isEqualToString:@"previous"]) {
         [self previous];
     } else {
