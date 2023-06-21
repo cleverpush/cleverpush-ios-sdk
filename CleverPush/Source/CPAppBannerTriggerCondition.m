@@ -10,6 +10,11 @@
             if ([[json objectForKey:@"type"] isEqualToString:@"event"]) {
                 self.type = CPAppBannerTriggerConditionTypeEvent;
             }
+            if ([[json objectForKey:@"type"] isEqualToString:@"unsubscribe"]) {
+                // We'll use a special event here which is only used internally
+                self.type = CPAppBannerTriggerConditionTypeEvent;
+                self.event = CLEVERPUSH_APP_BANNER_UNSUBSCRIBE_EVENT;
+            }
             if ([[json objectForKey:@"type"] isEqualToString:@"sessions"]) {
                 self.type = CPAppBannerTriggerConditionTypeSessions;
             }
