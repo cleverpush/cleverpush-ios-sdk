@@ -1476,7 +1476,9 @@ static id isNil(id object) {
     }
     if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
         if ([notification objectForKey:@"voucherCode"] != nil && ![[notification objectForKey:@"voucherCode"] isKindOfClass:[NSNull class]] && ![[notification objectForKey:@"voucherCode"] isEqualToString:@""]) {
-            [CPAppBannerModuleInstance setAppBannerVoucherCode:[notification objectForKey:@"voucherCode"]];
+            NSMutableDictionary *voucherCode = [[NSMutableDictionary alloc] init];
+            [voucherCode setObject:[notification objectForKey:@"voucherCode"] forKey:[notification objectForKey:@"appBanner"]];
+            [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCode];
         }
 
         [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
