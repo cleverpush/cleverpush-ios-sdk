@@ -13,14 +13,13 @@
         return;
     }
 
-    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && [CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder].count > 0) {
-        for (id key in [CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]) {
+    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil) {
+        [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             if ([self.data.id isEqualToString:key]) {
                 self.isVoucherCodeAvailable = YES;
-                self.notificationId = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:key];
-                break;
+                self.notificationId = key;
             }
-        }
+        }];
     }
 
     [self conditionalPresentation];

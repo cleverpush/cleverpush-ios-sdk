@@ -1476,9 +1476,12 @@ static id isNil(id object) {
     }
     if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]]) {
         if ([notification objectForKey:@"voucherCode"] != nil && ![[notification objectForKey:@"voucherCode"] isKindOfClass:[NSNull class]] && ![[notification objectForKey:@"voucherCode"] isEqualToString:@""]) {
-            NSMutableDictionary *voucherCode = [[NSMutableDictionary alloc] init];
-            [voucherCode setObject:[notification objectForKey:@"voucherCode"] forKey:[notification objectForKey:@"appBanner"]];
-            [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCode];
+            NSMutableDictionary *voucherCodesByAppBanner = [[NSMutableDictionary alloc] init];
+            if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && [CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder].count > 0) {
+                voucherCodesByAppBanner = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]mutableCopy];
+            }
+            [voucherCodesByAppBanner setObject:[notification objectForKey:@"voucherCode"] forKey:[notification objectForKey:@"appBanner"]];
+            [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
         }
 
         [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
