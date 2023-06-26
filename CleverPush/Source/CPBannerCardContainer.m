@@ -95,8 +95,8 @@
         CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
 
         [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
-        if (self.isVoucherCodeAvailable && (self.notificationId != nil) && ![self.notificationId isKindOfClass:[NSNull class]] && ![self.notificationId isEqualToString:@""]) {
-            [cell.btnCPBanner setTitle:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.notificationId inString:block.text] forState:UIControlStateNormal];
+        if (self.isVoucherCodeAvailable && (self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+            [cell.btnCPBanner setTitle:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text] forState:UIControlStateNormal];
         }
 
         UIColor *titleColor;
@@ -153,8 +153,8 @@
 
         cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
-        if (self.isVoucherCodeAvailable && (self.notificationId != nil) && ![self.notificationId isKindOfClass:[NSNull class]] && ![self.notificationId isEqualToString:@""]) {
-            cell.txtCPBanner.text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.notificationId inString:block.text];
+        if (self.isVoucherCodeAvailable && (self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+            cell.txtCPBanner.text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
         }
 
         UIColor *textColor;

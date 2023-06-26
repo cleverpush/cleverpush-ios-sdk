@@ -14,12 +14,10 @@
     }
 
     if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil) {
-        [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            if ([self.data.id isEqualToString:key]) {
-                self.isVoucherCodeAvailable = YES;
-                self.notificationId = key;
-            }
-        }];
+        if ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id] != nil) {
+            self.isVoucherCodeAvailable = true;
+            self.voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id];
+        }
     }
 
     [self conditionalPresentation];
@@ -217,8 +215,8 @@
 #pragma mark - Initialise HTML banner
 - (void)initWithHTMLBanner:(CPAppBanner*)banner {
     self.data = banner;
-    if (self.isVoucherCodeAvailable && (self.notificationId != nil) && ![self.notificationId isKindOfClass:[NSNull class]] && ![self.notificationId isEqualToString:@""]) {
-        [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.notificationId inString:self.data.HTMLContent]];
+    if (self.isVoucherCodeAvailable && (self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+        [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:self.data.HTMLContent]];
 
     } else {
         [self composeHTML:self.data.HTMLContent];
@@ -244,8 +242,8 @@
     cell.isVoucherCodeAvailable = self.isVoucherCodeAvailable;
     [cell setActionCallback:self.actionCallback];
 
-    if (self.notificationId != nil && ![self.notificationId isKindOfClass:[NSNull class]] && ![self.notificationId isEqualToString:@""]) {
-        cell.notificationId = self.notificationId;
+    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+        cell.voucherCode = self.voucherCode;
     }
 
     if ((!self.data.carouselEnabled && !self.data.multipleScreensEnabled) || self.data.screens.count == 0) {
