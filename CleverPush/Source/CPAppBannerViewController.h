@@ -33,7 +33,6 @@
 @property (nonatomic, strong) IBOutlet CPAspectKeepImageView *backGroundImage;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 @property (nonatomic, assign) long index;
-@property (nonatomic, assign) BOOL isVoucherCodeAvailable;
 @property (nonatomic, strong) NSString *voucherCode;
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;

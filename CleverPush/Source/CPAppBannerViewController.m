@@ -13,11 +13,8 @@
         return;
     }
 
-    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil) {
-        if ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id] != nil) {
-            self.isVoucherCodeAvailable = true;
-            self.voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id];
-        }
+    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id] != nil)) {
+        self.voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id];
     }
 
     [self conditionalPresentation];
@@ -215,7 +212,7 @@
 #pragma mark - Initialise HTML banner
 - (void)initWithHTMLBanner:(CPAppBanner*)banner {
     self.data = banner;
-    if (self.isVoucherCodeAvailable && (self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+    if ((self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
         [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:self.data.HTMLContent]];
 
     } else {
@@ -239,7 +236,6 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
-    cell.isVoucherCodeAvailable = self.isVoucherCodeAvailable;
     [cell setActionCallback:self.actionCallback];
 
     if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
