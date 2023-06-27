@@ -454,6 +454,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setApiEndpoint:apiEndpoint];
 }
 
++ (void)setAuthorizerToken:(NSString *)authorizerToken {
+    [self.CPSharedInstance setAuthorizerToken:authorizerToken];
+}
+
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0)) {
     [self.CPSharedInstance updateBadge:replacementContent];
 }
@@ -532,6 +536,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getApiEndpoint {
     return [self.CPSharedInstance getApiEndpoint];
+}
+
++ (NSString*)getAuthorizerToken {
+    return [self.CPSharedInstance getAuthorizerToken];
 }
 
 + (NSString*)channelId {
