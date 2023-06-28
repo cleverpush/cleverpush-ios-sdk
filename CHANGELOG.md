@@ -1,3 +1,8 @@
+## 1.28.0
+* Added feature for app banner unsubscribe trigger
+* App Banners: Fixed scrolling animation effect
+* Optimised StoryView behaviour
+
 ## 1.27.13
 * App Banners: Fixed a potential crash when the color was empty
 * App Banners: Added the ability to place the close (X) button statically
