@@ -2,6 +2,8 @@
 #import "CPAppBannerTriggerConditionType.h"
 #import "CPAppBannerTriggerConditionEventProperty.h"
 
+#define CLEVERPUSH_APP_BANNER_UNSUBSCRIBE_EVENT @"CleverPush_APP_BANNER_UNSUBSCRIBE_EVENT"
+
 @interface CPAppBannerTriggerCondition : NSObject
 
 #pragma mark - Class Variables

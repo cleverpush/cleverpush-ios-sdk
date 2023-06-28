@@ -26,7 +26,7 @@ typedef void (^CPChatSubscribeCallback)(void);
 - (void)setChatTimestampTextColor:(UIColor *)color;
 - (void)setChatReceiverBubbleTextColor:(UIColor *)color;
 
-- (UIColor*)getChatbackgroundColor;
+- (UIColor*)getChatBackgroundColor;
 - (UIColor*)getChatSenderBubbleTextColor;
 - (UIColor*)getChatSenderBubbleBackgroundColor;
 - (UIColor*)getChatSendButtonBackgroundColor;
