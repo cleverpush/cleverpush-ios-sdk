@@ -19,8 +19,6 @@
                                       target:self action:@selector(doneButtonPressed)];
     keyboardToolbar.items = @[flexBarButton, doneBarButton];
     self.txtLiveActivityName.inputAccessoryView = keyboardToolbar;
-
-    [CleverPush setAuthorizerToken:@"CUSTOM_TOKEN_CLEVERPUSH"];
 }
 
 #pragma mark - Button Actions

@@ -1666,25 +1666,28 @@ static id isNil(id object) {
 #pragma mark - Generalised Api call.
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
-
-    NSMutableURLRequest *dataRequest = [request mutableCopy];
+    NSURLRequest *modifiedRequest;
     if ([CleverPush getAuthorizerToken] != nil && ![[CleverPush getAuthorizerToken] isKindOfClass:[NSNull class]] && ![[CleverPush getAuthorizerToken] isEqualToString:@""]) {
+        NSMutableURLRequest *urlRequest = [request mutableCopy];
         NSError *error;
-        NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[dataRequest HTTPBody] options:0 error:&error] mutableCopy];
+        NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
         if (error) {
             return;
         }
-        NSString *tokenvalue = [CleverPush getAuthorizerToken];
-        [requestParameters setObject:tokenvalue forKey:@"authorizationToken"];
+        NSString *authorizerToken = [CleverPush getAuthorizerToken];
+        [requestParameters setObject:authorizerToken forKey:@"authorizationToken"];
         NSData *updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
         if (error) {
             return;
         }
-        [dataRequest setHTTPBody:updatedRequestData];
+        [urlRequest setHTTPBody:updatedRequestData];
+        modifiedRequest = urlRequest;
+    } else {
+        modifiedRequest = request;
     }
 
     NSURLSession *session = [NSURLSession sharedSession];
-    [[session dataTaskWithRequest:dataRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[session dataTaskWithRequest:modifiedRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (successBlock != nil || failureBlock != nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         }
