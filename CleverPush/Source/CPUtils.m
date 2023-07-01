@@ -571,4 +571,10 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return [UIColor whiteColor];
 }
 
+#pragma mark - Find the particular word in the string and replace it in the original string.
++ (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString {
+    NSString *result = [inputString stringByReplacingOccurrencesOfString:originalString withString:replacement];
+    return result;
+}
+
 @end

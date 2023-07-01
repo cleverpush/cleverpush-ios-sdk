@@ -28,6 +28,7 @@
 @property (nonatomic, assign) id controller;
 @property (nonatomic, weak) id <HeightDelegate> delegate;
 @property (nonatomic, weak) id <NavigateNextPage> changePage;
+@property (nonatomic, assign) NSString *voucherCode;
 
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled;

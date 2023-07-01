@@ -9,13 +9,18 @@
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if (self.data == nil) {
+        return;
+    }
+
+    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id] != nil)) {
+        self.voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id];
+    }
+
     [self conditionalPresentation];
     [self setOrientation];
     [self setUpPageControl];
     self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
-    if (self.data == nil) {
-        return;
-    }
 }
 
 #pragma mark - Custom UI Functions
@@ -207,7 +212,12 @@
 #pragma mark - Initialise HTML banner
 - (void)initWithHTMLBanner:(CPAppBanner*)banner {
     self.data = banner;
-    [self composeHTML:self.data.HTMLContent];
+    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+        [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:self.data.HTMLContent]];
+
+    } else {
+        [self composeHTML:self.data.HTMLContent];
+    }
 }
 
 #pragma mark - CollectionView Delegate and DataSource
@@ -227,6 +237,10 @@
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
+
+    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+        cell.voucherCode = self.voucherCode;
+    }
 
     if ((!self.data.carouselEnabled && !self.data.multipleScreensEnabled) || self.data.screens.count == 0) {
         cell.blocks = self.data.blocks;
