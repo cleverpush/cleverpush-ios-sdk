@@ -1478,7 +1478,7 @@ static id isNil(id object) {
         if ([notification objectForKey:@"voucherCode"] != nil && ![[notification objectForKey:@"voucherCode"] isKindOfClass:[NSNull class]] && ![[notification objectForKey:@"voucherCode"] isEqualToString:@""]) {
             NSMutableDictionary *voucherCodesByAppBanner = [[NSMutableDictionary alloc] init];
             if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && [CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder].count > 0) {
-                voucherCodesByAppBanner = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]mutableCopy];
+                voucherCodesByAppBanner = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] mutableCopy];
             }
             [voucherCodesByAppBanner setObject:[notification objectForKey:@"voucherCode"] forKey:[notification objectForKey:@"appBanner"]];
             [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
