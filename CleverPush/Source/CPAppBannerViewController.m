@@ -212,7 +212,7 @@
 #pragma mark - Initialise HTML banner
 - (void)initWithHTMLBanner:(CPAppBanner*)banner {
     self.data = banner;
-    if ((self.voucherCode != nil) && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
         [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:self.data.HTMLContent]];
 
     } else {
