@@ -61,8 +61,13 @@
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
             CGFloat aspectRatio = cell.imgCPBanner.frame.size.width / block.imageWidth;
-            CGFloat calculatedHeight = block.imageHeight * aspectRatio;
-            cell.imgCPBannerHeightConstraint.constant = calculatedHeight;
+                if (block.imageWidth > [UIScreen mainScreen].bounds.size.width) {
+                    cell.imgCPBannerWidthConstraint.constant = [UIScreen mainScreen].bounds.size.width;
+                    cell.imgCPBannerHeightConstraint.constant = block.imageWidth / aspectRatio;
+                } else {
+                    cell.imgCPBannerWidthConstraint.constant = block.imageWidth;
+                    cell.imgCPBannerHeightConstraint.constant = block.imageHeight;
+                }
         }
 
         cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
