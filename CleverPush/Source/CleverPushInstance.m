@@ -99,6 +99,7 @@ NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
+NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
 
@@ -1674,9 +1675,27 @@ static id isNil(id object) {
 #pragma mark - Generalised Api call.
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
+    NSURLRequest *modifiedRequest;
+    if (authorizationToken != nil && ![authorizationToken isKindOfClass:[NSNull class]] && ![authorizationToken isEqualToString:@""]) {
+        NSMutableURLRequest *urlRequest = [request mutableCopy];
+        NSError *error;
+        NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
+        if (error) {
+            return;
+        }
+        [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
+        NSData *updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
+        if (error) {
+            return;
+        }
+        [urlRequest setHTTPBody:updatedRequestData];
+        modifiedRequest = urlRequest;
+    } else {
+        modifiedRequest = request;
+    }
 
     NSURLSession *session = [NSURLSession sharedSession];
-    [[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[session dataTaskWithRequest:modifiedRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (successBlock != nil || failureBlock != nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         }
@@ -3089,6 +3108,10 @@ static id isNil(id object) {
 
 - (void)setApiEndpoint:(NSString*)endpoint {
     apiEndpoint = endpoint;
+}
+
+- (void)setAuthorizerToken:(NSString *)authorizerToken {
+    authorizationToken = authorizerToken;
 }
 
 - (NSString*)getApiEndpoint {
