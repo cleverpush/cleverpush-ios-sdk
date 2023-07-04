@@ -1498,7 +1498,15 @@ static id isNil(id object) {
         if (hasWebViewOpened) {
             if (notification != nil && [notification objectForKey:@"url"] != nil && [[notification objectForKey:@"url"] length] != 0 && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]]) {
                 NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
-                [CPUtils openSafari:url];
+                if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
+                    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                    } else {
+                        [CPUtils openSafari:url];
+                    }
+                } else {
+                    [CPUtils openSafari:url];
+                }
             }
         }
         return;
