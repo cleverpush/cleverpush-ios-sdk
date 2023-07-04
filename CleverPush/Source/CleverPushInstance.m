@@ -1667,15 +1667,14 @@ static id isNil(id object) {
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
     NSURLRequest *modifiedRequest;
-    if ([CleverPush getAuthorizerToken] != nil && ![[CleverPush getAuthorizerToken] isKindOfClass:[NSNull class]] && ![[CleverPush getAuthorizerToken] isEqualToString:@""]) {
+    if (authorizationToken != nil && ![authorizationToken isKindOfClass:[NSNull class]] && ![authorizationToken isEqualToString:@""]) {
         NSMutableURLRequest *urlRequest = [request mutableCopy];
         NSError *error;
         NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
         if (error) {
             return;
         }
-        NSString *authorizerToken = [CleverPush getAuthorizerToken];
-        [requestParameters setObject:authorizerToken forKey:@"authorizationToken"];
+        [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
         NSData *updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
         if (error) {
             return;
@@ -3104,10 +3103,6 @@ static id isNil(id object) {
 
 - (void)setAuthorizerToken:(NSString *)authorizerToken {
     authorizationToken = authorizerToken;
-}
-
-- (NSString*)getAuthorizerToken {
-    return authorizationToken;
 }
 
 - (NSString*)getApiEndpoint {

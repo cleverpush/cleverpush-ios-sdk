@@ -538,10 +538,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getApiEndpoint];
 }
 
-+ (NSString*)getAuthorizerToken {
-    return [self.CPSharedInstance getAuthorizerToken];
-}
-
 + (NSString*)channelId {
     return [self.CPSharedInstance channelId];
 }
