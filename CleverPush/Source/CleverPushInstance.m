@@ -1500,9 +1500,7 @@ static id isNil(id object) {
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
             if ([[UIApplication sharedApplication] canOpenURL:url]) {
                 [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-            } else {
-                [CPUtils openSafari:url];
-            }
+            } 
         }
     }
 
