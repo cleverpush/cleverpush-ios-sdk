@@ -11,23 +11,41 @@
 
 @implementation CPStoryView
 
+NSString* storyWidgetId;
+
 #pragma mark - Initialise the Widgets with UICollectionView frame
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
     return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:id];
+}
+
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
 }
 
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:nil];
+}
+
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
 }
 
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:nil];
+}
+
 - (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
     if (self) {
-        if (id != nil && id.length != 0) {
-            [CPWidgetModule getWidgetsStories:id completion:^(CPWidgetsStories *Widget) {
+        NSString *customWidgetId = id;
+        if (customWidgetId == nil || [customWidgetId isKindOfClass:[NSNull class]] || [customWidgetId isEqualToString:@""]) {
+            customWidgetId = [CPStoryView getWidgetId];
+        }
+        if (customWidgetId != nil && customWidgetId.length != 0) {
+            [CPWidgetModule getWidgetsStories:customWidgetId completion:^(CPWidgetsStories *Widget) {
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
                     if (backgroundColor != nil) {
                         self.backgroundColor = backgroundColor;
@@ -101,6 +119,15 @@
         }
     }
     return self;
+}
+
+#pragma mark - Set & get story widgetId
++ (void)setWidgetId:(NSString *)widgetId {
+    storyWidgetId = widgetId;
+}
+
++ (NSString*)getWidgetId {
+    return storyWidgetId;
 }
 
 #pragma mark - UICollectionView delegate
