@@ -31,5 +31,6 @@
 + (NSString *)timeAgoStringFromDate:(NSDate *)date;
 + (NSUserDefaults *)getUserDefaultsAppGroup;
 + (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor;
++ (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString;
 
 @end
