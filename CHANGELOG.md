@@ -1,3 +1,10 @@
+## 1.28.1
+* Added feature for displaying voucher code in app banner comes from notification
+* Added feature for set an authorization token that will be used in an API call.
+* Added feature for more customization options and `setWidgetId` function for `CPStoryView`
+* Added feature for support automatic handling of urls deep links for notification
+* App Banners: Fixed layout issue in ipad
+
 ## 1.28.0
 * Added feature for app banner unsubscribe trigger
 * App Banners: Fixed scrolling animation effect
