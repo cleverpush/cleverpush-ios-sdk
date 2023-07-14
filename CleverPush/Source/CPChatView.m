@@ -261,8 +261,9 @@ UIColor* chatReceiverBubbleTextColor;
 
         [CleverPush subscribe:^(NSString* subscriptionId) {
             // wait for ID
-            [CleverPush getSubscriptionId];
-            [self loadChat];
+            [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
+                [self loadChat];
+            }];
         }];
     } else if ([message.body isEqualToString:@"reload"]) {
         if (lastSubscriptionId != nil) {
