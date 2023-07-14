@@ -1,3 +1,6 @@
+## 1.28.2
+* Optimized `subscribe` method for `CPChatView`
+
 ## 1.28.1
 * Added feature for displaying voucher code in app banner comes from notification
 * Added feature for set an authorization token that will be used in an API call.
