@@ -5,6 +5,7 @@
 #import "CPTranslate.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "CPLog.h"
+#import "CPInboxDetailView.h"
 
 @implementation CPInboxView
 
@@ -197,6 +198,10 @@ CPNotificationClickBlock handleClick;
     if (handleClick) {
         handleClick(self.notifications[indexPath.row]);
     }
+
+    if (self.notifications[indexPath.row].inboxAppBanner != nil && ![self.notifications[indexPath.row].inboxAppBanner isKindOfClass:[NSNull class]] )  {
+        [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
+    }
 }
 
 - (void)saveReadNotifications:(NSMutableArray *)readNotifications{
@@ -212,6 +217,258 @@ CPNotificationClickBlock handleClick;
         return [[NSArray alloc] init];
     }
     return readNotifications;
+}
+
+- (void)showAppBanner:(NSString *)bannerId notificationId:(NSString*)notificationId {
+    [self showBanner:[CleverPush channelId] bannerId:bannerId notificationId:notificationId force:true];
+}
+
+- (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
+    if ([CleverPush popupVisible]) {
+      //  [activePendingBanners addObject:banner];
+        return;
+    }
+
+    [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+    appBannerViewController.data = banner;
+
+    UIViewController* topController = [CleverPush topViewController];
+    
+    
+    [topController presentViewController:appBannerViewController animated:YES completion:nil];
+
+    if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            [appBannerViewController onDismiss];
+        });
+    }
+   // [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
+    [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
+
+
+        NSLog(@"Banner Data = %lu",(unsigned long)banners.count);
+        for (NSDictionary* json in banners) {
+            CPAppBanner* banner = [[CPAppBanner alloc] initWithJson:json];
+            [self showBanner:banner force:force];
+
+        }
+
+    }];
+}
+
+- (void)showBanner:(CPAppBanner*)banner force:(BOOL)force {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        NSBundle *bundle = [CPUtils getAssetsBundle];
+        CPInboxDetailView *appBannerViewController;
+        if (bundle) {
+            appBannerViewController = [[CPInboxDetailView alloc] initWithNibName:@"CPInboxDetailView" bundle:bundle];
+        } else {
+            appBannerViewController = [[CPInboxDetailView alloc] initWithNibName:@"CPInboxDetailView" bundle:[NSBundle mainBundle]];
+        }
+
+        __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
+            CPAppBannerCarouselBlock *screens = [[CPAppBannerCarouselBlock alloc] init];
+            CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
+            CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
+            NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
+            NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
+            NSString *type;
+
+            for (CPAppBannerCarouselBlock *screensList in banner.screens) {
+                if (!screensList.isScreenClicked) {
+                    screens = screensList;
+                    break;
+                }
+            }
+            for (CPAppBannerBlock *bannerBlock in screens.blocks) {
+                if (bannerBlock.type == CPAppBannerBlockTypeButton) {
+                    [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
+                    [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                }
+            }
+            for (CPAppBannerButtonBlock *button in buttonBlocks) {
+                if ([button.id isEqualToString:action.blockId]) {
+                    buttons = (CPAppBannerButtonBlock*)button;
+                    type = @"button";
+                    break;
+                }
+            }
+            for (CPAppBannerImageBlock *image in imageBlocks) {
+                if ([image.id isEqualToString:action.blockId]) {
+                    images = (CPAppBannerImageBlock*)image;
+                    type = @"image";
+                    break;
+                }
+            }
+
+            if ([type isEqualToString:@"button"]) {
+                if (screens != nil && buttons != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:buttons forImageBlock:nil blockType:type];
+                }
+            } else if ([type isEqualToString:@"image"]) {
+                if (screens != nil && images != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:nil forImageBlock:images blockType:type];
+                }
+            }
+
+            if (self.handleBannerOpened && action) {
+                self.handleBannerOpened(action);
+            }
+
+            if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
+                [[UIApplication sharedApplication] openURL:action.url];
+            }
+
+            if (action && [action.type isEqualToString:@"subscribe"]) {
+                [CleverPush subscribe];
+            }
+
+            if (action && [action.type isEqualToString:@"addTags"]) {
+                [CleverPush addSubscriptionTags:action.tags];
+            }
+
+            if (action && [action.type isEqualToString:@"removeTags"]) {
+                [CleverPush removeSubscriptionTags:action.tags];
+            }
+
+            if (action && [action.type isEqualToString:@"addTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if (![topics containsObject:topic]) {
+                        [topics addObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+
+            if (action && [action.type isEqualToString:@"removeTopics"]) {
+                NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
+                for (NSString *topic in action.topics) {
+                    if ([topics containsObject:topic]) {
+                        [topics removeObject:topic];
+                    }
+                }
+                [CleverPush setSubscriptionTopics:topics];
+            }
+
+            if (action && [action.type isEqualToString:@"setAttribute"]) {
+                [CleverPush setSubscriptionAttribute:action.attributeId value:action.attributeValue];
+            }
+
+            if (action && [action.type isEqualToString:@"copyToClipboard"]) {
+                UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+                pasteboard.string = action.name;
+            }
+        };
+        [appBannerViewController setActionCallback:callbackBlock];
+
+
+
+        // remove banner so it will not show again this session
+
+
+        [self presentAppBanner:appBannerViewController banner:banner];
+    });
+}
+
+#pragma mark - Get the banner details by api call and load the banner data in to class variables
+- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
+
+    if ([CleverPush isDevelopmentModeEnabled]) {
+        bannersPath = [NSString stringWithFormat:@"%@&t=%f", bannersPath, NSDate.date.timeIntervalSince1970];
+    }
+
+    if (notificationId != nil) {
+        bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
+    }
+
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
+    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
+        NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
+
+        NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
+        jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
+
+
+        if (jsonBanners != nil) {
+            if (notificationId && callback) {
+                callback(jsonBanners);
+            }
+
+        }
+    } onFailure:^(NSError* error) {
+        [CPLog error:@"Failed getting app banners %@", error];
+    }];
+}
+
+- (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
+
+
+    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
+
+    NSString* subscriptionId = nil;
+    if ([CleverPush isSubscribed]) {
+        subscriptionId = [CleverPush getSubscriptionId];
+    }
+    NSMutableDictionary* dataDic = [[NSMutableDictionary alloc]init];
+    if (banner.testId != nil) {
+        dataDic = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                    banner.id, @"bannerId",
+                    banner.channel, @"channelId",
+                    banner.testId, @"testId",
+                    subscriptionId, @"subscriptionId",
+                    nil] mutableCopy];
+    } else {
+        dataDic = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
+                    banner.id, @"bannerId",
+                    banner.channel, @"channelId",
+                    subscriptionId, @"subscriptionId",
+                    nil] mutableCopy];
+    }
+
+    if ([event isEqualToString:@"clicked"]) {
+        if ([type isEqualToString:@"button"]) {
+            if (block != nil) {
+                if (block.id != nil) {
+                    [dataDic setObject:block.id forKey:@"blockId"];
+                }
+                if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
+                    [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                }
+            }
+        } else  if ([type isEqualToString:@"image"]) {
+            if (image != nil) {
+                if (image.id != nil) {
+                    [dataDic setObject:image.id forKey:@"blockId"];
+                }
+                if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
+                    [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                }
+            }
+        }
+
+        [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
+                    screen.isScreenClicked = true;
+            }
+        } onFailure:nil];
+    } else {
+        [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
+    }
 }
 
 @end

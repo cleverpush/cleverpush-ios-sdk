@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "93A9904728D35DF700F990A4"
+               BlueprintIdentifier = "9310FD392A6025F9004B400B"
                BuildableName = "CleverPushNotificationServiceExtension.appex"
                BlueprintName = "CleverPushNotificationServiceExtension"
                ReferencedContainer = "container:CleverPushExample.xcodeproj">

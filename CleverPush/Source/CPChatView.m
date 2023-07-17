@@ -253,6 +253,11 @@ UIColor* chatReceiverBubbleTextColor;
 #pragma mark -  WKScriptMessageHandler
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
+
+    NSLog(@"Message body = %@",message.body);
+    NSLog(@"Message name = %@",message.name);
+    NSLog(@"subscribeCallback = %@",subscribeCallback);
+
     if ([message.body isEqualToString:@"subscribe"]) {
         if (subscribeCallback != nil) {
             subscribeCallback();
@@ -261,8 +266,12 @@ UIColor* chatReceiverBubbleTextColor;
 
         [CleverPush subscribe:^(NSString* subscriptionId) {
             // wait for ID
-            [CleverPush getSubscriptionId];
-            [self loadChat];
+
+            [CleverPush getSubscriptionId:^(NSString *subscriptionId) {
+                NSLog(@"id print = %@",subscriptionId);
+                [self loadChat];
+            }];
+
         }];
     } else if ([message.body isEqualToString:@"reload"]) {
         if (lastSubscriptionId != nil) {

@@ -203,6 +203,15 @@
 		29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */; };
 		29F9086928E9EBD900D8D4D8 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		29F9086A28E9EBDA00D8D4D8 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9310FD662A602D1F004B400B /* CPInboxDetailView.h */; };
+		9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9310FD662A602D1F004B400B /* CPInboxDetailView.h */; };
+		9310FD6A2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
+		9310FD6B2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
+		9310FD6C2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
+		9310FD6D2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
+		9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
+		9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
+		9310FD712A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
 		93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */; };
 		93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */; };
@@ -495,6 +504,9 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
 		29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		9310FD662A602D1F004B400B /* CPInboxDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailView.h; sourceTree = "<group>"; };
+		9310FD672A602D1F004B400B /* CPInboxDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailView.m; sourceTree = "<group>"; };
+		9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailView.xib; sourceTree = "<group>"; };
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
@@ -765,6 +777,7 @@
 				CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */,
 				29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */,
 				CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */,
+				9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -777,6 +790,8 @@
 				CB8F47B4275F393D00FC19A7 /* CPInboxCell.m */,
 				CB8F47B1275F393D00FC19A7 /* CPInboxView.h */,
 				CB8F47B3275F393D00FC19A7 /* CPInboxView.m */,
+				9310FD662A602D1F004B400B /* CPInboxDetailView.h */,
+				9310FD672A602D1F004B400B /* CPInboxDetailView.m */,
 				297B4E211E58A16600BAF990 /* CleverPush.h */,
 				297B4E221E58A16600BAF990 /* CleverPush.m */,
 				CB1B65C42757763B0087AC49 /* CleverPushInstance.h */,
@@ -994,6 +1009,7 @@
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
+				9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */,
 				29DB961723FC8970008FC985 /* CleverPush.h in Headers */,
 				29DB960E23FC6622008FC985 /* CleverPushLocation.h in Headers */,
 			);
@@ -1072,6 +1088,7 @@
 				CBA989A22679D61F003DE995 /* CPStoriesController.h in Headers */,
 				2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */,
 				2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */,
+				9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */,
 				29AD0C5C26682A92009E10D0 /* CPAppBannerHTMLBlock.h in Headers */,
 				CBA989B32679D664003DE995 /* CPWidgetPosition.h in Headers */,
 				2906A16D258557C20078FD61 /* CPAppBannerImageBlock.h in Headers */,
@@ -1247,6 +1264,7 @@
 				93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */,
 				93DACB1F2959651900177B08 /* CPHTMLBlockCell.xib in Resources */,
 				93DACB202959651900177B08 /* CPButtonBlockCell.xib in Resources */,
+				9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */,
 				93DACB212959651900177B08 /* CPBannerCardContainer.xib in Resources */,
 				93DACB222959651900177B08 /* CPTopicDialogCell.xib in Resources */,
 				93DACB232959651900177B08 /* CPInboxCell.xib in Resources */,
@@ -1257,6 +1275,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9310FD712A602D2A004B400B /* CPInboxDetailView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1289,6 +1308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				297C34D123FB710100314A84 /* CleverPushLocation.m in Sources */,
+				9310FD6B2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1307,6 +1327,7 @@
 				CB73FFAB272C44660099B648 /* CPAppBannerViewController.m in Sources */,
 				CBA989A72679D62D003DE995 /* CPWidgetsStories.m in Sources */,
 				296A134225BE128700A2BEED /* CPSubscription.m in Sources */,
+				9310FD6A2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */,
 				2905218A276B8BC100D81148 /* CPInboxCell.m in Sources */,
 				291FCE5B252B5F1C00F5185E /* CPTopicsViewController.m in Sources */,
@@ -1417,6 +1438,7 @@
 				291FCD2B2525DC2800F5185E /* DWDimmingView.m in Sources */,
 				CB8F47B6275F393D00FC19A7 /* CPInboxCell.m in Sources */,
 				29DB95F523FC33CD008FC985 /* CPNotificationCategoryController.m in Sources */,
+				9310FD6C2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				29B3BFA227C697E500D52D64 /* NSDictionary+SafeExpectations.m in Sources */,
 				CBA1906B26DE5909001B8F39 /* CPTopicDialogCell.m in Sources */,
 				291FCD2C2525DC2800F5185E /* DWAnimatableShapeLayer.m in Sources */,
@@ -1460,6 +1482,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */,
+				9310FD6D2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1470,6 +1493,7 @@
 				CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */,
 				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
 				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
+				9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */,
 				CB1B65D827577BA70087AC49 /* CPAttributesTests.m in Sources */,
 				CB1B65E227577BEB0087AC49 /* CPStoryWidgetTest.m in Sources */,

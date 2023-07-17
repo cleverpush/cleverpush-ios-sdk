@@ -2360,7 +2360,7 @@ static id isNil(id object) {
 
 #pragma mark - Retrieving notifications based on the flag remote/local
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback {
-    [self getNotifications:combineWithApi limit:50 skip:0 callback:callback];
+    [self getNotifications:combineWithApi limit:1 skip:0 callback:callback];
 }
 
 #pragma mark - Retrieving notifications based on the flag remote/local

@@ -19,6 +19,23 @@
                                       target:self action:@selector(doneButtonPressed)];
     keyboardToolbar.items = @[flexBarButton, doneBarButton];
     self.txtLiveActivityName.inputAccessoryView = keyboardToolbar;
+
+    CPInboxView *inboxView = [[CPInboxView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)
+                                                  combine_with_api:NO
+                                                        read_color:UIColor.whiteColor
+                                                      unread_color:UIColor.lightGrayColor
+                                           notification_text_color:UIColor.blackColor
+                                     notification_text_font_family:@"AppleSDGothicNeo-Reguler"
+                                            notification_text_size:17
+                                                   date_text_color:UIColor.blackColor
+                                             date_text_font_family:@"AppleSDGothicNeo-Reguler"
+                                                    date_text_size:12
+                                                    divider_colour:UIColor.blackColor];
+        [self.view addSubview:inboxView];
+
+
+
+    
 }
 
 #pragma mark - Button Actions
