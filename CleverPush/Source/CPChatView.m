@@ -253,6 +253,7 @@ UIColor* chatReceiverBubbleTextColor;
 #pragma mark -  WKScriptMessageHandler
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
+
     if ([message.body isEqualToString:@"subscribe"]) {
         if (subscribeCallback != nil) {
             subscribeCallback();
