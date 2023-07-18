@@ -219,16 +219,12 @@ CPNotificationClickBlock handleClick;
     return readNotifications;
 }
 
+#pragma mark - Show app banner using the bannerId
 - (void)showAppBanner:(NSString *)bannerId notificationId:(NSString*)notificationId {
     [self showBanner:[CleverPush channelId] bannerId:bannerId notificationId:notificationId force:true];
 }
 
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
-    if ([CleverPush popupVisible]) {
-      //  [activePendingBanners addObject:banner];
-        return;
-    }
-
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [appBannerViewController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
@@ -236,8 +232,6 @@ CPNotificationClickBlock handleClick;
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
-    
-    
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
@@ -245,20 +239,15 @@ CPNotificationClickBlock handleClick;
             [appBannerViewController onDismiss];
         });
     }
-   // [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+    [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
 }
 
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
-
-
-        NSLog(@"Banner Data = %lu",(unsigned long)banners.count);
         for (NSDictionary* json in banners) {
             CPAppBanner* banner = [[CPAppBanner alloc] initWithJson:json];
             [self showBanner:banner force:force];
-
         }
-
     }];
 }
 
@@ -368,12 +357,6 @@ CPNotificationClickBlock handleClick;
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
-
-
-
-        // remove banner so it will not show again this session
-
-
         [self presentAppBanner:appBannerViewController banner:banner];
     });
 }

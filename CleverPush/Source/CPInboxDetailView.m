@@ -1,4 +1,5 @@
 #import "CPInboxDetailView.h"
+#import "CPInboxDetailContainer.h"
 #import "CPLog.h"
 
 @interface CPInboxDetailView()
@@ -15,10 +16,8 @@
     }
 
     [self conditionalPresentation];
-    [self bannerPosition:YES bottom:YES center:YES];
-    [self setAppBannerWithoutMargin];
     [self setUpPageControl];
-    self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
+    [self setDynamicCloseButton:NO];
 }
 
 #pragma mark - Custom UI Functions
@@ -30,7 +29,6 @@
         [self initWithBanner:self.data];
         [self delagates];
         [self setContentVisibility:false];
-        [self setDynamicCloseButton:NO];
     }
 }
 
@@ -38,8 +36,6 @@
 - (void)setContentVisibility:(BOOL)isHtml {
     self.cardCollectionView.hidden = isHtml;
     self.backGroundImage.hidden = isHtml;
-    self.bannerContainer.hidden = isHtml;
-    self.btnClose.hidden = isHtml;
     self.pageControl.hidden = isHtml;
     self.webView.hidden = !isHtml;
 }
@@ -48,7 +44,7 @@
 - (void)delagates {
     NSBundle *bundle = [CPUtils getAssetsBundle];
     if (bundle) {
-        [self.cardCollectionView registerNib:[UINib nibWithNibName:@"CPBannerCardContainer" bundle:bundle] forCellWithReuseIdentifier:@"CPBannerCardContainer"];
+        [self.cardCollectionView registerNib:[UINib nibWithNibName:@"CPInboxDetailContainer" bundle:bundle] forCellWithReuseIdentifier:@"CPInboxDetailContainer"];
     }
     self.cardCollectionView.delegate = self;
     self.cardCollectionView.dataSource = self;
@@ -96,29 +92,6 @@
 
     [self.btnClose.layer setMasksToBounds:false];
     self.btnClose.hidden = NO;
-
-}
-
-#pragma mark - set app banner without margin padding from all of the edges will be zero
-- (void)setAppBannerWithoutMargin {
-    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-    if (@available(iOS 11.0, *)) {
-        CGFloat topPadding = window.safeAreaInsets.top;
-        CGFloat bottomPadding = window.safeAreaInsets.bottom + 20;
-        self.leadingConstraint.constant = 0;
-        self.trailingConstraint.constant = 0;
-        [self.bannerContainer.layer setCornerRadius:0.0];
-        [self.bannerContainer.layer setMasksToBounds:YES];
-        self.pageControllTopConstraint.constant = - bottomPadding;
-        self.btnTopConstraints.constant = topPadding;
-    }
-}
-
-#pragma mark - activate and deativate constraints based on the layout type
-- (void)bannerPosition:(BOOL)top bottom:(BOOL)bottom center:(BOOL)center {
-    self.topConstraint.active = top;
-    self.bottomConstraint.active = bottom;
-    self.centerYConstraint.active = center;
 }
 
 - (void)setUpPageControl {
@@ -131,19 +104,6 @@
     }
 }
 
-#pragma mark - custom delegate manage tableview constraint size based on it's content size and based on conditional
-- (void)manageTableHeightDelegate:(CGSize)value {
-    if (value.height > UIScreen.mainScreen.bounds.size.height) {
-        self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
-    } else {
-        self.popupHeight.constant = value.height + 20;
-        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-            self.popupHeight.constant = value.height + 60;
-        }
-        [self.cardCollectionView layoutIfNeeded];
-    }
-}
-
 #pragma mark - Initialise blocks banner
 - (void)initWithBanner:(CPAppBanner*)banner {
     self.data = banner;
@@ -152,18 +112,12 @@
 #pragma mark - Initialise HTML banner
 - (void)initWithHTMLBanner:(CPAppBanner*)banner {
     self.data = banner;
-    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-        [self composeHTML:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:self.data.HTMLContent]];
-
-    } else {
-        [self composeHTML:self.data.HTMLContent];
-    }
+    [self composeHTML:self.data.HTMLContent];
 }
 
 #pragma mark - CollectionView Delegate and DataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
-
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -175,13 +129,9 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
+    CPInboxDetailContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPInboxDetailContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-
-    if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-        cell.voucherCode = self.voucherCode;
-    }
 
     if ((!self.data.carouselEnabled && !self.data.multipleScreensEnabled) || self.data.screens.count == 0) {
         cell.blocks = self.data.blocks;
@@ -200,20 +150,12 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
-    [cell setDynamicCloseButton:self.data.closeButtonEnabled];
-
-    cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
-    cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
-    cell.centerViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
-    cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
-    cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
-
     [cell layoutIfNeeded];
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
-    [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
+    [((CPInboxDetailContainer *)cell).tblCPBanner reloadData];
     [cell layoutIfNeeded];
 }
 
@@ -278,61 +220,15 @@
     [userController addScriptMessageHandler:self name:@"openWebView"];
     config.userContentController = userController;
 
-    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height) configuration:config];
+    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, self.webView.frame.origin.y, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, self.webView.frame.size.height) configuration:config];
     self.webView.scrollView.scrollEnabled = true;
     self.webView.scrollView.bounces = false;
     self.webView.allowsBackForwardNavigationGestures = false;
     self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.navigationDelegate = self;
-    self.webView.backgroundColor = [UIColor clearColor];
     self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
-    if (self.data.closeButtonEnabled) {
-        UIColor *backgroundColor;
-        UIButton *closeButton = [[UIButton alloc]init];
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        CGRect frame = window.rootViewController.view.frame;
-        CGFloat width = frame.size.width;
-        CGFloat height = frame.size.height;
-        CGFloat topPadding = 0;
-
-        if (@available(iOS 11.0, *)) {
-            topPadding = window.safeAreaInsets.top;
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, topPadding, 40, 40))];
-            if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, self.view.safeAreaInsets.top - 40, 40, 40))];
-            }
-        } else {
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, 10, 40, 40))];
-            if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, [UIApplication sharedApplication].statusBarFrame.size.height - 40, 40, 40))];
-            }
-        }
-
-        if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
-            backgroundColor = [UIColor colorWithHexString:self.data.background.darkColor];
-        } else {
-            backgroundColor = [UIColor colorWithHexString:self.data.background.color];
-        }
-        UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
-
-        if (@available(iOS 13.0, *)) {
-            [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-            closeButton.tintColor = color;
-        } else {
-            [closeButton setTitle:@"X" forState:UIControlStateNormal];
-            [closeButton setTitleColor:color forState:UIControlStateNormal];
-        }
-
-        [closeButton.layer setMasksToBounds:false];
-        [closeButton addTarget:self action:@selector(onDismiss)
-              forControlEvents:UIControlEventTouchUpInside];
-        [self.webView addSubview:closeButton];
-    }
     [self.view addSubview:self.webView];
 
     // remove </body> and </html> which will get added later again
@@ -509,123 +405,5 @@
 - (IBAction)btnClose:(UIButton *)sender {
     [self onDismiss];
 }
-
-#pragma mark - Get sessions from NSUserDefaults
-- (long)getSessions {
-    return [self getSessions];
-}
-
-#pragma mark - Save sessions in NSUserDefaults
-- (void)saveSessions {
-    [self saveSessions];
-}
-
-#pragma mark - Call back while banner has been open-up successfully
-- (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback {
-    [self setBannerOpenedCallback:callback];
-}
-
-#pragma mark - load the events
-- (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
-    [self triggerEvent:eventId properties:properties];
-}
-
-#pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil];
-}
-
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force];
-}
-
-#pragma mark - Show banners by channel-id and banner-id
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [self showBanner:channelId bannerId:bannerId notificationId:notificationId];
-}
-
-- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
-    [self showBanner:channelId bannerId:bannerId notificationId:notificationId force:force];
-}
-
-#pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
-- (void)startup {
-    [self startup];
-}
-
-#pragma mark - Resets the initialization, e.g. when channel ID has been changed
-- (void)resetInitialization {
-    [self resetInitialization];
-}
-
-#pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
-- (NSMutableArray*)shownAppBanners {
-    return [self shownAppBanners];
-}
-
-#pragma mark - function determine that the banner is visible or not
-- (BOOL)isBannerShown:(NSString*)bannerId {
-    return [self isBannerShown:bannerId];
-}
-
-#pragma mark - update/set the NSUserDefaults of key CleverPush_SHOWN_APP_BANNERS
-- (void)setBannerIsShown:(CPAppBanner*)banner {
-    [self setBannerIsShown:banner];
-}
-
-#pragma mark - Initialised a session
-- (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
-    [self initSession:channelId afterInit:afterInit];
-}
-
-#pragma mark - Initialised a banner with channel
-- (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification {
-    [self initBannersWithChannel:channelId showDrafts:showDraftsParam fromNotification:fromNotification];
-}
-
-#pragma mark - Get the banner details by api call and load the banner data in to class variables
-- (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [self getBanners:channelId completion:callback];
-}
-
-#pragma mark - Get the banner details by api call and load the banner data in to class variables
-- (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:groupId completion:callback];
-}
-
-#pragma mark - check the banner triggering allowed or not.
-- (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
-    return [self bannerTargetingAllowed:banner];
-}
-
-#pragma mark - Create banners based on conditional attributes within the objects
-- (void)createBanners:(NSMutableArray*)banners {
-    [self createBanners:banners];
-}
-
-#pragma mark - manage the schedule to display the banner at a specific time
-- (void)scheduleBanners {
-    [self scheduleBanners];
-}
-
-#pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
-- (void)showBanner:(CPAppBanner*)banner {
-    [self showBanner:banner];
-}
-
-- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
-    [self presentAppBanner:appBannerViewController banner:banner];
-}
-
-#pragma mark - show next banner with sort by date and alphabetically
-- (void)showNextActivePendingBanner:(CPAppBanner*)banner {
-    [self showNextActivePendingBanner:banner];
-}
-
-#pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
-- (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
-    [self sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:button forImageBlock:image blockType:type];
-}
-
 
 @end

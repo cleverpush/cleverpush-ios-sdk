@@ -33,25 +33,11 @@
 @property (nonatomic, strong) IBOutlet CPAspectKeepImageView *backGroundImage;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
 @property (nonatomic, assign) long index;
-@property (nonatomic, strong) NSString *voucherCode;
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
 @property (weak, nonatomic) IBOutlet UIView *bannerContainer;
 @property (weak, nonatomic) IBOutlet UIButton *btnClose;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *popupHeight;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *topConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *leadingConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *trailingConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *centerYConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerHeight;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerWidth;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnTopConstraints;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControllTopConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerLeadingConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerTraillingConstraint;
-
 
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;
@@ -60,7 +46,5 @@
 - (void)onDismiss;
 - (IBAction)tapOutSideBanner:(UIButton *)sender;
 - (IBAction)btnClose:(UIButton *)sender;
-
-- (void)showBanner:(CPAppBanner*)banner;
 
 @end
