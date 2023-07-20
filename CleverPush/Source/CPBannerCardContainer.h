@@ -19,6 +19,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topViewBannerConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *centerViewBannerConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tblviewTopBannerConstraint;
+@property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControlHeightConstraint;
 @property (weak, nonatomic) IBOutlet UIImageView *imgviewBackground;
 @property (weak, nonatomic) IBOutlet UIView *viewBannerCardContainer;
 @property (weak, nonatomic) IBOutlet UIButton *btnClose;
@@ -32,5 +34,6 @@
 
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled;
+- (void)setUpPageControl;
 
 @end

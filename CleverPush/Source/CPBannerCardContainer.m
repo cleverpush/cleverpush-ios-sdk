@@ -25,6 +25,14 @@
         [self backgroundPopupShadow];
         [self setBackground];
     });
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(getCurrentAppBannerPageIndex:)
+                                                         name:@"getCurrentAppBannerPageIndexValue"
+                                                       object:nil];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)dynamicHeight:(CGSize)value {
@@ -45,6 +53,12 @@
         }
     }
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
+}
+
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
+    NSDictionary *pagevalue = notification.userInfo;
+    NSInteger index = [pagevalue[@"currentIndex"] integerValue];
+    self.pageControl.currentPage = index;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -329,6 +343,18 @@
     }
 
     [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+}
+
+- (void)setUpPageControl {
+    if (self.data.carouselEnabled == true) {
+        [self.pageControl setNumberOfPages:self.data.screens.count];
+        self.pageControl.hidden = NO;
+        self.pageControlHeightConstraint.constant = 30;
+    } else {
+        [self.pageControl setNumberOfPages:0];
+        self.pageControl.hidden = YES;
+        self.pageControlHeightConstraint.constant = 0;
+    }
 }
 
 @end

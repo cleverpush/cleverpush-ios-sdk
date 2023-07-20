@@ -19,7 +19,6 @@
 
     [self conditionalPresentation];
     [self setOrientation];
-    [self setUpPageControl];
     self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
 }
 
@@ -44,7 +43,7 @@
     self.backGroundImage.hidden = isHtml;
     self.bannerContainer.hidden = isHtml;
     self.btnClose.hidden = isHtml;
-    self.pageControl.hidden = isHtml;
+    self.pageControl.hidden = YES;
     self.webView.hidden = !isHtml;
 }
 
@@ -260,6 +259,7 @@
     cell.controller = self;
     [cell.tblCPBanner reloadData];
     [cell setDynamicCloseButton:self.data.closeButtonEnabled];
+    [cell setUpPageControl];
 
     cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
     cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultLow;
@@ -290,6 +290,7 @@
     if (nextItem.row < self.data.screens.count) {
         [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
         self.pageControl.currentPage = self.index + 1;
+        [self pageControlCurrentIndex: self.index + 1];
     }
 }
 
@@ -303,10 +304,17 @@
                 CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
                 [self.cardCollectionView scrollRectToVisible:rect animated:NO];
                 self.pageControl.currentPage = i;
+                [self pageControlCurrentIndex: i];
                 break;
             }
         }
     }
+}
+
+#pragma mark - Set the value of pageControl from current index
+-(void)pageControlCurrentIndex:(NSInteger)value {
+    NSDictionary *pagevalue = @{@"currentIndex": @(value)};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:pagevalue];
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl
@@ -319,6 +327,7 @@
         self.pageControl.currentPage = currentPage;
     }
     self.index = self.pageControl.currentPage;
+    [self pageControlCurrentIndex: currentPage];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
