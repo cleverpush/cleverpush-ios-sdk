@@ -26,6 +26,13 @@ UIColor* chatReceiverBubbleTextColor;
 
 #pragma mark - Load chat with subscription id
 - (void)loadChat {
+    BOOL isSubscriptionChanged = [CleverPush getSubscriptionChanged];
+    BOOL isSubscribed = [CleverPush isSubscribed];
+    if (isSubscriptionChanged || !isSubscribed) {
+        [CleverPush setSubscriptionChanged:false];
+        [self clearWKWebViewCache];
+    }
+
     NSString* subscriptionId;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
@@ -273,6 +280,16 @@ UIColor* chatReceiverBubbleTextColor;
             [self loadChat];
         }
     }
+}
+
+#pragma mark - Clear webview cache memory
+- (void)clearWKWebViewCache {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        NSSet *websiteDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeDiskCache,WKWebsiteDataTypeOfflineWebApplicationCache,WKWebsiteDataTypeMemoryCache,WKWebsiteDataTypeLocalStorage,WKWebsiteDataTypeCookies,WKWebsiteDataTypeSessionStorage,WKWebsiteDataTypeIndexedDBDatabases,WKWebsiteDataTypeWebSQLDatabases,WKWebsiteDataTypeFetchCache,WKWebsiteDataTypeServiceWorkerRegistrations]];
+        NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
+        [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
+        }];
+    });
 }
 
 #pragma mark - Chatview color get and set methods.
