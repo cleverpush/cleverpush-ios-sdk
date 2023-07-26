@@ -344,6 +344,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAppBannerDraftsEnabled:showDraft];
 }
 
++ (void)setSubscriptionChanged:(BOOL)subscriptionChanged {
+    [self.CPSharedInstance setSubscriptionChanged:subscriptionChanged];
+}
+
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
 }
@@ -561,6 +565,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)getAppBannerDraftsEnabled {
     return [self.CPSharedInstance getAppBannerDraftsEnabled];
+}
+
++ (BOOL)getSubscriptionChanged {
+    return [self.CPSharedInstance getSubscriptionChanged];
 }
 
 + (BOOL)isSubscribed {

@@ -77,6 +77,7 @@ static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
 static BOOL isShowDraft = NO;
+static BOOL isSubscriptionChanged = NO;
 static BOOL incrementBadge = NO;
 static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
@@ -1284,6 +1285,15 @@ static id isNil(id object) {
             if (!subscriptionId) {
                 [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
             }
+
+            NSString *newSubscriptionId = [results objectForKey:@"id"];
+            NSString *oldSubscriptionId;
+            if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
+                oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+            }
+            BOOL isSubscriptionChanged = [newSubscriptionId isEqualToString:oldSubscriptionId];
+            [CleverPush setSubscriptionChanged:isSubscriptionChanged];
+
             subscriptionId = [results objectForKey:@"id"];
             [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
             [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
@@ -3094,6 +3104,10 @@ static id isNil(id object) {
     isShowDraft = showDraft;
 }
 
+- (void)setSubscriptionChanged:(BOOL)subscriptionChanged {
+    isSubscriptionChanged = subscriptionChanged;
+}
+
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     ignoreDisabledNotificationPermission = ignore;
 }
@@ -3173,6 +3187,10 @@ static id isNil(id object) {
 
 - (BOOL)getAppBannerDraftsEnabled {
     return isShowDraft;
+}
+
+- (BOOL)getSubscriptionChanged {
+    return isSubscriptionChanged;
 }
 
 - (BOOL)popupVisible {
