@@ -1496,7 +1496,7 @@ static id isNil(id object) {
         pendingOpenedResult = result;
     }
 
-    if (notification != nil && [notification objectForKey:@"url"] != nil && [[notification objectForKey:@"url"] length] != 0 && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]]) {
+    if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
             if ([[UIApplication sharedApplication] canOpenURL:url]) {
@@ -1507,7 +1507,7 @@ static id isNil(id object) {
 
     if (!handleNotificationOpened) {
         if (hasWebViewOpened) {
-            if (notification != nil && [notification objectForKey:@"url"] != nil && [[notification objectForKey:@"url"] length] != 0 && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]]) {
+            if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
                 NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
                 [CPUtils openSafari:url];
             }
