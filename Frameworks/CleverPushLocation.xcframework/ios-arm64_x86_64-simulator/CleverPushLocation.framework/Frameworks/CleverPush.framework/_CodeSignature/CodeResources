@@ -6,19 +6,19 @@
 	<dict>
 		<key>CPAppBannerViewController.nib</key>
 		<data>
-		Ids3OemtZtc+vsh2ROjv21AM7P0=
+		rcCxNGTQ8CSrhm4hv9R9B1RqQko=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
-		joX74AVKQWvuiNPCc8spHa9kA4I=
+		zZBOZckgvy3o+7jZ7l+iiCyKtAg=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		zLPTw+NcvESSiQ6S9Q9wzH770k8=
+		9xxEigL0Gm8w7MwVDhKt/uScIg8=
 		</data>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		oWMQSyoRQu/dC0Mi/BVM0YVlbAg=
+		Jy9wzloLwiVzWxMj1UXfTshl6E8=
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
@@ -35,6 +35,26 @@
 		<key>CPInboxCell.nib</key>
 		<data>
 		oE2HxBVHsXCHnep7Qt6EIQ0MKMo=
+		</data>
+		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
+		<data>
+		HbHiV339D+zhKxYNBIm2vCE2FvY=
+		</data>
+		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
+		<data>
+		AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+		</data>
+		<key>CPInboxDetailContainer.nib/runtime.nib</key>
+		<data>
+		dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+		</data>
+		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
+		<data>
+		QsGZRu9UCcU/mtZ1gL1zXHO34ss=
+		</data>
+		<key>CPInboxDetailView.nib/runtime.nib</key>
+		<data>
+		frUBOau21teq4oSPmL3Fajuz2vM=
 		</data>
 		<key>CPTextBlockCell.nib</key>
 		<data>
@@ -55,44 +75,44 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Ids3OemtZtc+vsh2ROjv21AM7P0=
+			rcCxNGTQ8CSrhm4hv9R9B1RqQko=
 			</data>
 			<key>hash2</key>
 			<data>
-			CED3NXefJ00sExkFC+pEqS8whGbguMRqM9x6Ibq9ZoI=
+			6p4lzF32ogzux/m34N9XiRKXQYfn53iADyO+SL7wamQ=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			joX74AVKQWvuiNPCc8spHa9kA4I=
+			zZBOZckgvy3o+7jZ7l+iiCyKtAg=
 			</data>
 			<key>hash2</key>
 			<data>
-			ahGhzEXdyBST1XZzXgpPjO5y2hG3k0JdCnspKnQtKgg=
+			OxipIjbXqJKFPWh8bkA07+NbS5KnuD48fA05XZ5CF7U=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			zLPTw+NcvESSiQ6S9Q9wzH770k8=
+			9xxEigL0Gm8w7MwVDhKt/uScIg8=
 			</data>
 			<key>hash2</key>
 			<data>
-			Tdzjqg2nMAdxuz9k83tEOv79IhTVZB843amyBcNiqrk=
+			HE+QikifmA5/ycnQHAUn0sEiNS8vcTA9VPcQv42G6uI=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			oWMQSyoRQu/dC0Mi/BVM0YVlbAg=
+			Jy9wzloLwiVzWxMj1UXfTshl6E8=
 			</data>
 			<key>hash2</key>
 			<data>
-			QYSVnRVxQSblag85/WTnPwLTSwTn1Ifv7j9PteydV10=
+			FYzKCFrf3VEww/UfEz45z0Th8sTAq3jBoiGMcrp+O0Q=
 			</data>
 		</dict>
 		<key>CPButtonBlockCell.nib</key>
@@ -137,6 +157,61 @@
 			<key>hash2</key>
 			<data>
 			W92n+oXUzXfvJhA5NiVUCbN3VvHmnhh63fn3TxGVdQA=
+			</data>
+		</dict>
+		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			HbHiV339D+zhKxYNBIm2vCE2FvY=
+			</data>
+			<key>hash2</key>
+			<data>
+			sCGBVgGyWKY9VO5n5H5SLqrRH/VHUV/ffxeFcMonsJc=
+			</data>
+		</dict>
+		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+			</data>
+			<key>hash2</key>
+			<data>
+			F15jZdq7NgYZ6A1ROJQtEwMfCDrd2WdEtW3RtlP4vQM=
+			</data>
+		</dict>
+		<key>CPInboxDetailContainer.nib/runtime.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+			</data>
+			<key>hash2</key>
+			<data>
+			2M2+iZlXUB8uTGGAUTIKKEnem3DiJnzPQLU41/Kyizg=
+			</data>
+		</dict>
+		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			QsGZRu9UCcU/mtZ1gL1zXHO34ss=
+			</data>
+			<key>hash2</key>
+			<data>
+			g4VL30ZYMKgeM1Jf0rrarQcM6r39+k7uhLm1MeoZDPI=
+			</data>
+		</dict>
+		<key>CPInboxDetailView.nib/runtime.nib</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			frUBOau21teq4oSPmL3Fajuz2vM=
+			</data>
+			<key>hash2</key>
+			<data>
+			74nv5QcTv2TujvA6mxu35hzhsFzncCfhWPelPQXk1Ko=
 			</data>
 		</dict>
 		<key>CPTextBlockCell.nib</key>

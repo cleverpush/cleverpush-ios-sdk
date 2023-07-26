@@ -137,6 +137,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (UIColor*)getNormalTintColor;
 - (void)setAutoClearBadge:(BOOL)autoClear;
 - (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
+- (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 - (void)setIncrementBadge:(BOOL)increment;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
@@ -193,6 +194,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (BOOL)isDevelopmentModeEnabled;
 - (BOOL)getAppBannerDraftsEnabled;
+- (BOOL)getSubscriptionChanged;
 - (BOOL)isSubscribed;
 - (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 - (BOOL)hasSubscriptionTag:(NSString*)tagId;

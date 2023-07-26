@@ -23,6 +23,8 @@ typedef void (^CPNotificationClickBlock)(CPNotification* result);
 @property (nonatomic) int date_text_size;
 @property (nonatomic, copy) CPNotificationClickBlock callback;
 @property (nonatomic, strong) NSString *notificationThumbnail;
+@property (nonatomic, strong) NSMutableArray<CPAppBanner*> *banners;
+@property (nonatomic, strong) CPAppBannerActionBlock handleBannerOpened;
 
 #pragma mark - Call back while banner has been open-up successfully
 

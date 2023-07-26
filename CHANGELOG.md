@@ -1,3 +1,7 @@
+## 1.28.3
+* Optimized `subscribe` method for `CPChatView` with another chanel id.
+* Fixed crash issue while opening URLs from notification payload.
+
 ## 1.28.2
 * Optimized `subscribe` method for `CPChatView`
 
