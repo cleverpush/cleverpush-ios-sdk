@@ -1291,11 +1291,8 @@ static id isNil(id object) {
             if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
                 oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
             }
-            if ([newSubscriptionId isEqualToString:oldSubscriptionId]) {
-                [CleverPush setSubscriptionChanged:NO];
-            } else {
-                [CleverPush setSubscriptionChanged:YES];
-            }
+            BOOL isSubscriptionChanged = [newSubscriptionId isEqualToString:oldSubscriptionId];
+            [CleverPush setSubscriptionChanged:isSubscriptionChanged];
 
             subscriptionId = [results objectForKey:@"id"];
             [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
