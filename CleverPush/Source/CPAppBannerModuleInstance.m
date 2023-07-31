@@ -906,7 +906,6 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - refactor for testcases
-
 - (void)setBanners:(NSMutableArray*)appBanner {
     banners = appBanner;
 }
