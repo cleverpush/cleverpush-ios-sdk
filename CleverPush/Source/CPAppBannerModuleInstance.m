@@ -33,6 +33,8 @@ long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
 
+NSInteger currentScreenIndex = 0;
+
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -93,6 +95,15 @@ long sessions = 0;
 - (void)startup {
     [self createBanners:banners];
     [self scheduleBanners];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(getCurrentAppBannerPageIndex:)
+                                                         name:@"getCurrentAppBannerPageIndexValue"
+                                                       object:nil];
+}
+
+#pragma mark - Release memories of currentAppBanner
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
@@ -601,8 +612,13 @@ long sessions = 0;
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                     if (!screensList.isScreenClicked) {
-                        screens = screensList;
-                        break;
+                        if (banner.carouselEnabled) {
+                            screens = banner.screens[currentScreenIndex];
+                            break;
+                        } else {
+                            screens = screensList;
+                            break;
+                        }
                     }
                 }
                 for (CPAppBannerBlock *bannerBlock in screens.blocks) {
@@ -881,6 +897,12 @@ long sessions = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
+}
+
+#pragma mark - Get the value of pageControl from current index
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
+    NSDictionary *pagevalue = notification.userInfo;
+    currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
 }
 
 #pragma mark - refactor for testcases
