@@ -597,20 +597,31 @@ long sessions = 0;
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
             NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
             NSString *type;
-            
-            for (CPAppBannerCarouselBlock *screensList in banner.screens) {
-                if (!screensList.isScreenClicked) {
-                    screens = screensList;
-                    break;
+
+            if (banner.multipleScreensEnabled && banner.screens.count > 0) {
+                for (CPAppBannerCarouselBlock *screensList in banner.screens) {
+                    if (!screensList.isScreenClicked) {
+                        screens = screensList;
+                        break;
+                    }
+                }
+                for (CPAppBannerBlock *bannerBlock in screens.blocks) {
+                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
+                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
+                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                    }
+                }
+            } else {
+                for (CPAppBannerBlock *bannerBlock in banner.blocks) {
+                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
+                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
+                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
+                    }
                 }
             }
-            for (CPAppBannerBlock *bannerBlock in screens.blocks) {
-                if (bannerBlock.type == CPAppBannerBlockTypeButton) {
-                    [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
-                    [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                }
-            }
+
             for (CPAppBannerButtonBlock *button in buttonBlocks) {
                 if ([button.id isEqualToString:action.blockId]) {
                     buttons = (CPAppBannerButtonBlock*)button;
