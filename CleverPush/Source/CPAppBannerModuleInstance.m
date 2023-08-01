@@ -602,7 +602,7 @@ NSInteger currentScreenIndex = 0;
         }
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-            CPAppBannerCarouselBlock *screens = [[CPAppBannerCarouselBlock alloc] init];
+            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
             CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
             CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
@@ -612,16 +612,11 @@ NSInteger currentScreenIndex = 0;
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                     if (!screensList.isScreenClicked) {
-                        if (banner.carouselEnabled) {
-                            screens = banner.screens[currentScreenIndex];
-                            break;
-                        } else {
-                            screens = screensList;
-                            break;
-                        }
+                        screen = banner.screens[currentScreenIndex];
+                        break;
                     }
                 }
-                for (CPAppBannerBlock *bannerBlock in screens.blocks) {
+                for (CPAppBannerBlock *bannerBlock in screen.blocks) {
                     if (bannerBlock.type == CPAppBannerBlockTypeButton) {
                         [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
                     } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
@@ -652,14 +647,14 @@ NSInteger currentScreenIndex = 0;
                     break;
                 }
             }
-            
+
             if ([type isEqualToString:@"button"]) {
-                if (screens != nil && buttons != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:buttons forImageBlock:nil blockType:type];
+                if (screen != nil && buttons != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:buttons forImageBlock:nil blockType:type];
                 }
             } else if ([type isEqualToString:@"image"]) {
-                if (screens != nil && images != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:nil forImageBlock:images blockType:type];
+                if (screen != nil && images != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:nil forImageBlock:images blockType:type];
                 }
             }
 
