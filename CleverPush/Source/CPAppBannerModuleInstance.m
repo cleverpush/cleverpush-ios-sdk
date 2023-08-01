@@ -33,6 +33,8 @@ long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
 
+NSInteger currentScreenIndex = 0;
+
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -93,6 +95,15 @@ long sessions = 0;
 - (void)startup {
     [self createBanners:banners];
     [self scheduleBanners];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(getCurrentAppBannerPageIndex:)
+                                                         name:@"getCurrentAppBannerPageIndexValue"
+                                                       object:nil];
+}
+
+#pragma mark - Release memories of currentAppBanner
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - fetch the details of shownAppBanners from NSUserDefaults by key CleverPush_SHOWN_APP_BANNERS
@@ -591,7 +602,7 @@ long sessions = 0;
         }
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-            CPAppBannerCarouselBlock *screens = [[CPAppBannerCarouselBlock alloc] init];
+            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
             CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
             CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
@@ -601,11 +612,11 @@ long sessions = 0;
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                     if (!screensList.isScreenClicked) {
-                        screens = screensList;
+                        screen = banner.screens[currentScreenIndex];
                         break;
                     }
                 }
-                for (CPAppBannerBlock *bannerBlock in screens.blocks) {
+                for (CPAppBannerBlock *bannerBlock in screen.blocks) {
                     if (bannerBlock.type == CPAppBannerBlockTypeButton) {
                         [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
                     } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
@@ -636,14 +647,14 @@ long sessions = 0;
                     break;
                 }
             }
-            
+
             if ([type isEqualToString:@"button"]) {
-                if (screens != nil && buttons != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:buttons forImageBlock:nil blockType:type];
+                if (screen != nil && buttons != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:buttons forImageBlock:nil blockType:type];
                 }
             } else if ([type isEqualToString:@"image"]) {
-                if (screens != nil && images != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screens forButtonBlock:nil forImageBlock:images blockType:type];
+                if (screen != nil && images != nil) {
+                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:nil forImageBlock:images blockType:type];
                 }
             }
 
@@ -883,8 +894,13 @@ long sessions = 0;
     return currentVoucherCodePlaceholder;
 }
 
-#pragma mark - refactor for testcases
+#pragma mark - Get the value of pageControl from current index
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
+    NSDictionary *pagevalue = notification.userInfo;
+    currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
+}
 
+#pragma mark - refactor for testcases
 - (void)setBanners:(NSMutableArray*)appBanner {
     banners = appBanner;
 }
