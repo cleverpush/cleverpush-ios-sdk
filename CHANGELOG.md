@@ -1,3 +1,6 @@
+## 1.28.4
+* Resolved the click count issue for app banners.
+
 ## 1.28.3
 * Optimized `subscribe` method for `CPChatView` with another chanel id.
 * Fixed crash issue while opening URLs from notification payload.
