@@ -135,7 +135,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testInitSession {
-    [self.appBanner initSession];
+    [self.appBanner startup];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];
@@ -224,7 +224,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testAndVerifyStartUpWithCreateAndScheduleBanners {
-    [self.appBanner initSession];
+    [self.appBanner startup];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];

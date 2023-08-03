@@ -121,7 +121,12 @@
 - (void)testSubscriptionIdIsNotNilAndNotificationNotEnableThanVerifyUnsubscribe {
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
-    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(false);
+    OCMStub([self.cleverPush areNotificationsEnabled:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(BOOL);
+        [invocation getArgument:&completion atIndex:2];
+        BOOL notificationsEnabled = NO;
+        completion(notificationsEnabled);
+    });
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     OCMVerify([self.cleverPush unsubscribe]);
 }
@@ -130,7 +135,15 @@
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
     OCMStub([self.cleverPush shouldSync]).andReturn(true);
-    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(true);
+
+    CleverPush *mockCleverPush = OCMClassMock([CleverPush class]);
+    BOOL expectedEnabledValue = YES;
+    OCMStub([self.cleverPush areNotificationsEnabled:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(BOOL);
+        [invocation getArgument:&completion atIndex:2];
+        BOOL notificationsEnabled = NO;
+        completion(notificationsEnabled);
+    });
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     [_testUtilInstance performSelector:@selector(syncSubscription) withObject:self.cleverPush afterDelay:10.0f];
 }

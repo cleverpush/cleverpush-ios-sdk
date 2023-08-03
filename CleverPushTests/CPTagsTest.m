@@ -37,8 +37,8 @@
     NSMutableArray *expectedTags = [self.cleverPush getSubscriptionTags];
     XCTAssertEqual(tags, expectedTags);
     XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
-
 }
+
 - (void)testHasSubscriptionTagWhenItIsFalse{
     NSMutableArray *tags = [[NSMutableArray alloc]init];
     [tags addObject:@"tagId"];
@@ -78,7 +78,7 @@
     }];
 }
 
-- (void)testVerifyApiCallAddTags {
+- (void)testVerifyApiCallAddTag {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
     [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
@@ -92,6 +92,21 @@
     OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testVerifyApiCallAddSubscriptionTags {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    NSArray<NSString *> *tags = @[@"tagOne", @"tagTwo", @"tagThree"];
+    [self.cleverPush addSubscriptionTags:tags];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
+}
+
 - (void)testVerifyApiCallRemoveTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
@@ -103,6 +118,47 @@
     [self.cleverPush removeSubscriptionTag:@"tagId"];
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
     OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testVerifyApiCallRemoveSubscriptionTags {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    NSArray<NSString *> *tags = @[@"tagOne", @"tagTwo", @"tagThree"];
+    [self.cleverPush removeSubscriptionTags:tags];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
+}
+
+- (void)testGetAvailableTopicsContainsTopicId {
+    NSMutableArray *topics = [[NSMutableArray alloc]init];
+    [topics addObject:@"topicId"];
+    [OCMStub([self.cleverPush getAvailableTopics:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSArray *myFirstArgument);
+        [invocation getArgument:&handler atIndex:2];
+        handler(topics);
+    }];
+    [self.cleverPush getAvailableTopics:^(NSArray *Topics) {
+        XCTAssertTrue([Topics containsObject:@"topicId"]);
+    }];
+}
+
+- (void)testGetAvailableTopicsNotContainsTopicId {
+    NSMutableArray *topics = [[NSMutableArray alloc]init];
+    [topics addObject:@"topicId"];
+    [OCMStub([self.cleverPush getAvailableTopics:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSArray *myFirstArgument);
+        [invocation getArgument:&handler atIndex:2];
+        handler(topics);
+    }];
+    [self.cleverPush getAvailableTopics:^(NSArray *tTopics) {
+        XCTAssertFalse([tTopics containsObject:@"topicIdTwo"]);
+    }];
 }
 
 - (void)tearDown {

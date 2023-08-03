@@ -669,6 +669,11 @@ static CleverPush* singleInstance = nil;
 
     [CleverPushUNUserNotificationCenter injectSelectors];
 
+    NSString *processName = [[NSProcessInfo processInfo] processName];
+    if ([processName isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [processName isEqualToString:@"IBDesignablesAgent-iOS"] || [processName isEqualToString:@"xctest"]) {
+        return;
+    }
+
     if (@available(iOS 10.0, *)) {
         UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
         if (!currentNotificationCenter.delegate) {
