@@ -37,6 +37,10 @@
 
 @end;
 
+@class CPChannelTag;
+@class CPChannelTopic;
+@class CPAppBanner;
+
 typedef void (^CPResultSuccessBlock)(NSDictionary* result);
 typedef void (^CPFailureBlock)(NSError* error);
 
@@ -51,12 +55,9 @@ typedef void (^CPResultSuccessBlock)(NSDictionary* result);
 typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
+typedef void (^CPAppBannerShownBlock)(CPAppBanner* appBanner);
 
 typedef void (^CPLogListener)(NSString* message);
-
-@class CPChannelTag;
-@class CPChannelTopic;
-@class CPAppBanner;
 
 @interface CleverPushInstance : NSObject
 
@@ -163,6 +164,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 - (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
+- (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
 - (void)setAuthorizerToken:(NSString*)authorizerToken;
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

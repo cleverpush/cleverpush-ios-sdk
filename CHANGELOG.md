@@ -1,3 +1,6 @@
+## 1.28.5
+* Implemented `setAppBannerShownCallback`
+
 ## 1.28.4
 * Resolved the click count issue for app banners.
 

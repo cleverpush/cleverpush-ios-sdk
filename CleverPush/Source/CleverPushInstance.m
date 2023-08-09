@@ -3173,6 +3173,10 @@ static id isNil(id object) {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
 
+- (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback {
+    [CPAppBannerModule setBannerShownCallback:callback];
+}
+
 - (void)disableAppBanners {
     [CPAppBannerModule disableBanners];
 }

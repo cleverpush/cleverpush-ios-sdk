@@ -6,23 +6,23 @@
 	<dict>
 		<key>Frameworks/CleverPush.framework/CPAppBannerViewController.nib</key>
 		<data>
-		rcCxNGTQ8CSrhm4hv9R9B1RqQko=
+		KVNC6hSgRGchVl8ORgqksm60us8=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
-		zZBOZckgvy3o+7jZ7l+iiCyKtAg=
+		f6pEBlBLqsCEci5S+GoIrw3Y2Wg=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		9xxEigL0Gm8w7MwVDhKt/uScIg8=
+		wiDDw2fugP3CUZtDJsS8Q3TEKvo=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		Jy9wzloLwiVzWxMj1UXfTshl6E8=
+		Qdhh620Q6YCPkzva+xFvTQBXC0k=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPButtonBlockCell.nib</key>
 		<data>
-		LuThaC1IF2r/rgBnYcx9D9rHdkU=
+		LPZf+gWGYYryC/hzwvQcpbuWaZ0=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
@@ -34,47 +34,47 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxCell.nib</key>
 		<data>
-		oE2HxBVHsXCHnep7Qt6EIQ0MKMo=
+		496T8qzoZpJgxhydF4GX8jpaGFY=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-11.0+.nib</key>
 		<data>
-		HbHiV339D+zhKxYNBIm2vCE2FvY=
+		f8uOjKdj6Pdot/SCb6HkWbNElRc=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<data>
-		AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+		oR1JQQARKkgxaYDEQvuyN1/EDNo=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/runtime.nib</key>
 		<data>
-		dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+		oKht2necuDPib/8pGlyaaKk4DKk=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<data>
-		QsGZRu9UCcU/mtZ1gL1zXHO34ss=
+		E/Sj71tHcZKnWSN9WyAxQYfGxC8=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<data>
-		frUBOau21teq4oSPmL3Fajuz2vM=
+		YOzjtnfyH2TpJfKxxgASyNP6wX0=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<data>
-		d15UteiF8uBxZvhcXB/gC4QjCLw=
+		FCsUyPFPnxtbi0V4/YYI8PseYY0=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPTopicDialogCell.nib</key>
 		<data>
-		OAZ+lvUr/uJ3S+sSWTsUsqpeleg=
+		tKOvfTRf6Rxhwhq3Km/xjmxJSbk=
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		by8WiQuZe8C60zFghvQxgJQUQ+g=
+		BkSo5trqZyZuLUHWZg2CNW3dadk=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		3SBuNei/07c/xvOW69abZPsYRZw=
+		1kzF+dypnrrdU5xnFiyyQnQmKqc=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		6zw/5D8mOkLBrCET9dJdofrZ80I=
+		Qq2QPOswbAimT10YsIrTYaGmknw=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -82,7 +82,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		UZAWkIQLZomax4fwJMx83lyFvgk=
+		AFIxKhxalFtM6mPWm1hy5zBOGv0=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -90,11 +90,11 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		AfMV7O01jlMzRgO8CeLmD8KEQYg=
+		hzxcq3aJ8I+q2pmNFRxPnpGF+VI=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		938fhKmzeZPgvb72Rx/9DF95RKM=
+		NKYsnQhcqgB8UNIYN8gDmRXx7e8=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -103,55 +103,55 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			rcCxNGTQ8CSrhm4hv9R9B1RqQko=
+			KVNC6hSgRGchVl8ORgqksm60us8=
 			</data>
 			<key>hash2</key>
 			<data>
-			6p4lzF32ogzux/m34N9XiRKXQYfn53iADyO+SL7wamQ=
+			QYAGt6ILwnn4uLTFwq2dkmFEFFfdKWvOQJ1GwquEHHA=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			zZBOZckgvy3o+7jZ7l+iiCyKtAg=
+			f6pEBlBLqsCEci5S+GoIrw3Y2Wg=
 			</data>
 			<key>hash2</key>
 			<data>
-			OxipIjbXqJKFPWh8bkA07+NbS5KnuD48fA05XZ5CF7U=
+			v1iosGpOcvSfdGjzqkVKaSZtN6XjtDVG2Rs5Uh4nmVI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			9xxEigL0Gm8w7MwVDhKt/uScIg8=
+			wiDDw2fugP3CUZtDJsS8Q3TEKvo=
 			</data>
 			<key>hash2</key>
 			<data>
-			HE+QikifmA5/ycnQHAUn0sEiNS8vcTA9VPcQv42G6uI=
+			FcdR7oHnJONEjnquwa6NJECqBhwJQCG4japHs/CFEJc=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Jy9wzloLwiVzWxMj1UXfTshl6E8=
+			Qdhh620Q6YCPkzva+xFvTQBXC0k=
 			</data>
 			<key>hash2</key>
 			<data>
-			FYzKCFrf3VEww/UfEz45z0Th8sTAq3jBoiGMcrp+O0Q=
+			CQc/Ef4aabTK7jSJfiklkSIwZvt5LVrpfpVgCl/Bq8E=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPButtonBlockCell.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			LuThaC1IF2r/rgBnYcx9D9rHdkU=
+			LPZf+gWGYYryC/hzwvQcpbuWaZ0=
 			</data>
 			<key>hash2</key>
 			<data>
-			q8L+/in0pmORtD+Xto3+9GqOqKdSt1C7uY7tYuQ5thQ=
+			YT5eepc9l7FMQTJz5nN4hg4tTkORuXMHiWfAFLjn5tU=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
@@ -180,121 +180,121 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			oE2HxBVHsXCHnep7Qt6EIQ0MKMo=
+			496T8qzoZpJgxhydF4GX8jpaGFY=
 			</data>
 			<key>hash2</key>
 			<data>
-			W92n+oXUzXfvJhA5NiVUCbN3VvHmnhh63fn3TxGVdQA=
+			Apsti40gkNBmoaWRFVDcDgVZk8aXaE/eGL9+Xn7iSeM=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-11.0+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			HbHiV339D+zhKxYNBIm2vCE2FvY=
+			f8uOjKdj6Pdot/SCb6HkWbNElRc=
 			</data>
 			<key>hash2</key>
 			<data>
-			sCGBVgGyWKY9VO5n5H5SLqrRH/VHUV/ffxeFcMonsJc=
+			vG4SOAzhee0iYGzUb/NtkzrwaDaDJ9NEeUbMfm2BQnA=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+			oR1JQQARKkgxaYDEQvuyN1/EDNo=
 			</data>
 			<key>hash2</key>
 			<data>
-			F15jZdq7NgYZ6A1ROJQtEwMfCDrd2WdEtW3RtlP4vQM=
+			3T9Vf5f3Sp3FvXAp4mfHVFj+lu6v9ICM2wWWFyoCzQ8=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+			oKht2necuDPib/8pGlyaaKk4DKk=
 			</data>
 			<key>hash2</key>
 			<data>
-			2M2+iZlXUB8uTGGAUTIKKEnem3DiJnzPQLU41/Kyizg=
+			lp5CT5ySny0qj08lKayARn7ZWrI7aPZIy6qx5dr4xC4=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			QsGZRu9UCcU/mtZ1gL1zXHO34ss=
+			E/Sj71tHcZKnWSN9WyAxQYfGxC8=
 			</data>
 			<key>hash2</key>
 			<data>
-			g4VL30ZYMKgeM1Jf0rrarQcM6r39+k7uhLm1MeoZDPI=
+			Gt30mh/UhI4YYmD8dxr8uq2Kfi2Sd+JLu+PlM1/thYI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			frUBOau21teq4oSPmL3Fajuz2vM=
+			YOzjtnfyH2TpJfKxxgASyNP6wX0=
 			</data>
 			<key>hash2</key>
 			<data>
-			74nv5QcTv2TujvA6mxu35hzhsFzncCfhWPelPQXk1Ko=
+			53/h0K4EBT2OkFMkQdoysM3gpatzoxzzmVpoelPJTuI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			d15UteiF8uBxZvhcXB/gC4QjCLw=
+			FCsUyPFPnxtbi0V4/YYI8PseYY0=
 			</data>
 			<key>hash2</key>
 			<data>
-			QHAWAYpSQh8RtV/K+j3tV77biyxi2hGBxXdfFzzMZxo=
+			d9aIkXv21ss2iLO8ORsfP0PNmfDWMS0ajopTb/CB97M=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPTopicDialogCell.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			OAZ+lvUr/uJ3S+sSWTsUsqpeleg=
+			tKOvfTRf6Rxhwhq3Km/xjmxJSbk=
 			</data>
 			<key>hash2</key>
 			<data>
-			bh7Ht9rjMOl1+wzBqRT9EwuBDOBmNkV8rnPI7VakhCc=
+			CWV6w2r0+cZZ6eFigesAMX7ewaGjAx4H7CuRtpe+1kg=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			by8WiQuZe8C60zFghvQxgJQUQ+g=
+			BkSo5trqZyZuLUHWZg2CNW3dadk=
 			</data>
 			<key>hash2</key>
 			<data>
-			adi/jXFHArTgv0Cn7C8O8PcLe0svOT+BlXsjgbhzWkg=
+			H86dSkx75EouAiTaetVpr/v/OXK9TaR7pBu+Nd2zR0M=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			3SBuNei/07c/xvOW69abZPsYRZw=
+			1kzF+dypnrrdU5xnFiyyQnQmKqc=
 			</data>
 			<key>hash2</key>
 			<data>
-			hMOrIiHSpzn1o95Tu6vyr84SypCbKJWgBmu0VfGqxtA=
+			xiYx1sftpK49BlcORtkQAcE97d0ujKw8g6yFd5FJVvU=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			6zw/5D8mOkLBrCET9dJdofrZ80I=
+			Qq2QPOswbAimT10YsIrTYaGmknw=
 			</data>
 			<key>hash2</key>
 			<data>
-			4IPLYIHbefe6TAiqXgxZ4SzC079YxfEPQIGwfO+FVoY=
+			pc+IqJ6VTzIHkMeqJPYhPmYWp6ry36mBHYMRkge3fl0=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -312,11 +312,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			UZAWkIQLZomax4fwJMx83lyFvgk=
+			AFIxKhxalFtM6mPWm1hy5zBOGv0=
 			</data>
 			<key>hash2</key>
 			<data>
-			5t8QZ3oN9e73jSJIU1uFyn3Cu2w8hDkcO5pQVAAuB9A=
+			fyYtLShEaifefYAUArpwbndLtakbKA5QOEhBnKvEqDM=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>
@@ -334,11 +334,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			938fhKmzeZPgvb72Rx/9DF95RKM=
+			NKYsnQhcqgB8UNIYN8gDmRXx7e8=
 			</data>
 			<key>hash2</key>
 			<data>
-			JDGrJzAjiHOQw8fnUsEk8yqmn/CjGyBnlBlgYkxhK2w=
+			1hH97dwBZQpYsgOuqmvZPTphv3YoU7s3/V2QTBzXqfs=
 			</data>
 		</dict>
 	</dict>

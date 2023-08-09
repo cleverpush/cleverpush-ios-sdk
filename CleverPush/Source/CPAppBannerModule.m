@@ -27,9 +27,14 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance saveSessions];
 }
 
-#pragma mark - Call back while banner has been open-up successfully
+#pragma mark - Callback while banner has been open-up successfully
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback {
     [self.moduleInstance setBannerOpenedCallback:callback];
+}
+
+#pragma mark - Callback while banner has been shown successfully
++ (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
+    [self.moduleInstance setBannerShownCallback:callback];
 }
 
 #pragma mark - load the events
