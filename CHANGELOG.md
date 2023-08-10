@@ -1,3 +1,6 @@
+## 1.28.6
+* Fixed App Banner backgrounds
+
 ## 1.28.5
 * Implemented `setAppBannerShownCallback`
 
