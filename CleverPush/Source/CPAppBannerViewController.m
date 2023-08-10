@@ -71,7 +71,7 @@
         return;
     }
 
-    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
+    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
         [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
         return;
     }
