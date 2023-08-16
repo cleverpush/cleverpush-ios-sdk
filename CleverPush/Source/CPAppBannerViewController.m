@@ -20,6 +20,11 @@
     [self conditionalPresentation];
     [self setOrientation];
     self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(deviceRotated)
+                                                     name:UIDeviceOrientationDidChangeNotification
+                                                   object:nil];
 }
 
 #pragma mark - Custom UI Functions
@@ -219,6 +224,17 @@
     }
 }
 
+#pragma mark - Update the UI while the device detects rotation.
+- (void)deviceRotated {
+    [self.cardCollectionView.collectionViewLayout invalidateLayout];
+    [self.cardCollectionView reloadData];
+}
+
+#pragma mark - Release memories of appBanner
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 #pragma mark - CollectionView Delegate and DataSource
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     return 1;
@@ -275,6 +291,8 @@
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     }
 
+    [cell.tblCPBanner layoutIfNeeded];
+    [cell.tblCPBanner updateConstraintsIfNeeded];
     [cell layoutIfNeeded];
     return cell;
 }
