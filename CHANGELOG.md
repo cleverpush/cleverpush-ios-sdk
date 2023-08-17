@@ -1,3 +1,6 @@
+## 1.28.7
+* Fixed App Banner orientation layout issue
+
 ## 1.28.6
 * Fixed App Banner backgrounds
 
