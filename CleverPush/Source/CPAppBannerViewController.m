@@ -98,7 +98,7 @@
     } else if (self.data.type == CPAppBannerTypeBottom) {
         [self bannerPosition:NO bottom:YES center:NO];
     } else {
-        [self setBackGroundColor];
+        [self setBackgroundColor];
         [self bannerPosition:YES bottom:YES center:YES];
     }
 }
@@ -192,7 +192,7 @@
 }
 
 #pragma mark - Set background color
-- (void)setBackGroundColor {
+- (void)setBackgroundColor {
     [self.view setBackgroundColor:[UIColor whiteColor]];
 
     if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
