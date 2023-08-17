@@ -20,11 +20,6 @@
     [self conditionalPresentation];
     [self setOrientation];
     self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(deviceRotated)
-                                                     name:UIDeviceOrientationDidChangeNotification
-                                                   object:nil];
 }
 
 #pragma mark - Custom UI Functions
@@ -103,6 +98,7 @@
     } else if (self.data.type == CPAppBannerTypeBottom) {
         [self bannerPosition:NO bottom:YES center:NO];
     } else {
+        [self setBackGroundColor];
         [self bannerPosition:YES bottom:YES center:YES];
     }
 }
@@ -195,6 +191,15 @@
     }
 }
 
+#pragma mark - Set background color
+- (void)setBackGroundColor {
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+
+    if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+        [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
+}
+
 #pragma mark - custom delegate manage tableview constraint size based on it's content size and based on conditional
 - (void)manageTableHeightDelegate:(CGSize)value {
     if (value.height > UIScreen.mainScreen.bounds.size.height) {
@@ -225,14 +230,14 @@
 }
 
 #pragma mark - Update the UI while the device detects rotation.
-- (void)deviceRotated {
-    [self.cardCollectionView.collectionViewLayout invalidateLayout];
-    [self.cardCollectionView reloadData];
-}
-
-#pragma mark - Release memories of appBanner
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.cardCollectionView.collectionViewLayout invalidateLayout];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.cardCollectionView performBatchUpdates:^{
+            [self.cardCollectionView reloadData];
+        } completion:nil];
+    }];
 }
 
 #pragma mark - CollectionView Delegate and DataSource
