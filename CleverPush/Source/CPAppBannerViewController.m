@@ -1,5 +1,6 @@
 #import "CPAppBannerViewController.h"
 #import "CPLog.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface CPAppBannerViewController()
 @end
@@ -98,7 +99,11 @@
     } else if (self.data.type == CPAppBannerTypeBottom) {
         [self bannerPosition:NO bottom:YES center:NO];
     } else {
-        [self setBackgroundColor];
+        if ([self.data.contentType isEqualToString:@"html"]) {
+            [self.view setBackgroundColor:[UIColor clearColor]];
+        } else {
+            [self setBackgroundColor];
+        }
         [self bannerPosition:YES bottom:YES center:YES];
     }
 }
@@ -197,6 +202,21 @@
 
     if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
         [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
+}
+
+#pragma mark - Set notch color
+- (void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+
+    if ([self.data.contentType isEqualToString:@"html"] && self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+        _topSafeAreaView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.safeAreaInsets.top)];
+        _topSafeAreaView.backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+        [self.view addSubview:_topSafeAreaView];
+
+        _bottomSafeAreaView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - self.view.safeAreaInsets.bottom, self.view.bounds.size.width, self.view.safeAreaInsets.bottom)];
+        _bottomSafeAreaView.backgroundColor = [UIColor colorWithHexString:self.data.background.color];
+        [self.view addSubview:_bottomSafeAreaView];
     }
 }
 
@@ -594,6 +614,10 @@
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self fadeOut];
         [self jumpOut];
+        if ([self.data.contentType isEqualToString:@"html"]) {
+            [_topSafeAreaView removeFromSuperview];
+            [_bottomSafeAreaView removeFromSuperview];
+        }
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self dismissViewControllerAnimated:NO completion:nil];
