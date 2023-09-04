@@ -1,3 +1,12 @@
+## 1.28.7
+* Fixed App Banner orientation layout issue
+
+## 1.28.6
+* Fixed App Banner backgrounds
+
+## 1.28.5
+* Implemented `setAppBannerShownCallback`
+
 ## 1.28.4
 * Resolved the click count issue for app banners.
 

@@ -10,15 +10,15 @@
 		</data>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
-		zZBOZckgvy3o+7jZ7l+iiCyKtAg=
+		w1yNXw7WYJddl4wyhquvM5pRp2c=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		9xxEigL0Gm8w7MwVDhKt/uScIg8=
+		+62ldI4mXS0ifYQkagufl6kUHvQ=
 		</data>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		Jy9wzloLwiVzWxMj1UXfTshl6E8=
+		h7WLLV7skMm0uv+UNP5Ynu0npnY=
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
@@ -38,15 +38,15 @@
 		</data>
 		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
 		<data>
-		HbHiV339D+zhKxYNBIm2vCE2FvY=
+		wNG+ozTz6HdJ+WYe3DT2+EqNKd8=
 		</data>
 		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<data>
-		AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+		smnFAaw/sgHbBGQQhE1szOQAL3I=
 		</data>
 		<key>CPInboxDetailContainer.nib/runtime.nib</key>
 		<data>
-		dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+		BwokFaSFKIDyMUXivwjSz1rGqc0=
 		</data>
 		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<data>
@@ -234,7 +234,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		+ASyesv0k67g0mjo6e95ig6tWYE=
+		AJgcEM335H+Y/Co2HX7GpYb7uNE=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -242,7 +242,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		UZAWkIQLZomax4fwJMx83lyFvgk=
+		AFIxKhxalFtM6mPWm1hy5zBOGv0=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -278,33 +278,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			zZBOZckgvy3o+7jZ7l+iiCyKtAg=
+			w1yNXw7WYJddl4wyhquvM5pRp2c=
 			</data>
 			<key>hash2</key>
 			<data>
-			OxipIjbXqJKFPWh8bkA07+NbS5KnuD48fA05XZ5CF7U=
+			2ZgJG/C6Y+2YyU0Qdci9kKVefLpNglCLV+ypYMPFeD4=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			9xxEigL0Gm8w7MwVDhKt/uScIg8=
+			+62ldI4mXS0ifYQkagufl6kUHvQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			HE+QikifmA5/ycnQHAUn0sEiNS8vcTA9VPcQv42G6uI=
+			lIHxFUe84Q/V6lSZ/acTDTmlFqEj8EQj6DwrEh1SbCE=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Jy9wzloLwiVzWxMj1UXfTshl6E8=
+			h7WLLV7skMm0uv+UNP5Ynu0npnY=
 			</data>
 			<key>hash2</key>
 			<data>
-			FYzKCFrf3VEww/UfEz45z0Th8sTAq3jBoiGMcrp+O0Q=
+			wjrVN8rtZWOCjO4yqYA3G+ZQbSZbk6tRst9mNaW0d9Y=
 			</data>
 		</dict>
 		<key>CPButtonBlockCell.nib</key>
@@ -355,33 +355,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HbHiV339D+zhKxYNBIm2vCE2FvY=
+			wNG+ozTz6HdJ+WYe3DT2+EqNKd8=
 			</data>
 			<key>hash2</key>
 			<data>
-			sCGBVgGyWKY9VO5n5H5SLqrRH/VHUV/ffxeFcMonsJc=
+			jK/USQXkn6HmOLThSRXGGHbkAf2B8VllpEpIUy265Y0=
 			</data>
 		</dict>
 		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			AJHCeFJ4ANT0ranEkPAQMGxjpPU=
+			smnFAaw/sgHbBGQQhE1szOQAL3I=
 			</data>
 			<key>hash2</key>
 			<data>
-			F15jZdq7NgYZ6A1ROJQtEwMfCDrd2WdEtW3RtlP4vQM=
+			v80FZUDWTdshU8BCCikodAFRbTjXGeCJVuWruwwxUEE=
 			</data>
 		</dict>
 		<key>CPInboxDetailContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			dO9E8w2uYvmHAhYqgG1ZQdqhI28=
+			BwokFaSFKIDyMUXivwjSz1rGqc0=
 			</data>
 			<key>hash2</key>
 			<data>
-			2M2+iZlXUB8uTGGAUTIKKEnem3DiJnzPQLU41/Kyizg=
+			xf2BrT3toGUxIBoaK4QBSTDdsSmtBNTR/ooev8XpJf0=
 			</data>
 		</dict>
 		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
@@ -894,11 +894,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			+ASyesv0k67g0mjo6e95ig6tWYE=
+			AJgcEM335H+Y/Co2HX7GpYb7uNE=
 			</data>
 			<key>hash2</key>
 			<data>
-			LmzPnE39Z3/GAAs6NGSsxxNPEz0x4P1IWLklN7k+4ko=
+			MGNoGKnlmkYUQfDtPGN1Z5WZkx44o4GLimauXSBCBfU=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -916,11 +916,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			UZAWkIQLZomax4fwJMx83lyFvgk=
+			AFIxKhxalFtM6mPWm1hy5zBOGv0=
 			</data>
 			<key>hash2</key>
 			<data>
-			5t8QZ3oN9e73jSJIU1uFyn3Cu2w8hDkcO5pQVAAuB9A=
+			fyYtLShEaifefYAUArpwbndLtakbKA5QOEhBnKvEqDM=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

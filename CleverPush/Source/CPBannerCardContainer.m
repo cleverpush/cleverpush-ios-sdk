@@ -24,6 +24,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self backgroundPopupShadow];
         [self setBackground];
+        [self setBackgroundColor];
     });
     [[NSNotificationCenter defaultCenter] addObserver:self
                                                      selector:@selector(getCurrentAppBannerPageIndex:)
@@ -337,7 +338,7 @@
         return;
     }
 
-    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
+    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
         [self.imgviewBackground setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
         return;
     }
@@ -354,6 +355,18 @@
         [self.pageControl setNumberOfPages:0];
         self.pageControl.hidden = YES;
         self.pageControlHeightConstraint.constant = 0;
+    }
+}
+
+#pragma mark - setup background color
+- (void)setBackgroundColor {
+    [self.contentView setBackgroundColor:[UIColor clearColor]];
+
+    if (self.data.type == CPAppBannerTypeFull) {
+        [self.contentView setBackgroundColor:[UIColor whiteColor]];
+        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+            [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        }
     }
 }
 

@@ -16,6 +16,11 @@
     } handleSubscribed:^(NSString *subscriptionId) {
         NSLog(@"Subscribed to CleverPush with ID: %@", subscriptionId);
     } autoRegister:YES];
+
+    [CleverPush setAppBannerShownCallback:^(CPAppBanner *appBanner) {
+        NSLog(@"APP BANNER SHOWN: %@", appBanner.name);
+    }];
+
     return YES;
 }
 

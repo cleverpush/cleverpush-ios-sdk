@@ -20,6 +20,7 @@ NSMutableArray<CPAppBanner*> *activePendingBanners;
 NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
+CPAppBannerShownBlock handleBannerShown;
 
 BOOL initialized = NO;
 BOOL showDrafts = NO;
@@ -51,6 +52,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback {
     handleBannerOpened = callback;
+}
+
+#pragma mark - Call back while banner has been open-up successfully
+- (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
+    handleBannerShown = callback;
 }
 
 #pragma mark - load the events
@@ -749,6 +755,10 @@ NSInteger currentScreenIndex = 0;
         });
     }
     [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+
+    if (handleBannerShown) {
+        handleBannerShown(banner);
+    }
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")

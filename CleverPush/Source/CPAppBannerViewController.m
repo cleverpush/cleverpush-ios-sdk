@@ -71,7 +71,7 @@
         return;
     }
 
-    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]]) {
+    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
         [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
         return;
     }
@@ -98,6 +98,7 @@
     } else if (self.data.type == CPAppBannerTypeBottom) {
         [self bannerPosition:NO bottom:YES center:NO];
     } else {
+        [self setBackgroundColor];
         [self bannerPosition:YES bottom:YES center:YES];
     }
 }
@@ -190,6 +191,15 @@
     }
 }
 
+#pragma mark - Set background color
+- (void)setBackgroundColor {
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+
+    if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+        [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
+}
+
 #pragma mark - custom delegate manage tableview constraint size based on it's content size and based on conditional
 - (void)manageTableHeightDelegate:(CGSize)value {
     if (value.height > UIScreen.mainScreen.bounds.size.height) {
@@ -217,6 +227,17 @@
     } else {
         [self composeHTML:self.data.HTMLContent];
     }
+}
+
+#pragma mark - Update the UI while the device detects rotation.
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.cardCollectionView.collectionViewLayout invalidateLayout];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.cardCollectionView performBatchUpdates:^{
+            [self.cardCollectionView reloadData];
+        } completion:nil];
+    }];
 }
 
 #pragma mark - CollectionView Delegate and DataSource
@@ -275,6 +296,8 @@
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     }
 
+    [cell.tblCPBanner layoutIfNeeded];
+    [cell.tblCPBanner updateConstraintsIfNeeded];
     [cell layoutIfNeeded];
     return cell;
 }
