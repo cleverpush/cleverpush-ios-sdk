@@ -90,7 +90,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
 + (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback;
-+ (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;
++ (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback;
 + (void)setSubscriptionLanguage:(NSString*)language;
 + (void)setSubscriptionCountry:(NSString*)country;
 + (void)setTopicsDialogWindow:(UIWindow *)window;
@@ -156,7 +156,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (UIColor*)getBrandingColor;
 
-+ (NSDictionary*)getAvailableAttributes __attribute__((deprecated));
++ (NSMutableArray*)getAvailableAttributes __attribute__((deprecated));
 + (NSDictionary*)getSubscriptionAttributes;
 
 + (BOOL)isDevelopmentModeEnabled;

@@ -2142,11 +2142,11 @@ static id isNil(id object) {
 }
 
 #pragma mark - Retrieving all the available attributes from the channelConfig
-- (NSDictionary*)getAvailableAttributes {
+- (NSMutableArray*)getAvailableAttributes {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
-    __block NSDictionary* customAttributes = nil;
-    [self getAvailableAttributes:^(NSDictionary* customAttributes_) {
+    __block NSMutableArray* customAttributes = [[NSMutableArray alloc] init];
+    [self getAvailableAttributes:^(NSMutableArray* customAttributes_) {
         customAttributes = customAttributes_;
         dispatch_semaphore_signal(sema);
     }];
@@ -2155,22 +2155,22 @@ static id isNil(id object) {
     return customAttributes;
 }
 
-- (void)getAvailableAttributes:(void(^)(NSDictionary *))callback {
+- (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             callback([self getAvailableAttributesFromConfig:channelConfig]);
             return;
         }
-        callback([[NSDictionary alloc] init]);
+        callback([[NSMutableArray alloc] init]);
     }];
 }
 
-- (NSDictionary*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig{
-    NSDictionary* customAttributes = [channelConfig cleverPushDictionaryForKey:@"customAttributes"];
+- (NSMutableArray*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig{
+    NSMutableArray* customAttributes = [[channelConfig cleverPushArrayForKey:@"customAttributes"] mutableCopy];
     if (customAttributes != nil) {
         return customAttributes;
     } else {
-        return [[NSDictionary alloc] init];
+        return [[NSMutableArray alloc] init];
     }
 }
 
