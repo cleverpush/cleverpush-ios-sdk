@@ -410,7 +410,7 @@ static id isNil(id object) {
 
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend {
     NSArray* channelTopics = [config cleverPushArrayForKey:@"channelTopics"];
-    if (channelTopics != nil && [channelTopics count] > 0) {
+    if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
         NSArray* topics = [self getSubscriptionTopics];
 
         if (!topics || [topics count] == 0) {
@@ -2167,7 +2167,7 @@ static id isNil(id object) {
 
 - (NSMutableArray*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig{
     NSMutableArray* customAttributes = [[channelConfig cleverPushArrayForKey:@"customAttributes"] mutableCopy];
-    if (customAttributes != nil) {
+    if (customAttributes != nil && ![customAttributes isKindOfClass:[NSNull class]] && [customAttributes count] > 0) {
         return customAttributes;
     } else {
         return [[NSMutableArray alloc] init];
@@ -3266,25 +3266,28 @@ static id isNil(id object) {
             channelConfig = result;
         }
 
-        if (
-            channelConfig != nil
-            && [channelConfig objectForKey:@"confirmAlertTestsEnabled"]
-            && [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue]
-            ) {
-                NSString *testsConfigPath = [configPath stringByAppendingString:@"&confirmAlertTestsEnabled=true"];
-                NSMutableURLRequest* testsRequest = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:testsConfigPath];
-                [self enqueueRequest:testsRequest onSuccess:^(NSDictionary* testsResult) {
-                    if (testsResult != nil) {
-                        channelConfig = testsResult;
-                    }
+        BOOL confirmAlertSettingsEnabled = ([channelConfig objectForKey:@"confirmAlertSettingsEnabled"] != nil) &&
+                                                  ![[channelConfig objectForKey:@"confirmAlertSettingsEnabled"] isKindOfClass:[NSNull class]] &&
+                                                  [[channelConfig objectForKey:@"confirmAlertSettingsEnabled"] boolValue];
+        BOOL confirmAlertTestsEnabled = ([channelConfig objectForKey:@"confirmAlertTestsEnabled"] != nil) &&
+                                          ![[channelConfig objectForKey:@"confirmAlertTestsEnabled"] isKindOfClass:[NSNull class]] &&
+                                          [[channelConfig objectForKey:@"confirmAlertTestsEnabled"] boolValue];
 
-                    [self fireChannelConfigListeners];
-                } onFailure:^(NSError* error) {
-                    [CPLog error:@"Failed getting the channel config %@", error];
-                    [self fireChannelConfigListeners];
-                }];
-                return;
-            }
+        if (channelConfig != nil && confirmAlertSettingsEnabled && confirmAlertTestsEnabled) {
+            NSString *testsConfigPath = [configPath stringByAppendingString:@"&confirmAlertTestsEnabled=true"];
+            NSMutableURLRequest* testsRequest = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:testsConfigPath];
+            [self enqueueRequest:testsRequest onSuccess:^(NSDictionary* testsResult) {
+                if (testsResult != nil) {
+                    channelConfig = testsResult;
+                }
+
+                [self fireChannelConfigListeners];
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"Failed getting the channel config %@", error];
+                [self fireChannelConfigListeners];
+            }];
+            return;
+        }
 
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
