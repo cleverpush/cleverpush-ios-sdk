@@ -467,7 +467,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 
     NSArray* channelTopics = [config cleverPushArrayForKey:@"channelTopics"];
-    if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
+    if (channelTopics != nil && [channelTopics count] > 0) {
         for (id channelTopic in channelTopics) {
             if (channelTopic != nil && ([channelTopic cleverPushStringForKey:@"createdAt"] == nil || [[channelTopic cleverPushStringForKey:@"createdAt"] isKindOfClass:[NSString class]])) {
                 NSDate *createdAt = [self getLocalDateTimeFromUTC:[channelTopic cleverPushStringForKey:@"createdAt"]];

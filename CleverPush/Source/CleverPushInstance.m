@@ -410,7 +410,7 @@ static id isNil(id object) {
 
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend {
     NSArray* channelTopics = [config cleverPushArrayForKey:@"channelTopics"];
-    if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
+    if (channelTopics != nil && [channelTopics count] > 0) {
         NSArray* topics = [self getSubscriptionTopics];
 
         if (!topics || [topics count] == 0) {
@@ -2091,7 +2091,7 @@ static id isNil(id object) {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTags = [channelConfig cleverPushArrayForKey:@"channelTags"];
-            if (channelTags != nil && ![channelTags isKindOfClass:[NSNull class]] && [channelTags count] > 0) {
+            if (channelTags != nil && [channelTags count] > 0) {
                 NSMutableArray* channelTagsArray = [NSMutableArray new];
                 [channelTags enumerateObjectsUsingBlock:^(NSDictionary* item, NSUInteger idx, BOOL *stop) {
                     CPChannelTag* tag = [CPChannelTag initWithJson:item];
@@ -2123,7 +2123,7 @@ static id isNil(id object) {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil) {
             NSArray* channelTopics = [channelConfig cleverPushArrayForKey:@"channelTopics"];
-            if (channelTopics != nil && ![channelTopics isKindOfClass:[NSNull class]] && [channelTopics count] > 0) {
+            if (channelTopics != nil && [channelTopics count] > 0) {
                 NSSortDescriptor *valueDescriptor = [[NSSortDescriptor alloc] initWithKey:@"sort" ascending:YES];
                 NSArray *descriptors = [NSArray arrayWithObject:valueDescriptor];
                 NSArray *sortedTopics = [channelTopics sortedArrayUsingDescriptors:descriptors];
@@ -2167,7 +2167,7 @@ static id isNil(id object) {
 
 - (NSMutableArray*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig{
     NSMutableArray* customAttributes = [[channelConfig cleverPushArrayForKey:@"customAttributes"] mutableCopy];
-    if (customAttributes != nil && ![customAttributes isKindOfClass:[NSNull class]] && [customAttributes count] > 0) {
+    if (customAttributes != nil && [customAttributes count] > 0) {
         return customAttributes;
     } else {
         return [[NSMutableArray alloc] init];

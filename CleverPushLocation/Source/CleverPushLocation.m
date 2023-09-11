@@ -21,7 +21,7 @@ double geoFenceTimerInterval = 1.0;
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSArray* geoFencesDict = [channelConfig cleverPushArrayForKey:@"geoFences"];
-                    if (channelConfig != nil && geoFencesDict != nil && ![geoFencesDict isKindOfClass:[NSNull class]] && [geoFencesDict count] > 0) {
+                    if (channelConfig != nil && geoFencesDict != nil && [geoFencesDict count] > 0) {
                         if (!locationManager) {
                             locationManager = [CLLocationManager new];
                         }
