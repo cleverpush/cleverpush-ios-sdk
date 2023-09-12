@@ -401,7 +401,7 @@ CPNotificationClickBlock handleClick;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
     } else {
-        [CPLog info:@"CPInboxView: sendBannerEvent: There is no subscription for CleverPush SDK."];
+        [CPLog debug:@"CPInboxView: sendBannerEvent: There is no subscription for CleverPush SDK."];
     }
     NSMutableDictionary* dataDic = [[NSMutableDictionary alloc]init];
     if (banner.testId != nil) {

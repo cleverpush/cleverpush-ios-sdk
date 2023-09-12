@@ -774,7 +774,7 @@ NSInteger currentScreenIndex = 0;
     if ([CleverPush isSubscribed]) {
         subscriptionId = [CleverPush getSubscriptionId];
     } else {
-        [CPLog info:@"CPAppBannerModuleInstance: sendBannerEvent: There is no subscription for CleverPush SDK."];
+        [CPLog debug:@"CPAppBannerModuleInstance: sendBannerEvent: There is no subscription for CleverPush SDK."];
     }
     NSMutableDictionary* dataDic = [[NSMutableDictionary alloc]init];
     if (banner.testId != nil) {
