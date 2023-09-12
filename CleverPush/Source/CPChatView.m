@@ -270,6 +270,9 @@ UIColor* chatReceiverBubbleTextColor;
         [CleverPush subscribe:^(NSString* subscriptionId) {
             // wait for ID
             [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
+                if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                    [CPLog info:@"CPChatView: didReceiveScriptMessage: There is no subscription for CleverPush SDK."];
+                }
                 [self loadChat];
             }];
         }];

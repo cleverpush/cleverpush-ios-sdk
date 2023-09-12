@@ -399,6 +399,8 @@ static id isNil(id object) {
                 }
             }
         }];
+    } else {
+        [CPLog info:@"There is no subscription for CleverPush SDK."];
     }
 
     [self initFeatures];
@@ -458,9 +460,13 @@ static id isNil(id object) {
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
-        if (subscriptionId != nil && !notificationsEnabled && !ignoreDisabledNotificationPermission) {
-            [CPLog info:@"notification authorization revoked, unsubscribing"];
-            [self unsubscribe];
+        if (subscriptionId == nil) {
+                [CPLog info:@"CleverPushInstance: applicationWillEnterForeground: There is no subscription for CleverPush SDK."];
+        } else {
+            if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
+                [CPLog info:@"notification authorization revoked, unsubscribing"];
+                [self unsubscribe];
+            }
         }
     }];
 }
@@ -907,7 +913,11 @@ static id isNil(id object) {
 
                             if (subscribedBlock) {
                                 [self getSubscriptionId:^(NSString* subscriptionId) {
-                                    subscribedBlock(subscriptionId);
+                                    if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
+                                        subscribedBlock(subscriptionId);
+                                    } else {
+                                        [CPLog info:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
+                                    }
                                 }];
                             }
                         } else if (subscribedBlock) {
@@ -1205,6 +1215,8 @@ static id isNil(id object) {
 
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
+    } else {
+        [CPLog info:@"CleverPushInstance: setSyncSubscriptionRequestData: There is no subscription for CleverPush SDK."];
     }
     if (deviceToken) {
         [dataDic setObject:deviceToken forKey:@"apnsToken"];
@@ -1816,6 +1828,9 @@ static id isNil(id object) {
 
 - (void)removeSubscriptionTagFromApi:(NSString *)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString *subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+            [CPLog info:@"CleverPushInstance: removeSubscriptionTagFromApi: There is no subscription for CleverPush SDK."];
+        }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1881,6 +1896,9 @@ static id isNil(id object) {
 
 - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString *subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+            [CPLog info:@"CleverPushInstance: addSubscriptionTagToApi: There is no subscription for CleverPush SDK."];
+        }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1943,6 +1961,9 @@ static id isNil(id object) {
 - (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
+            if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                [CPLog info:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
+            }
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -1977,6 +1998,9 @@ static id isNil(id object) {
 - (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
+            if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                [CPLog info:@"CleverPushInstance: pushSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+            }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
             NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
             if (!subscriptionAttributes) {
@@ -2021,6 +2045,9 @@ static id isNil(id object) {
 - (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
+            if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                [CPLog info:@"CleverPushInstance: pullSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+            }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
             NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
             if (!subscriptionAttributes) {
@@ -2262,6 +2289,9 @@ static id isNil(id object) {
 
 - (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString* subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+            [CPLog info:@"CleverPushInstance: addSubscriptionTopic: There is no subscription for CleverPush SDK."];
+        }
         NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
         if ([topics containsObject:topicId]) {
             if (callback) {
@@ -2308,6 +2338,9 @@ static id isNil(id object) {
 
 - (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
     [self getSubscriptionId:^(NSString* subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+            [CPLog info:@"CleverPushInstance: removeSubscriptionTopic: There is no subscription for CleverPush SDK."];
+        }
         NSMutableArray *topics = [[NSMutableArray alloc] initWithArray:[self getSubscriptionTopics]];
         if (![topics containsObject:topicId]) {
             if (callback) {
@@ -2546,6 +2579,9 @@ static id isNil(id object) {
             NSString *eventId = [event cleverPushStringForKey:@"_id"];
 
             [self getSubscriptionId:^(NSString* subscriptionId) {
+                if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                    [CPLog info:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -2576,6 +2612,9 @@ static id isNil(id object) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self waitForTrackingConsent:^{
             [self getSubscriptionId:^(NSString* subscriptionId) {
+                if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                    [CPLog info:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -2829,6 +2868,8 @@ static id isNil(id object) {
                     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
 
                     } onFailure:nil];
+                } else if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                    [CPLog info:@"CleverPushInstance: trackSessionStart: There is no subscription for CleverPush SDK."];
                 }
             }];
         });
@@ -2873,6 +2914,8 @@ static id isNil(id object) {
                     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
 
                     } onFailure:nil];
+                } else if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                    [CPLog info:@"CleverPushInstance: trackSessionEnd: There is no subscription for CleverPush SDK."];
                 }
             }];
         });

@@ -18,6 +18,9 @@ double geoFenceTimerInterval = 1.0;
 + (void)init {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
         [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
+            if (subscriptionId == nil || [subscriptionId isKindOfClass:[NSNull class]] || [subscriptionId isEqualToString:@""]) {
+                [CPLog info:@"CleverPushLocation: init: There is no subscription for CleverPush SDK."];
+            }
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (channelConfig != nil && [channelConfig cleverPushArrayForKey:@"geoFences"] != nil) {
