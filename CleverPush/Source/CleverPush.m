@@ -298,8 +298,8 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
-+ (void)getAvailableAttributes:(void(^)(NSDictionary *))callback {
-    [self.CPSharedInstance getAvailableAttributes:^(NSDictionary *callbackInner) {
++ (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback {
+    [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray *callbackInner) {
         callback(callbackInner);
     }];
 }
@@ -557,7 +557,7 @@ static CleverPush* singleInstance = nil;
 }
 
 
-+ (NSDictionary*)getAvailableAttributes __attribute__((deprecated)) {
++ (NSMutableArray*)getAvailableAttributes __attribute__((deprecated)) {
     return [self.CPSharedInstance getAvailableAttributes];
 }
 

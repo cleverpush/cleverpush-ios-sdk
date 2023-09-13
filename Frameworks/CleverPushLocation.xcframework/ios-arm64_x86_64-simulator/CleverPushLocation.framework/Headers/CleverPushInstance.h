@@ -127,7 +127,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 - (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
 - (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback;
-- (void)getAvailableAttributes:(void(^)(NSDictionary *))callback;
+- (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback;
 - (void)setSubscriptionLanguage:(NSString*)language;
 - (void)setSubscriptionCountry:(NSString*)country;
 - (void)setTopicsDialogWindow:(UIWindow *)window;
@@ -191,7 +191,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (UIColor*)getBrandingColor;
 
-- (NSDictionary*)getAvailableAttributes __attribute__((deprecated));
+- (NSMutableArray*)getAvailableAttributes __attribute__((deprecated));
 - (NSDictionary*)getSubscriptionAttributes;
 
 - (BOOL)isDevelopmentModeEnabled;
@@ -244,7 +244,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)hasSubscriptionTopics;
 - (BOOL)isSubscriptionInProgress;
 - (void)setSubscriptionInProgress:(BOOL)progress;
-- (NSDictionary*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig;
+- (NSMutableArray*)getAvailableAttributesFromConfig:(NSDictionary*)channelConfig;
 - (NSString*)getCurrentPageUrl;
 - (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params;
 - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback;

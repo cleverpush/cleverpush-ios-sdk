@@ -1,3 +1,6 @@
+## 1.28.8
+* Optimized `getAvailableAttributes` method
+
 ## 1.28.7
 * Fixed App Banner orientation layout issue
 
