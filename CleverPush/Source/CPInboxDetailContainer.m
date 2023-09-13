@@ -50,9 +50,6 @@
                 }
         }
 
-        cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
-        [cell.activitydata startAnimating];
-
         NSString *imageUrl;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkImageUrl != nil) {
             imageUrl = block.darkImageUrl;
@@ -61,6 +58,8 @@
         }
 
         if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
+            cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
+            [cell.activitydata startAnimating];
             [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
                 if (callback) {
                     [UIView performWithoutAnimation:^{
