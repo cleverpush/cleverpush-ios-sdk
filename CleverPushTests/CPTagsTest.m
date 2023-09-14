@@ -237,6 +237,19 @@
     }];
 }
 
+- (void)testCheckTags {
+    NSString *urlStr = @"https://example.com";
+    NSDictionary *params = @{@"key": @"value"};
+    [self.cleverPush checkTags:urlStr params:params];
+    XCTAssertNoThrow([self.cleverPush checkTags:urlStr params:params]);
+}
+
+- (void)testCheckTagsFailure {
+    NSString *urlStr = nil;
+    NSDictionary *params = @{@"key": @"value"};
+    XCTAssertThrows([self.cleverPush checkTags:urlStr params:params], @"Expected an exception to be thrown");
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
@@ -258,23 +271,7 @@
 
 /*
 
- - (void)removeSubscriptionTag:(NSString*)tagId;
- - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
- - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
-
- - (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
-
- - (NSArray<NSString*>*)getSubscriptionTags;
-
- - (NSArray*)getAvailableTags __attribute__((deprecated));
-
- - (BOOL)hasSubscriptionTag:(NSString*)tagId;
-
  - (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params;
  - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback;
-
- - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
- - (void)removeSubscriptionTagFromApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
-
 
  */
