@@ -109,7 +109,7 @@
 
 - (void)testVerifyApiCallAddSubscriptionTagsFailure {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false); // Simulate no tracking consent
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
     [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
     NSArray<NSString *> *tags = @[@"tagOne", @"tagTwo", @"tagThree"];
     [self.cleverPush addSubscriptionTags:tags];
