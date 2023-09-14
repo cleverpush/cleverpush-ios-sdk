@@ -147,6 +147,32 @@
     OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testVerifyApiCallRemoveTagsFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSString *tagId = @"tagId";
+
+    [OCMStub([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^failureHandler)(NSError *error);
+        [invocation getArgument:&failureHandler atIndex:3];
+        NSError *error = [NSError errorWithDomain:@"com.example" code:123 userInfo:nil];
+        failureHandler(error);
+    }];
+
+    [self.cleverPush removeSubscriptionTag:tagId];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+
+    XCTFail("The test should fail because of the simulated error.");
+}
+
 - (void)testVerifyApiCallRemoveSubscriptionTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
@@ -232,12 +258,9 @@
 
 /*
 
-
- - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
  - (void)removeSubscriptionTag:(NSString*)tagId;
  - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
  - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
- - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds;
 
  - (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
 
