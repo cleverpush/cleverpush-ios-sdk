@@ -44,7 +44,7 @@
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
@@ -58,7 +58,7 @@
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
