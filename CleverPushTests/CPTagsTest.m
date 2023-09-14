@@ -162,6 +162,30 @@
     OCMVerify([self.cleverPush removeSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
 }
 
+- (void)testVerifyApiCallRemoveSubscriptionTagsFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    NSArray<NSString *> *tags = @[@"tagOne", @"tagTwo", @"tagThree"];
+
+    [OCMStub([self.cleverPush removeSubscriptionTags:[OCMArg any] callback:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^failureHandler)(NSError *error);
+        [invocation getArgument:&failureHandler atIndex:3];
+        NSError *error = [NSError errorWithDomain:@"com.example" code:123 userInfo:nil];
+        failureHandler(error);
+    }];
+
+    [self.cleverPush removeSubscriptionTags:tags];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
+}
+
+
 - (void)testGetAvailableTopicsContainsTopicId {
     NSMutableArray *topics = [[NSMutableArray alloc]init];
     [topics addObject:@"topicId"];
@@ -209,9 +233,6 @@
 
 /*
 
- - (void)addSubscriptionTag:(NSString*)tagId;
- - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
- - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
 
  - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
  - (void)removeSubscriptionTag:(NSString*)tagId;
