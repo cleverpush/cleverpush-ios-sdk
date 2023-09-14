@@ -107,6 +107,15 @@
     OCMVerify([self.cleverPush addSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
 }
 
+- (void)testVerifyApiCallAddSubscriptionTagsFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false); // Simulate no tracking consent
+    [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
+    NSArray<NSString *> *tags = @[@"tagOne", @"tagTwo", @"tagThree"];
+    [self.cleverPush addSubscriptionTags:tags];
+    OCMVerifyAll(self.cleverPush);
+}
+
 - (void)testVerifyApiCallRemoveTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
@@ -179,3 +188,36 @@
 
 @end
 
+
+/*
+
+
+ - (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
+ - (void)addSubscriptionTag:(NSString*)tagId;
+ - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
+ - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
+ - (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds;
+
+
+ - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
+ - (void)removeSubscriptionTag:(NSString*)tagId;
+ - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
+ - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
+ - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds;
+
+ - (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
+
+ - (NSArray<NSString*>*)getSubscriptionTags;
+
+ - (NSArray*)getAvailableTags __attribute__((deprecated));
+
+ - (BOOL)hasSubscriptionTag:(NSString*)tagId;
+
+ - (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params;
+ - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback;
+
+ - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
+ - (void)removeSubscriptionTagFromApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
+
+
+ */
