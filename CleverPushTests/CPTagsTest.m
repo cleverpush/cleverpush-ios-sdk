@@ -92,6 +92,24 @@
     OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testVerifyApiCallAddTagFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
+    [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
+
+    [OCMStub([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^failureHandler)(NSError *error);
+        [invocation getArgument:&failureHandler atIndex:3];
+        NSError *error = [NSError errorWithDomain:@"com.example" code:123 userInfo:nil];
+        failureHandler(error);
+    }];
+
+    [self.cleverPush addSubscriptionTag:@"tagId"];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
 - (void)testVerifyApiCallAddSubscriptionTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
@@ -191,13 +209,9 @@
 
 /*
 
-
- - (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
  - (void)addSubscriptionTag:(NSString*)tagId;
  - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
  - (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
- - (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds;
-
 
  - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
  - (void)removeSubscriptionTag:(NSString*)tagId;
