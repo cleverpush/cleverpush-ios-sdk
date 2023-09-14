@@ -185,7 +185,6 @@
     OCMVerify([self.cleverPush removeSubscriptionTags:[OCMArg any] callback:[OCMArg any]]);
 }
 
-
 - (void)testGetAvailableTopicsContainsTopicId {
     NSMutableArray *topics = [[NSMutableArray alloc]init];
     [topics addObject:@"topicId"];
