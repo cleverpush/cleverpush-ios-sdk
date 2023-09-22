@@ -40,14 +40,10 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = cell.imgCPBanner.frame.size.width / block.imageWidth;
-                if (block.imageWidth > [UIScreen mainScreen].bounds.size.width) {
-                    cell.imgCPBannerWidthConstraint.constant = [UIScreen mainScreen].bounds.size.width;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageWidth / aspectRatio;
-                } else {
-                    cell.imgCPBannerWidthConstraint.constant = block.imageWidth;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageHeight;
-                }
+            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat aspectRatio = (block.scale / 100.0) * screenWidth;
+            cell.imgCPBannerWidthConstraint.constant = aspectRatio;
+            cell.imgCPBannerHeightConstraint.constant = aspectRatio;
         }
 
         NSString *imageUrl;
