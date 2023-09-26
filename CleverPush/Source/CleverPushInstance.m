@@ -1616,10 +1616,29 @@ static id isNil(id object) {
         [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
     }
 
+    bool isCarousel = [notification objectForKey:@"carouselEnabled"] != nil && ![[notification objectForKey:@"carouselEnabled"] isKindOfClass:[NSNull class]] && [notification cleverPushArrayForKey:@"carouselItems"] != nil && ![[notification cleverPushArrayForKey:@"carouselItems"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"carouselEnabled"] boolValue];
+
+    if (isCarousel) {
+        NSArray *carouselItems = [notificationMutable cleverPushArrayForKey:@"carouselItems"];
+        if (carouselItems.count > 0) {
+            NSMutableArray *carouselArray = [[NSMutableArray alloc] init];
+            for (NSDictionary *dict in carouselItems) {
+                NSMutableDictionary *carouselDict = [dict mutableCopy];
+                id actions = carouselDict[@"actions"];
+                if ([actions isEqual:[NSNull null]]) {
+                    carouselDict[@"actions"] = @"";
+                }
+                [carouselArray addObject:carouselDict];
+            }
+            notificationMutable[@"carouselItems"] = carouselArray;
+        }
+    }
+
     NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY]];
     if (!notifications) {
         notifications = [[NSMutableArray alloc] init];
     }
+
     [notifications addObject:notificationMutable];
     notifications = [self filterDuplicateNotifications:notifications];
     NSArray *notificationsArray = [NSArray arrayWithArray:notifications];
