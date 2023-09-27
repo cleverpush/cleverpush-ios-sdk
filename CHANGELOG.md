@@ -1,3 +1,6 @@
+## 1.28.9
+* Optimized `setAuthorizerToken` method for preventing a crash
+
 ## 1.28.8
 * Optimized `getAvailableAttributes` method
 
