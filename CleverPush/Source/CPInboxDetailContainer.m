@@ -118,10 +118,21 @@
         }
         cell.btnCPBanner.backgroundColor = backgroundColor;
 
+        CGSize maxSize = CGSizeMake(cell.btnCPBanner.frame.size.width - (15.0 * 2), CGFLOAT_MAX);
+        CGRect titleRect = [block.text boundingRectWithSize:maxSize
+                                                     options:NSStringDrawingUsesLineFragmentOrigin
+                                                  attributes:@{NSFontAttributeName: cell.btnCPBanner.titleLabel.font}
+                                                     context:nil];
+        CGFloat titleHeight = ceil(titleRect.size.height);
+        titleHeight = titleHeight + 10;
+
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
+        cell.btnCPBanner.titleLabel.numberOfLines = 0;
+        cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
+        cell.btnCPBannerHeightConstraint.constant = titleHeight;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
