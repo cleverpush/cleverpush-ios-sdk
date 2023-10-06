@@ -129,6 +129,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (void)setAuthorizerToken:(NSString*)authorizerToken;
++ (void)setCustomTopViewController:(UIViewController*)viewController;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 + (void)addStoryView:(CPStoryView*)storyView;
 + (void)updateDeselectFlag:(BOOL)value;
@@ -153,6 +154,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getSubscriptionId;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
++ (UIViewController*)getCustomTopViewController;
 
 + (UIColor*)getBrandingColor;
 
