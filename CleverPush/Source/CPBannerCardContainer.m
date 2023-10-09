@@ -318,8 +318,6 @@
     }
 }
 
-
-
 #pragma mark - setup background image
 - (void)setBackground {
     [self.imgviewBackground setContentMode:UIViewContentModeScaleAspectFill];
