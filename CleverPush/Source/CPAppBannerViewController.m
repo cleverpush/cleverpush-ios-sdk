@@ -237,6 +237,12 @@
         [self.cardCollectionView performBatchUpdates:^{
             [self.cardCollectionView reloadData];
         } completion:nil];
+
+        NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
+        for (NSIndexPath *indexPath in visibleIndexPaths) {
+            CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+            [cell.tblCPBanner reloadData];
+        }
     }];
 }
 

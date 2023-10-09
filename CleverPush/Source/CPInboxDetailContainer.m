@@ -41,10 +41,8 @@
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
             CGFloat aspectRatio = block.imageWidth / block.imageHeight;
-            CGFloat newWidth = cell.contentView.frame.size.width;
-            CGFloat newHeight = (newWidth / aspectRatio) * (block.scale / 100.0);
-            cell.imgCPBannerWidthConstraint.constant = newWidth;
-            cell.imgCPBannerHeightConstraint.constant = newHeight;
+            cell.imgCPBannerWidthConstraint.constant = cell.contentView.frame.size.width;
+            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 
         NSString *imageUrl;
