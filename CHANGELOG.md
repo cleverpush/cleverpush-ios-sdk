@@ -1,3 +1,8 @@
+## 1.28.10
+* App Banners: Optimized image scaling
+* App Banners: Allow buttons to have multiple lines
+* Topics Dialog: Optimized layout for long topic lists
+
 ## 1.28.9
 * Optimized `setAuthorizerToken` method for preventing a crash
 
