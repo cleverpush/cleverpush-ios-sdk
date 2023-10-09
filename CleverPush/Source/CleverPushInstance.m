@@ -87,6 +87,7 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 int maximumNotifications = 100;
+static UIViewController *customTopViewController = nil;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -328,7 +329,11 @@ static id isNil(id object) {
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
 - (UIViewController*)topViewController {
-    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+    if ([CleverPush getCustomTopViewController] != nil) {
+        return [CleverPush getCustomTopViewController];
+    } else {
+        return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+    }
 }
 
 - (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
@@ -3193,8 +3198,16 @@ static id isNil(id object) {
     authorizationToken = authorizerToken;
 }
 
+- (void)setCustomTopViewController:(UIViewController *)viewController {
+    customTopViewController = viewController;
+}
+
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
+}
+
+- (UIViewController*)getCustomTopViewController {
+    return customTopViewController;
 }
 
 #pragma mark - App Banner methods
