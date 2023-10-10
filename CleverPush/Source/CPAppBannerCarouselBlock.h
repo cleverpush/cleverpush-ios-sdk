@@ -7,6 +7,7 @@
 @property (nonatomic, strong) NSString *content;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (assign) BOOL isScreenClicked;
+@property (assign) BOOL isScreenAlreadyShown;
 
 - (id)initWithJson:(NSDictionary*)json;
 

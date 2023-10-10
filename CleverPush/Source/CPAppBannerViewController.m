@@ -238,11 +238,6 @@
             [self.cardCollectionView reloadData];
         } completion:nil];
 
-        NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
-        for (NSIndexPath *indexPath in visibleIndexPaths) {
-            CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
-            [cell.tblCPBanner reloadData];
-        }
     }];
 }
 
@@ -342,8 +337,11 @@
 
 #pragma mark - Set the value of pageControl from current index
 -(void)pageControlCurrentIndex:(NSInteger)value {
-    NSDictionary *pagevalue = @{@"currentIndex": @(value)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:pagevalue];
+    NSDictionary *bannerInfo = @{
+        @"currentIndex": @(value),
+        @"appBanner": self.data
+    };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:bannerInfo];
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl

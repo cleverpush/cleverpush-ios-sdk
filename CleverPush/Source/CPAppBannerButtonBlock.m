@@ -7,6 +7,7 @@
     self = [super init];
     if (self) {
         self.type = CPAppBannerBlockTypeButton;
+        self.isButtonElementClicked = NO;
 
         self.text = @"";
         if ([json cleverPushStringForKey:@"text"]) {

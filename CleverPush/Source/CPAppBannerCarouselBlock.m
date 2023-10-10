@@ -24,6 +24,7 @@
         self.blocks = [NSMutableArray new];
         self.content = [json objectForKey:@"content"];
         self.isScreenClicked = NO;
+        self.isScreenAlreadyShown = NO;
 
         if ([json objectForKey:@"blocks"] != nil) {
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {

@@ -23,6 +23,12 @@
 
 #pragma mark - Button Actions
 - (IBAction)btnHandlerStartLiveActivity:(id)sender {
+
+    [CleverPush showAppBanner:@"2aA6Cp7yjYTJ5Azqf"];
+
+
+    return;
+
     if (@available(iOS 13.0, *)) {
         NSString *activityName = [_txtLiveActivityName text];
         if (activityName && activityName.length) {

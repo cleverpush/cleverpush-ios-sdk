@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic) int size;
 @property (nonatomic) int radius;
+@property (assign) BOOL isButtonElementClicked;
 
 #pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;

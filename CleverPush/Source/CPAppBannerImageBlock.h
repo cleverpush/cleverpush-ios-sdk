@@ -13,6 +13,7 @@
 @property (nonatomic) int scale;
 @property (nonatomic) int imageWidth;
 @property (nonatomic) int imageHeight;
+@property (assign) BOOL isimageElementClicked;
 
 #pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;
