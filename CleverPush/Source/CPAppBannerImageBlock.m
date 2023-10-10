@@ -8,7 +8,7 @@
     self = [super init];
     if (self) {
         self.type = CPAppBannerBlockTypeImage;
-        self.isimageElementClicked = NO;
+        self.isimageClicked = NO;
 
         if ([json cleverPushStringForKey:@"imageUrl"]) {
             self.imageUrl = [json cleverPushStringForKey:@"imageUrl"];

@@ -801,8 +801,7 @@ NSInteger currentScreenIndex = 0;
                 if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
                     [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
                 }
-                BOOL isButtonElementClicked = block.isButtonElementClicked;
-                dataDic[@"isElementAlreadyClicked"] = @(isButtonElementClicked);
+                dataDic[@"isElementAlreadyClicked"] = @(block.isButtonClicked);
             }
         } else  if ([type isEqualToString:@"image"]) {
             if (image != nil) {
@@ -812,8 +811,7 @@ NSInteger currentScreenIndex = 0;
                 if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
                     [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
                 }
-                BOOL isimageElementClicked = image.isimageElementClicked;
-                dataDic[@"isElementAlreadyClicked"] = @(isimageElementClicked);
+                dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
         
@@ -822,9 +820,9 @@ NSInteger currentScreenIndex = 0;
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if ([type isEqualToString:@"button"]) {
-                block.isButtonElementClicked = true;
+                block.isButtonClicked = true;
             } else {
-                image.isimageElementClicked = true;
+                image.isimageClicked = true;
             }
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
@@ -832,8 +830,7 @@ NSInteger currentScreenIndex = 0;
         } onFailure:nil];
     } else {
         if (banner.multipleScreensEnabled) {
-            BOOL isScreenAlreadyShown = banner.screens[currentScreenIndex].isScreenAlreadyShown;
-            dataDic[@"isScreenAlreadyShown"] = @(isScreenAlreadyShown);
+            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
             [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
         } else {
             dataDic[@"isScreenAlreadyShown"] = @(false);
@@ -844,7 +841,7 @@ NSInteger currentScreenIndex = 0;
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (banner.multipleScreensEnabled) {
-                banner.screens[currentScreenIndex].isScreenAlreadyShown = YES;
+                banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
             }
         } onFailure:nil];
     }
