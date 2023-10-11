@@ -236,14 +236,13 @@
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self.cardCollectionView performBatchUpdates:^{
             [self.cardCollectionView reloadData];
-
-            NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
-            for (NSIndexPath *indexPath in visibleIndexPaths) {
-                CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
-                [cell.tblCPBanner reloadData];
-            }
         } completion:nil];
 
+        NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
+        for (NSIndexPath *indexPath in visibleIndexPaths) {
+            CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+            [cell.tblCPBanner reloadData];
+        }
     }];
 }
 
