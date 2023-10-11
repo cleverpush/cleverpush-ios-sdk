@@ -102,8 +102,8 @@ NSInteger currentScreenIndex = 0;
     [self createBanners:banners];
     [self scheduleBanners];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(getCurrentAppBannerPageIndex:)
-                                                         name:@"getCurrentAppBannerPageIndexValue"
+                                                     selector:@selector(getCurrentAppBannerPageInfo:)
+                                                         name:@"getCurrentAppBannerPageInfoValue"
                                                        object:nil];
 }
 
@@ -819,22 +819,15 @@ NSInteger currentScreenIndex = 0;
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-            if ([type isEqualToString:@"button"]) {
-                block.isButtonClicked = true;
-            } else {
-                image.isimageClicked = true;
-            }
+            ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
+
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
         } onFailure:nil];
     } else {
-        if (banner.multipleScreensEnabled) {
-            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
-            [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
-        } else {
-            dataDic[@"isScreenAlreadyShown"] = @(false);
-        }
+        dataDic[@"isScreenAlreadyShown"] = @(banner.multipleScreensEnabled ? banner.screens[currentScreenIndex].isScreenAlreadyShown : false);
+        [dataDic setObject:(banner.multipleScreensEnabled ? banner.screens[currentScreenIndex].id : nil) forKey:@"screenId"];
 
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
@@ -925,7 +918,7 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - Get the value of pageControl from current index
-- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
+- (void)getCurrentAppBannerPageInfo:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
     currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
     CPAppBanner *appBanner = pagevalue[@"appBanner"];
