@@ -470,13 +470,6 @@ CPNotificationClickBlock handleClick;
             }
         } onFailure:nil];
     } else {
-        if (banner.multipleScreensEnabled) {
-            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[self.currentScreenIndex].isScreenAlreadyShown);
-            [dataDic setObject:banner.screens[self.currentScreenIndex].id forKey:@"screenId"];
-        } else {
-            dataDic[@"isScreenAlreadyShown"] = @(false);
-        }
-
         dataDic[@"isScreenAlreadyShown"] = @(banner.multipleScreensEnabled ? banner.screens[self.currentScreenIndex].isScreenAlreadyShown : false);
         [dataDic setObject:(banner.multipleScreensEnabled ? banner.screens[self.currentScreenIndex].id : nil) forKey:@"screenId"];
 
