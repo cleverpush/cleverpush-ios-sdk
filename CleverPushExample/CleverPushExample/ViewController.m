@@ -24,7 +24,7 @@
 #pragma mark - Button Actions
 - (IBAction)btnHandlerStartLiveActivity:(id)sender {
 
-    [CleverPush showAppBanner:@"2aA6Cp7yjYTJ5Azqf"];
+    [CleverPush showAppBanner:@"p4jkJX2vd3mSrprDk"];
 
 
     return;
