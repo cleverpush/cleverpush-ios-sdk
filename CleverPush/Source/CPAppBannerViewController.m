@@ -341,7 +341,7 @@
     }
 }
 
-#pragma mark - Get the value of current app banner info from pageControl current index
+#pragma mark - Set the value of pageControl from current index
 -(void)pageControlCurrentIndex:(NSInteger)value {
     NSDictionary *bannerInfo = @{
         @"currentIndex": @(value),
