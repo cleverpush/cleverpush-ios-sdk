@@ -470,8 +470,12 @@ CPNotificationClickBlock handleClick;
             }
         } onFailure:nil];
     } else {
-        dataDic[@"isScreenAlreadyShown"] = @(banner.multipleScreensEnabled ? banner.screens[self.currentScreenIndex].isScreenAlreadyShown : false);
-        [dataDic setObject:(banner.multipleScreensEnabled ? banner.screens[self.currentScreenIndex].id : nil) forKey:@"screenId"];
+        if (banner.multipleScreensEnabled) {
+            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[self.currentScreenIndex].isScreenAlreadyShown);
+            [dataDic setObject:banner.screens[self.currentScreenIndex].id forKey:@"screenId"];
+        } else {
+            dataDic[@"isScreenAlreadyShown"] = @(false);
+        }
 
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
