@@ -79,8 +79,7 @@
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            CGFloat data1 = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
-            cell.imgCPBannerHeightConstraint.constant = data1;
+            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 
         NSString *imageUrl;
