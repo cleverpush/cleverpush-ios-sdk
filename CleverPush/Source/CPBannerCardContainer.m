@@ -27,8 +27,8 @@
         [self setBackgroundColor];
     });
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(getCurrentAppBannerPageInfo:)
-                                                         name:@"getCurrentAppBannerPageInfoValue"
+                                                     selector:@selector(getCurrentAppBannerPageIndex:)
+                                                         name:@"getCurrentAppBannerPageIndexValue"
                                                        object:nil];
 }
 
@@ -56,7 +56,7 @@
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
 }
 
-- (void)getCurrentAppBannerPageInfo:(NSNotification *)notification {
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
     NSInteger index = [pagevalue[@"currentIndex"] integerValue];
     self.pageControl.currentPage = index;

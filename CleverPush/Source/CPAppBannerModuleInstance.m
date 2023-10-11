@@ -102,8 +102,8 @@ NSInteger currentScreenIndex = 0;
     [self createBanners:banners];
     [self scheduleBanners];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(getCurrentAppBannerPageInfo:)
-                                                         name:@"getCurrentAppBannerPageInfoValue"
+                                                     selector:@selector(getCurrentAppBannerPageIndex:)
+                                                         name:@"getCurrentAppBannerPageIndexValue"
                                                        object:nil];
 }
 
@@ -918,7 +918,7 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - Get the value of pageControl from current index
-- (void)getCurrentAppBannerPageInfo:(NSNotification *)notification {
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
     currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
     CPAppBanner *appBanner = pagevalue[@"appBanner"];

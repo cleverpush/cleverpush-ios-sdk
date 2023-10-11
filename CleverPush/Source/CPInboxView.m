@@ -106,8 +106,8 @@ CPNotificationClickBlock handleClick;
             [self presentEmptyView:frame];
         }
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(getCurrentAppBannerPageInfo:)
-                                                             name:@"getCurrentAppBannerPageInfoValue"
+                                                         selector:@selector(getCurrentAppBannerPageIndex:)
+                                                             name:@"getCurrentAppBannerPageIndexValue"
                                                            object:nil];
     }
     return self;
@@ -229,7 +229,7 @@ CPNotificationClickBlock handleClick;
 }
 
 #pragma mark - Get the value of pageControl from current index
-- (void)getCurrentAppBannerPageInfo:(NSNotification *)notification {
+- (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
     self.currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
     CPAppBanner *appBanner = pagevalue[@"appBanner"];
