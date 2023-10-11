@@ -238,11 +238,10 @@
             [self.cardCollectionView reloadData];
 
             NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
-                  for (NSIndexPath *indexPath in visibleIndexPaths) {
-                      CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
-                      [cell.tblCPBanner reloadData];
-                  }
-            
+            for (NSIndexPath *indexPath in visibleIndexPaths) {
+                CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+                [cell.tblCPBanner reloadData];
+            }
         } completion:nil];
 
     }];
