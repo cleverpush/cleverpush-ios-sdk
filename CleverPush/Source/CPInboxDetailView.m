@@ -69,7 +69,15 @@
         return;
     }
 
-    [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+        if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
+            [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+        } else {
+            [self.backGroundImage setBackgroundColor:[UIColor whiteColor]];
+        }
+    } else {
+        [self.backGroundImage setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
 }
 
 #pragma mark - dynamic hide and show top button from top right corner

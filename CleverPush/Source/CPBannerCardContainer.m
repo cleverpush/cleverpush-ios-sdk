@@ -60,6 +60,8 @@
     NSDictionary *pagevalue = notification.userInfo;
     NSInteger index = [pagevalue[@"currentIndex"] integerValue];
     self.pageControl.currentPage = index;
+    self.currentScreenIndex = index;
+    [self setBackground];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -352,7 +354,15 @@
         return;
     }
 
-    [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+        if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
+            [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+        } else {
+            [self.imgviewBackground setBackgroundColor:[UIColor whiteColor]];
+        }
+    } else {
+        [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
 }
 
 - (void)setUpPageControl {
@@ -372,9 +382,17 @@
     [self.contentView setBackgroundColor:[UIColor clearColor]];
 
     if (self.data.type == CPAppBannerTypeFull) {
-        [self.contentView setBackgroundColor:[UIColor whiteColor]];
-        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
-            [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+            if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
+                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+            } else {
+                [self.contentView setBackgroundColor:[UIColor whiteColor]];
+            }
+        } else {
+            [self.contentView setBackgroundColor:[UIColor whiteColor]];
+            if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            }
         }
     }
 }
