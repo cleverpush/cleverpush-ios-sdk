@@ -90,11 +90,11 @@
 		</data>
 		<key>Headers/CPAppBannerButtonBlock.h</key>
 		<data>
-		lKMkzKFeS2/gQ0wCW+5G5WkAVz4=
+		Rb3sR2t/4dLIRNOnUHKGGmce6PY=
 		</data>
 		<key>Headers/CPAppBannerCarouselBlock.h</key>
 		<data>
-		uvQSoGSZnE9aeArA/EStNF5IwI0=
+		LWtKiF4um3dKWSjw8QEvpGU5k1c=
 		</data>
 		<key>Headers/CPAppBannerDismissType.h</key>
 		<data>
@@ -110,7 +110,7 @@
 		</data>
 		<key>Headers/CPAppBannerImageBlock.h</key>
 		<data>
-		g7RN6NIcNsuwfS9wLqFtYOHBR80=
+		q/TDZshJT/yN31MzRi+a3qcBA9I=
 		</data>
 		<key>Headers/CPAppBannerStatus.h</key>
 		<data>
@@ -170,7 +170,7 @@
 		</data>
 		<key>Headers/CPInboxView.h</key>
 		<data>
-		CJWmZ+UJ4RFpLYs/QguZntyYf18=
+		0Cp3XhB12x6K8+vqqMOYOm8BI6M=
 		</data>
 		<key>Headers/CPNotification.h</key>
 		<data>
@@ -254,7 +254,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		P42uaPKX/edCJvQ2r4KQaQt9g60=
+		DNnkVuaYr4lZGG8cmMwWCkzN9pQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -498,22 +498,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			lKMkzKFeS2/gQ0wCW+5G5WkAVz4=
+			Rb3sR2t/4dLIRNOnUHKGGmce6PY=
 			</data>
 			<key>hash2</key>
 			<data>
-			kMBxbQETt0YFt1SIbL169Uyyf0P2d5KmWifvWiiWyKE=
+			6CdRsP0zn5yS+34gGgZEEsaUVIXkVFcTh/tVScDnVG0=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerCarouselBlock.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			uvQSoGSZnE9aeArA/EStNF5IwI0=
+			LWtKiF4um3dKWSjw8QEvpGU5k1c=
 			</data>
 			<key>hash2</key>
 			<data>
-			O9fu+zF89/PBnM4Y+kPW47FVy1iSsaQAwzTaotSNkLA=
+			/yHvx/WPBvr9kX76e6WYYmPQ5g4k0kzGB+/aKfawvXg=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerDismissType.h</key>
@@ -553,11 +553,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			g7RN6NIcNsuwfS9wLqFtYOHBR80=
+			q/TDZshJT/yN31MzRi+a3qcBA9I=
 			</data>
 			<key>hash2</key>
 			<data>
-			rgDy6gBJ3Fw0c4E+s4zqKdHVjyM2POP8HJihHl8M9FY=
+			16vmevy7q8L0AH14unnU6binAFkqOCk5W50Caf9wK6E=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerStatus.h</key>
@@ -718,11 +718,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			CJWmZ+UJ4RFpLYs/QguZntyYf18=
+			0Cp3XhB12x6K8+vqqMOYOm8BI6M=
 			</data>
 			<key>hash2</key>
 			<data>
-			EnneGGRQBkBuXOyH6SFiYYbAjIslhElHnYY1hW1KXh0=
+			1CGLJRHHxJDn8Zt1+DT++pyhEZL7VJDdXXuMqEG0Q8w=
 			</data>
 		</dict>
 		<key>Headers/CPNotification.h</key>

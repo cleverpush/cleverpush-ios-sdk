@@ -1,3 +1,7 @@
+## 1.28.11
+* Fixed a potential crash in app banners with multiple screens
+* Optimized tracking for app banners
+
 ## 1.28.10
 * App Banners: Optimized image scaling
 * App Banners: Allow buttons to have multiple lines
