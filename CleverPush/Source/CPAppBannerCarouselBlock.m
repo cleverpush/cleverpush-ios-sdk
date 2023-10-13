@@ -43,6 +43,10 @@
                 [self.blocks addObject:block];
             }
         }
+
+        if ([json objectForKey:@"background"] != nil) {
+            self.background = [[CPAppBannerBackground alloc] initWithJson:[json objectForKey:@"background"]];
+        }
     }
     return self;
 }

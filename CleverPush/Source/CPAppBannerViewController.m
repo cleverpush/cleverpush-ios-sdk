@@ -193,10 +193,17 @@
 
 #pragma mark - Set background color
 - (void)setBackgroundColor {
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-
-    if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
-        [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+        if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
+            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+        } else {
+            [self.view setBackgroundColor:[UIColor whiteColor]];
+        }
+    } else {
+        [self.view setBackgroundColor:[UIColor whiteColor]];
+        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        }
     }
 }
 
