@@ -25,6 +25,7 @@ typedef void (^CPNotificationClickBlock)(CPNotification* result);
 @property (nonatomic, strong) NSString *notificationThumbnail;
 @property (nonatomic, strong) NSMutableArray<CPAppBanner*> *banners;
 @property (nonatomic, strong) CPAppBannerActionBlock handleBannerOpened;
+@property (nonatomic) NSInteger currentScreenIndex;
 
 #pragma mark - Call back while banner has been open-up successfully
 

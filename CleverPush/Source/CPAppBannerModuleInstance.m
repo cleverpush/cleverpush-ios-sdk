@@ -801,6 +801,7 @@ NSInteger currentScreenIndex = 0;
                 if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
                     [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
                 }
+                dataDic[@"isElementAlreadyClicked"] = @(block.isButtonClicked);
             }
         } else  if ([type isEqualToString:@"image"]) {
             if (image != nil) {
@@ -810,6 +811,7 @@ NSInteger currentScreenIndex = 0;
                 if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
                     [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
                 }
+                dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
         
@@ -817,15 +819,28 @@ NSInteger currentScreenIndex = 0;
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
+
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
         } onFailure:nil];
     } else {
+        if (banner.multipleScreensEnabled) {
+            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
+            [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
+        } else {
+            dataDic[@"isScreenAlreadyShown"] = @(false);
+        }
+
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
-        [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
+        [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
+            if (banner.multipleScreensEnabled) {
+                banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
+            }
+        } onFailure:nil];
     }
 }
 
@@ -910,6 +925,8 @@ NSInteger currentScreenIndex = 0;
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
     currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
+    CPAppBanner *appBanner = pagevalue[@"appBanner"];
+    [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
 }
 
 #pragma mark - refactor for testcases

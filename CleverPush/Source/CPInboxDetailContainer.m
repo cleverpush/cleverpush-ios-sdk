@@ -41,7 +41,9 @@
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
             CGFloat aspectRatio = block.imageWidth / block.imageHeight;
-            cell.imgCPBannerWidthConstraint.constant = cell.contentView.frame.size.width;
+            if (isnan(aspectRatio) || aspectRatio == 0.0) {
+                aspectRatio = 1.0;
+            }
             cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 

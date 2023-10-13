@@ -342,8 +342,11 @@
 
 #pragma mark - Set the value of pageControl from current index
 -(void)pageControlCurrentIndex:(NSInteger)value {
-    NSDictionary *pagevalue = @{@"currentIndex": @(value)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:pagevalue];
+    NSDictionary *bannerInfo = @{
+        @"currentIndex": @(value),
+        @"appBanner": self.data
+    };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:bannerInfo];
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl
@@ -361,6 +364,18 @@
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     return CGSizeMake(self.bannerContainer.frame.size.width, self.bannerContainer.frame.size.height);
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAt:(NSIndexPath *)indexPath {
+    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout *)collectionViewLayout;
+    CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[indexPath.row];
+
+    if (block.imageWidth > 0 && block.imageHeight > 0) {
+        CGFloat imageViewWidth = flowLayout.itemSize.width;
+        CGFloat imageViewHeight = imageViewWidth * block.scale / 100;
+        return CGSizeMake(flowLayout.itemSize.width, imageViewHeight);
+    }
+    return flowLayout.itemSize;
 }
 
 #pragma mark - compose HTML Banner
