@@ -728,6 +728,7 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner {
+    currentScreenIndex = 0;
     [activePendingBanners removeObject:banner];
     if (activePendingBanners.count != 0) {
         [self showBanner:activePendingBanners.firstObject force:NO];

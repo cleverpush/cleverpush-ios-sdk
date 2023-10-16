@@ -61,6 +61,8 @@
     NSInteger index = [pagevalue[@"currentIndex"] integerValue];
     self.pageControl.currentPage = index;
     self.currentScreenIndex = index;
+    CPAppBanner *appBanner = pagevalue[@"appBanner"];
+    self.data = appBanner;
     [self setBackground];
 }
 
