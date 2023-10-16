@@ -83,6 +83,4 @@
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
 
-
-
 @end
