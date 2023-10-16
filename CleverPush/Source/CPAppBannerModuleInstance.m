@@ -34,7 +34,7 @@ long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
 
-NSInteger currentScreenIndex;
+NSInteger currentScreenIndex = 0;
 
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
