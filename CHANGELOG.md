@@ -1,3 +1,6 @@
+## 1.28.12
+* Fixed a potential crash for the click event in-app banners
+
 ## 1.28.11
 * Fixed a potential crash in app banners with multiple screens
 * Optimized tracking for app banners
