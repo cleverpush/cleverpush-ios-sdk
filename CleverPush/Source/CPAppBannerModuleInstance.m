@@ -34,8 +34,6 @@ long MIN_SESSION_LENGTH_DEV = 30;
 long lastSessionTimestamp;
 long sessions = 0;
 
-NSInteger currentScreenIndex = 0;
-
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -618,7 +616,7 @@ NSInteger currentScreenIndex = 0;
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                     if (!screensList.isScreenClicked) {
-                        screen = banner.screens[currentScreenIndex];
+                        screen = banner.screens[self.currentScreenIndex];
                         break;
                     }
                 }
@@ -827,18 +825,26 @@ NSInteger currentScreenIndex = 0;
         } onFailure:nil];
     } else {
         if (banner.multipleScreensEnabled) {
-            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
-            [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
+            dataDic[@"isScreenAlreadyShown"] = @(banner.screens[self.currentScreenIndex].isScreenAlreadyShown);
+            [dataDic setObject:banner.screens[self.currentScreenIndex].id forKey:@"screenId"];
+
+            NSLog(@"Banner ID = %@",banner.id);
+            NSLog(@"Banner screen count = %ld",banner.screens.count);
+            NSLog(@"Banner screen count = %ld",banner.screens.count);
+            NSLog(@"Get Current index = %ld",self.currentScreenIndex);
+
+            [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
+
         } else {
             dataDic[@"isScreenAlreadyShown"] = @(false);
         }
 
-        [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
+
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
             if (banner.multipleScreensEnabled) {
-                banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
+                banner.screens[self.currentScreenIndex].isScreenAlreadyShown = true;
             }
         } onFailure:nil];
     }
@@ -924,7 +930,7 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Get the value of pageControl from current index
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
-    currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
+    self.currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
     CPAppBanner *appBanner = pagevalue[@"appBanner"];
     [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
 }

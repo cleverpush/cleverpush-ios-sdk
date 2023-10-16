@@ -83,4 +83,6 @@
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
 
+@property (nonatomic) NSInteger currentScreenIndex;
+
 @end
