@@ -234,6 +234,7 @@
 		93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
 		93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */; };
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
@@ -526,6 +527,7 @@
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
 		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
+		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
@@ -629,6 +631,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */,
 				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
@@ -761,6 +764,7 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */,
 				2917E92428E9F3B800CF6458 /* QuartzCore.framework */,
 				29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */,
 				CB1B65F9275780260087AC49 /* Foundation.framework */,
