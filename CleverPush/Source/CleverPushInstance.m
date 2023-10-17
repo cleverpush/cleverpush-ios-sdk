@@ -88,6 +88,7 @@ static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 int maximumNotifications = 100;
 static UIViewController *customTopViewController = nil;
+int localEventTrackingRetentionDays = 90;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -3202,12 +3203,20 @@ static id isNil(id object) {
     customTopViewController = viewController;
 }
 
+- (void)setLocalEventTrackingRetentionDays:(int)days {
+    localEventTrackingRetentionDays = days;
+}
+
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
 }
 
 - (UIViewController*)getCustomTopViewController {
     return customTopViewController;
+}
+
+- (int)getLocalEventTrackingRetentionDays {
+    return localEventTrackingRetentionDays;
 }
 
 #pragma mark - App Banner methods

@@ -130,6 +130,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
 + (void)setAuthorizerToken:(NSString*)authorizerToken;
 + (void)setCustomTopViewController:(UIViewController*)viewController;
++ (void)setLocalEventTrackingRetentionDays:(int)days;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 + (void)addStoryView:(CPStoryView*)storyView;
 + (void)updateDeselectFlag:(BOOL)value;
@@ -155,6 +156,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
 + (UIViewController*)getCustomTopViewController;
++ (int)getLocalEventTrackingRetentionDays;
 
 + (UIColor*)getBrandingColor;
 
