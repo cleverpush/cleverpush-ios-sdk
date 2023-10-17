@@ -227,6 +227,13 @@
 		93DACB212959651900177B08 /* CPBannerCardContainer.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */; };
 		93DACB222959651900177B08 /* CPTopicDialogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */; };
 		93DACB232959651900177B08 /* CPInboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */; };
+		93E5F0E52ADE6B8D00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E82ADE6BC000D76057 /* CPAppBannerEventFilters.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
@@ -517,6 +524,8 @@
 		934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailContainer.xib; sourceTree = "<group>"; };
 		934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailContainer.h; sourceTree = "<group>"; };
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
+		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
+		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
@@ -850,6 +859,8 @@
 				29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */,
 				2965AF3B29B7E4A100D52B75 /* CPAppBannerTriggerConditionEventProperty.h */,
 				2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */,
+				93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */,
+				93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */,
 				295640002588224100FE7611 /* CPAppBannerTriggerType.h */,
 				298676F62572D08B0002E9F1 /* CPAppBannerType.h */,
 				18B5BD83283FB14C0046577F /* CPFilterRelationType.h */,
@@ -1018,6 +1029,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */,
 				294B19D728672217003A9FCD /* CPLog.h in Headers */,
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
@@ -1035,6 +1047,7 @@
 			files = (
 				2906A152258557B60078FD61 /* CPAppBannerBlock.h in Headers */,
 				2906A140258557B00078FD61 /* CPAppBannerAlignment.h in Headers */,
+				93E5F0E82ADE6BC000D76057 /* CPAppBannerEventFilters.h in Headers */,
 				296A139725BE230900A2BEED /* CPSubscription.h in Headers */,
 				2906A164258557BE0078FD61 /* CPAppBannerButtonBlock.h in Headers */,
 				2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */,
@@ -1324,6 +1337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				297C34D123FB710100314A84 /* CleverPushLocation.m in Sources */,
+				93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6B2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				934D88FF2A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */,
 			);
@@ -1378,6 +1392,7 @@
 				294B19D3286717A2003A9FCD /* CPLog.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
+				93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */,
 				CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */,
 				296D0AD6257460E800531EFF /* UIControl+CPBlockActions.m in Sources */,
@@ -1441,6 +1456,7 @@
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,
 				CB73FF9A272C3EAA0099B648 /* CPImageBlockCell.m in Sources */,
 				CB8F47B5275F393D00FC19A7 /* CPInboxView.m in Sources */,
+				93E5F0E52ADE6B8D00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				2986773D2572DFC40002E9F1 /* CPAppBannerButtonBlock.m in Sources */,
 				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
@@ -1501,6 +1517,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */,
+				93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6D2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				934D89012A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */,
 			);
@@ -1513,6 +1530,7 @@
 				CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */,
 				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
 				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
+				93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */,
 				CB1B65D827577BA70087AC49 /* CPAttributesTests.m in Sources */,
