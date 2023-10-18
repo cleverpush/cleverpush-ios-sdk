@@ -235,6 +235,8 @@
             cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
             cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
+           // [cell composeHTML:block.content];
+
             NSURL *url = [NSURL URLWithString:block.url];
             NSURLRequest *request = [NSURLRequest requestWithURL:url];
             [cell.webHTMLBlock loadRequest:request];
