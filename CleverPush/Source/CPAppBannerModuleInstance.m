@@ -352,6 +352,31 @@ NSInteger currentScreenIndex = 0;
         }
     }
 
+    for (CPAppBannerEventFilters *events in banner.eventFilters) {
+        NSLog(@"events.event = %@",events.event);
+        NSLog(@"events.property = %@",events.property);
+        NSLog(@"events.relation = %@",events.relation);
+        NSLog(@"events.value = %@",events.value);
+        NSLog(@"events.fromValue = %@",events.fromValue);
+        NSLog(@"events.toValue = %@",events.toValue);
+
+
+
+        /*
+        int idn Primary key
+        String banner_id banner.id
+        String track_event_id events.event
+        String property  events.property
+        String value events.value
+        String relation events.relation
+        int count Default 2 and after that every time it needed to be increased
+        String created_date_time 18-12-2023 12.09.10
+        String updated_date_time 18-12-2023 12.20.10
+        String fromValue 18-12-2023 12.20.10
+        String toValue 18-12-2023 12.20.10
+         */
+    }
+
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
     allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     return allowed;
@@ -928,6 +953,82 @@ NSInteger currentScreenIndex = 0;
     currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
     CPAppBanner *appBanner = pagevalue[@"appBanner"];
     [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+}
+
+#pragma mark - cleverPush database methods for app banners eventFilters
+- (NSString *)cleverPushDatabasePath {
+    NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDir = [documentPaths objectAtIndex:0];
+    NSString *databasePath = [documentsDir stringByAppendingPathComponent:@"CleverPushDatabase.sqlite"];
+    return databasePath;
+}
+
+- (BOOL)cleverPushDatabaseExists {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    return [fileManager fileExistsAtPath:[self cleverPushDatabasePath]];
+}
+
+- (BOOL)createCleverPushDatabase {
+    sqlite3 *database;
+    NSString *databasePath = [self cleverPushDatabasePath];
+
+    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        sqlite3_close(database);
+        return YES;
+    } else {
+        NSLog(@"Error opening or creating the database.");
+        return NO;
+    }
+}
+
+- (BOOL)cleverPushDatabasetableExists:(NSString *)tableName {
+    sqlite3 *database;
+    NSString *databasePath = [self cleverPushDatabasePath];
+
+    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        NSString *query = [NSString stringWithFormat:@"SELECT name FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
+        sqlite3_stmt *statement;
+
+        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
+            if (sqlite3_step(statement) == SQLITE_ROW) {
+                sqlite3_finalize(statement);
+                sqlite3_close(database);
+                return YES;
+            }
+        }
+
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+
+    return NO;
+}
+
+- (BOOL)cleverPushDatabaseCreateTableIfNeeded {
+    NSString *tableName = @"TableBannerTrackEvent";
+
+    if (![self cleverPushDatabasetableExists:tableName]) {
+        sqlite3 *database;
+        NSString *databasePath = [self cleverPushDatabasePath];
+
+        if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+            NSString *createTableSQL = @"CREATE TABLE IF NOT EXISTS your_table_name (id INTEGER PRIMARY KEY, name TEXT);";
+
+            char *errMsg;
+
+            if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
+                NSLog(@"Error creating table: %s", errMsg);
+                sqlite3_free(errMsg);
+                sqlite3_close(database);
+                return NO;
+            }
+
+            sqlite3_close(database);
+            return YES;
+        }
+    }
+
+    return YES;
 }
 
 #pragma mark - refactor for testcases

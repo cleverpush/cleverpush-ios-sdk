@@ -21,6 +21,7 @@
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerCondition.h"
 #import "CPAppBannerViewController.h"
+#import <sqlite3.h>
 
 @class CPAppBannerViewController;
 
@@ -82,5 +83,10 @@
 - (BOOL)getBannersDisabled;
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
+- (NSString *)cleverPushDatabasePath;
+- (BOOL)cleverPushDatabaseExists;
+- (BOOL)createCleverPushDatabase;
+- (BOOL)cleverPushDatabasetableExists:(NSString *)tableName;
+- (BOOL)cleverPushDatabaseCreateTableIfNeeded;
 
 @end
