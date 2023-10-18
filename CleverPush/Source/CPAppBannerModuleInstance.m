@@ -359,22 +359,6 @@ NSInteger currentScreenIndex = 0;
         NSLog(@"events.value = %@",events.value);
         NSLog(@"events.fromValue = %@",events.fromValue);
         NSLog(@"events.toValue = %@",events.toValue);
-
-
-
-        /*
-        int idn Primary key
-        String banner_id banner.id
-        String track_event_id events.event
-        String property  events.property
-        String value events.value
-        String relation events.relation
-        int count Default 2 and after that every time it needed to be increased
-        String created_date_time 18-12-2023 12.09.10
-        String updated_date_time 18-12-2023 12.20.10
-        String fromValue 18-12-2023 12.20.10
-        String toValue 18-12-2023 12.20.10
-         */
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
@@ -553,6 +537,7 @@ NSInteger currentScreenIndex = 0;
                 continue;
             }
         }
+
 
         BOOL contains = NO;
         for (CPAppBanner* tryBanner in [self getActiveBanners]) {
@@ -973,6 +958,7 @@ NSInteger currentScreenIndex = 0;
     NSString *databasePath = [self cleverPushDatabasePath];
 
     if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        // Database opened successfully, you can perform initialization here if needed.
         sqlite3_close(database);
         return YES;
     } else {
@@ -1012,7 +998,20 @@ NSInteger currentScreenIndex = 0;
         NSString *databasePath = [self cleverPushDatabasePath];
 
         if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = @"CREATE TABLE IF NOT EXISTS your_table_name (id INTEGER PRIMARY KEY, name TEXT);";
+            NSString *createTableSQL = [NSString stringWithFormat:
+                @"CREATE TABLE IF NOT EXISTS %@ ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "banner_id TEXT, "
+                "track_event_id TEXT, "
+                "property TEXT, "
+                "value TEXT, "
+                "relation TEXT, "
+                "count INTEGER DEFAULT 1, "
+                "created_date_time TEXT, "
+                "updated_date_time TEXT, "
+                "fromValue TEXT, "
+                "toValue TEXT"
+                ");", tableName];
 
             char *errMsg;
 
@@ -1029,6 +1028,131 @@ NSInteger currentScreenIndex = 0;
     }
 
     return YES;
+}
+
+- (BOOL)insertcleverPushDatabaseRecordWithBannerID:(NSString *)bannerID
+                  trackEventID:(NSString *)trackEventID
+                     property:(NSString *)property
+                        value:(NSString *)value
+                    relation:(NSString *)relation
+                        count:(NSInteger)count
+             createdDateTime:(NSString *)createdDateTime
+             updatedDateTime:(NSString *)updatedDateTime
+                   fromValue:(NSString *)fromValue
+                     toValue:(NSString *)toValue {
+    NSString *tableName = @"TableBannerTrackEvent";
+
+    if (![self cleverPushDatabasetableExists:tableName]) {
+        if (![self cleverPushDatabaseCreateTableIfNeeded]) {
+            return NO;
+        }
+    }
+
+    sqlite3 *database;
+    NSString *databasePath = [self cleverPushDatabasePath];
+
+    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        NSString *insertSQL = [NSString stringWithFormat:
+            @"INSERT INTO %@ (banner_id, track_event_id, property, value, relation, count, created_date_time, updated_date_time, fromValue, toValue) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", tableName];
+
+        sqlite3_stmt *statement;
+
+        if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &statement, nil) == SQLITE_OK) {
+            sqlite3_bind_text(statement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 2, [trackEventID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 3, [property UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 4, [value UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 5, [relation UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_int(statement, 6, (int)count);
+            sqlite3_bind_text(statement, 7, [createdDateTime UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 9, [fromValue UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(statement, 10, [toValue UTF8String], -1, SQLITE_STATIC);
+
+            if (sqlite3_step(statement) == SQLITE_DONE) {
+                sqlite3_finalize(statement);
+                sqlite3_close(database);
+                return YES;
+            }
+        }
+
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+
+    return NO;
+}
+
+- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback {
+    NSString *tableName = @"TableBannerTrackEvent";
+
+    if (![self cleverPushDatabasetableExists:tableName]) {
+        NSLog(@"Table '%@' does not exist.", tableName);
+        if (callback) {
+            callback(@[]);
+        }
+        return;
+    }
+
+    sqlite3 *database;
+    NSString *databasePath = [self cleverPushDatabasePath];
+    NSMutableArray *recordArray = [NSMutableArray array];
+
+    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", tableName];
+        sqlite3_stmt *statement;
+
+        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                int recordID = sqlite3_column_int(statement, 0);
+                const char *bannerID = (const char *)sqlite3_column_text(statement, 1);
+                const char *trackEventID = (const char *)sqlite3_column_text(statement, 2);
+                const char *property = (const char *)sqlite3_column_text(statement, 3);
+                const char *value = (const char *)sqlite3_column_text(statement, 4);
+                const char *relation = (const char *)sqlite3_column_text(statement, 5);
+                int count = sqlite3_column_int(statement, 6);
+                const char *createdDateTime = (const char *)sqlite3_column_text(statement, 7);
+                const char *updatedDateTime = (const char *)sqlite3_column_text(statement, 8);
+                const char *fromValue = (const char *)sqlite3_column_text(statement, 9);
+                const char *toValue = (const char *)sqlite3_column_text(statement, 10);
+
+                NSString *bannerIDString = [NSString stringWithUTF8String:bannerID];
+                NSString *trackEventIDString = [NSString stringWithUTF8String:trackEventID];
+                NSString *propertyString = [NSString stringWithUTF8String:property];
+                NSString *valueString = [NSString stringWithUTF8String:value];
+                NSString *relationString = [NSString stringWithUTF8String:relation];
+                NSString *createdDateTimeString = [NSString stringWithUTF8String:createdDateTime];
+                NSString *updatedDateTimeString = [NSString stringWithUTF8String:updatedDateTime];
+                NSString *fromValueString = [NSString stringWithUTF8String:fromValue];
+                NSString *toValueString = [NSString stringWithUTF8String:toValue];
+
+                NSDictionary *record = @{
+                    @"id": @(recordID),
+                    @"banner_id": bannerIDString,
+                    @"track_event_id": trackEventIDString,
+                    @"property": propertyString,
+                    @"value": valueString,
+                    @"relation": relationString,
+                    @"count": @(count),
+                    @"created_date_time": createdDateTimeString,
+                    @"updated_date_time": updatedDateTimeString,
+                    @"fromValue": fromValueString,
+                    @"toValue": toValueString
+                };
+
+
+                [recordArray addObject:record];
+            }
+        }
+
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+
+    if (callback) {
+        callback(recordArray);
+    }
 }
 
 #pragma mark - refactor for testcases
