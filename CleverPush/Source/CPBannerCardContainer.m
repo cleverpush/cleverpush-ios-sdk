@@ -226,6 +226,25 @@
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
 
+        cell.webConfiguration = [[WKWebViewConfiguration alloc] init];
+        cell.userController = [[WKUserContentController alloc] init];
+
+        [cell.userController addScriptMessageHandler:self name:@"close"];
+        [cell.userController addScriptMessageHandler:self name:@"subscribe"];
+        [cell.userController addScriptMessageHandler:self name:@"unsubscribe"];
+        [cell.userController addScriptMessageHandler:self name:@"closeBanner"];
+        [cell.userController addScriptMessageHandler:self name:@"trackEvent"];
+        [cell.userController addScriptMessageHandler:self name:@"setSubscriptionAttribute"];
+        [cell.userController addScriptMessageHandler:self name:@"addSubscriptionTag"];
+        [cell.userController addScriptMessageHandler:self name:@"removeSubscriptionTag"];
+        [cell.userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
+        [cell.userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
+        [cell.userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
+        [cell.userController addScriptMessageHandler:self name:@"showTopicsDialog"];
+        [cell.userController addScriptMessageHandler:self name:@"trackClick"];
+        [cell.userController addScriptMessageHandler:self name:@"openWebView"];
+        cell.webConfiguration.userContentController = cell.userController;
+
         if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
             cell.webHTMLBlock.scrollView.bounces = false;
@@ -235,11 +254,85 @@
             cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
             cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
-           // [cell composeHTML:block.content];
+            cell.webHTMLBlock.navigationDelegate = self;
 
-            NSURL *url = [NSURL URLWithString:block.url];
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            [cell.webHTMLBlock loadRequest:request];
+            if ([block.content containsString:@"</body>"]) {
+                block.content = [block.content stringByReplacingOccurrencesOfString:@"</body>" withString:@""];
+            }
+            if ([block.content containsString:@"</html>"]) {
+                block.content = [block.content stringByReplacingOccurrencesOfString:@"</html>" withString:@""];
+            }
+
+            NSString *script = @"\
+               <script>\
+                   /*function onCloseClick() {\
+                       try {\
+                           window.webkit.messageHandlers.close.postMessage(null);\
+                       } catch (error) {\
+                           console.log('Caught error on closeBTN click', error);\
+                       }\
+                   }\
+                   var closeElements = document.getElementsByTagName(\"*\");\
+                   for (var i = 0, len = closeElements.length; i < len; i++) {\
+                       var item = closeElements[i];\
+                       if (item.id && item.id.indexOf && item.id.indexOf(\"close\") == 0 || item.className && item.className.indexOf && item.className.indexOf(\"close\") == 0) {\
+                           item.addEventListener('click', onCloseClick);\
+                       }\
+                   }*/\
+                   if (typeof window.CleverPush === 'undefined') {\
+                       window.CleverPush = {};\
+                   }\
+                   window.CleverPush.subscribe = function subscribe() {\
+                       window.webkit.messageHandlers.subscribe.postMessage(null);\
+                   };\
+                   window.CleverPush.unsubscribe = function unsubscribe() {\
+                       window.webkit.messageHandlers.unsubscribe.postMessage(null);\
+                   };\
+                   window.CleverPush.closeBanner = function closeBanner() {\
+                       window.webkit.messageHandlers.closeBanner.postMessage(null);\
+                   };\
+                   window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
+                       window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
+                   };\
+                   window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
+                       window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
+                   };\
+                   window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId) {\
+                       window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId);\
+                   };\
+                   window.CleverPush.removeSubscriptionTag = function removeSubscriptionTag(tagId) {\
+                       window.webkit.messageHandlers.removeSubscriptionTag.postMessage(tagId);\
+                   };\
+                   window.CleverPush.setSubscriptionTopics = function setSubscriptionTopics(topicIds) {\
+                       window.webkit.messageHandlers.setSubscriptionTopics.postMessage(topicIds);\
+                   };\
+                   window.CleverPush.addSubscriptionTopic = function addSubscriptionTopic(topicId) {\
+                       window.webkit.messageHandlers.addSubscriptionTopic.postMessage(topicId);\
+                   };\
+                   window.CleverPush.removeSubscriptionTopic = function removeSubscriptionTopic(topicId) {\
+                       window.webkit.messageHandlers.removeSubscriptionTopic.postMessage(topicId);\
+                   };\
+                   window.CleverPush.showTopicsDialog = function showTopicsDialog() {\
+                       window.webkit.messageHandlers.showTopicsDialog.postMessage(null);\
+                   };\
+                   window.CleverPush.openWebView = function openWebView(url) {\
+                       window.webkit.messageHandlers.openWebView.postMessage(url);\
+                   };\
+                   window.CleverPush.trackClick = function trackClick(ID, properties) {\
+                       window.webkit.messageHandlers.trackClick.postMessage({ buttonId: ID, properties: properties });\
+                   };\
+               </script>";
+
+            NSString *closingBodyHtmlTag = @"</body></html>";
+            NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", block.content, script, closingBodyHtmlTag];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
+                  [cell.webHTMLBlock loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+            });
+
+            cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];
+            [cell.contentView addSubview:cell.webHTMLBlock];
         }
         return cell;
     }
@@ -258,6 +351,49 @@
         return block.height;
     } else {
         return UITableViewAutomaticDimension;
+    }
+}
+
+#pragma mark - UIWebView Delgate Method
+- (void)userContentController:(WKUserContentController*)userContentController
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+    if (message != nil && message.body != nil && message.name != nil) {
+        if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
+            UIViewController* topController = [CleverPush topViewController];
+            [topController dismissViewControllerAnimated:YES completion:nil];
+        } else if ([message.name isEqualToString:@"subscribe"]) {
+            [CleverPush subscribe];
+        } else if ([message.name isEqualToString:@"unsubscribe"]) {
+            [CleverPush unsubscribe];
+        } else if ([message.name isEqualToString:@"trackEvent"]) {
+            [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
+        } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
+            [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
+        } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
+            [CleverPush addSubscriptionTag:message.body];
+        } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
+            [CleverPush removeSubscriptionTag:message.body];
+        } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
+            [CleverPush setSubscriptionTopics:message.body];
+        } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
+            [CleverPush addSubscriptionTopic:message.body];
+        } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
+            [CleverPush removeSubscriptionTopic:message.body];
+        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
+            [CleverPush showTopicsDialog];
+        } else if ([message.name isEqualToString:@"trackClick"]) {
+            CPAppBannerAction* action;
+            NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
+            buttonBlockDic = [message.body mutableCopy];
+            buttonBlockDic[@"bannerAction"] = @"type";
+            action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
+            [self actionCallback:action from:YES];
+        } else if ([message.name isEqualToString:@"openWebView"]) {
+            NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
+            if (webUrl && webUrl.scheme && webUrl.host) {
+                [CPUtils openSafari:webUrl dismissViewController:CleverPush.topViewController];
+            }
+        }
     }
 }
 

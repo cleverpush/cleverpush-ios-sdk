@@ -9,10 +9,5 @@
 @property (strong, nonatomic) IBOutlet WKWebView *webHTMLBlock;
 @property (strong, nonatomic) WKWebViewConfiguration *webConfiguration; 
 @property (strong, nonatomic) WKUserContentController *userController;
-@property (nonatomic, assign) id controller;
-@property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
-
-- (void)composeHTML:(NSString*)content;
-- (void)setActionCallback:(CPAppBannerActionBlock)callback;
 
 @end
