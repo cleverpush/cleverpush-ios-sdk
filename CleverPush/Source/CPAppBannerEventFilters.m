@@ -23,6 +23,13 @@
             self.relation = [json objectForKey:@"relation"];
         }
 
+        if ([json objectForKey:@"fromValue"] && [[json objectForKey:@"fromValue"] isKindOfClass:[NSString class]]) {
+            self.fromValue = [json objectForKey:@"fromValue"];
+        }
+
+        if ([json objectForKey:@"toValue"] && [[json objectForKey:@"toValue"] isKindOfClass:[NSString class]]) {
+            self.toValue = [json objectForKey:@"toValue"];
+        }
     }
     return self;
 }

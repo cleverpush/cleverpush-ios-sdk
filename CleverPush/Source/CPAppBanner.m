@@ -324,7 +324,6 @@
                     @"updated_date_time": updatedDateTimeString
                 };
 
-                NSLog(@"Records Data = %@",record);
 
                 [recordsArray addObject:record];
             }

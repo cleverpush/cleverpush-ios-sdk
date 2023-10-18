@@ -8,6 +8,8 @@
 @property (nonatomic, strong) NSString *property;
 @property (nonatomic, strong) NSString *relation;
 @property (nonatomic, strong) NSString *value;
+@property (nonatomic, strong) NSString *fromValue;
+@property (nonatomic, strong) NSString *toValue;
 
 - (id)initWithJson:(NSDictionary*)json;
 
