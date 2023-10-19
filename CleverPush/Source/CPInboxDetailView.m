@@ -233,17 +233,14 @@
 
     self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, self.webView.frame.origin.y, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, self.webView.frame.size.height) configuration:config];
     self.webView.scrollView.scrollEnabled = true;
-    self.webView.scrollView.bounces = false;
-    self.webView.allowsBackForwardNavigationGestures = false;
-    self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.navigationDelegate = self;
-    self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
+    [CPUtils configureWebView:self.webView];
 
     [self.view addSubview:self.webView];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.webView loadHTMLString:[CPUtils generateHTMLStringWithContent:content] baseURL:nil];
+        [self.webView loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:content] baseURL:nil];
     });
 }
 

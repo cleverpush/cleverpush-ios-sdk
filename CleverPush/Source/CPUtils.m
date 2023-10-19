@@ -577,6 +577,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return result;
 }
 
+#pragma mark - CleverPush Javascript functions
 + (NSString *)cleverPushJavaScript {
     return @"\
        <script>\
@@ -639,7 +640,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
        </script>";
 }
 
-+ (NSString *)generateHTMLStringWithContent:(NSString *)content {
++ (NSString *)generateBannerHTMLStringWithFunctions:(NSString *)content {
     if ([content containsString:@"</body>"]) {
         content = [content stringByReplacingOccurrencesOfString:@"</body>" withString:@""];
     }
@@ -664,6 +665,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
              @"setSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
              @"showTopicsDialog", @"trackClick", @"openWebView"];
+}
+
++ (void)configureWebView:(WKWebView *)webView {
+    webView.scrollView.bounces = NO;
+    webView.opaque = NO;
+    webView.allowsBackForwardNavigationGestures = NO;
+    webView.contentMode = UIViewContentModeScaleToFill;
 }
 
 @end

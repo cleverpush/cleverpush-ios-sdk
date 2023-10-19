@@ -237,17 +237,14 @@
 
         if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
-            cell.webHTMLBlock.scrollView.bounces = false;
-            cell.webHTMLBlock.opaque = false;
             cell.webHTMLBlock.backgroundColor = UIColor.clearColor;
             cell.webHTMLBlock.scrollView.backgroundColor = UIColor.clearColor;
-            cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
-            cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
             cell.webHTMLBlock.navigationDelegate = self;
+            [CPUtils configureWebView:cell.webHTMLBlock];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                [cell.webHTMLBlock loadHTMLString:[CPUtils generateHTMLStringWithContent:block.content] baseURL:nil];
+                [cell.webHTMLBlock loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:block.content] baseURL:nil];
             });
 
             cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];

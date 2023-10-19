@@ -56,9 +56,7 @@ UIColor* chatReceiverBubbleTextColor;
 
         _webView = [[WKWebView alloc] initWithFrame:frame configuration:configuration];
         _webView.scrollView.scrollEnabled = true;
-        _webView.scrollView.bounces = false;
-        _webView.allowsBackForwardNavigationGestures = false;
-        _webView.contentMode = UIViewContentModeScaleToFill;
+        [CPUtils configureWebView:_webView];
         [self loadChat];
         _webView.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         _webView.navigationDelegate = self;

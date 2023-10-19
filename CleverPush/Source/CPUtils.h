@@ -33,7 +33,8 @@
 + (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor;
 + (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString;
 + (NSString *)cleverPushJavaScript;
-+ (NSString *)generateHTMLStringWithContent:(NSString *)content;
++ (NSString *)generateBannerHTMLStringWithFunctions:(NSString *)content;
 + (NSArray<NSString *> *)scriptMessageNames;
++ (void)configureWebView:(WKWebView *)webView;
 
 @end
