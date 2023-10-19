@@ -281,7 +281,7 @@
 
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
-                  [cell.webHTMLBlock loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+                [cell.webHTMLBlock loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
             });
 
             cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];
