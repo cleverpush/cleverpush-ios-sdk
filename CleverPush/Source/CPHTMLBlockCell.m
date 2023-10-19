@@ -1,5 +1,4 @@
 #import "CPHTMLBlockCell.h"
-#import "CleverPush.h"
 
 @implementation CPHTMLBlockCell
 
