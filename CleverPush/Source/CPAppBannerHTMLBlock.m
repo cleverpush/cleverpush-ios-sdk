@@ -8,10 +8,6 @@
     if (self) {
         self.type = CPAppBannerBlockTypeHTML;
         
-        if ([json objectForKey:@"url"]) {
-            self.url = [json objectForKey:@"url"];
-        }
-        
         if ([json objectForKey:@"height"] && [[json objectForKey:@"height"] intValue]) {
             self.height = [[json objectForKey:@"height"] intValue];
         }
