@@ -705,7 +705,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             buttonBlockDic = [message.body mutableCopy];
             buttonBlockDic[@"bannerAction"] = @"type";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-           // [self actionCallback:action from:YES];
+            [self actionCallback:action];
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {
@@ -713,6 +713,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }
         }
     }
+}
+
+#pragma mark - Callback event for tracking clicks
++ (void)actionCallback:(CPAppBannerAction*)action{
+    [self actionCallback:action];
 }
 
 @end

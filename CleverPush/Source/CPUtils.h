@@ -38,5 +38,4 @@
 + (void)configureWebView:(WKWebView *)webView;
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
 
-
 @end
