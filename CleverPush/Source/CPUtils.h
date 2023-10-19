@@ -36,5 +36,7 @@
 + (NSString *)generateBannerHTMLStringWithFunctions:(NSString *)content;
 + (NSArray<NSString *> *)scriptMessageNames;
 + (void)configureWebView:(WKWebView *)webView;
++ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
+
 
 @end

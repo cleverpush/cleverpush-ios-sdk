@@ -227,42 +227,7 @@
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
     if (message != nil && message.body != nil && message.name != nil) {
-        if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
-            UIViewController* topController = [CleverPush topViewController];
-            [topController dismissViewControllerAnimated:YES completion:nil];
-        } else if ([message.name isEqualToString:@"subscribe"]) {
-            [CleverPush subscribe];
-        } else if ([message.name isEqualToString:@"unsubscribe"]) {
-            [CleverPush unsubscribe];
-        } else if ([message.name isEqualToString:@"trackEvent"]) {
-            [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
-        } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
-            [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
-        } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
-            [CleverPush addSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
-            [CleverPush removeSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
-            [CleverPush setSubscriptionTopics:message.body];
-        } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
-            [CleverPush addSubscriptionTopic:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
-            [CleverPush removeSubscriptionTopic:message.body];
-        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
-            [CleverPush showTopicsDialog];
-        } else if ([message.name isEqualToString:@"trackClick"]) {
-            CPAppBannerAction* action;
-            NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
-            buttonBlockDic = [message.body mutableCopy];
-            buttonBlockDic[@"bannerAction"] = @"type";
-            action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [self actionCallback:action from:YES];
-        } else if ([message.name isEqualToString:@"openWebView"]) {
-            NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
-            if (webUrl && webUrl.scheme && webUrl.host) {
-                [CPUtils openSafari:webUrl dismissViewController:CleverPush.topViewController];
-            }
-        }
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
     }
 }
 
