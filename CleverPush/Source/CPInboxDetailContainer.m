@@ -182,20 +182,10 @@
         cell.webConfiguration = [[WKWebViewConfiguration alloc] init];
         cell.userController = [[WKUserContentController alloc] init];
 
-        [cell.userController addScriptMessageHandler:self name:@"close"];
-        [cell.userController addScriptMessageHandler:self name:@"subscribe"];
-        [cell.userController addScriptMessageHandler:self name:@"unsubscribe"];
-        [cell.userController addScriptMessageHandler:self name:@"closeBanner"];
-        [cell.userController addScriptMessageHandler:self name:@"trackEvent"];
-        [cell.userController addScriptMessageHandler:self name:@"setSubscriptionAttribute"];
-        [cell.userController addScriptMessageHandler:self name:@"addSubscriptionTag"];
-        [cell.userController addScriptMessageHandler:self name:@"removeSubscriptionTag"];
-        [cell.userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
-        [cell.userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
-        [cell.userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
-        [cell.userController addScriptMessageHandler:self name:@"showTopicsDialog"];
-        [cell.userController addScriptMessageHandler:self name:@"trackClick"];
-        [cell.userController addScriptMessageHandler:self name:@"openWebView"];
+        for (NSString *name in [CPUtils scriptMessageNames]) {
+            [cell.userController addScriptMessageHandler:self name:name];
+        }
+
         cell.webConfiguration.userContentController = cell.userController;
 
         if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {

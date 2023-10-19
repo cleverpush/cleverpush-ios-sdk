@@ -224,20 +224,11 @@
 - (void)composeHTML:(NSString*)content {
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc] init];
-    [userController addScriptMessageHandler:self name:@"close"];
-    [userController addScriptMessageHandler:self name:@"subscribe"];
-    [userController addScriptMessageHandler:self name:@"unsubscribe"];
-    [userController addScriptMessageHandler:self name:@"closeBanner"];
-    [userController addScriptMessageHandler:self name:@"trackEvent"];
-    [userController addScriptMessageHandler:self name:@"setSubscriptionAttribute"];
-    [userController addScriptMessageHandler:self name:@"addSubscriptionTag"];
-    [userController addScriptMessageHandler:self name:@"removeSubscriptionTag"];
-    [userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
-    [userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
-    [userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
-    [userController addScriptMessageHandler:self name:@"showTopicsDialog"];
-    [userController addScriptMessageHandler:self name:@"trackClick"];
-    [userController addScriptMessageHandler:self name:@"openWebView"];
+
+    for (NSString *name in [CPUtils scriptMessageNames]) {
+        [userController addScriptMessageHandler:self name:name];
+    }
+
     config.userContentController = userController;
 
     self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, self.webView.frame.origin.y, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, self.webView.frame.size.height) configuration:config];

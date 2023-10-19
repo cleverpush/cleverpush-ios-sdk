@@ -659,4 +659,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return finalHTMLString;
 }
 
++ (NSArray<NSString *> *)scriptMessageNames {
+    return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
+             @"setSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
+             @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
+             @"showTopicsDialog", @"trackClick", @"openWebView"];
+}
+
 @end

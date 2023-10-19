@@ -34,5 +34,6 @@
 + (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString;
 + (NSString *)cleverPushJavaScript;
 + (NSString *)generateHTMLStringWithContent:(NSString *)content;
++ (NSArray<NSString *> *)scriptMessageNames;
 
 @end
