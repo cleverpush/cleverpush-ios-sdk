@@ -245,7 +245,7 @@
         [cell.userController addScriptMessageHandler:self name:@"openWebView"];
         cell.webConfiguration.userContentController = cell.userController;
 
-        if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
+        if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
             cell.webHTMLBlock.scrollView.bounces = false;
             cell.webHTMLBlock.opaque = false;

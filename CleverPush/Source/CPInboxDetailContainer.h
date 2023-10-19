@@ -3,7 +3,7 @@
 #import "CPAppBannerBlock.h"
 #import "CPAppBanner.h"
 
-@interface CPInboxDetailContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
+@interface CPInboxDetailContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 @property (weak, nonatomic) IBOutlet UITableView *tblCPBanner;
 @property (weak, nonatomic) IBOutlet UIImageView *imgviewBackground;
 @property (weak, nonatomic) IBOutlet UIView *viewBannerCardContainer;
