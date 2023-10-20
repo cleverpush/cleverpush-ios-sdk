@@ -371,6 +371,9 @@ CPNotificationClickBlock handleClick;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
+                if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id] != nil)) {
+                    pasteboard.string = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id];
+                }
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
