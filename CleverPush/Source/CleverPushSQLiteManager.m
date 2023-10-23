@@ -1,5 +1,6 @@
 #import "CleverPushSQLiteManager.h"
 #import "CleverPush.h"
+#import "CPLog.h"
 
 @implementation CleverPushSQLiteManager
 
@@ -34,7 +35,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
         sqlite3_close(database);
         return YES;
     } else {
-        NSLog(@"Error opening or creating the database.");
+        [CPLog debug:@"CleverPushSQLiteManager: createCleverPushDatabase: Error opening or creating the database."];
         return NO;
     }
 }
@@ -88,7 +89,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
             char *errMsg;
             
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
-                NSLog(@"Error creating table: %s", errMsg);
+                [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseCreateTableIfNeeded: Error creating table: %s", errMsg];
                 sqlite3_free(errMsg);
                 sqlite3_close(database);
                 return NO;
@@ -207,7 +208,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     NSString *tableName = @"TableBannerTrackEvent";
     
     if (![self cleverPushDatabasetableExists:tableName]) {
-        NSLog(@"Table '%@' does not exist.", tableName);
+        [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseGetAllRecords: Table '%@' does not exist.", tableName];
         if (callback) {
             callback(@[]);
         }
@@ -287,15 +288,15 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     if ([fileManager fileExistsAtPath:databasePath]) {
         NSError *error;
         if ([fileManager removeItemAtPath:databasePath error:&error]) {
-            NSLog(@"Database file deleted successfully.");
+            [CPLog debug:@"CleverPushSQLiteManager: deleteCleverPushDatabase: Database file deleted successfully"];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_DATABASE_CREATED_KEY];
             [[NSUserDefaults standardUserDefaults] synchronize];
         } else {
-            NSLog(@"Error deleting database file: %@", [error localizedDescription]);
+            [CPLog debug:@"CleverPushSQLiteManager: deleteCleverPushDatabase: Error deleting database file: %@", [error localizedDescription]];
         }
     } else {
-        NSLog(@"Database file does not exist.");
+        [CPLog debug:@"CleverPushSQLiteManager: Database: file does not exist."];
     }
 }
 

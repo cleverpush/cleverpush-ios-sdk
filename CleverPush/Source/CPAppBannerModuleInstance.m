@@ -222,9 +222,6 @@ NSInteger currentScreenIndex = 0;
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
 
-    NSLog(@"Request URL = %@",request.URL);
-
-
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
         BOOL useGroupId = groupId != nil && ![groupId isEqualToString:@""];
