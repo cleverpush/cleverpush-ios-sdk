@@ -177,6 +177,10 @@
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                block.action.url= [NSURL URLWithString:[[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:[NSString stringWithFormat:@"%@",block.action.url]] stringByAddingPercentEscapesUsingEncoding:
+                                                        NSUTF8StringEncoding]];
+            }
             [self actionCallback:block.action from:YES];
         }];
         return cell;

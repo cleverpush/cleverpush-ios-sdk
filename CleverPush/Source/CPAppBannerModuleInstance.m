@@ -614,6 +614,7 @@ NSInteger currentScreenIndex = 0;
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
             NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
             NSString *type;
+            NSString *voucherCode;
 
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
@@ -668,7 +669,15 @@ NSInteger currentScreenIndex = 0;
                 handleBannerOpened(action);
             }
 
+            if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id] != nil)) {
+                voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id];
+            }
+
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
+                if (voucherCode != nil && ![voucherCode isKindOfClass:[NSNull class]] && ![voucherCode isEqualToString:@""]) {
+                    action.url = [NSURL URLWithString:[[CPUtils replaceString:@"{voucherCode}" withReplacement:voucherCode inString:[NSString stringWithFormat:@"%@",action.url]] stringByAddingPercentEscapesUsingEncoding:
+                                                            NSUTF8StringEncoding]];
+                }
                 [[UIApplication sharedApplication] openURL:action.url];
             }
 
@@ -711,8 +720,8 @@ NSInteger currentScreenIndex = 0;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
-                if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id] != nil)) {
-                    pasteboard.string = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id];
+                if (voucherCode != nil && ![voucherCode isKindOfClass:[NSNull class]] && ![voucherCode isEqualToString:@""]) {
+                    pasteboard.string = voucherCode;
                 }
             }
         };
