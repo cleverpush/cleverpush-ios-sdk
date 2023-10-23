@@ -27,6 +27,7 @@
 #import "NSDictionary+SafeExpectations.h"
 #import "NSMutableArray+ContainsString.h"
 #import "NSString+VersionComparator.h"
+#import "CleverPushSQLiteManager.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -132,6 +133,7 @@ CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
+CleverPushSQLiteManager* cleverPushSqlManager;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -381,6 +383,43 @@ static id isNil(id object) {
 
     if (autoRegister && ![self getUnsubscribeStatus]) {
         [self autoSubscribeWithDelays];
+    }
+
+    cleverPushSqlManager = [CleverPushSQLiteManager sharedManager];
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+
+    if (![cleverPushSqlManager cleverPushDatabaseExists]) {
+        if ([cleverPushSqlManager createCleverPushDatabase]) {
+            if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
+                [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+                       [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
+                       [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+        }
+    } else {
+        if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
+            if(!([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil)) {
+                [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+               [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
+               [[NSUserDefaults standardUserDefaults] synchronize];
+            } else {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSString *topicsVersion = [userDefaults objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+                NSDate *dataBaseCreated = [dateFormatter dateFromString:topicsVersion];
+                NSInteger numberOfDays = [CleverPush getLocalEventTrackingRetentionDays];
+                NSDate *futureDate = [dataBaseCreated dateByAddingTimeInterval:(60 * 5)]; // (60 * 60 * 24 * numberOfDays)
+                // Future Date Calculcation Example = 60 seconds * 60 minutes * 24 hours * 90 days
+
+                NSDate *currentDate = [NSDate date];
+                if ([currentDate compare:futureDate] == NSOrderedDescending || [currentDate compare:futureDate] == NSOrderedSame) {
+                    [cleverPushSqlManager deleteCleverPushDatabase];
+                }
+
+            }
+        }
     }
 
     if (subscriptionId != nil) {

@@ -23,5 +23,6 @@
                      fromValue:(NSString *)fromValue
                        toValue:(NSString *)toValue;
 - (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback;
+- (BOOL)deleteCleverPushDatabase;
 
 @end

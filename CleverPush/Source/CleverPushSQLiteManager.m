@@ -1,4 +1,5 @@
 #import "CleverPushSQLiteManager.h"
+#import "CleverPush.h"
 
 @implementation CleverPushSQLiteManager
 
@@ -271,5 +272,25 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     }
 }
 
+- (BOOL)deleteCleverPushDatabase {
+    NSError *error;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *databasePath = [self cleverPushDatabasePath];
+
+    if (self.database) {
+        sqlite3_close(self.database);
+        self.database = NULL;
+    }
+
+    if ([fileManager removeItemAtPath:databasePath error:&error]) {
+        NSLog(@"Database deleted successfully.");
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+        return YES;
+    } else {
+        NSLog(@"Error deleting database: %@", [error localizedDescription]);
+        return NO;
+    }
+}
 
 @end
