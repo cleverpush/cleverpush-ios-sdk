@@ -24,6 +24,4 @@
                        toValue:(NSString *)toValue;
 - (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback;
 
-
-
 @end
