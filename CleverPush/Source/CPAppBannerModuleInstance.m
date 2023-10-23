@@ -359,23 +359,7 @@ NSInteger currentScreenIndex = 0;
     }
 
     sqlManager = [CleverPushSQLiteManager sharedManager];
-
-
-    if (![sqlManager cleverPushDatabaseExists]) {
-        if ([sqlManager createCleverPushDatabase]) {
-            NSLog(@"Database created successfully.");
-            if ([sqlManager cleverPushDatabaseCreateTableIfNeeded]) {
-                NSLog(@"Table created successfully.");
-            } else {
-                NSLog(@"Failed to create the table.");
-            }
-        } else {
-            NSLog(@"Failed to create the database.");
-        }
-    } else {
-        NSLog(@"DATABSE CHE Failed to create the database.");
-    }
-
+    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
     NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
@@ -386,7 +370,7 @@ NSInteger currentScreenIndex = 0;
     }
 
     for (CPAppBannerEventFilters *events in banner.eventFilters) {
-        [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.from_value toValue:events.to_value];
+        [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp from_value:events.from_value to_value:events.to_value];
     }
 
     [sqlManager cleverPushDatabaseGetAllRecords:^(NSArray *records) {

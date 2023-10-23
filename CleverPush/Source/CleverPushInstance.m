@@ -387,34 +387,23 @@ static id isNil(id object) {
 
     cleverPushSqlManager = [CleverPushSQLiteManager sharedManager];
 
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-
     if (![cleverPushSqlManager cleverPushDatabaseExists]) {
         if ([cleverPushSqlManager createCleverPushDatabase]) {
             if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
-                [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
-                       [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
-                       [[NSUserDefaults standardUserDefaults] synchronize];
+                [self cleverPushDataRecord];
             }
         }
     } else {
         if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
             if(!([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil)) {
-                [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
-               [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
-               [[NSUserDefaults standardUserDefaults] synchronize];
+                [self cleverPushDataRecord];
             } else {
-                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSString *topicsVersion = [userDefaults objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
-                NSDate *dataBaseCreated = [dateFormatter dateFromString:topicsVersion];
-                NSInteger numberOfDays = [CleverPush getLocalEventTrackingRetentionDays];
-                NSDate *futureDate = [dataBaseCreated dateByAddingTimeInterval:(60 * 5)]; // (60 * 60 * 24 * numberOfDays)
-                // Future Date Calculcation Example = 60 seconds * 60 minutes * 24 hours * 90 days
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+                [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
 
-                NSDate *currentDate = [NSDate date];
-                if ([currentDate compare:futureDate] == NSOrderedDescending || [currentDate compare:futureDate] == NSOrderedSame) {
+                if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
                     [cleverPushSqlManager deleteCleverPushDatabase];
                 }
 
@@ -3568,6 +3557,16 @@ static id isNil(id object) {
     [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:allCategories];
 
     allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
+}
+
+#pragma mark - Cleverpush database record
+- (void)cleverPushDataRecord {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+   [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
+   [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end
