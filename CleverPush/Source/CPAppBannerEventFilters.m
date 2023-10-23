@@ -24,11 +24,11 @@
         }
 
         if ([json objectForKey:@"fromValue"] && [[json objectForKey:@"fromValue"] isKindOfClass:[NSString class]]) {
-            self.fromValue = [json objectForKey:@"fromValue"];
+            self.from_value = [json objectForKey:@"fromValue"];
         }
 
         if ([json objectForKey:@"toValue"] && [[json objectForKey:@"toValue"] isKindOfClass:[NSString class]]) {
-            self.toValue = [json objectForKey:@"toValue"];
+            self.to_value = [json objectForKey:@"toValue"];
         }
     }
     return self;

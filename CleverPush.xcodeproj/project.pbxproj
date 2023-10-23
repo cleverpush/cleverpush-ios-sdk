@@ -219,6 +219,13 @@
 		934D88FF2A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
 		934D89002A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
 		934D89012A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
+		935A5F172AE64FB7007A3F7F /* CleverPushSQLiteManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 935A5F152AE64FB7007A3F7F /* CleverPushSQLiteManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		935A5F182AE64FB7007A3F7F /* CleverPushSQLiteManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 935A5F152AE64FB7007A3F7F /* CleverPushSQLiteManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		935A5F192AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */; };
+		935A5F1A2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */; };
+		935A5F1B2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */; };
+		935A5F1C2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */; };
+		935A5F1D2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
 		93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */; };
 		93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */; };
@@ -525,6 +532,8 @@
 		934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailContainer.xib; sourceTree = "<group>"; };
 		934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailContainer.h; sourceTree = "<group>"; };
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
+		935A5F152AE64FB7007A3F7F /* CleverPushSQLiteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushSQLiteManager.h; sourceTree = "<group>"; };
+		935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushSQLiteManager.m; sourceTree = "<group>"; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
 		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
 		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
@@ -955,6 +964,8 @@
 				2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */,
 				93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */,
 				93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */,
+				935A5F152AE64FB7007A3F7F /* CleverPushSQLiteManager.h */,
+				935A5F162AE64FB7007A3F7F /* CleverPushSQLiteManager.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -1038,6 +1049,7 @@
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
+				935A5F182AE64FB7007A3F7F /* CleverPushSQLiteManager.h in Headers */,
 				9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */,
 				934D88FD2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */,
 				29DB961723FC8970008FC985 /* CleverPush.h in Headers */,
@@ -1118,6 +1130,7 @@
 				298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
 				CBA989A22679D61F003DE995 /* CPStoriesController.h in Headers */,
+				935A5F172AE64FB7007A3F7F /* CleverPushSQLiteManager.h in Headers */,
 				2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */,
 				2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */,
 				9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */,
@@ -1340,6 +1353,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935A5F1A2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */,
 				297C34D123FB710100314A84 /* CleverPushLocation.m in Sources */,
 				93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6B2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
@@ -1396,6 +1410,7 @@
 				294B19D3286717A2003A9FCD /* CPLog.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
+				935A5F192AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */,
 				93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */,
 				CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */,
@@ -1442,6 +1457,7 @@
 				291FCD2D2525DC2800F5185E /* DWAlertView.m in Sources */,
 				CBA989992679D58C003DE995 /* CPStoryContent.m in Sources */,
 				29DB95F323FC33C6008FC985 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				935A5F1B2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */,
 				CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */,
 				296068AC25744C89002159D0 /* CPAppBannerAction.m in Sources */,
 				2986772A2572DFAC0002E9F1 /* CPAppBannerBackground.m in Sources */,
@@ -1520,6 +1536,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935A5F1C2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */,
 				29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */,
 				93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6D2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
@@ -1532,6 +1549,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */,
+				935A5F1D2AE64FB7007A3F7F /* CleverPushSQLiteManager.m in Sources */,
 				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
 				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
 				93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,

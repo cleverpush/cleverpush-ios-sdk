@@ -83,22 +83,5 @@
 - (BOOL)getBannersDisabled;
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
-- (NSString *)cleverPushDatabasePath;
-- (BOOL)cleverPushDatabaseExists;
-- (BOOL)createCleverPushDatabase;
-- (BOOL)cleverPushDatabasetableExists:(NSString *)tableName;
-- (BOOL)cleverPushDatabaseCreateTableIfNeeded;
-- (BOOL)insertcleverPushDatabaseRecordWithBannerID:(NSString *)bannerID
-                  trackEventID:(NSString *)trackEventID
-                     property:(NSString *)property
-                        value:(NSString *)value
-                    relation:(NSString *)relation
-                        count:(NSInteger)count
-             createdDateTime:(NSString *)createdDateTime
-             updatedDateTime:(NSString *)updatedDateTime
-                   fromValue:(NSString *)fromValue
-                     toValue:(NSString *)toValue;
-- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback;
-
 
 @end
