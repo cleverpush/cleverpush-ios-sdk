@@ -370,12 +370,13 @@ NSInteger currentScreenIndex = 0;
         [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp from_value:events.from_value to_value:events.to_value];
     }
 
+    __block BOOL eventFilters = NO;
+
     [sqlManager cleverPushDatabaseGetAllRecords:^(NSArray *records) {
         for (NSDictionary *record in records) {
-            NSLog(@"Record: %@", record);
+            eventFilters = [self checkEventFilter:[record objectForKey:@"value"] compareWith:[record objectForKey:@"count"]  relation:[record objectForKey:@"relation"] isAllowed:allowed compareWithFrom:[record objectForKey:@"from_value"] compareWithTo:[record objectForKey:@"to_value"] property:[record objectForKey:@"property"] createdAt:[record objectForKey:@"created_date_time"]];
         }
     }];
-
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
     allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
@@ -392,6 +393,52 @@ NSInteger currentScreenIndex = 0;
     } else {
         return YES;
     }
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
+    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
+    if (relation == nil || compareValue == nil || value == nil || property == nil || createdAt == nil) {
+        allowed = NO;
+    }
+
+    NSLog(@"value = %@",value);
+    NSLog(@"compareValue = %@",compareValue);
+    NSLog(@"compareWithFrom = %@",compareValueFrom);
+    NSLog(@"compareValueTo = %@",compareValueTo);
+    NSLog(@"relation = %@",relation);
+    NSLog(@"allowed %s", allowed ? "TRUE" : "FALSE");
+    NSLog(@"property = %@",property);
+    NSLog(@"createdAt = %@",createdAt);
+
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *createDate = [dateFormatter dateFromString:createdAt];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
+    NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
+    NSString *currentTimeStamp;
+    if (currentDate != nil) {
+        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        currentTimeStamp = [dateFormatter stringFromDate:currentDate];
+    }
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSCalendarUnit units = NSCalendarUnitDay;
+    NSDateComponents *components = [calendar components:units
+                                               fromDate:createDate
+                                                 toDate:currentDate
+                                                options:0];
+    NSInteger daysDifference = [components day];
+
+    if (daysDifference > (long)property) {
+        allowed = NO;
+    }
+
+    return allowed;
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.

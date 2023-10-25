@@ -211,8 +211,6 @@
             self.attributes = [json objectForKey:@"attributes"];
         }
 
-      //  [self createOrOpenDatabase];
-
     }
     return self;
 }

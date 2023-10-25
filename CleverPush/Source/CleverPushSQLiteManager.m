@@ -141,27 +141,37 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     
     if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
         
-        NSString *selectSQL = [NSString stringWithFormat:@"SELECT count FROM %@ WHERE track_event_id = ?;", tableName];
+        NSString *selectSQL = [NSString stringWithFormat:
+                                       @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", tableName];
         sqlite3_stmt *selectStatement;
         
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_text(selectStatement, 1, [trackEventID UTF8String], -1, SQLITE_STATIC);
-            
+            sqlite3_bind_text(selectStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 2, [trackEventID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 5, [relation UTF8String], -1, SQLITE_STATIC);
+
             if (sqlite3_step(selectStatement) == SQLITE_ROW) {
                 int currentCount = sqlite3_column_int(selectStatement, 0);
                 int updatedCount = currentCount + 1;
                 sqlite3_finalize(selectStatement);
                 
                 NSString *updateSQL = [NSString stringWithFormat:
-                                       @"UPDATE %@ SET count = ?, updated_date_time = ? "
-                                       "WHERE track_event_id = ?;", tableName];
-                
+                                               @"UPDATE %@ SET count = ?, updated_date_time = ? "
+                                               "WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", tableName];
+
                 sqlite3_stmt *updateStatement;
                 
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
                     sqlite3_bind_int(updateStatement, 1, updatedCount);
                     sqlite3_bind_text(updateStatement, 2, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 3, [trackEventID UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 3, [bannerID UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 4, [trackEventID UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 5, [property UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 6, [value UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 7, [relation UTF8String], -1, SQLITE_STATIC);
+
                     
                     if (sqlite3_step(updateStatement) == SQLITE_DONE) {
                         sqlite3_finalize(updateStatement);
