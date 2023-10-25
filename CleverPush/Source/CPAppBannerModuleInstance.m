@@ -358,11 +358,11 @@ NSInteger currentScreenIndex = 0;
     sqlManager = [CleverPushSQLiteManager sharedManager];
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
     NSString *currentTimeStamp;
     if (currentDate != nil) {
-        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
         currentTimeStamp = [dateFormatter stringFromDate:currentDate];
     }
 
@@ -417,13 +417,13 @@ NSInteger currentScreenIndex = 0;
 
 
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSDate *createDate = [dateFormatter dateFromString:createdAt];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
     NSString *currentTimeStamp;
     if (currentDate != nil) {
-        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
         currentTimeStamp = [dateFormatter stringFromDate:currentDate];
     }
     NSCalendar *calendar = [NSCalendar currentCalendar];
