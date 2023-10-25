@@ -62,21 +62,7 @@ sqlite3 *database;
 - (BOOL)cleverPushDatabaseCreateTableIfNeeded {
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = [NSString stringWithFormat:
-                                        @"CREATE TABLE IF NOT EXISTS %@ ("
-                                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                                        "banner_id TEXT, "
-                                        "track_event_id TEXT, "
-                                        "property TEXT, "
-                                        "value TEXT, "
-                                        "relation TEXT, "
-                                        "count INTEGER DEFAULT 1, "
-                                        "created_date_time TEXT, "
-                                        "updated_date_time TEXT, "
-                                        "from_value TEXT, "
-                                        "to_value TEXT"
-                                        ");", cleverPushDatabaseTable];
-
+            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, banner_id TEXT, track_event_id TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, created_date_time TEXT, updated_date_time TEXT, from_value TEXT, to_value TEXT);", cleverPushDatabaseTable];
             char *errMsg;
 
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {

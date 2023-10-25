@@ -19,8 +19,6 @@
                                       target:self action:@selector(doneButtonPressed)];
     keyboardToolbar.items = @[flexBarButton, doneBarButton];
     self.txtLiveActivityName.inputAccessoryView = keyboardToolbar;
-
-    [CleverPush trackEvent:@"Testing Banner iOS1"];
 }
 
 #pragma mark - Button Actions
