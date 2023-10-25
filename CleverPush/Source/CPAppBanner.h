@@ -15,7 +15,6 @@
 #import "CPAppBannerHTMLBlock.h"
 #import "CPFilterRelationType.h"
 #import "CPAppBannerEventFilters.h"
-#import "sqlite3.h"
 #import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
