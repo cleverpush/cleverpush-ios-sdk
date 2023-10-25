@@ -244,6 +244,9 @@ NSInteger currentScreenIndex = 0;
                     if (![self bannerTargetingAllowed:banner]) {
                         continue;
                     }
+                    if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                        continue;
+                    }
 
                     if (![self bannerTimeAllowed:banner]) {
                         continue;
@@ -269,6 +272,39 @@ NSInteger currentScreenIndex = 0;
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
     }];
+}
+
+#pragma mark - check the banner triggering allowed or not.
+- (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
+
+    __block BOOL allowed = YES;
+
+    sqlManager = [CleverPushSQLiteManager sharedManager];
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSDate *currentDate = [NSDate date];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
+
+    for (CPAppBannerEventFilters *events in banner.eventFilters) {
+        [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp from_value:events.from_value to_value:events.to_value];
+    }
+
+    [sqlManager cleverPushDatabaseGetAllRecords:^(NSArray *records) {
+        
+        for (NSDictionary *record in records) {
+            allowed = [self checkEventFilter:[NSString stringWithFormat:@"%@",[record objectForKey:@"value"]] compareWith:[NSString stringWithFormat:@"%@",[record objectForKey:@"count"]]  relation:[record objectForKey:@"relation"] isAllowed:YES compareWithFrom:[record objectForKey:@"from_value"] compareWithTo:[record objectForKey:@"to_value"] property:[record objectForKey:@"property"] createdAt:[record objectForKey:@"created_date_time"]];
+            if (allowed) {
+                break;
+            } else {
+                NSLog(@"EVENT ARE NOT MATCHING WITH FILTERS");
+            }
+
+            NSLog(@"eventFilters %s", allowed ? "TRUE" : "FALSE");
+        }
+    }];
+
+    return allowed;
 }
 
 #pragma mark - check the banner triggering allowed or not.
@@ -355,29 +391,6 @@ NSInteger currentScreenIndex = 0;
         }
     }
 
-    sqlManager = [CleverPushSQLiteManager sharedManager];
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
-    NSString *currentTimeStamp;
-    if (currentDate != nil) {
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-        currentTimeStamp = [dateFormatter stringFromDate:currentDate];
-    }
-
-    for (CPAppBannerEventFilters *events in banner.eventFilters) {
-        [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp from_value:events.from_value to_value:events.to_value];
-    }
-
-    __block BOOL eventFilters = NO;
-
-    [sqlManager cleverPushDatabaseGetAllRecords:^(NSArray *records) {
-        for (NSDictionary *record in records) {
-            eventFilters = [self checkEventFilter:[record objectForKey:@"value"] compareWith:[record objectForKey:@"count"]  relation:[record objectForKey:@"relation"] isAllowed:allowed compareWithFrom:[record objectForKey:@"from_value"] compareWithTo:[record objectForKey:@"to_value"] property:[record objectForKey:@"property"] createdAt:[record objectForKey:@"created_date_time"]];
-        }
-    }];
-
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
     allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     return allowed;
@@ -406,36 +419,47 @@ NSInteger currentScreenIndex = 0;
         allowed = NO;
     }
 
-    NSLog(@"value = %@",value);
-    NSLog(@"compareValue = %@",compareValue);
-    NSLog(@"compareWithFrom = %@",compareValueFrom);
-    NSLog(@"compareValueTo = %@",compareValueTo);
-    NSLog(@"relation = %@",relation);
-    NSLog(@"allowed %s", allowed ? "TRUE" : "FALSE");
-    NSLog(@"property = %@",property);
-    NSLog(@"createdAt = %@",createdAt);
-
-
+    NSDate *currentDate = [NSDate date];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSDate *createDate = [dateFormatter dateFromString:createdAt];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSDate *currentDate = [dateFormatter dateFromString:[CPUtils getCurrentDateString]];
-    NSString *currentTimeStamp;
-    if (currentDate != nil) {
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-        currentTimeStamp = [dateFormatter stringFromDate:currentDate];
-    }
+    NSDate *createdDate = [dateFormatter dateFromString:createdAt];
+
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSCalendarUnit units = NSCalendarUnitDay;
     NSDateComponents *components = [calendar components:units
-                                               fromDate:createDate
-                                                 toDate:currentDate
+                                               fromDate:currentDate
+                                                 toDate:createdDate
                                                 options:0];
     NSInteger daysDifference = [components day];
 
-    if (daysDifference > (long)property) {
+    if (daysDifference > [property intValue]) {
         allowed = NO;
+    }
+
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
+        if ([value rangeOfString:compareValue].location == NSNotFound) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
+        if ([value rangeOfString:compareValue].location != NSNotFound) {
+            allowed = NO;
+        }
     }
 
     return allowed;
@@ -663,6 +687,11 @@ NSInteger currentScreenIndex = 0;
 
             if (![self bannerTargetingAllowed:banner]) {
                 [CPLog debug:@"Skipping banner because: targeting not allowed"];
+                return;
+            }
+
+            if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                [CPLog debug:@"Skipping banner because: event filters not allowed"];
                 return;
             }
 

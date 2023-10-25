@@ -110,6 +110,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     return [self.moduleInstance bannerTargetingAllowed:banner];
 }
 
+#pragma mark - check the banner targeting with the events filter allowed or not.
++ (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
+    return [self.moduleInstance bannerTargetingWithEventFiltersAllowed:banner];
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 + (void)createBanners:(NSMutableArray*)banners {
     [self.moduleInstance createBanners:banners];

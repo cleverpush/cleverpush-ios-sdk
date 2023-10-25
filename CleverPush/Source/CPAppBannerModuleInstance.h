@@ -46,6 +46,7 @@
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner;
+- (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner;
 - (void)createBanners:(NSMutableArray*)banners;
 - (void)scheduleBanners;
 - (void)showBanner:(CPAppBanner*)banner;
