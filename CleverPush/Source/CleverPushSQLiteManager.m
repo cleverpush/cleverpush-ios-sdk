@@ -6,6 +6,7 @@
 
 static CleverPushSQLiteManager *sharedInstance = nil;
 NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
+sqlite3 *database;
 
 + (CleverPushSQLiteManager *)sharedManager {
     static dispatch_once_t onceToken;
@@ -29,10 +30,7 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
 }
 
 - (BOOL)createCleverPushDatabase {
-    sqlite3 *database;
-    NSString *databasePath = [self cleverPushDatabasePath];
-    
-    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         sqlite3_close(database);
         return YES;
     } else {
@@ -42,13 +40,10 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
 }
 
 - (BOOL)cleverPushDatabasetableExists:(NSString *)tableName {
-    sqlite3 *database;
-    NSString *databasePath = [self cleverPushDatabasePath];
-    
-    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT name FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
         sqlite3_stmt *statement;
-        
+
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
             if (sqlite3_step(statement) == SQLITE_ROW) {
                 sqlite3_finalize(statement);
@@ -56,20 +51,17 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                 return YES;
             }
         }
-        
+
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
-    
+
     return NO;
 }
 
 - (BOOL)cleverPushDatabaseCreateTableIfNeeded {
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
-        sqlite3 *database;
-        NSString *databasePath = [self cleverPushDatabasePath];
-        
-        if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+        if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
             NSString *createTableSQL = [NSString stringWithFormat:
                                         @"CREATE TABLE IF NOT EXISTS %@ ("
                                         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -86,43 +78,33 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                                         ");", cleverPushDatabaseTable];
 
             char *errMsg;
-            
+
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
                 [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseCreateTableIfNeeded: Error creating table: %s", errMsg];
                 sqlite3_free(errMsg);
                 sqlite3_close(database);
                 return NO;
             }
-            
+
             sqlite3_close(database);
             return YES;
         }
     }
-    
     return YES;
 }
 
-- (BOOL)insertRecordWithBannerID:(NSString *)bannerID
-                    trackEventID:(NSString *)trackEventID
-                        property:(NSString *)property
-                           value:(NSString *)value
-                        relation:(NSString *)relation
-                           count:(NSNumber *)count
-                 createdDateTime:(NSString *)createdDateTime
-                 updatedDateTime:(NSString *)updatedDateTime
-                      from_value:(NSString *)from_value
-                        to_value:(NSString *)to_value {
+- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime from_value:(NSString *)from_value to_value:(NSString *)to_value {
 
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         if (![self cleverPushDatabaseCreateTableIfNeeded]) {
             return NO;
         }
     }
-    
+
     if (!count) {
         count = @(0);
     }
-    
+
     if (!bannerID) bannerID = @"";
     if (!trackEventID) trackEventID = @"";
     if (!property) property = @"";
@@ -132,16 +114,13 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
     if (!updatedDateTime) updatedDateTime = @"";
     if (!from_value) from_value = @"";
     if (!to_value) to_value = @"";
-    
-    sqlite3 *database;
-    NSString *databasePath = [self cleverPushDatabasePath];
-    
-    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
-        
+
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+
         NSString *selectSQL = [NSString stringWithFormat:
-                                       @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
+                               @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
         sqlite3_stmt *selectStatement;
-        
+
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
             sqlite3_bind_text(selectStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 2, [trackEventID UTF8String], -1, SQLITE_STATIC);
@@ -153,13 +132,13 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                 int currentCount = sqlite3_column_int(selectStatement, 0);
                 int updatedCount = currentCount + 1;
                 sqlite3_finalize(selectStatement);
-                
+
                 NSString *updateSQL = [NSString stringWithFormat:
-                                               @"UPDATE %@ SET count = ?, updated_date_time = ? "
-                                               "WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
+                                       @"UPDATE %@ SET count = ?, updated_date_time = ? "
+                                       "WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
 
                 sqlite3_stmt *updateStatement;
-                
+
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
                     sqlite3_bind_int(updateStatement, 1, updatedCount);
                     sqlite3_bind_text(updateStatement, 2, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
@@ -169,7 +148,7 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                     sqlite3_bind_text(updateStatement, 6, [value UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 7, [relation UTF8String], -1, SQLITE_STATIC);
 
-                    
+
                     if (sqlite3_step(updateStatement) == SQLITE_DONE) {
                         sqlite3_finalize(updateStatement);
                         sqlite3_close(database);
@@ -178,14 +157,14 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                 }
             }
         }
-        
+
         NSString *insertSQL = [NSString stringWithFormat:
                                @"INSERT INTO %@ (banner_id, track_event_id, property, value, relation, count, created_date_time, updated_date_time, from_value, to_value) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", cleverPushDatabaseTable];
 
         sqlite3_stmt *insertStatement;
-        
-        
+
+
         if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
             sqlite3_bind_text(insertStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 2, [trackEventID UTF8String], -1, SQLITE_STATIC);
@@ -197,17 +176,17 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
             sqlite3_bind_text(insertStatement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 9, [from_value UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 10, [to_value UTF8String], -1, SQLITE_STATIC);
-            
+
             if (sqlite3_step(insertStatement) == SQLITE_DONE) {
                 sqlite3_finalize(insertStatement);
                 sqlite3_close(database);
                 return YES;
             }
         }
-        
+
         sqlite3_close(database);
     }
-    
+
     return NO;
 }
 
@@ -220,15 +199,13 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
         }
         return;
     }
-    
-    sqlite3 *database;
-    NSString *databasePath = [self cleverPushDatabasePath];
+
     NSMutableArray *recordArray = [NSMutableArray array];
-    
-    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", cleverPushDatabaseTable];
         sqlite3_stmt *statement;
-        
+
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
             while (sqlite3_step(statement) == SQLITE_ROW) {
                 int recordID = sqlite3_column_int(statement, 0);
@@ -242,7 +219,7 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                 const char *updatedDateTime = (const char *)sqlite3_column_text(statement, 8);
                 const char *from_value = (const char *)sqlite3_column_text(statement, 9);
                 const char *to_value = (const char *)sqlite3_column_text(statement, 10);
-                
+
                 NSString *bannerIDString = [NSString stringWithUTF8String:bannerID];
                 NSString *trackEventIDString = [NSString stringWithUTF8String:trackEventID];
                 NSString *propertyString = [NSString stringWithUTF8String:property];
@@ -252,7 +229,7 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                 NSString *updatedDateTimeString = [NSString stringWithUTF8String:updatedDateTime];
                 NSString *from_valueString = [NSString stringWithUTF8String:from_value];
                 NSString *to_valueString = [NSString stringWithUTF8String:to_value];
-                
+
                 NSDictionary *record = @{
                     @"id": @(recordID),
                     @"banner_id": bannerIDString,
@@ -266,54 +243,40 @@ NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
                     @"from_value": from_valueString,
                     @"to_value": to_valueString
                 };
-                
                 [recordArray addObject:record];
             }
         }
-        
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
-    
+
     if (callback) {
         callback(recordArray);
     }
 }
 
 - (BOOL)deleteRecordsOlderThanDays:(NSInteger)days {
-
-    sqlite3 *database;
-    NSString *databasePath = [self cleverPushDatabasePath];
-
-    if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
-
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
-
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy-MM-dd"];
         NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
-
         NSString *deleteSQL = [NSString stringWithFormat:
-            @"DELETE FROM %@ WHERE created_date_time <= ?;", cleverPushDatabaseTable];
-
+                               @"DELETE FROM %@ WHERE created_date_time <= ?;", cleverPushDatabaseTable];
         sqlite3_stmt *deleteStatement;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
             sqlite3_bind_text(deleteStatement, 1, [dateToDeleteString UTF8String], -1, SQLITE_STATIC);
-
             if (sqlite3_step(deleteStatement) == SQLITE_DONE) {
                 sqlite3_finalize(deleteStatement);
                 sqlite3_close(database);
                 return YES;
             }
         }
-
         sqlite3_close(database);
     }
-
     return NO;
 }
-
 
 @end
