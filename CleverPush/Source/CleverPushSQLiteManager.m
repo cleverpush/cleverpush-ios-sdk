@@ -5,6 +5,7 @@
 @implementation CleverPushSQLiteManager
 
 static CleverPushSQLiteManager *sharedInstance = nil;
+NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
 
 + (CleverPushSQLiteManager *)sharedManager {
     static dispatch_once_t onceToken;
@@ -64,9 +65,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
 }
 
 - (BOOL)cleverPushDatabaseCreateTableIfNeeded {
-    NSString *tableName = @"TableBannerTrackEvent";
-    
-    if (![self cleverPushDatabasetableExists:tableName]) {
+    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         sqlite3 *database;
         NSString *databasePath = [self cleverPushDatabasePath];
         
@@ -84,8 +83,8 @@ static CleverPushSQLiteManager *sharedInstance = nil;
                                         "updated_date_time TEXT, "
                                         "from_value TEXT, "
                                         "to_value TEXT"
-                                        ");", tableName];
-            
+                                        ");", cleverPushDatabaseTable];
+
             char *errMsg;
             
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
@@ -113,10 +112,8 @@ static CleverPushSQLiteManager *sharedInstance = nil;
                  updatedDateTime:(NSString *)updatedDateTime
                       from_value:(NSString *)from_value
                         to_value:(NSString *)to_value {
-    
-    NSString *tableName = @"TableBannerTrackEvent";
-    
-    if (![self cleverPushDatabasetableExists:tableName]) {
+
+    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         if (![self cleverPushDatabaseCreateTableIfNeeded]) {
             return NO;
         }
@@ -142,7 +139,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
         
         NSString *selectSQL = [NSString stringWithFormat:
-                                       @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", tableName];
+                                       @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
         sqlite3_stmt *selectStatement;
         
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
@@ -159,7 +156,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
                 
                 NSString *updateSQL = [NSString stringWithFormat:
                                                @"UPDATE %@ SET count = ?, updated_date_time = ? "
-                                               "WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", tableName];
+                                               "WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
 
                 sqlite3_stmt *updateStatement;
                 
@@ -184,8 +181,8 @@ static CleverPushSQLiteManager *sharedInstance = nil;
         
         NSString *insertSQL = [NSString stringWithFormat:
                                @"INSERT INTO %@ (banner_id, track_event_id, property, value, relation, count, created_date_time, updated_date_time, from_value, to_value) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", tableName];
-        
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", cleverPushDatabaseTable];
+
         sqlite3_stmt *insertStatement;
         
         
@@ -215,10 +212,9 @@ static CleverPushSQLiteManager *sharedInstance = nil;
 }
 
 - (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback {
-    NSString *tableName = @"TableBannerTrackEvent";
-    
-    if (![self cleverPushDatabasetableExists:tableName]) {
-        [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseGetAllRecords: Table '%@' does not exist.", tableName];
+
+    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
+        [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseGetAllRecords: Table '%@' does not exist.", cleverPushDatabaseTable];
         if (callback) {
             callback(@[]);
         }
@@ -230,7 +226,7 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     NSMutableArray *recordArray = [NSMutableArray array];
     
     if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
-        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", tableName];
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", cleverPushDatabaseTable];
         sqlite3_stmt *statement;
         
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
@@ -284,30 +280,40 @@ static CleverPushSQLiteManager *sharedInstance = nil;
     }
 }
 
-- (void)deleteCleverPushDatabase {
-    NSString *databasePath = [self cleverPushDatabasePath];
-    NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:databasePath error:nil];
-    NSString *protection = [fileAttributes[NSFileProtectionKey] description];
-    
+- (BOOL)deleteRecordsOlderThanDays:(NSInteger)days {
+
     sqlite3 *database;
+    NSString *databasePath = [self cleverPushDatabasePath];
+
     if (sqlite3_open([databasePath UTF8String], &database) == SQLITE_OK) {
+
+        NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
+
+        NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
+
+        NSString *deleteSQL = [NSString stringWithFormat:
+            @"DELETE FROM %@ WHERE created_date_time <= ?;", cleverPushDatabaseTable];
+
+        sqlite3_stmt *deleteStatement;
+
+        if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
+            sqlite3_bind_text(deleteStatement, 1, [dateToDeleteString UTF8String], -1, SQLITE_STATIC);
+
+            if (sqlite3_step(deleteStatement) == SQLITE_DONE) {
+                sqlite3_finalize(deleteStatement);
+                sqlite3_close(database);
+                return YES;
+            }
+        }
+
         sqlite3_close(database);
     }
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if ([fileManager fileExistsAtPath:databasePath]) {
-        NSError *error;
-        if ([fileManager removeItemAtPath:databasePath error:&error]) {
-            [CPLog debug:@"CleverPushSQLiteManager: deleteCleverPushDatabase: Database file deleted successfully"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_DATABASE_CREATED_KEY];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        } else {
-            [CPLog debug:@"CleverPushSQLiteManager: deleteCleverPushDatabase: Error deleting database file: %@", [error localizedDescription]];
-        }
-    } else {
-        [CPLog debug:@"CleverPushSQLiteManager: Database: file does not exist."];
-    }
+
+    return NO;
 }
+
 
 @end

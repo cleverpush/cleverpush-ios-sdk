@@ -404,7 +404,7 @@ static id isNil(id object) {
                 NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
 
                 if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
-                    [cleverPushSqlManager deleteCleverPushDatabase];
+                    [cleverPushSqlManager deleteRecordsOlderThanDays:[CleverPush getLocalEventTrackingRetentionDays]];
                 }
 
             }

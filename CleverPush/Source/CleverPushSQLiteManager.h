@@ -23,6 +23,6 @@
                       from_value:(NSString *)from_value
                         to_value:(NSString *)to_value;
 - (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback;
-- (void)deleteCleverPushDatabase;
+- (BOOL)deleteRecordsOlderThanDays:(NSInteger)days;
 
 @end
