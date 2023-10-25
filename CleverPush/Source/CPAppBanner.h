@@ -62,7 +62,6 @@
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *bannerDescription;
 @property (nonatomic, strong) NSString *mediaUrl;
-@property (nonatomic) sqlite3 *database;
 
 - (id)initWithJson:(NSDictionary*)json;
 - (BOOL)darkModeEnabled:(UITraitCollection*)traitCollection;
