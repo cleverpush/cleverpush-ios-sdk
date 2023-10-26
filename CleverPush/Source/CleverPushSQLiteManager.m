@@ -62,7 +62,7 @@ sqlite3 *database;
 - (BOOL)cleverPushDatabaseCreateTableIfNeeded {
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, banner_id TEXT, track_event_id TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, created_date_time TEXT, updated_date_time TEXT, from_value TEXT, to_value TEXT);", cleverPushDatabaseTable];
+            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, banner_id TEXT, track_event_id TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, created_date_time TEXT, updated_date_time TEXT, fromValue TEXT, toValue TEXT);", cleverPushDatabaseTable];
             char *errMsg;
 
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
@@ -79,7 +79,7 @@ sqlite3 *database;
     return YES;
 }
 
-- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime from_value:(NSString *)from_value to_value:(NSString *)to_value {
+- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
 
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         if (![self cleverPushDatabaseCreateTableIfNeeded]) {
@@ -98,13 +98,15 @@ sqlite3 *database;
     if (!relation) relation = @"";
     if (!createdDateTime) createdDateTime = @"";
     if (!updatedDateTime) updatedDateTime = @"";
-    if (!from_value) from_value = @"";
-    if (!to_value) to_value = @"";
+    if (!fromValue) fromValue = @"";
+    if (!toValue) toValue = @"";
 
     if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
 
         NSString *selectSQL = [NSString stringWithFormat:
-                               @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
+                               @"SELECT count FROM %@ WHERE banner_id = ? AND track_event_id = ? AND property = ? AND value = ? AND relation = ?;",
+                               cleverPushDatabaseTable];
+
         sqlite3_stmt *selectStatement;
 
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
@@ -134,7 +136,6 @@ sqlite3 *database;
                     sqlite3_bind_text(updateStatement, 6, [value UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 7, [relation UTF8String], -1, SQLITE_STATIC);
 
-
                     if (sqlite3_step(updateStatement) == SQLITE_DONE) {
                         sqlite3_finalize(updateStatement);
                         sqlite3_close(database);
@@ -145,11 +146,10 @@ sqlite3 *database;
         }
 
         NSString *insertSQL = [NSString stringWithFormat:
-                               @"INSERT INTO %@ (banner_id, track_event_id, property, value, relation, count, created_date_time, updated_date_time, from_value, to_value) "
+                               @"INSERT INTO %@ (banner_id, track_event_id, property, value, relation, count, created_date_time, updated_date_time, fromValue, toValue) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", cleverPushDatabaseTable];
 
         sqlite3_stmt *insertStatement;
-
 
         if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
             sqlite3_bind_text(insertStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
@@ -160,8 +160,8 @@ sqlite3 *database;
             sqlite3_bind_int(insertStatement, 6, 1);
             sqlite3_bind_text(insertStatement, 7, [createdDateTime UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 9, [from_value UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 10, [to_value UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(insertStatement, 9, [fromValue UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(insertStatement, 10, [toValue UTF8String], -1, SQLITE_STATIC);
 
             if (sqlite3_step(insertStatement) == SQLITE_DONE) {
                 sqlite3_finalize(insertStatement);
@@ -176,17 +176,13 @@ sqlite3 *database;
     return NO;
 }
 
-- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback {
+- (NSArray<CPAppBannerEventFilters *> *)cleverPushDatabaseGetAllRecords {
+    NSMutableArray<CPAppBannerEventFilters *> *recordArray = [NSMutableArray array];
 
     if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
         [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseGetAllRecords: Table '%@' does not exist.", cleverPushDatabaseTable];
-        if (callback) {
-            callback(@[]);
-        }
-        return;
+        return recordArray;
     }
-
-    NSMutableArray *recordArray = [NSMutableArray array];
 
     if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", cleverPushDatabaseTable];
@@ -203,8 +199,63 @@ sqlite3 *database;
                 int count = sqlite3_column_int(statement, 6);
                 const char *createdDateTime = (const char *)sqlite3_column_text(statement, 7);
                 const char *updatedDateTime = (const char *)sqlite3_column_text(statement, 8);
-                const char *from_value = (const char *)sqlite3_column_text(statement, 9);
-                const char *to_value = (const char *)sqlite3_column_text(statement, 10);
+                const char *fromValue = (const char *)sqlite3_column_text(statement, 9);
+                const char *toValue = (const char *)sqlite3_column_text(statement, 10);
+
+                NSDictionary *recordDict = @{
+                    @"event": trackEventID ? [NSString stringWithUTF8String:trackEventID] : @"",
+                    @"property": property ? [NSString stringWithUTF8String:property] : @"",
+                    @"relation": relation ? [NSString stringWithUTF8String:relation] : @"",
+                    @"value": value ? [NSString stringWithUTF8String:value] : @"",
+                    @"fromValue": fromValue ? [NSString stringWithUTF8String:fromValue] : @"",
+                    @"toValue": toValue ? [NSString stringWithUTF8String:toValue] : @"",
+                    @"banner" : bannerID ? [NSString stringWithUTF8String:bannerID] : @"",
+                    @"count" : [NSString stringWithFormat:@"%d", count] ? : @"",
+                    @"createdDateTime": createdDateTime ? [NSString stringWithUTF8String:createdDateTime] : @"",
+                    @"updatedDateTime": updatedDateTime ? [NSString stringWithUTF8String:updatedDateTime] : @"",
+
+
+                };
+                CPAppBannerEventFilters *record = [[CPAppBannerEventFilters alloc] initWithJson:recordDict];
+                [recordArray addObject:record];
+            }
+        }
+        sqlite3_finalize(statement);
+        sqlite3_close(database);
+    }
+
+    return recordArray;
+}
+
+- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray<CPAppBannerEventFilters *> *records))callback {
+
+    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
+        [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseGetAllRecords: Table '%@' does not exist.", cleverPushDatabaseTable];
+        if (callback) {
+            callback(@[]);
+        }
+        return;
+    }
+
+    NSMutableArray<CPAppBannerEventFilters *> *recordArray = [NSMutableArray array];
+
+    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", cleverPushDatabaseTable];
+        sqlite3_stmt *statement;
+
+        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                int recordID = sqlite3_column_int(statement, 0);
+                const char *bannerID = (const char *)sqlite3_column_text(statement, 1);
+                const char *trackEventID = (const char *)sqlite3_column_text(statement, 2);
+                const char *property = (const char *)sqlite3_column_text(statement, 3);
+                const char *value = (const char *)sqlite3_column_text(statement, 4);
+                const char *relation = (const char *)sqlite3_column_text(statement, 5);
+                int count = sqlite3_column_int(statement, 6);
+                const char *createdDateTime = (const char *)sqlite3_column_text(statement, 7);
+                const char *updatedDateTime = (const char *)sqlite3_column_text(statement, 8);
+                const char *fromValue = (const char *)sqlite3_column_text(statement, 9);
+                const char *toValue = (const char *)sqlite3_column_text(statement, 10);
 
                 NSString *bannerIDString = [NSString stringWithUTF8String:bannerID];
                 NSString *trackEventIDString = [NSString stringWithUTF8String:trackEventID];
@@ -213,22 +264,22 @@ sqlite3 *database;
                 NSString *relationString = [NSString stringWithUTF8String:relation];
                 NSString *createdDateTimeString = [NSString stringWithUTF8String:createdDateTime];
                 NSString *updatedDateTimeString = [NSString stringWithUTF8String:updatedDateTime];
-                NSString *from_valueString = [NSString stringWithUTF8String:from_value];
-                NSString *to_valueString = [NSString stringWithUTF8String:to_value];
+                NSString *fromValueString = [NSString stringWithUTF8String:fromValue];
+                NSString *toValueString = [NSString stringWithUTF8String:toValue];
+                NSString *countString = [NSString stringWithFormat:@"%d", count];
 
-                NSDictionary *record = @{
-                    @"id": @(recordID),
-                    @"banner_id": bannerIDString,
-                    @"track_event_id": trackEventIDString,
-                    @"property": propertyString,
-                    @"value": valueString,
-                    @"relation": relationString,
-                    @"count": @(count),
-                    @"created_date_time": createdDateTimeString,
-                    @"updated_date_time": updatedDateTimeString,
-                    @"from_value": from_valueString,
-                    @"to_value": to_valueString
-                };
+                CPAppBannerEventFilters *record = [[CPAppBannerEventFilters alloc] init];
+                record.event = trackEventIDString;
+                record.property = propertyString;
+                record.relation = relationString;
+                record.value = valueString;
+                record.fromValue = fromValueString;
+                record.toValue = toValueString;
+                record.banner = bannerIDString;
+                record.count = countString;
+                record.createdDateTime = createdDateTimeString;
+                record.updatedDateTime = updatedDateTimeString;
+
                 [recordArray addObject:record];
             }
         }

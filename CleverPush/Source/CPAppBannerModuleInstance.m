@@ -275,10 +275,29 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - check the banner triggering allowed or not.
+- (NSArray<CPAppBannerEventFilters *> *)compareArray:(NSArray<CPAppBannerEventFilters *> *)apiArray
+                                     withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)databaseArray {
+    NSMutableArray<CPAppBannerEventFilters *> *resultArray = [NSMutableArray array];
+
+    for (CPAppBannerEventFilters *apiEvent in apiArray) {
+        for (CPAppBannerEventFilters *databaseEvent in databaseArray) {
+            if ([apiEvent.event isEqualToString:databaseEvent.event] &&
+                [apiEvent.property isEqualToString:databaseEvent.property] &&
+                [apiEvent.relation isEqualToString:databaseEvent.relation] &&
+                [apiEvent.value isEqualToString:databaseEvent.value] &&
+                [apiEvent.fromValue isEqualToString:databaseEvent.fromValue] &&
+                [apiEvent.toValue isEqualToString:databaseEvent.toValue]) {
+                [resultArray addObject:databaseEvent];
+                break;
+            }
+        }
+    }
+    return resultArray;
+}
 - (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
     __block BOOL allowed = YES;
 
-    if (banner.eventFilters.count > 0 ) {
+   if (banner.eventFilters.count > 0 ) {
         sqlManager = [CleverPushSQLiteManager sharedManager];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         NSDate *currentDate = [NSDate date];
@@ -286,17 +305,17 @@ NSInteger currentScreenIndex = 0;
         NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
-            [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp from_value:events.from_value to_value:events.to_value];
+            [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
-        [sqlManager cleverPushDatabaseGetAllRecords:^(NSArray *records) {
-            for (NSDictionary *record in records) {
-                allowed = [self checkEventFilter:[NSString stringWithFormat:@"%@",[record objectForKey:@"value"]] compareWith:[NSString stringWithFormat:@"%@",[record objectForKey:@"count"]]  relation:[record objectForKey:@"relation"] isAllowed:YES compareWithFrom:[record objectForKey:@"from_value"] compareWithTo:[record objectForKey:@"to_value"] property:[record objectForKey:@"property"] createdAt:[record objectForKey:@"created_date_time"]];
-                if (allowed) {
-                    break;
-                }
+       NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareArray:banner.eventFilters withDatabaseArray:[sqlManager cleverPushDatabaseGetAllRecords]];
+
+        for (CPAppBannerEventFilters *matchingEvent in FilterRecrods) {
+                allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdDateTime];
+            if (allowed) {
+                break;
             }
-        }];
+        }
     }
     return allowed;
 }

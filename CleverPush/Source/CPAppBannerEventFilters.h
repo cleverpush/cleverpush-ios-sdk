@@ -8,8 +8,12 @@
 @property (nonatomic, strong) NSString *property;
 @property (nonatomic, strong) NSString *relation;
 @property (nonatomic, strong) NSString *value;
-@property (nonatomic, strong) NSString *from_value;
-@property (nonatomic, strong) NSString *to_value;
+@property (nonatomic, strong) NSString *fromValue;
+@property (nonatomic, strong) NSString *toValue;
+@property (nonatomic, strong) NSString *banner;
+@property (nonatomic, assign) NSString *count;
+@property (nonatomic, strong) NSString *createdDateTime;
+@property (nonatomic, strong) NSString *updatedDateTime;
 
 - (id)initWithJson:(NSDictionary*)json;
 

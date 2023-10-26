@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <sqlite3.h>
+#import "CPAppBannerEventFilters.h"
 
 @interface CleverPushSQLiteManager : NSObject
 
@@ -12,8 +13,10 @@
 - (BOOL)createCleverPushDatabase;
 - (BOOL)cleverPushDatabasetableExists:(NSString *)tableName;
 - (BOOL)cleverPushDatabaseCreateTableIfNeeded;
-- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber*)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime from_value:(NSString *)from_value to_value:(NSString *)to_value;
-- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray *records))callback;
+- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber*)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue;
+- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray<CPAppBannerEventFilters *> *records))callback;
 - (BOOL)deleteRecordsOlderThanDays:(NSInteger)days;
+- (NSArray<CPAppBannerEventFilters *> *)cleverPushDatabaseGetAllRecords;
+
 
 @end

@@ -1,7 +1,6 @@
 #import "CPAppBanner.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
-#import "sqlite3.h"
 
 @implementation CPAppBanner
 
