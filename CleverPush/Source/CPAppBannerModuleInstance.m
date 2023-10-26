@@ -273,47 +273,92 @@ NSInteger currentScreenIndex = 0;
     }];
 }
 
-#pragma mark - check the banner triggering allowed or not.
-- (NSArray<CPAppBannerEventFilters *> *)compareArray:(NSArray<CPAppBannerEventFilters *> *)apiArray
-                                     withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)databaseArray {
-    NSMutableArray<CPAppBannerEventFilters *> *resultArray = [NSMutableArray array];
+#pragma mark - check the banner targeting with the events filter allowed or not.
+- (NSArray<CPAppBannerEventFilters *> *)compareTargetEvents:(NSArray<CPAppBannerEventFilters *> *)targetEvents
+                                          withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)targetEventsFromDatabase {
+    NSMutableArray<CPAppBannerEventFilters *> *filteredResults = [NSMutableArray array];
 
-    for (CPAppBannerEventFilters *apiEvent in apiArray) {
-        for (CPAppBannerEventFilters *databaseEvent in databaseArray) {
+    for (CPAppBannerEventFilters *apiEvent in targetEvents) {
+        for (CPAppBannerEventFilters *databaseEvent in targetEventsFromDatabase) {
             if ([apiEvent.event isEqualToString:databaseEvent.event] &&
                 [apiEvent.property isEqualToString:databaseEvent.property] &&
                 [apiEvent.relation isEqualToString:databaseEvent.relation] &&
                 [apiEvent.value isEqualToString:databaseEvent.value] &&
                 [apiEvent.fromValue isEqualToString:databaseEvent.fromValue] &&
                 [apiEvent.toValue isEqualToString:databaseEvent.toValue]) {
-                [resultArray addObject:databaseEvent];
+                [filteredResults addObject:databaseEvent];
                 break;
             }
         }
     }
-    return resultArray;
+    return filteredResults;
 }
 - (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
     __block BOOL allowed = YES;
 
-   if (banner.eventFilters.count > 0 ) {
+    if (banner.eventFilters.count > 0 ) {
         sqlManager = [CleverPushSQLiteManager sharedManager];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        NSDate *currentDate = [NSDate date];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-        NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
+        NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
             [sqlManager insert:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
-       NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareArray:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
+        NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
 
         for (CPAppBannerEventFilters *matchingEvent in FilterRecrods) {
-                allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdAt];
+            allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdAt];
             if (allowed) {
                 break;
             }
+        }
+    }
+    return allowed;
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
+    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
+    if (relation == nil || compareValue == nil || value == nil || property == nil || createdAt == nil) {
+        allowed = NO;
+    }
+
+    NSDate *currentDate = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *createdDate = [dateFormatter dateFromString:createdAt];
+
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSCalendarUnit units = NSCalendarUnitDay;
+    NSDateComponents *components = [calendar components:units
+                                               fromDate:currentDate
+                                                 toDate:createdDate
+                                                options:0];
+    NSInteger daysDifference = [components day];
+
+    if (daysDifference > [property intValue]) {
+        allowed = NO;
+    }
+
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+            allowed = NO;
         }
     }
     return allowed;
@@ -418,63 +463,6 @@ NSInteger currentScreenIndex = 0;
     } else {
         return YES;
     }
-}
-
-#pragma mark - check the banner triggering allowed as per selected event filters.
-- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
-    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
-}
-
-#pragma mark - check the banner triggering allowed as per selected event filters.
-- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
-    if (relation == nil || compareValue == nil || value == nil || property == nil || createdAt == nil) {
-        allowed = NO;
-    }
-
-    NSDate *currentDate = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-    NSDate *createdDate = [dateFormatter dateFromString:createdAt];
-
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSCalendarUnit units = NSCalendarUnitDay;
-    NSDateComponents *components = [calendar components:units
-                                               fromDate:currentDate
-                                                 toDate:createdDate
-                                                options:0];
-    NSInteger daysDifference = [components day];
-
-    if (daysDifference > [property intValue]) {
-        allowed = NO;
-    }
-
-    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
-        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
-            allowed = NO;
-        }
-    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
-            allowed = NO;
-        }
-    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
-            allowed = NO;
-        }
-    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (CHECK_FILTER_EQUAL_TO(value, compareValue)) {
-            allowed = NO;
-        }
-    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
-        if ([value rangeOfString:compareValue].location == NSNotFound) {
-            allowed = NO;
-        }
-    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
-        if ([value rangeOfString:compareValue].location != NSNotFound) {
-            allowed = NO;
-        }
-    }
-
-    return allowed;
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
@@ -636,7 +624,6 @@ NSInteger currentScreenIndex = 0;
                 continue;
             }
         }
-
 
         BOOL contains = NO;
         for (CPAppBanner* tryBanner in [self getActiveBanners]) {
@@ -994,12 +981,12 @@ NSInteger currentScreenIndex = 0;
 - (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    
+
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
         NSDate *bannerStartdate1;
         NSDate *bannerStartdate2;
         NSComparisonResult result;
-        
+
         if (bannerElement1[@"startAt"] != nil && ![bannerElement1[@"startAt"] isKindOfClass:[NSNull class]]) {
             bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
         }

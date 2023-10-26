@@ -239,7 +239,7 @@ sqlite3 *database;
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:
                                @"DELETE FROM %@ WHERE createdAt <= ?;", cleverPushDatabaseTable];

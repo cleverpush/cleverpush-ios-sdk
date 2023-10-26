@@ -32,5 +32,6 @@
 + (NSUserDefaults *)getUserDefaultsAppGroup;
 + (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor;
 + (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString;
++ (NSString *)getCurrentTimestampWithFormat:(NSString *)dateFormat;
 
 @end
