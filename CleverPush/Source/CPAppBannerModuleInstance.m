@@ -278,15 +278,15 @@ NSInteger currentScreenIndex = 0;
                                           withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)targetEventsFromDatabase {
     NSMutableArray<CPAppBannerEventFilters *> *filteredResults = [NSMutableArray array];
 
-    for (CPAppBannerEventFilters *apiEvent in targetEvents) {
-        for (CPAppBannerEventFilters *databaseEvent in targetEventsFromDatabase) {
-            if ([apiEvent.event isEqualToString:databaseEvent.event] &&
-                [apiEvent.property isEqualToString:databaseEvent.property] &&
-                [apiEvent.relation isEqualToString:databaseEvent.relation] &&
-                [apiEvent.value isEqualToString:databaseEvent.value] &&
-                [apiEvent.fromValue isEqualToString:databaseEvent.fromValue] &&
-                [apiEvent.toValue isEqualToString:databaseEvent.toValue]) {
-                [filteredResults addObject:databaseEvent];
+    for (CPAppBannerEventFilters *eventsObject in targetEvents) {
+        for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
+            if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
+                [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
+                [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
+                [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
+                [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
+                [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue]) {
+                [filteredResults addObject:eventsObjectFromDatabase];
                 break;
             }
         }
