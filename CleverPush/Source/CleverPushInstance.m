@@ -398,11 +398,12 @@ static id isNil(id object) {
             if (!databaseCreated) {
                 [self setCleverPushDatabaseInfo];
             } else {
-                NSDate *databaseCreatedTime = [defaults objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
-                NSDate *retentionDay = [databaseCreatedTime dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
-                NSDate *currentDate = [NSDate date];
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+                [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
 
-                if ([currentDate compare:retentionDay] != NSOrderedAscending) {
+                if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
                     [cleverPushSqlManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
                 }
             }

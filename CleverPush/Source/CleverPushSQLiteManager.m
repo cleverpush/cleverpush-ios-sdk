@@ -54,7 +54,6 @@ sqlite3 *database;
                 return YES;
             }
         }
-
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
@@ -196,31 +195,17 @@ sqlite3 *database;
 
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
             while (sqlite3_step(statement) == SQLITE_ROW) {
-                int recordID = sqlite3_column_int(statement, 0);
-                const char *bannerID = (const char *)sqlite3_column_text(statement, 1);
-                const char *trackEventID = (const char *)sqlite3_column_text(statement, 2);
-                const char *property = (const char *)sqlite3_column_text(statement, 3);
-                const char *value = (const char *)sqlite3_column_text(statement, 4);
-                const char *relation = (const char *)sqlite3_column_text(statement, 5);
-                int count = sqlite3_column_int(statement, 6);
-                const char *createdAt = (const char *)sqlite3_column_text(statement, 7);
-                const char *updatedAt = (const char *)sqlite3_column_text(statement, 8);
-                const char *fromValue = (const char *)sqlite3_column_text(statement, 9);
-                const char *toValue = (const char *)sqlite3_column_text(statement, 10);
-
                 NSDictionary *recordDict = @{
-                    @"event": trackEventID ? [NSString stringWithUTF8String:trackEventID] : @"",
-                    @"property": property ? [NSString stringWithUTF8String:property] : @"",
-                    @"relation": relation ? [NSString stringWithUTF8String:relation] : @"",
-                    @"value": value ? [NSString stringWithUTF8String:value] : @"",
-                    @"fromValue": fromValue ? [NSString stringWithUTF8String:fromValue] : @"",
-                    @"toValue": toValue ? [NSString stringWithUTF8String:toValue] : @"",
-                    @"banner" : bannerID ? [NSString stringWithUTF8String:bannerID] : @"",
-                    @"count" : [NSString stringWithFormat:@"%d", count] ? : @"",
-                    @"createdAt": createdAt ? [NSString stringWithUTF8String:createdAt] : @"",
-                    @"updatedAt": updatedAt ? [NSString stringWithUTF8String:updatedAt] : @"",
-
-
+                    @"banner" : (const char *)sqlite3_column_text(statement, 1) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)] : @"",
+                    @"event": (const char *)sqlite3_column_text(statement, 2) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 2)] : @"",
+                    @"property": (const char *)sqlite3_column_text(statement, 3) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 3)] : @"",
+                    @"value": (const char *)sqlite3_column_text(statement, 4) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 4)] : @"",
+                    @"relation": (const char *)sqlite3_column_text(statement, 5) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 5)] : @"",
+                    @"count" : [NSString stringWithFormat:@"%d", sqlite3_column_int(statement, 6)] ?: @"",
+                    @"createdAt": (const char *)sqlite3_column_text(statement, 7) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 7)] : @"",
+                    @"updatedAt": (const char *)sqlite3_column_text(statement, 8) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 8)] : @"",
+                    @"fromValue": (const char *)sqlite3_column_text(statement, 9) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 9)] : @"",
+                    @"toValue": (const char *)sqlite3_column_text(statement, 10) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 10)] : @"",
                 };
                 CPAppBannerEventFilters *record = [[CPAppBannerEventFilters alloc] initWithJson:recordDict];
                 [recordArray addObject:record];
@@ -229,7 +214,6 @@ sqlite3 *database;
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
-
     return recordArray;
 }
 
