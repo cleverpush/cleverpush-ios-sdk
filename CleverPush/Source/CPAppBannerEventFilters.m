@@ -2,7 +2,7 @@
 
 @implementation CPAppBannerEventFilters
 
-#pragma mark - wrapping the data of the banner in to CPAppBanner NSObject
+#pragma mark - wrapping the data of the event filters in to CPAppBannerEventFilters NSObject
 - (id)initWithJson:(NSDictionary*)json {
     self = [super init];
     if (self) {
