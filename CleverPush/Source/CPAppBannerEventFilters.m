@@ -52,11 +52,6 @@
             self.createdAt = [json objectForKey:@"createdAt"];
         }
 
-        self.event = @"";
-        if ([json objectForKey:@"event"] && [[json objectForKey:@"event"] isKindOfClass:[NSString class]]) {
-            self.event = [json objectForKey:@"event"];
-        }
-
         self.updatedAt = @"";
         if ([json objectForKey:@"updatedAt"] && [[json objectForKey:@"updatedAt"] isKindOfClass:[NSString class]]) {
             self.updatedAt = [json objectForKey:@"updatedAt"];
