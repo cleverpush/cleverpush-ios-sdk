@@ -12,11 +12,10 @@
 - (BOOL)cleverPushDatabaseExists;
 - (BOOL)createCleverPushDatabase;
 - (BOOL)cleverPushDatabasetableExists:(NSString *)tableName;
-- (BOOL)cleverPushDatabaseCreateTableIfNeeded;
-- (BOOL)insertRecordWithBannerID:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber*)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue;
-- (void)cleverPushDatabaseGetAllRecords:(void (^)(NSArray<CPAppBannerEventFilters *> *records))callback;
-- (BOOL)deleteRecordsOlderThanDays:(NSInteger)days;
-- (NSArray<CPAppBannerEventFilters *> *)cleverPushDatabaseGetAllRecords;
+- (BOOL)createCleverPushDatabaseTable;
+- (BOOL)insert:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber*)count createdAt:(NSString *)createdAt updatedAt:(NSString *)updatedAt fromValue:(NSString *)fromValue toValue:(NSString *)toValue;
+- (BOOL)deleteDataBasedOnRetentionDays:(NSInteger)days;
+- (NSArray<CPAppBannerEventFilters *> *)getcleverPushDatabaseAllRecords;
 
 
 @end

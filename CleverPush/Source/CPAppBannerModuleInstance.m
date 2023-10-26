@@ -305,13 +305,13 @@ NSInteger currentScreenIndex = 0;
         NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
-            [sqlManager insertRecordWithBannerID:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
+            [sqlManager insert:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
-       NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareArray:banner.eventFilters withDatabaseArray:[sqlManager cleverPushDatabaseGetAllRecords]];
+       NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareArray:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
 
         for (CPAppBannerEventFilters *matchingEvent in FilterRecrods) {
-                allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdDateTime];
+                allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdAt];
             if (allowed) {
                 break;
             }

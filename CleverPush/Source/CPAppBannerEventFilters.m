@@ -47,9 +47,9 @@
             self.count =  [json objectForKey:@"count"];
         }
 
-        self.createdDateTime = @"";
-        if ([json objectForKey:@"createdDateTime"] && [[json objectForKey:@"createdDateTime"] isKindOfClass:[NSString class]]) {
-            self.createdDateTime = [json objectForKey:@"createdDateTime"];
+        self.createdAt = @"";
+        if ([json objectForKey:@"createdAt"] && [[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
+            self.createdAt = [json objectForKey:@"createdAt"];
         }
 
         self.event = @"";
@@ -57,9 +57,9 @@
             self.event = [json objectForKey:@"event"];
         }
 
-        self.updatedDateTime = @"";
-        if ([json objectForKey:@"updatedDateTime"] && [[json objectForKey:@"updatedDateTime"] isKindOfClass:[NSString class]]) {
-            self.updatedDateTime = [json objectForKey:@"updatedDateTime"];
+        self.updatedAt = @"";
+        if ([json objectForKey:@"updatedAt"] && [[json objectForKey:@"updatedAt"] isKindOfClass:[NSString class]]) {
+            self.updatedAt = [json objectForKey:@"updatedAt"];
         }
 
     }

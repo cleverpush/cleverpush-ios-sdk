@@ -389,12 +389,12 @@ static id isNil(id object) {
 
     if (![cleverPushSqlManager cleverPushDatabaseExists]) {
         if ([cleverPushSqlManager createCleverPushDatabase]) {
-            if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
+            if ([cleverPushSqlManager createCleverPushDatabaseTable]) {
                 [self cleverPushDataRecord];
             }
         }
     } else {
-        if ([cleverPushSqlManager cleverPushDatabaseCreateTableIfNeeded]) {
+        if ([cleverPushSqlManager createCleverPushDatabaseTable]) {
             if(!([[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil)) {
                 [self cleverPushDataRecord];
             } else {
@@ -404,7 +404,7 @@ static id isNil(id object) {
                 NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
 
                 if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
-                    [cleverPushSqlManager deleteRecordsOlderThanDays:[CleverPush getLocalEventTrackingRetentionDays]];
+                    [cleverPushSqlManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
                 }
 
             }

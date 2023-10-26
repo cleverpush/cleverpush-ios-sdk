@@ -12,8 +12,8 @@
 @property (nonatomic, strong) NSString *toValue;
 @property (nonatomic, strong) NSString *banner;
 @property (nonatomic, assign) NSString *count;
-@property (nonatomic, strong) NSString *createdDateTime;
-@property (nonatomic, strong) NSString *updatedDateTime;
+@property (nonatomic, strong) NSString *createdAt;
+@property (nonatomic, strong) NSString *updatedAt;
 
 - (id)initWithJson:(NSDictionary*)json;
 
