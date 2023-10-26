@@ -237,23 +237,27 @@ sqlite3 *database;
 - (BOOL)deleteDataBasedOnRetentionDays:(NSInteger)days {
     if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
+
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-        NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:
                                @"DELETE FROM %@ WHERE createdAt <= ?;", cleverPushDatabaseTable];
         sqlite3_stmt *deleteStatement;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_text(deleteStatement, 1, [dateToDeleteString UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_double(deleteStatement, 1, [dateToDelete timeIntervalSince1970]);
             if (sqlite3_step(deleteStatement) == SQLITE_DONE) {
                 sqlite3_finalize(deleteStatement);
                 sqlite3_close(database);
                 return YES;
+            } else {
+                [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to execute the delete statement: %s", sqlite3_errmsg(database)];
             }
+        } else {
+            [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to prepare the delete statement: %s", sqlite3_errmsg(database)];
         }
         sqlite3_close(database);
+    } else {
+        [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to open the database: %s", sqlite3_errmsg(database)];
     }
     return NO;
 }
