@@ -21,7 +21,6 @@
 #import "CPAppBannerTrigger.h"
 #import "CPAppBannerTriggerCondition.h"
 #import "CPAppBannerViewController.h"
-#import <sqlite3.h>
 
 @class CPAppBannerViewController;
 

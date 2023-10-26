@@ -209,7 +209,6 @@
         if ([json objectForKey:@"attributes"] && [[json objectForKey:@"attributes"] isKindOfClass:[NSArray class]]) {
             self.attributes = [json objectForKey:@"attributes"];
         }
-
     }
     return self;
 }
