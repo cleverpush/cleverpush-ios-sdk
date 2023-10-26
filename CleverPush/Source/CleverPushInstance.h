@@ -209,7 +209,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getUnsubscribeStatus;
 - (void)setConfirmAlertShown;
 - (void)areNotificationsEnabled:(void(^)(BOOL))callback;
-- (void)cleverPushDataRecord;
+- (void)setCleverPushDatabaseInfo;
 
 - (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 - (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

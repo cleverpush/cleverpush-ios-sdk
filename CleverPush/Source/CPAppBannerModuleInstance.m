@@ -893,6 +893,7 @@ NSInteger currentScreenIndex = 0;
                     subscriptionId, @"subscriptionId",
                     nil] mutableCopy];
     }
+
     if ([event isEqualToString:@"clicked"]) {
         if ([type isEqualToString:@"button"]) {
             if (block != nil) {
