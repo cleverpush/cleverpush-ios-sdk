@@ -293,6 +293,13 @@ NSInteger currentScreenIndex = 0;
     }
     return filteredResults;
 }
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
+    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
 - (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
     __block BOOL allowed = YES;
 
@@ -301,6 +308,9 @@ NSInteger currentScreenIndex = 0;
         NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
+            if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
+                continue;
+            }
             [sqlManager insert:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
@@ -316,14 +326,8 @@ NSInteger currentScreenIndex = 0;
     return allowed;
 }
 
-#pragma mark - check the banner triggering allowed as per selected event filters.
-- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
-    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
-}
-
-#pragma mark - check the banner triggering allowed as per selected event filters.
 - (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
-    if (relation == nil || compareValue == nil || value == nil || property == nil || createdAt == nil) {
+    if (relation == nil || compareValue == nil) {
         allowed = NO;
     }
 
@@ -340,28 +344,70 @@ NSInteger currentScreenIndex = 0;
                                                 options:0];
     NSInteger daysDifference = [components day];
 
-    if (daysDifference > [property intValue]) {
+    if (allowed && daysDifference > [property intValue]) {
         allowed = NO;
     }
 
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
-        if (!CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+        if (![value isEqualToVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
-        if (!CHECK_FILTER_GREATER_THAN(value, compareValue)) {
+        if (![value isEqualOrOlderThanVersion:compareValue]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
-        if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+        if (![value isEqualOrNewerThanVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        if (![compareValue isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
-        if (CHECK_FILTER_EQUAL_TO(value, compareValue)) {
+        if (![value isEqualToVersion:compareValue]) {
             allowed = NO;
         }
     }
     return allowed;
+}
+
+- (BOOL)isValidTargetValuesWithEvent:(NSString *)event property:(NSString *)property relation:(NSString *)relation value:(NSString *)value fromValue:(NSString *)fromValue toValue:(NSString *)toValue bannerId:(NSString *)bannerId {
+    if (event == nil || [event isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: track event is not valid", bannerId];
+        return NO;
+    }
+    if (![self isValidIntegerValue:property]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: property value is not valid", bannerId];
+        return NO;
+    }
+    if (relation == nil || [relation isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: relation is not valid", bannerId];
+        return NO;
+    }
+    if ([relation isEqualToString:@"between"]) {
+        if (![self isValidIntegerValue:fromValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: from value is not valid", bannerId];
+            return NO;
+        }
+        if (![self isValidIntegerValue:toValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: to value is not valid", bannerId];
+            return NO;
+        }
+    } else {
+        if (![self isValidIntegerValue:value]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: value is not valid", bannerId];
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (BOOL)isValidIntegerValue:(NSString *)value {
+    if (value == nil || [value isEqualToString:@""] || [value doubleValue] < 0 || [value doubleValue] != (int)[value doubleValue]) {
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - check the banner triggering allowed or not.
