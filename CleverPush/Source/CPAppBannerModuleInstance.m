@@ -969,7 +969,7 @@ NSInteger currentScreenIndex = 0;
             ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
 
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
-                screen.isScreenClicked = true;
+                    screen.isScreenClicked = true;
             }
         } onFailure:nil];
     } else {
