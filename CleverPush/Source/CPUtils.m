@@ -585,6 +585,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSDate *currentDate = [NSDate date];
     NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
     return currentTimeStamp;
+}
 
 #pragma mark - CleverPush Javascript functions
 + (NSString *)cleverPushJavaScript {
