@@ -318,6 +318,9 @@ NSInteger currentScreenIndex = 0;
 
         for (CPAppBannerEventFilters *event in eventRecords) {
             allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
+            if (allowed) {
+                break;
+            }
         }
     }
     return allowed;
