@@ -33,5 +33,10 @@
 + (UIColor *)readableForegroundColorForBackgroundColor:(UIColor*)backgroundColor;
 + (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString;
 + (NSString *)getCurrentTimestampWithFormat:(NSString *)dateFormat;
++ (NSString *)cleverPushJavaScript;
++ (NSString *)generateBannerHTMLStringWithFunctions:(NSString *)content;
++ (NSArray<NSString *> *)scriptMessageNames;
++ (void)configureWebView:(WKWebView *)webView;
++ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
 
 @end

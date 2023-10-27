@@ -226,18 +226,29 @@
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
 
-        if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
+        cell.webConfiguration = [[WKWebViewConfiguration alloc] init];
+        cell.userController = [[WKUserContentController alloc] init];
+
+        for (NSString *name in [CPUtils scriptMessageNames]) {
+            [cell.userController addScriptMessageHandler:self name:name];
+        }
+
+        cell.webConfiguration.userContentController = cell.userController;
+
+        if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
-            cell.webHTMLBlock.scrollView.bounces = false;
-            cell.webHTMLBlock.opaque = false;
             cell.webHTMLBlock.backgroundColor = UIColor.clearColor;
             cell.webHTMLBlock.scrollView.backgroundColor = UIColor.clearColor;
-            cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
-            cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
-            NSURL *url = [NSURL URLWithString:block.url];
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            [cell.webHTMLBlock loadRequest:request];
+            cell.webHTMLBlock.navigationDelegate = self;
+            [CPUtils configureWebView:cell.webHTMLBlock];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [cell.webHTMLBlock loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:block.content] baseURL:nil];
+            });
+
+            cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];
+            [cell.contentView addSubview:cell.webHTMLBlock];
         }
         return cell;
     }
@@ -256,6 +267,14 @@
         return block.height;
     } else {
         return UITableViewAutomaticDimension;
+    }
+}
+
+#pragma mark - UIWebView Delgate Method
+- (void)userContentController:(WKUserContentController*)userContentController
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+    if (message != nil && message.body != nil && message.name != nil) {
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
     }
 }
 

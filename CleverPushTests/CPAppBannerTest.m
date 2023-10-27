@@ -82,7 +82,6 @@ dispatch_queue_t dispatchQueue = nil;
     
     self.htmlBlock = [[CPAppBannerHTMLBlock alloc]init];
     self.htmlBlock.action = self.action;
-    self.htmlBlock.url = @"https://www.google.com";
     self.htmlBlock.height = 300;
     self.htmlBlock.scale = 20;
     self.blocks = [[NSMutableArray alloc]initWithObjects:self.buttonBlock,self.textBlock,self.imageBlock,self.htmlBlock,  nil];

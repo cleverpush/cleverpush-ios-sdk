@@ -106,7 +106,7 @@
 		</data>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
 		<data>
-		b2bs+0m+4U7SBNHnTdiOCdj6azE=
+		AW+JnsIkpC/o6+sPd5pPSxoSfPI=
 		</data>
 		<key>Headers/CPAppBannerImageBlock.h</key>
 		<data>
@@ -210,7 +210,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		3+SOkdzXG6s75PcXtq3lG1i56W4=
+		dvFxwjGPHokWbMEoWWwuy3p0S1E=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -254,7 +254,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		P42uaPKX/edCJvQ2r4KQaQt9g60=
+		ASdHnFR7v65PQc/9EYuuN+r//lg=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -542,11 +542,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			b2bs+0m+4U7SBNHnTdiOCdj6azE=
+			AW+JnsIkpC/o6+sPd5pPSxoSfPI=
 			</data>
 			<key>hash2</key>
 			<data>
-			z+nNxHPE6r1zF4HqdfgGSlCCzJIDesgvG0pAdGbjT7Y=
+			ShUJDSD1q81MImQcarwS19MpoU06ITPquJyaXfWrMPQ=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerImageBlock.h</key>
@@ -828,11 +828,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			3+SOkdzXG6s75PcXtq3lG1i56W4=
+			dvFxwjGPHokWbMEoWWwuy3p0S1E=
 			</data>
 			<key>hash2</key>
 			<data>
-			QFGIV1eoHG9Nv59xl0vEpxOq0T74AJjn1/nljxoa/SQ=
+			S/veLQhDFd5hl9a9omrIVWzceJJvO+C/4BB27p0UDXw=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>

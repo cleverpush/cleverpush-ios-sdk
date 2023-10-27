@@ -1,3 +1,6 @@
+## 1.28.13
+* Optimizations for in app banners
+
 ## 1.28.12
 * Fixed a potential crash for the click event in-app banners
 

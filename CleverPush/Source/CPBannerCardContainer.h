@@ -12,7 +12,7 @@
 - (void)navigateToNextPage:(NSString *)value;
 @end
 
-@interface CPBannerCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource>
+@interface CPBannerCardContainer : UICollectionViewCell <UITableViewDelegate, UITableViewDataSource , WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 @property (weak, nonatomic) IBOutlet UITableView *tblCPBanner;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tblCPBannerHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomViewBannerConstraint;
