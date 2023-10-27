@@ -962,6 +962,7 @@ NSInteger currentScreenIndex = 0;
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
+        
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
