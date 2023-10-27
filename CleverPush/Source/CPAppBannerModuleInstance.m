@@ -962,7 +962,7 @@ NSInteger currentScreenIndex = 0;
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
-        
+
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
@@ -1027,6 +1027,7 @@ NSInteger currentScreenIndex = 0;
 - (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+    
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
         NSDate *bannerStartdate1;
         NSDate *bannerStartdate2;
