@@ -17,5 +17,4 @@
 - (BOOL)deleteDataBasedOnRetentionDays:(NSInteger)days;
 - (NSArray<CPAppBannerEventFilters *> *)getcleverPushDatabaseAllRecords;
 
-
 @end

@@ -57,7 +57,6 @@ sqlite3 *database;
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
-
     return NO;
 }
 
@@ -94,7 +93,6 @@ sqlite3 *database;
     if (!count) {
         count = @(0);
     }
-
     if (!bannerID) bannerID = @"";
     if (!trackEventID) trackEventID = @"";
     if (!property) property = @"";
@@ -110,7 +108,6 @@ sqlite3 *database;
         NSString *selectSQL = [NSString stringWithFormat:
                                @"SELECT count FROM %@ WHERE bannerId = ? AND trackEventId = ? AND property = ? AND value = ? AND relation = ?;",
                                cleverPushDatabaseTable];
-
         sqlite3_stmt *selectStatement;
 
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
@@ -128,7 +125,6 @@ sqlite3 *database;
                 NSString *updateSQL = [NSString stringWithFormat:
                                        @"UPDATE %@ SET count = ?, updatedAt = ? "
                                        "WHERE bannerId = ? AND trackEventId = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
-
                 sqlite3_stmt *updateStatement;
 
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
@@ -152,7 +148,6 @@ sqlite3 *database;
         NSString *insertSQL = [NSString stringWithFormat:
                                @"INSERT INTO %@ (bannerId, trackEventId, property, value, relation, count, createdAt, updatedAt, fromValue, toValue) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", cleverPushDatabaseTable];
-
         sqlite3_stmt *insertStatement;
 
         if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
@@ -173,10 +168,8 @@ sqlite3 *database;
                 return YES;
             }
         }
-
         sqlite3_close(database);
     }
-
     return NO;
 }
 
@@ -223,12 +216,15 @@ sqlite3 *database;
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
 
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+        NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:
                                @"DELETE FROM %@ WHERE createdAt <= ?;", cleverPushDatabaseTable];
         sqlite3_stmt *deleteStatement;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_double(deleteStatement, 1, [dateToDelete timeIntervalSince1970]);
+            sqlite3_bind_text(deleteStatement, 1, [dateToDeleteString UTF8String], -1, SQLITE_STATIC);
             if (sqlite3_step(deleteStatement) == SQLITE_DONE) {
                 sqlite3_finalize(deleteStatement);
                 sqlite3_close(database);
