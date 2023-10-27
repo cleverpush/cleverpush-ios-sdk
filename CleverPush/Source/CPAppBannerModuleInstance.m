@@ -314,13 +314,10 @@ NSInteger currentScreenIndex = 0;
             [sqlManager insert:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
-        NSArray<CPAppBannerEventFilters *> *FilterRecrods = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
+        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
 
-        for (CPAppBannerEventFilters *matchingEvent in FilterRecrods) {
-            allowed = [self checkEventFilter:matchingEvent.value compareWith:matchingEvent.count compareWithFrom:matchingEvent.fromValue compareWithTo:matchingEvent.toValue relation:matchingEvent.relation isAllowed:YES property:matchingEvent.property createdAt:matchingEvent.createdAt];
-            if (allowed) {
-                break;
-            }
+        for (CPAppBannerEventFilters *event in eventRecords) {
+            allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
         }
     }
     return allowed;
@@ -336,16 +333,18 @@ NSInteger currentScreenIndex = 0;
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSDate *createdDate = [dateFormatter dateFromString:createdAt];
 
-    NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSCalendarUnit units = NSCalendarUnitDay;
-    NSDateComponents *components = [calendar components:units
-                                               fromDate:currentDate
-                                                 toDate:createdDate
-                                                options:0];
-    NSInteger daysDifference = [components day];
+    if (createdDate != nil) {
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSCalendarUnit units = NSCalendarUnitDay;
+        NSDateComponents *components = [calendar components:units
+                                                   fromDate:currentDate
+                                                     toDate:createdDate
+                                                    options:0];
+        NSInteger daysDifference = [components day];
 
-    if (allowed && daysDifference > [property intValue]) {
-        allowed = NO;
+        if (allowed && daysDifference > [property intValue]) {
+            allowed = NO;
+        }
     }
 
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {

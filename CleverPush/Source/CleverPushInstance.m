@@ -133,7 +133,7 @@ CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
-CleverPushSQLiteManager* cleverPushSqlManager;
+CleverPushSQLiteManager* databaseManager;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -385,13 +385,13 @@ static id isNil(id object) {
         [self autoSubscribeWithDelays];
     }
 
-    cleverPushSqlManager = [CleverPushSQLiteManager sharedManager];
-    if (![cleverPushSqlManager cleverPushDatabaseExists]) {
-        if ([cleverPushSqlManager createCleverPushDatabase] && [cleverPushSqlManager createCleverPushDatabaseTable]) {
+    databaseManager = [CleverPushSQLiteManager sharedManager];
+    if (![databaseManager cleverPushDatabaseExists]) {
+        if ([databaseManager createCleverPushDatabase] && [databaseManager createCleverPushDatabaseTable]) {
             [self setCleverPushDatabaseInfo];
         }
     } else {
-        if ([cleverPushSqlManager createCleverPushDatabaseTable]) {
+        if ([databaseManager createCleverPushDatabaseTable]) {
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             BOOL databaseCreated = [defaults objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil;
 
@@ -402,9 +402,11 @@ static id isNil(id object) {
                 [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
                 [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                 NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
-
-                if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
-                    [cleverPushSqlManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
+                
+                if (retentionDay != nil) {
+                    if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
+                       [databaseManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
+                    }
                 }
             }
         }
