@@ -2616,6 +2616,7 @@ static id isNil(id object) {
                 } onFailure:nil];
             }];
 
+            [CPAppBannerModule setCurrentEventId:eventId];
             [CPAppBannerModule triggerEvent:eventId properties:properties];
         }];
     });

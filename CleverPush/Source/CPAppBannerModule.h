@@ -40,5 +40,6 @@
 + (void)enableBanners;
 + (void)setTrackingEnabled:(BOOL)enabled;
 + (void)resetInitialization;
++ (void)setCurrentEventId:(NSString*)eventId;
 
 @end

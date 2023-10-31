@@ -56,6 +56,7 @@
 - (void)disableBanners;
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
+- (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
 - (void)setBanners:(NSMutableArray*)appBanner;

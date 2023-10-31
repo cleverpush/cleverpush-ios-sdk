@@ -36,6 +36,8 @@ long sessions = 0;
 
 NSInteger currentScreenIndex = 0;
 
+NSString *currentEventId = @"";
+
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -553,25 +555,51 @@ NSInteger currentScreenIndex = 0;
         return;
     }
 
-    for (CPAppBanner* banner in [self getActiveBanners]) {
-        if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
-            if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:NO];
-                });
+    if (currentEventId != nil && ![currentEventId isKindOfClass:[NSNull class]] && ![currentEventId isEqualToString:@""] ) {
+            for (CPAppBanner *banner in [self getActiveBanners]) {
+                for (CPAppBannerTrigger *trigger in banner.triggers) {
+                    for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
+                        if ([condition.event isEqualToString:currentEventId]) {
+                            if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
+                                [self scheduleBannerDisplay:banner withDelaySeconds:banner.delaySeconds];
+                            } else {
+                                double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
+                                double totalDelay = startAtDelay + banner.delaySeconds;
+                                [self scheduleBannerDisplay:banner withDelaySeconds:totalDelay];
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+    } else {
+        for (CPAppBanner* banner in [self getActiveBanners]) {
+            if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
+                if (banner.delaySeconds > 0) {
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                        [self showBanner:banner force:NO];
+                    });
+                } else {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                        [self showBanner:banner force:NO];
+                    });
+                }
             } else {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
+                double totalDelay = startAtDelay + banner.delaySeconds;
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                     [self showBanner:banner force:NO];
                 });
             }
-        } else {
-            double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
-            double totalDelay = startAtDelay + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self showBanner:banner force:NO];
-            });
         }
     }
+}
+
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay {
+    dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self showBanner:banner force:NO];
+    });
 }
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
@@ -720,8 +748,10 @@ NSInteger currentScreenIndex = 0;
         }
 
         // remove banner so it will not show again this session
-        [banners removeObject:banner];
-        [activeBanners removeObject:banner];
+        if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
+            [banners removeObject:banner];
+            [activeBanners removeObject:banner];
+        }
 
         [self presentAppBanner:appBannerViewController banner:banner];
     });
@@ -874,6 +904,10 @@ NSInteger currentScreenIndex = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+- (void)setCurrentEventId:(NSString*)eventId {
+    currentEventId = eventId;
 }
 
 #pragma mark - Group array of objects by dates and alphabets.

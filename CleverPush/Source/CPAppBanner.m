@@ -132,6 +132,8 @@
             self.frequency = CPAppBannerFrequencyOnce;
         } else if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"once_per_session"]) {
             self.frequency = CPAppBannerFrequencyOncePerSession;
+        } else if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"every_trigger"]) {
+            self.frequency = CPAppBannerFrequencyEveryTrigger;
         }
 
         self.triggers = [NSMutableArray new];
