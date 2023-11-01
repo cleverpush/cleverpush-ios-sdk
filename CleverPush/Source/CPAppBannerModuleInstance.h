@@ -47,6 +47,7 @@
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner;
 - (void)createBanners:(NSMutableArray*)banners;
 - (void)scheduleBanners;
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay;
 - (void)showBanner:(CPAppBanner*)banner;
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner;
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner;

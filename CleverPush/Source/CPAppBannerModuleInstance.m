@@ -12,6 +12,7 @@
 
 #pragma mark - Class Variables
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
+NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -35,8 +36,6 @@ long lastSessionTimestamp;
 long sessions = 0;
 
 NSInteger currentScreenIndex = 0;
-
-NSString *currentEventId = @"";
 
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
