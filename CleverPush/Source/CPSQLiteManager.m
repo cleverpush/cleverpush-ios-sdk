@@ -1,14 +1,14 @@
-#import "CleverPushSQLiteManager.h"
+#import "CPSQLiteManager.h"
 #import "CleverPush.h"
 #import "CPLog.h"
 
-@implementation CleverPushSQLiteManager
+@implementation CPSQLiteManager
 
-static CleverPushSQLiteManager *sharedInstance = nil;
-NSString *cleverPushDatabaseTable = @"TableBannerTrackEvent";
+static CPSQLiteManager *sharedInstance = nil;
+NSString *databaseTable = @"TableBannerTrackEvent";
 sqlite3 *database;
 
-+ (CleverPushSQLiteManager *)sharedManager {
++ (CPSQLiteManager *)sharedManager {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
@@ -16,8 +16,8 @@ sqlite3 *database;
     return sharedInstance;
 }
 
-#pragma mark - get the cleverpush database path
-- (NSString *)cleverPushDatabasePath {
+#pragma mark - get the database path
+- (NSString *)databasePath {
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDir = [documentPaths objectAtIndex:0];
     NSString *databasePath = [documentsDir stringByAppendingPathComponent:@"CleverPushDatabase.sqlite"];
@@ -25,25 +25,25 @@ sqlite3 *database;
 }
 
 #pragma mark - to check if the database exists or not
-- (BOOL)cleverPushDatabaseExists {
+- (BOOL)databaseExists {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager fileExistsAtPath:[self cleverPushDatabasePath]];
+    return [fileManager fileExistsAtPath:[self databasePath]];
 }
 
 #pragma mark - to create the database
-- (BOOL)createCleverPushDatabase {
-    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+- (BOOL)createDatabase {
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         sqlite3_close(database);
         return YES;
     } else {
-        [CPLog debug:@"CleverPushSQLiteManager: createCleverPushDatabase: Error opening or creating the database."];
+        [CPLog debug:@"CPSQLiteManager: createDatabase: Error opening or creating the database."];
         return NO;
     }
 }
 
 #pragma mark - to check if the database table exists or not
-- (BOOL)cleverPushDatabasetableExists:(NSString *)tableName {
-    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+- (BOOL)databaseTableExists:(NSString *)tableName {
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT name FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
         sqlite3_stmt *statement;
 
@@ -61,14 +61,14 @@ sqlite3 *database;
 }
 
 #pragma mark - to create the database table if needed
-- (BOOL)createCleverPushDatabaseTable {
-    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
-        if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, trackEventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdAt TEXT, updatedAt TEXT, fromValue TEXT, toValue TEXT);", cleverPushDatabaseTable];
+- (BOOL)createTable {
+    if (![self databaseTableExists:databaseTable]) {
+        if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
+            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, trackEventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdAt TEXT, updatedAt TEXT, fromValue TEXT, toValue TEXT);", databaseTable];
             char *errMsg;
 
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
-                [CPLog debug:@"CleverPushSQLiteManager: cleverPushDatabaseCreateTableIfNeeded: Error creating table: %s", errMsg];
+                [CPLog debug:@"CPSQLiteManager: createTable: Error creating table: %s", errMsg];
                 sqlite3_free(errMsg);
                 sqlite3_close(database);
                 return NO;
@@ -84,8 +84,8 @@ sqlite3 *database;
 #pragma mark - to insert the record in the database
 - (BOOL)insert:(NSString *)bannerID trackEventID:(NSString *)trackEventID property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdAt:(NSString *)createdAt updatedAt:(NSString *)updatedAt fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
 
-    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
-        if (![self createCleverPushDatabaseTable]) {
+    if (![self databaseTableExists:databaseTable]) {
+        if (![self createTable]) {
             return NO;
         }
     }
@@ -103,11 +103,11 @@ sqlite3 *database;
     if (!fromValue) fromValue = @"";
     if (!toValue) toValue = @"";
 
-    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
 
         NSString *selectSQL = [NSString stringWithFormat:
                                @"SELECT count FROM %@ WHERE bannerId = ? AND trackEventId = ? AND property = ? AND value = ? AND relation = ?;",
-                               cleverPushDatabaseTable];
+                               databaseTable];
         sqlite3_stmt *selectStatement;
 
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
@@ -124,7 +124,7 @@ sqlite3 *database;
 
                 NSString *updateSQL = [NSString stringWithFormat:
                                        @"UPDATE %@ SET count = ?, updatedAt = ? "
-                                       "WHERE bannerId = ? AND trackEventId = ? AND property = ? AND value = ? AND relation = ?;", cleverPushDatabaseTable];
+                                       "WHERE bannerId = ? AND trackEventId = ? AND property = ? AND value = ? AND relation = ?;", databaseTable];
                 sqlite3_stmt *updateStatement;
 
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
@@ -147,7 +147,7 @@ sqlite3 *database;
 
         NSString *insertSQL = [NSString stringWithFormat:
                                @"INSERT INTO %@ (bannerId, trackEventId, property, value, relation, count, createdAt, updatedAt, fromValue, toValue) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", cleverPushDatabaseTable];
+                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", databaseTable];
         sqlite3_stmt *insertStatement;
 
         if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
@@ -174,16 +174,16 @@ sqlite3 *database;
 }
 
 #pragma mark - to get all the recrods from database
-- (NSArray<CPAppBannerEventFilters *> *)getcleverPushDatabaseAllRecords {
+- (NSArray<CPAppBannerEventFilters *> *)getAllRecords {
     NSMutableArray<CPAppBannerEventFilters *> *recordArray = [NSMutableArray array];
 
-    if (![self cleverPushDatabasetableExists:cleverPushDatabaseTable]) {
-        [CPLog debug:@"CleverPushSQLiteManager: getcleverPushDatabaseAllRecords: Table '%@' does not exist.", cleverPushDatabaseTable];
+    if (![self databaseTableExists:databaseTable]) {
+        [CPLog debug:@"CPSQLiteManager: getAllRecords: Table '%@' does not exist.", databaseTable];
         return recordArray;
     }
 
-    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
-        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", cleverPushDatabaseTable];
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", databaseTable];
         sqlite3_stmt *statement;
 
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
@@ -212,7 +212,7 @@ sqlite3 *database;
 
 #pragma mark - to delete the records from certain past days
 - (BOOL)deleteDataBasedOnRetentionDays:(NSInteger)days {
-    if (sqlite3_open([[self cleverPushDatabasePath] UTF8String], &database) == SQLITE_OK) {
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
 
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
@@ -220,7 +220,7 @@ sqlite3 *database;
         [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:
-                               @"DELETE FROM %@ WHERE createdAt <= ?;", cleverPushDatabaseTable];
+                               @"DELETE FROM %@ WHERE createdAt <= ?;", databaseTable];
         sqlite3_stmt *deleteStatement;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
@@ -230,14 +230,14 @@ sqlite3 *database;
                 sqlite3_close(database);
                 return YES;
             } else {
-                [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to execute the delete statement: %s", sqlite3_errmsg(database)];
+                [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to execute the delete statement: %s", sqlite3_errmsg(database)];
             }
         } else {
-            [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to prepare the delete statement: %s", sqlite3_errmsg(database)];
+            [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to prepare the delete statement: %s", sqlite3_errmsg(database)];
         }
         sqlite3_close(database);
     } else {
-        [CPLog debug:@"CleverPushSQLiteManager: deleteDataBasedOnRetentionDays: Failed to open the database: %s", sqlite3_errmsg(database)];
+        [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to open the database: %s", sqlite3_errmsg(database)];
     }
     return NO;
 }

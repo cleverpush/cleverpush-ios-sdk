@@ -27,7 +27,7 @@
 #import "NSDictionary+SafeExpectations.h"
 #import "NSMutableArray+ContainsString.h"
 #import "NSString+VersionComparator.h"
-#import "CleverPushSQLiteManager.h"
+#import "CPSQLiteManager.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -133,7 +133,7 @@ CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
-CleverPushSQLiteManager* databaseManager;
+CPSQLiteManager* databaseManager;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -385,18 +385,18 @@ static id isNil(id object) {
         [self autoSubscribeWithDelays];
     }
 
-    databaseManager = [CleverPushSQLiteManager sharedManager];
-    if (![databaseManager cleverPushDatabaseExists]) {
-        if ([databaseManager createCleverPushDatabase] && [databaseManager createCleverPushDatabaseTable]) {
-            [self setCleverPushDatabaseInfo];
+    databaseManager = [CPSQLiteManager sharedManager];
+    if (![databaseManager databaseExists]) {
+        if ([databaseManager createDatabase] && [databaseManager createTable]) {
+            [self setDatabaseInfo];
         }
     } else {
-        if ([databaseManager createCleverPushDatabaseTable]) {
+        if ([databaseManager createTable]) {
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             BOOL databaseCreated = [defaults objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil;
 
             if (!databaseCreated) {
-                [self setCleverPushDatabaseInfo];
+                [self setDatabaseInfo];
             } else {
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                 [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
@@ -3561,7 +3561,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Cleverpush database information
-- (void)setCleverPushDatabaseInfo {
+- (void)setDatabaseInfo {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];

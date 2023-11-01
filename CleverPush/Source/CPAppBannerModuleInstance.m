@@ -3,7 +3,7 @@
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "NSString+VersionComparator.h"
-#import "CleverPushSQLiteManager.h"
+#import "CPSQLiteManager.h"
 
 @interface CPAppBannerModuleInstance()
 
@@ -22,7 +22,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
-CleverPushSQLiteManager *sqlManager;
+CPSQLiteManager *sqlManager;
 
 BOOL initialized = NO;
 BOOL showDrafts = NO;
@@ -304,7 +304,7 @@ NSInteger currentScreenIndex = 0;
     __block BOOL allowed = YES;
 
     if (banner.eventFilters.count > 0 ) {
-        sqlManager = [CleverPushSQLiteManager sharedManager];
+        sqlManager = [CPSQLiteManager sharedManager];
         NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
@@ -314,7 +314,7 @@ NSInteger currentScreenIndex = 0;
             [sqlManager insert:banner.id trackEventID:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
-        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getcleverPushDatabaseAllRecords]];
+        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getAllRecords]];
 
         for (CPAppBannerEventFilters *event in eventRecords) {
             allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
