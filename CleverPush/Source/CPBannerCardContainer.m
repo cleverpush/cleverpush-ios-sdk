@@ -178,8 +178,7 @@
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
             if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-                block.action.url = [NSURL URLWithString:[[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:[NSString stringWithFormat:@"%@", block.action.url]] stringByAddingPercentEscapesUsingEncoding:
-                                                        NSUTF8StringEncoding]];
+                block.action.url = [CPUtils replaceAndEncodeURL:block.action.url withReplacement:self.voucherCode];;
             }
             [self actionCallback:block.action from:YES];
         }];

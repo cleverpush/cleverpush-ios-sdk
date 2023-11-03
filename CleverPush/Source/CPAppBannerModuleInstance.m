@@ -674,9 +674,8 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
-                if (voucherCode != nil && ![voucherCode isKindOfClass:[NSNull class]] && ![voucherCode isEqualToString:@""]) {
-                    action.url = [NSURL URLWithString:[[CPUtils replaceString:@"{voucherCode}" withReplacement:voucherCode inString:[NSString stringWithFormat:@"%@",action.url]] stringByAddingPercentEscapesUsingEncoding:
-                                                            NSUTF8StringEncoding]];
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];;
                 }
                 [[UIApplication sharedApplication] openURL:action.url];
             }
@@ -720,7 +719,7 @@ NSInteger currentScreenIndex = 0;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
-                if (voucherCode != nil && ![voucherCode isKindOfClass:[NSNull class]] && ![voucherCode isEqualToString:@""]) {
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
                     pasteboard.string = voucherCode;
                 }
             }
