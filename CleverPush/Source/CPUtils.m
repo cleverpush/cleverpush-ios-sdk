@@ -741,4 +741,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return NO;
 }
 
+#pragma mark - String validation of a key exists or not
++ (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary {
+    if (!dictionary || dictionary.count == 0) {
+        return nil;
+    }
+    NSString *voucherCode = dictionary[key];
+    return voucherCode;
+}
+
 @end

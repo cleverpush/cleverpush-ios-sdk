@@ -285,6 +285,7 @@ CPNotificationClickBlock handleClick;
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
             NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
             NSString *type;
+            NSString *voucherCode;
 
             for (CPAppBannerCarouselBlock *screensList in banner.screens) {
                 if (!screensList.isScreenClicked) {
@@ -371,8 +372,9 @@ CPNotificationClickBlock handleClick;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
-                if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id] != nil)) {
-                    pasteboard.string = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id];
+                voucherCode = [CPUtils valueForKey:banner.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    pasteboard.string = voucherCode;
                 }
             }
         };

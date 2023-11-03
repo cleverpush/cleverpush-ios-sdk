@@ -669,9 +669,7 @@ NSInteger currentScreenIndex = 0;
                 handleBannerOpened(action);
             }
 
-            if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id] != nil)) {
-                voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:banner.id];
-            }
+            voucherCode = [CPUtils valueForKey:banner.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
