@@ -412,6 +412,10 @@ static id isNil(id object) {
 
     [self initFeatures];
 
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+        [self initIabTcf];
+    }
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
@@ -496,6 +500,60 @@ static id isNil(id object) {
         [CPAppBannerModule initSession:channelId afterInit:NO];
     });
 }
+
+#pragma mark - Initialised Iab Tcf Functionality.
+- (void)initIabTcf {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if ([userDefaults objectForKey:@"IABTCF_VendorConsents"] != nil) {
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(handleTCFChange:) name:NSUserDefaultsDidChangeNotification object:nil];
+    }
+}
+
+- (void)handleTCFChange:(NSNotification *)notification {
+
+    if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
+        [self setTrackingConsentRequired:YES];
+    }
+
+    if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
+        // [self setSubscribeConsentRequired:YES];
+    }
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *notificationObject = [userDefaults dictionaryRepresentation];
+
+    if (notificationObject != nil && notificationObject.count > 0) {
+        NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
+        NSUInteger indexToCheck = 1139;
+
+        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""]) {
+            if (vendorConsents.length > indexToCheck) {
+                unichar consentStatus = [vendorConsents characterAtIndex:indexToCheck];
+                BOOL hasConsent = (consentStatus == '1');
+
+                if (hasConsent) {
+                    if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
+                        [self setTrackingConsent:YES];
+                    }
+
+                    if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
+                       // [self setSubscribeConsentRequired:YES];
+                    }
+                } else {
+                    [CPLog debug:@"The vendor does not have consent."];
+                }
+            } else {
+                [CPLog debug:@"The vendor consents that the string is too short to get a character at the provided index."];
+            }
+        }
+    }
+}
+
+- (void)dealloc {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+}
+
 
 #pragma mark - Initialised AppReviews.
 - (void)initAppReview {

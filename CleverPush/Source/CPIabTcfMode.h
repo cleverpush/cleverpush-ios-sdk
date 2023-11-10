@@ -1,5 +1,5 @@
 typedef NS_ENUM(NSInteger, CPIabTcfMode) {
-    CpIabTcfModeDisabled,
+    CPIabTcfModeDisabled,
     CPIabTcfModeSubscribeWaitForConsent,
     CPIabTcfModeTrackingWaitForConsent
 };

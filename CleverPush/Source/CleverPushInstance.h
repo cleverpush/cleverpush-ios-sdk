@@ -242,6 +242,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (CPHandleSubscribedBlock)getSubscribeHandler;
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback;
 - (void)initFeatures;
+- (void)initIabTcf;
 - (void)initAppReview;
 - (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter;
 - (NSInteger)secondsAfterLastCheck;
