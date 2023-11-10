@@ -21,6 +21,7 @@
 #import "CleverPushInstance.h"
 #import "CPInboxView.h"
 #import "CleverPushUserDefaults.h"
+#import "CPIabTcfMode.h"
 
 @interface CleverPush : NSObject
 
@@ -128,6 +129,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
++ (void)setIabTcfMode:(CPIabTcfMode)mode;
 + (void)setAuthorizerToken:(NSString*)authorizerToken;
 + (void)setCustomTopViewController:(UIViewController*)viewController;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
@@ -155,6 +157,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
 + (UIViewController*)getCustomTopViewController;
++ (CPIabTcfMode)getIabTcfMode;
 
 + (UIColor*)getBrandingColor;
 

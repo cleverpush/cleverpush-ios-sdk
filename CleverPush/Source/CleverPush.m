@@ -464,6 +464,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setApiEndpoint:apiEndpoint];
 }
 
++ (void)setIabTcfMode:(CPIabTcfMode)mode {
+    [self.CPSharedInstance setIabTcfMode:mode];
+}
+
 + (void)setAuthorizerToken:(NSString *)authorizerToken {
     [self.CPSharedInstance setAuthorizerToken:authorizerToken];
 }
@@ -550,6 +554,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getApiEndpoint {
     return [self.CPSharedInstance getApiEndpoint];
+}
+
++ (CPIabTcfMode)getIabTcfMode {
+    return [self.CPSharedInstance getIabTcfMode];
 }
 
 + (UIViewController*)getCustomTopViewController {

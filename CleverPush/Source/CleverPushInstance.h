@@ -17,6 +17,7 @@
 #import "CPSubscription.h"
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
+#import "CPIabTcfMode.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
@@ -166,6 +167,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
+- (void)setIabTcfMode:(CPIabTcfMode)mode;
 - (void)setAuthorizerToken:(NSString*)authorizerToken;
 - (void)setCustomTopViewController:(UIViewController*)viewController;
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
@@ -190,6 +192,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSString*)getApiEndpoint;
 - (NSString*)channelId;
 - (UIViewController*)getCustomTopViewController;
+- (CPIabTcfMode)getIabTcfMode;
 
 - (UIColor*)getBrandingColor;
 

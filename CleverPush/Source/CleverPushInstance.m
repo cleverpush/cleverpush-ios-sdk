@@ -27,6 +27,7 @@
 #import "NSDictionary+SafeExpectations.h"
 #import "NSMutableArray+ContainsString.h"
 #import "NSString+VersionComparator.h"
+#import "CPIabTcfMode.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -131,6 +132,7 @@ CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
+CPIabTcfMode currentIabTcfMode;
 
 BOOL pendingChannelConfigRequest = NO;
 BOOL pendingAppBannersRequest = NO;
@@ -3194,6 +3196,10 @@ static id isNil(id object) {
     apiEndpoint = endpoint;
 }
 
+- (void)setIabTcfMode:(CPIabTcfMode)mode {
+    currentIabTcfMode = mode;
+}
+
 - (void)setAuthorizerToken:(NSString *)authorizerToken {
     authorizationToken = authorizerToken;
 }
@@ -3204,6 +3210,10 @@ static id isNil(id object) {
 
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
+}
+
+- (CPIabTcfMode)getIabTcfMode {
+    return currentIabTcfMode;
 }
 
 - (UIViewController*)getCustomTopViewController {
