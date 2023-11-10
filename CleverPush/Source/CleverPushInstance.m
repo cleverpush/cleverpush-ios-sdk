@@ -530,34 +530,39 @@ static id isNil(id object) {
 }
 
 - (void)enableIabTcfMode:(NSNotification *)notification {
-    if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
+    CPIabTcfMode tcfMode = [self getIabTcfMode];
+
+    if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
         [self setTrackingConsentRequired:YES];
     }
-    if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-         [self setSubscribeConsentRequired:YES];
+
+    if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
+        [self setSubscribeConsentRequired:YES];
     }
 
     NSDictionary *notificationObject = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
-    if (notificationObject != nil && notificationObject.count > 0) {
+
+    if (notificationObject.count > 0) {
         NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
-        NSUInteger indexToCheck = 1139;
-        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""]) {
-            if (vendorConsents.length > indexToCheck) {
-                unichar consentStatus = [vendorConsents characterAtIndex:indexToCheck];
-                BOOL hasConsent = (consentStatus == '1');
-                if (hasConsent) {
-                    if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
-                        [self setTrackingConsent:YES];
-                    }
-                    if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-                        [self setSubscribeConsent:YES];
-                    }
-                } else {
-                    [CPLog debug:@"The vendor does not have consent."];
+        NSUInteger targetConsentIndex = 1139;
+        
+        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""] && vendorConsents.length > targetConsentIndex) {
+            unichar consentStatus = [vendorConsents characterAtIndex:targetConsentIndex];
+            BOOL hasConsent = (consentStatus == '1');
+
+            if (hasConsent) {
+                if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
+                    [self setTrackingConsent:YES];
+                }
+
+                if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
+                    [self setSubscribeConsent:YES];
                 }
             } else {
-                [CPLog debug:@"The vendor consents that the string is too short to get a character at the provided index."];
+                [CPLog debug:@"The vendor does not have consent."];
             }
+        } else {
+            [CPLog debug:@"The vendor consents that the string is too short to get a character at the provided index, or the vendor consents that the value is not found."];
         }
     }
 }
