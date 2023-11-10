@@ -525,12 +525,11 @@ static id isNil(id object) {
 - (void)initIabTcf {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     if ([userDefaults objectForKey:@"IABTCF_VendorConsents"] != nil) {
-        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(handleTCFChange:) name:NSUserDefaultsDidChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enableIabTcfMode:) name:NSUserDefaultsDidChangeNotification object:nil];
     }
 }
 
-- (void)handleTCFChange:(NSNotification *)notification {
+- (void)enableIabTcfMode:(NSNotification *)notification {
     if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
         [self setTrackingConsentRequired:YES];
     }
