@@ -2026,7 +2026,6 @@ static id isNil(id object) {
             }
             return;
         }
-
         [self addSubscriptionTagToApi:tagId callback:^(NSString *tagId) {
             if (callback) {
                 callback(tagId);
@@ -2113,12 +2112,12 @@ static id isNil(id object) {
             }
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
-                NSDictionary* dataDic = @{
-                    @"channelId": channelId,
-                    @"attributeId": attributeId,
-                    @"value": value,
-                    @"subscriptionId": subscriptionId ?: @"",
-                };
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                         channelId, @"channelId",
+                                                         attributeId, @"attributeId",
+                                                         value, @"value",
+                                                         subscriptionId, @"subscriptionId",
+                                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2166,7 +2165,7 @@ static id isNil(id object) {
             } else {
                 arrayValue = [arrayValue mutableCopy];
             }
-            if (![arrayValue containsObject:value]) {
+            if (![arrayValue containsString:value]) {
                 [arrayValue addObject:value];
             }
 
@@ -2176,12 +2175,12 @@ static id isNil(id object) {
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
-                NSDictionary* dataDic = @{
-                    @"channelId": channelId,
-                    @"attributeId": attributeId,
-                    @"value": value,
-                    @"subscriptionId": subscriptionId ?: @"",
-                };
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                         channelId, @"channelId",
+                                                         attributeId, @"attributeId",
+                                                         value, @"value",
+                                                         subscriptionId, @"subscriptionId",
+                                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2228,12 +2227,12 @@ static id isNil(id object) {
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
-                NSDictionary* dataDic = @{
-                    @"channelId": channelId,
-                    @"attributeId": attributeId,
-                    @"value": value,
-                    @"subscriptionId": subscriptionId ?: @"",
-                };
+                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                         channelId, @"channelId",
+                                                         attributeId, @"attributeId",
+                                                         value, @"value",
+                                                         subscriptionId, @"subscriptionId",
+                                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2781,12 +2780,12 @@ static id isNil(id object) {
                 [CPLog debug:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
             }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
-            NSDictionary* dataDic = @{
-                @"channelId": channelId,
-                @"name": eventName,
-                @"parameters": isNil(parameters),
-                @"subscriptionId": subscriptionId ?: @"",
-            };
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                     channelId, @"channelId",
+                                                     eventName, @"name",
+                                                     isNil(parameters), @"parameters",
+                                                     subscriptionId, @"subscriptionId",
+                                                     nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
@@ -3027,12 +3026,12 @@ static id isNil(id object) {
                     NSString* lastNotificationId = [groupUserDefaults stringForKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
-                    NSDictionary* dataDic = @{
-                        @"channelId": channelId,
-                        @"subscriptionId": subscriptionId ?: @"",
-                        @"apnsToken": deviceToken ?: @"",
-                        @"lastNotificationId": isNil(lastNotificationId),
-                    };
+                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                                channelId, @"channelId",
+                                                                subscriptionId, @"subscriptionId",
+                                                                deviceToken, @"apnsToken",
+                                                                isNil(lastNotificationId), @"lastNotificationId",
+                                                                nil];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
