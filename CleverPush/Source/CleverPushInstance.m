@@ -534,27 +534,22 @@ static id isNil(id object) {
     if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
         [self setTrackingConsentRequired:YES];
     }
-
     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
          [self setSubscribeConsentRequired:YES];
     }
 
     NSDictionary *notificationObject = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
-
     if (notificationObject != nil && notificationObject.count > 0) {
         NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
         NSUInteger indexToCheck = 1139;
-
         if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""]) {
             if (vendorConsents.length > indexToCheck) {
                 unichar consentStatus = [vendorConsents characterAtIndex:indexToCheck];
                 BOOL hasConsent = (consentStatus == '1');
-
                 if (hasConsent) {
                     if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
                         [self setTrackingConsent:YES];
                     }
-
                     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
                         [self setSubscribeConsent:YES];
                     }
