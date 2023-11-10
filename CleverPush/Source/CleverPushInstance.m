@@ -110,6 +110,7 @@ NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
 NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
+NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
 
 NSMutableDictionary* autoAssignSessionsCounted;
@@ -140,8 +141,11 @@ BOOL channelTopicsPickerVisible = NO;
 BOOL developmentMode = NO;
 BOOL trackingConsentRequired = NO;
 BOOL hasTrackingConsent = NO;
+BOOL subscribeConsentRequired = NO;
+BOOL hasSubscribeConsent = NO;
 BOOL hasWebViewOpened = NO;
 BOOL hasTrackingConsentCalled = NO;
+BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
 
 int sessionVisits;
@@ -173,6 +177,21 @@ static id isNil(id object) {
         [self fireTrackingConsentListeners];
     } else {
         pendingTrackingConsentListeners = [NSMutableArray new];
+    }
+}
+
+- (void)setSubscribeConsentRequired:(BOOL)required {
+    subscribeConsentRequired = required;
+}
+
+- (void)setSubscribeConsent:(BOOL)consent {
+    hasSubscribeConsentCalled = YES;
+    hasSubscribeConsent = consent;
+
+    if (hasSubscribeConsent) {
+        [self fireSubscribeConsentListeners];
+    } else {
+        pendingSubscribeConsentListeners = [NSMutableArray new];
     }
 }
 
@@ -273,6 +292,7 @@ static id isNil(id object) {
     pendingSubscriptionListeners = [[NSMutableArray alloc] init];
     pendingDeviceTokenListeners = [[NSMutableArray alloc] init];
     pendingTrackingConsentListeners = [[NSMutableArray alloc] init];
+    pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
 
@@ -517,7 +537,7 @@ static id isNil(id object) {
     }
 
     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-        // [self setSubscribeConsentRequired:YES];
+         [self setSubscribeConsentRequired:YES];
     }
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSDictionary *notificationObject = [userDefaults dictionaryRepresentation];
@@ -537,7 +557,7 @@ static id isNil(id object) {
                     }
 
                     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-                       // [self setSubscribeConsentRequired:YES];
+                        [self setSubscribeConsentRequired:YES];
                     }
                 } else {
                     [CPLog debug:@"The vendor does not have consent."];
@@ -848,6 +868,47 @@ static id isNil(id object) {
 
 - (BOOL)getHasTrackingConsentCalled {
     return hasTrackingConsentCalled;
+}
+
+#pragma mark - Based on the subscribeConsentRequired and hasSubscribeConsent Triggered this method
+- (void)fireSubscribeConsentListeners {
+    for (void (^listener)(void *) in pendingSubscribeConsentListeners) {
+        // check if listener is non-nil (otherwise: EXC_BAD_ACCESS)
+        if (listener) {
+#pragma clang diagnostic ignored "-Wstrict-prototypes"
+            __strong void (^callbackBlock)() = listener;
+#pragma clang diagnostic pop
+            callbackBlock();
+        }
+    }
+    pendingSubscribeConsentListeners = [NSMutableArray new];
+}
+
+- (void)waitForSubscribeConsent:(void(^)(void))callback {
+    if (![self getSubscribeConsentRequired] || [self getHasSubscribeConsent]) {
+        callback();
+        return;
+    }
+
+    if (![self getHasSubscribeConsentCalled]) {
+        [self addCallbacksToSubscribeConsentListeners:callback];
+    }
+}
+
+- (void)addCallbacksToSubscribeConsentListeners:(void(^)(void))callback {
+    [pendingSubscribeConsentListeners addObject:callback];
+}
+
+- (BOOL)getSubscribeConsentRequired {
+    return subscribeConsentRequired;
+}
+
+- (BOOL)getHasSubscribeConsent {
+    return hasSubscribeConsent;
+}
+
+- (BOOL)getHasSubscribeConsentCalled {
+    return hasSubscribeConsentCalled;
 }
 
 #pragma mark - Returns if the user has currently given the notification permission

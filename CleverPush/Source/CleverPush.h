@@ -48,6 +48,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
++ (void)setSubscribeConsentRequired:(BOOL)required;
++ (void)setSubscribeConsent:(BOOL)consent;
 + (void)enableDevelopmentMode;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;

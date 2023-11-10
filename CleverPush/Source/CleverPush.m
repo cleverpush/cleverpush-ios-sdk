@@ -113,6 +113,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTrackingConsent:consent];
 }
 
++ (void)setSubscribeConsentRequired:(BOOL)required {
+    [self.CPSharedInstance setSubscribeConsentRequired:required];
+}
+
++ (void)setSubscribeConsent:(BOOL)consent {
+    [self.CPSharedInstance setSubscribeConsent:consent];
+}
+
 + (void)enableDevelopmentMode {
     [self.CPSharedInstance enableDevelopmentMode];
 }
