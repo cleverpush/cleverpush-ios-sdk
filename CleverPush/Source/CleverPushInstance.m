@@ -531,7 +531,6 @@ static id isNil(id object) {
 }
 
 - (void)handleTCFChange:(NSNotification *)notification {
-
     if ([self getIabTcfMode] == CPIabTcfModeTrackingWaitForConsent) {
         [self setTrackingConsentRequired:YES];
     }
@@ -570,8 +569,7 @@ static id isNil(id object) {
 }
 
 - (void)dealloc {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
 }
 
 
