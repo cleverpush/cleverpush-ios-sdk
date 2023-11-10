@@ -539,8 +539,8 @@ static id isNil(id object) {
     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
          [self setSubscribeConsentRequired:YES];
     }
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *notificationObject = [userDefaults dictionaryRepresentation];
+
+    NSDictionary *notificationObject = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 
     if (notificationObject != nil && notificationObject.count > 0) {
         NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
@@ -557,7 +557,7 @@ static id isNil(id object) {
                     }
 
                     if ([self getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-                        [self setSubscribeConsentRequired:YES];
+                        [self setSubscribeConsent:YES];
                     }
                 } else {
                     [CPLog debug:@"The vendor does not have consent."];
@@ -1955,13 +1955,19 @@ static id isNil(id object) {
 }
 
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
-    [self waitForTrackingConsent:^{
+    void (^consentBlock)(void) = ^{
         [self removeSubscriptionTagFromApi:tagId callback:^(NSString *tag) {
             if (callback) {
                 callback(tagId);
             }
         } onFailure:failureBlock];
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:consentBlock];
+    } else {
+        [self waitForSubscribeConsent:consentBlock];
+    }
 }
 
 - (void)removeSubscriptionTagFromApi:(NSString *)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
@@ -2014,7 +2020,7 @@ static id isNil(id object) {
 }
 
 - (void)addSubscriptionTag:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
-    [self waitForTrackingConsent:^{
+    void (^consentBlock)(void) = ^{
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         subscriptionTags = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY]];
 
@@ -2024,12 +2030,19 @@ static id isNil(id object) {
             }
             return;
         }
+
         [self addSubscriptionTagToApi:tagId callback:^(NSString *tagId) {
             if (callback) {
                 callback(tagId);
             }
         } onFailure:failureBlock];
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:consentBlock];
+    } else {
+        [self waitForSubscribeConsent:consentBlock];
+    }
 }
 
 - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
@@ -2097,19 +2110,19 @@ static id isNil(id object) {
 
 #pragma mark - Set subscription attribute tag by calling api. subscription/attribute
 - (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback {
-    [self waitForTrackingConsent:^{
+    void (^setSubscriptionAttributeBlock)(void) = ^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
             }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         attributeId, @"attributeId",
-                                         value, @"value",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
+                NSDictionary* dataDic = @{
+                    @"channelId": channelId,
+                    @"attributeId": attributeId,
+                    @"value": value,
+                    @"subscriptionId": subscriptionId ?: @"",
+                };
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2122,19 +2135,25 @@ static id isNil(id object) {
                     [subscriptionAttributes setObject:value forKey:attributeId];
                     [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                     [userDefaults synchronize];
-                    
+
                     if (callback) {
                         callback();
                     }
                 } onFailure:nil];
             });
         }];
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:setSubscriptionAttributeBlock];
+    } else {
+        [self waitForSubscribeConsent:setSubscriptionAttributeBlock];
+    }
 }
 
 #pragma mark - Push subscription array attribute value.
 - (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
-    [self waitForTrackingConsent:^{
+    void (^pushSubscriptionAttributeValueBlock)(void) = ^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pushSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
@@ -2151,7 +2170,7 @@ static id isNil(id object) {
             } else {
                 arrayValue = [arrayValue mutableCopy];
             }
-            if (![arrayValue containsString:value]) {
+            if (![arrayValue containsObject:value]) {
                 [arrayValue addObject:value];
             }
 
@@ -2159,14 +2178,14 @@ static id isNil(id object) {
             [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
             [userDefaults synchronize];
 
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         attributeId, @"attributeId",
-                                         value, @"value",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
+                NSDictionary* dataDic = @{
+                    @"channelId": channelId,
+                    @"attributeId": attributeId,
+                    @"value": value,
+                    @"subscriptionId": subscriptionId ?: @"",
+                };
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2176,12 +2195,19 @@ static id isNil(id object) {
                 } onFailure:nil];
             });
         }];
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:pushSubscriptionAttributeValueBlock];
+    } else {
+        [self waitForSubscribeConsent:pushSubscriptionAttributeValueBlock];
+    }
+
 }
 
 #pragma mark - Pull subscription array attribute value.
 - (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
-    [self waitForTrackingConsent:^{
+    void (^pullSubscriptionAttributeValueBlock)(void) = ^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pullSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
@@ -2204,14 +2230,14 @@ static id isNil(id object) {
             [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
             [userDefaults synchronize];
 
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         attributeId, @"attributeId",
-                                         value, @"value",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
+                NSDictionary* dataDic = @{
+                    @"channelId": channelId,
+                    @"attributeId": attributeId,
+                    @"value": value,
+                    @"subscriptionId": subscriptionId ?: @"",
+                };
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2221,7 +2247,13 @@ static id isNil(id object) {
                 } onFailure:nil];
             });
         }];
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:pullSubscriptionAttributeValueBlock];
+    } else {
+        [self waitForSubscribeConsent:pullSubscriptionAttributeValueBlock];
+    }
 }
 
 #pragma mark - Check if subscription array attribute has a value.
@@ -2747,28 +2779,34 @@ static id isNil(id object) {
 }
 
 - (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-        [self waitForTrackingConsent:^{
-            [self getSubscriptionId:^(NSString* subscriptionId) {
-                if (subscriptionId == nil) {
-                    [CPLog debug:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
-                }
-                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         eventName, @"name",
-                                         isNil(parameters), @"parameters",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
+    void (^triggerFollowUpEventBlock)(void) = ^{
+        [self getSubscriptionId:^(NSString* subscriptionId) {
+            if (subscriptionId == nil) {
+                [CPLog debug:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
+            }
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
+            NSDictionary* dataDic = @{
+                @"channelId": channelId,
+                @"name": eventName,
+                @"parameters": isNil(parameters),
+                @"subscriptionId": subscriptionId ?: @"",
+            };
 
-                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                [request setHTTPBody:postData];
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
 
-                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
 
-                } onFailure:nil];
-            }];
+            } onFailure:nil];
         }];
+    };
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+            [self waitForTrackingConsent:triggerFollowUpEventBlock];
+        } else {
+            [self waitForSubscribeConsent:triggerFollowUpEventBlock];
+        }
     });
 }
 
@@ -2977,8 +3015,8 @@ static id isNil(id object) {
 
 #pragma mark - track Session Start by api call subscription/session/start
 - (void)trackSessionStart {
-    [self waitForTrackingConsent:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+    void (^trackSessionStartBlock)(void) = ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
@@ -2993,12 +3031,12 @@ static id isNil(id object) {
                     NSString* lastNotificationId = [groupUserDefaults stringForKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
-                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             channelId, @"channelId",
-                                             subscriptionId, @"subscriptionId",
-                                             deviceToken, @"apnsToken",
-                                             isNil(lastNotificationId), @"lastNotificationId",
-                                             nil];
+                    NSDictionary* dataDic = @{
+                        @"channelId": channelId,
+                        @"subscriptionId": subscriptionId ?: @"",
+                        @"apnsToken": deviceToken ?: @"",
+                        @"lastNotificationId": isNil(lastNotificationId),
+                    };
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
@@ -3011,7 +3049,13 @@ static id isNil(id object) {
                 }
             }];
         });
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:trackSessionStartBlock];
+    } else {
+        [self waitForSubscribeConsent:trackSessionStartBlock];
+    }
 }
 
 #pragma mark - track the count of session visit
@@ -3021,16 +3065,12 @@ static id isNil(id object) {
 
 #pragma mark - session time gets end by calling this end point subscription/session/end
 - (void)trackSessionEnd {
-    [self waitForTrackingConsent:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+    void (^trackSessionEndBlock)(void) = ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
-                    if (!deviceToken) {
-                        deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
-                    }
-
-                    if (sessionStartedTimestamp == 0) {
+                    if (!deviceToken || sessionStartedTimestamp == 0) {
                         return;
                     }
 
@@ -3038,13 +3078,13 @@ static id isNil(id object) {
                     long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/end"];
-                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             channelId, @"channelId",
-                                             subscriptionId, @"subscriptionId",
-                                             deviceToken, @"apnsToken",
-                                             sessionVisits, @"visits",
-                                             sessionDuration, @"duration",
-                                             nil];
+                    NSDictionary* dataDic = @{
+                        @"channelId": channelId,
+                        @"subscriptionId": subscriptionId ?: @"",
+                        @"apnsToken": deviceToken,
+                        @"visits": @(sessionVisits),
+                        @"duration": @(sessionDuration),
+                    };
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
@@ -3057,7 +3097,13 @@ static id isNil(id object) {
                 }
             }];
         });
-    }];
+    };
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForTrackingConsent:trackSessionEndBlock];
+    } else {
+        [self waitForSubscribeConsent:trackSessionEndBlock];
+    }
 }
 
 #pragma mark - Display pending topic dialog
