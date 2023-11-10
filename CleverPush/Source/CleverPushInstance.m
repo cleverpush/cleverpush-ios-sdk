@@ -571,7 +571,6 @@ static id isNil(id object) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSUserDefaultsDidChangeNotification object:nil];
 }
 
-
 #pragma mark - Initialised AppReviews.
 - (void)initAppReview {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
