@@ -2048,10 +2048,10 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                         channelId, @"channelId",
-                         tagId, @"tagId",
-                        subscriptionId, @"subscriptionId",
-                        nil];
+                                                 channelId, @"channelId",
+                                                 tagId, @"tagId",
+                                                 subscriptionId, @"subscriptionId",
+                                                 nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
@@ -3027,11 +3027,11 @@ static id isNil(id object) {
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                channelId, @"channelId",
-                                                                subscriptionId, @"subscriptionId",
-                                                                deviceToken, @"apnsToken",
-                                                                isNil(lastNotificationId), @"lastNotificationId",
-                                                                nil];
+                                                                 channelId, @"channelId",
+                                                                 subscriptionId, @"subscriptionId",
+                                                                 deviceToken, @"apnsToken",
+                                                                 isNil(lastNotificationId), @"lastNotificationId",
+                                                                 nil];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
@@ -3063,34 +3063,38 @@ static id isNil(id object) {
     void (^trackSessionEndBlock)(void) = ^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self getChannelConfig:^(NSDictionary* channelConfig) {
-                bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
-                if (trackAppStatistics || subscriptionId) {
-                    if (!deviceToken || sessionStartedTimestamp == 0) {
-                        return;
-                    }
+                            bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
+                            if (trackAppStatistics || subscriptionId) {
+                                if (!deviceToken) {
+                                    deviceToken = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
+                                }
 
-                    long sessionEndedTimestamp = [[NSDate date] timeIntervalSince1970];
-                    long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
+                                if (sessionStartedTimestamp == 0) {
+                                    return;
+                                }
 
-                    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/end"];
-                    NSDictionary* dataDic = @{
-                        @"channelId": channelId,
-                        @"subscriptionId": subscriptionId ?: @"",
-                        @"apnsToken": deviceToken,
-                        @"visits": @(sessionVisits),
-                        @"duration": @(sessionDuration),
-                    };
+                                long sessionEndedTimestamp = [[NSDate date] timeIntervalSince1970];
+                                long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
 
-                    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                    [request setHTTPBody:postData];
+                                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/end"];
+                                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                         channelId, @"channelId",
+                                                         subscriptionId, @"subscriptionId",
+                                                         deviceToken, @"apnsToken",
+                                                         sessionVisits, @"visits",
+                                                         sessionDuration, @"duration",
+                                                         nil];
 
-                    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                                [request setHTTPBody:postData];
 
-                    } onFailure:nil];
-                } else if (subscriptionId == nil) {
-                    [CPLog debug:@"CleverPushInstance: trackSessionEnd: There is no subscription for CleverPush SDK."];
-                }
-            }];
+                                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+
+                                } onFailure:nil];
+                            } else if (subscriptionId == nil) {
+                                [CPLog debug:@"CleverPushInstance: trackSessionEnd: There is no subscription for CleverPush SDK."];
+                            }
+                        }];];
         });
     };
 
