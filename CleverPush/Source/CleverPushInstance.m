@@ -2048,10 +2048,10 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     channelId, @"channelId",
-                                     tagId, @"tagId",
-                                     subscriptionId, @"subscriptionId",
-                                     nil];
+                         channelId, @"channelId",
+                         tagId, @"tagId",
+                        subscriptionId, @"subscriptionId",
+                        nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
