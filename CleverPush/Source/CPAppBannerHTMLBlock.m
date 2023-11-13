@@ -8,14 +8,14 @@
     if (self) {
         self.type = CPAppBannerBlockTypeHTML;
         
-        if ([json objectForKey:@"url"]) {
-            self.url = [json objectForKey:@"url"];
-        }
-        
         if ([json objectForKey:@"height"] && [[json objectForKey:@"height"] intValue]) {
             self.height = [[json objectForKey:@"height"] intValue];
         }
-        
+
+        if ([json objectForKey:@"content"]) {
+            self.content = [json objectForKey:@"content"];
+        }
+
         self.action = [[CPAppBannerAction alloc] initWithJson:[json objectForKey:@"action"]];
     }
     return self;

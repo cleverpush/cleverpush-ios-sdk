@@ -4,6 +4,7 @@
 @interface CPButtonBlockCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet CPUIBlockButton *btnCPBanner;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnCPBannerHeightConstraint;
 
 @end
 

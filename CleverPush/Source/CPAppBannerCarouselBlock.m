@@ -24,6 +24,7 @@
         self.blocks = [NSMutableArray new];
         self.content = [json objectForKey:@"content"];
         self.isScreenClicked = NO;
+        self.isScreenAlreadyShown = NO;
 
         if ([json objectForKey:@"blocks"] != nil) {
             for (NSDictionary *blockJson in [json objectForKey:@"blocks"]) {
@@ -41,6 +42,10 @@
                 }
                 [self.blocks addObject:block];
             }
+        }
+
+        if ([json objectForKey:@"background"] != nil) {
+            self.background = [[CPAppBannerBackground alloc] initWithJson:[json objectForKey:@"background"]];
         }
     }
     return self;

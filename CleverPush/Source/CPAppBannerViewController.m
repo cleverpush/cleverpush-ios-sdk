@@ -193,10 +193,17 @@
 
 #pragma mark - Set background color
 - (void)setBackgroundColor {
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-
-    if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
-        [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+        if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
+            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+        } else {
+            [self.view setBackgroundColor:[UIColor whiteColor]];
+        }
+    } else {
+        [self.view setBackgroundColor:[UIColor whiteColor]];
+        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        }
     }
 }
 
@@ -237,6 +244,12 @@
         [self.cardCollectionView performBatchUpdates:^{
             [self.cardCollectionView reloadData];
         } completion:nil];
+
+        NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
+        for (NSIndexPath *indexPath in visibleIndexPaths) {
+            CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+            [cell.tblCPBanner reloadData];
+        }
     }];
 }
 
@@ -336,8 +349,11 @@
 
 #pragma mark - Set the value of pageControl from current index
 -(void)pageControlCurrentIndex:(NSInteger)value {
-    NSDictionary *pagevalue = @{@"currentIndex": @(value)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:pagevalue];
+    NSDictionary *bannerInfo = @{
+        @"currentIndex": @(value),
+        @"appBanner": self.data
+    };
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:bannerInfo];
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl
@@ -357,35 +373,36 @@
     return CGSizeMake(self.bannerContainer.frame.size.width, self.bannerContainer.frame.size.height);
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAt:(NSIndexPath *)indexPath {
+    UICollectionViewFlowLayout *flowLayout = (UICollectionViewFlowLayout *)collectionViewLayout;
+    CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[indexPath.row];
+
+    if (block.imageWidth > 0 && block.imageHeight > 0) {
+        CGFloat imageViewWidth = flowLayout.itemSize.width;
+        CGFloat imageViewHeight = imageViewWidth * block.scale / 100;
+        return CGSizeMake(flowLayout.itemSize.width, imageViewHeight);
+    }
+    return flowLayout.itemSize;
+}
+
 #pragma mark - compose HTML Banner
 - (void)composeHTML:(NSString*)content {
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc] init];
-    [userController addScriptMessageHandler:self name:@"close"];
-    [userController addScriptMessageHandler:self name:@"subscribe"];
-    [userController addScriptMessageHandler:self name:@"unsubscribe"];
-    [userController addScriptMessageHandler:self name:@"closeBanner"];
-    [userController addScriptMessageHandler:self name:@"trackEvent"];
-    [userController addScriptMessageHandler:self name:@"setSubscriptionAttribute"];
-    [userController addScriptMessageHandler:self name:@"addSubscriptionTag"];
-    [userController addScriptMessageHandler:self name:@"removeSubscriptionTag"];
-    [userController addScriptMessageHandler:self name:@"setSubscriptionTopics"];
-    [userController addScriptMessageHandler:self name:@"addSubscriptionTopic"];
-    [userController addScriptMessageHandler:self name:@"removeSubscriptionTopic"];
-    [userController addScriptMessageHandler:self name:@"showTopicsDialog"];
-    [userController addScriptMessageHandler:self name:@"trackClick"];
-    [userController addScriptMessageHandler:self name:@"openWebView"];
+
+    for (NSString *name in [CPUtils scriptMessageNames]) {
+        [userController addScriptMessageHandler:self name:name];
+    }
+
     config.userContentController = userController;
 
     self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height) configuration:config];
     self.webView.scrollView.scrollEnabled = true;
-    self.webView.scrollView.bounces = false;
-    self.webView.allowsBackForwardNavigationGestures = false;
-    self.webView.contentMode = UIViewContentModeScaleToFill;
     self.webView.navigationDelegate = self;
     self.webView.backgroundColor = [UIColor clearColor];
-    self.webView.opaque = false;
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
+    [CPUtils configureWebView:self.webView];
+    
     self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     if (self.data.closeButtonEnabled) {
@@ -434,80 +451,8 @@
     }
     [self.view addSubview:self.webView];
 
-    // remove </body> and </html> which will get added later again
-    if ([content containsString:@"</body>"]) {
-        content = [content stringByReplacingOccurrencesOfString:@"</body>" withString:@""];
-    }
-    if ([content containsString:@"</html>"]) {
-        content = [content stringByReplacingOccurrencesOfString:@"</html>" withString:@""];
-    }
-
-    NSString *script = @"\
-    <script>\
-        /*function onCloseClick() {\
-            try {\
-                window.webkit.messageHandlers.close.postMessage(null);\
-            } catch (error) {\
-                console.log('Caught error on closeBTN click', error);\
-            }\
-        }\
-        var closeElements = document.getElementsByTagName(\"*\");\
-        for (var i = 0, len = closeElements.length; i < len; i++) {\
-            var item = closeElements[i];\
-            if (item.id && item.id.indexOf && item.id.indexOf(\"close\") == 0 || item.className && item.className.indexOf && item.className.indexOf(\"close\") == 0) {\
-                item.addEventListener('click', onCloseClick);\
-            }\
-        }*/\
-        if (typeof window.CleverPush === 'undefined') {\
-            window.CleverPush = {};\
-        }\
-        window.CleverPush.subscribe = function subscribe() {\
-            window.webkit.messageHandlers.subscribe.postMessage(null);\
-        };\
-        window.CleverPush.unsubscribe = function unsubscribe() {\
-            window.webkit.messageHandlers.unsubscribe.postMessage(null);\
-        };\
-        window.CleverPush.closeBanner = function closeBanner() {\
-            window.webkit.messageHandlers.closeBanner.postMessage(null);\
-        };\
-        window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
-            window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
-        };\
-        window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
-            window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
-        };\
-        window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId) {\
-            window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId);\
-        };\
-        window.CleverPush.removeSubscriptionTag = function removeSubscriptionTag(tagId) {\
-            window.webkit.messageHandlers.removeSubscriptionTag.postMessage(tagId);\
-        };\
-        window.CleverPush.setSubscriptionTopics = function setSubscriptionTopics(topicIds) {\
-            window.webkit.messageHandlers.setSubscriptionTopics.postMessage(topicIds);\
-        };\
-        window.CleverPush.addSubscriptionTopic = function addSubscriptionTopic(topicId) {\
-            window.webkit.messageHandlers.addSubscriptionTopic.postMessage(topicId);\
-        };\
-        window.CleverPush.removeSubscriptionTopic = function removeSubscriptionTopic(topicId) {\
-            window.webkit.messageHandlers.removeSubscriptionTopic.postMessage(topicId);\
-        };\
-        window.CleverPush.showTopicsDialog = function showTopicsDialog() {\
-            window.webkit.messageHandlers.showTopicsDialog.postMessage(null);\
-        };\
-        window.CleverPush.openWebView = function openWebView(url) {\
-            window.webkit.messageHandlers.openWebView.postMessage(url);\
-        };\
-        window.CleverPush.trackClick = function trackClick(ID, properties) {\
-            window.webkit.messageHandlers.trackClick.postMessage({ buttonId: ID, properties: properties });\
-        };\
-    </script>";
-
-    NSString *closingBodyHtmlTag = @"</body></html>";
-    NSString *scriptSource = [NSString stringWithFormat: @"%@%@%@", content, script, closingBodyHtmlTag];
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *headerString = @"<head><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'></head>";
-        [self.webView loadHTMLString:[headerString stringByAppendingString:scriptSource] baseURL:nil];
+        [self.webView loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:content] baseURL:nil];
     });
 }
 
@@ -515,41 +460,7 @@
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
     if (message != nil && message.body != nil && message.name != nil) {
-        if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
-            [self onDismiss];
-        } else if ([message.name isEqualToString:@"subscribe"]) {
-            [CleverPush subscribe];
-        } else if ([message.name isEqualToString:@"unsubscribe"]) {
-            [CleverPush unsubscribe];
-        } else if ([message.name isEqualToString:@"trackEvent"]) {
-            [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
-        } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
-            [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
-        } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
-            [CleverPush addSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
-            [CleverPush removeSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
-            [CleverPush setSubscriptionTopics:message.body];
-        } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
-            [CleverPush addSubscriptionTopic:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
-            [CleverPush removeSubscriptionTopic:message.body];
-        } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
-            [CleverPush showTopicsDialog];
-        } else if ([message.name isEqualToString:@"trackClick"]) {
-            CPAppBannerAction* action;
-            NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
-            buttonBlockDic = [message.body mutableCopy];
-            buttonBlockDic[@"bannerAction"] = @"type";
-            action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [self actionCallback:action];
-        } else if ([message.name isEqualToString:@"openWebView"]) {
-            NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
-            if (webUrl && webUrl.scheme && webUrl.host) {
-                [CPUtils openSafari:webUrl dismissViewController:CleverPush.topViewController];
-            }
-        }
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
     }
 }
 

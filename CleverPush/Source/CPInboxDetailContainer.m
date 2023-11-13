@@ -40,14 +40,11 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = cell.imgCPBanner.frame.size.width / block.imageWidth;
-                if (block.imageWidth > [UIScreen mainScreen].bounds.size.width) {
-                    cell.imgCPBannerWidthConstraint.constant = [UIScreen mainScreen].bounds.size.width;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageWidth / aspectRatio;
-                } else {
-                    cell.imgCPBannerWidthConstraint.constant = block.imageWidth;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageHeight;
-                }
+            CGFloat aspectRatio = block.imageWidth / block.imageHeight;
+            if (isnan(aspectRatio) || aspectRatio == 0.0) {
+                aspectRatio = 1.0;
+            }
+            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 
         NSString *imageUrl;
@@ -118,10 +115,21 @@
         }
         cell.btnCPBanner.backgroundColor = backgroundColor;
 
+        CGSize maxSize = CGSizeMake(cell.btnCPBanner.frame.size.width - (15.0 * 2), CGFLOAT_MAX);
+        CGRect titleRect = [block.text boundingRectWithSize:maxSize
+                                                     options:NSStringDrawingUsesLineFragmentOrigin
+                                                  attributes:@{NSFontAttributeName: cell.btnCPBanner.titleLabel.font}
+                                                     context:nil];
+        CGFloat titleHeight = ceil(titleRect.size.height);
+        titleHeight = titleHeight + 10;
+
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
+        cell.btnCPBanner.titleLabel.numberOfLines = 0;
+        cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
+        cell.btnCPBannerHeightConstraint.constant = titleHeight;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
@@ -171,17 +179,29 @@
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
 
-        if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
+        cell.webConfiguration = [[WKWebViewConfiguration alloc] init];
+        cell.userController = [[WKUserContentController alloc] init];
+
+        for (NSString *name in [CPUtils scriptMessageNames]) {
+            [cell.userController addScriptMessageHandler:self name:name];
+        }
+
+        cell.webConfiguration.userContentController = cell.userController;
+
+        if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
-            cell.webHTMLBlock.scrollView.bounces = false;
-            cell.webHTMLBlock.opaque = false;
+            cell.webHTMLBlock.backgroundColor = UIColor.clearColor;
             cell.webHTMLBlock.scrollView.backgroundColor = UIColor.clearColor;
-            cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
-            cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
-            NSURL *url = [NSURL URLWithString:block.url];
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            [cell.webHTMLBlock loadRequest:request];
+            cell.webHTMLBlock.navigationDelegate = self;
+            [CPUtils configureWebView:cell.webHTMLBlock];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [cell.webHTMLBlock loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:block.content] baseURL:nil];
+            });
+
+            cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];
+            [cell.contentView addSubview:cell.webHTMLBlock];
         }
         return cell;
     }
@@ -200,6 +220,14 @@
         return block.height;
     } else {
         return UITableViewAutomaticDimension;
+    }
+}
+
+#pragma mark - UIWebView Delgate Method
+- (void)userContentController:(WKUserContentController*)userContentController
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+    if (message != nil && message.body != nil && message.name != nil) {
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
     }
 }
 

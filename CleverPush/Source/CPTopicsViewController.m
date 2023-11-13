@@ -366,6 +366,10 @@ static CGFloat const CPConstraints = 30.0;
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
+    [UIView performWithoutAnimation:^{
+        [tableView beginUpdates];
+        [tableView endUpdates];
+    }];
     return cell;
 }
 

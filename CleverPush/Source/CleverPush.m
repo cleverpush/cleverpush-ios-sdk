@@ -468,6 +468,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAuthorizerToken:authorizerToken];
 }
 
++ (void)setCustomTopViewController:(UIViewController *)viewController {
+    [self.CPSharedInstance setCustomTopViewController:viewController];
+}
+
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0)) {
     [self.CPSharedInstance updateBadge:replacementContent];
 }
@@ -546,6 +550,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getApiEndpoint {
     return [self.CPSharedInstance getApiEndpoint];
+}
+
++ (UIViewController*)getCustomTopViewController {
+    return [self.CPSharedInstance getCustomTopViewController];
 }
 
 + (NSString*)channelId {

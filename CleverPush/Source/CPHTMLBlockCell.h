@@ -1,9 +1,11 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
-@interface CPHTMLBlockCell : UITableViewCell
+@interface CPHTMLBlockCell : UITableViewCell <WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webHTMLContentHeight;
-@property (weak, nonatomic) IBOutlet WKWebView *webHTMLBlock;
+@property (strong, nonatomic) IBOutlet WKWebView *webHTMLBlock;
+@property (strong, nonatomic) WKWebViewConfiguration *webConfiguration; 
+@property (strong, nonatomic) WKUserContentController *userController;
 
 @end

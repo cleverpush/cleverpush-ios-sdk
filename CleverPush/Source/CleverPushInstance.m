@@ -71,7 +71,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.28.8";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.28.13";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -87,6 +87,7 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 int maximumNotifications = 100;
+static UIViewController *customTopViewController = nil;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -328,7 +329,11 @@ static id isNil(id object) {
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
 - (UIViewController*)topViewController {
-    return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+    if ([CleverPush getCustomTopViewController] != nil) {
+        return [CleverPush getCustomTopViewController];
+    } else {
+        return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+    }
 }
 
 - (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
@@ -1711,17 +1716,29 @@ static id isNil(id object) {
     if (authorizationToken != nil && ![authorizationToken isKindOfClass:[NSNull class]] && ![authorizationToken isEqualToString:@""]) {
         NSMutableURLRequest *urlRequest = [request mutableCopy];
         NSError *error;
-        NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
-        if (error) {
-            return;
+        if ([urlRequest.HTTPMethod isEqualToString:@"GET"]) {
+            NSURLComponents *components = [NSURLComponents componentsWithURL:urlRequest.URL resolvingAgainstBaseURL:NO];
+            NSMutableArray<NSURLQueryItem *> *queryItems = [components.queryItems mutableCopy];
+            if (!queryItems) {
+                queryItems = [NSMutableArray new];
+            }
+            [queryItems addObject:[NSURLQueryItem queryItemWithName:@"authorizationToken" value:authorizationToken]];
+            components.queryItems = queryItems;
+            urlRequest.URL = components.URL;
+            modifiedRequest = urlRequest;
+        } else {
+            NSMutableDictionary *requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
+            if (error) {
+                return;
+            }
+            [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
+            NSData *updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
+            if (error) {
+                return;
+            }
+            [urlRequest setHTTPBody:updatedRequestData];
+            modifiedRequest = urlRequest;
         }
-        [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
-        NSData *updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
-        if (error) {
-            return;
-        }
-        [urlRequest setHTTPBody:updatedRequestData];
-        modifiedRequest = urlRequest;
     } else {
         modifiedRequest = request;
     }
@@ -3181,8 +3198,16 @@ static id isNil(id object) {
     authorizationToken = authorizerToken;
 }
 
+- (void)setCustomTopViewController:(UIViewController *)viewController {
+    customTopViewController = viewController;
+}
+
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
+}
+
+- (UIViewController*)getCustomTopViewController {
+    return customTopViewController;
 }
 
 #pragma mark - App Banner methods

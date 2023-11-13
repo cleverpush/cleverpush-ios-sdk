@@ -1,3 +1,21 @@
+## 1.28.13
+* Optimizations for in app banners
+
+## 1.28.12
+* Fixed a potential crash for the click event in-app banners
+
+## 1.28.11
+* Fixed a potential crash in app banners with multiple screens
+* Optimized tracking for app banners
+
+## 1.28.10
+* App Banners: Optimized image scaling
+* App Banners: Allow buttons to have multiple lines
+* Topics Dialog: Optimized layout for long topic lists
+
+## 1.28.9
+* Optimized `setAuthorizerToken` method for preventing a crash
+
 ## 1.28.8
 * Optimized `getAvailableAttributes` method
 

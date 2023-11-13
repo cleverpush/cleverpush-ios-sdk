@@ -60,6 +60,10 @@
     NSDictionary *pagevalue = notification.userInfo;
     NSInteger index = [pagevalue[@"currentIndex"] integerValue];
     self.pageControl.currentPage = index;
+    self.currentScreenIndex = index;
+    CPAppBanner *appBanner = pagevalue[@"appBanner"];
+    self.data = appBanner;
+    [self setBackground];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -75,14 +79,11 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = cell.imgCPBanner.frame.size.width / block.imageWidth;
-                if (block.imageWidth > [UIScreen mainScreen].bounds.size.width) {
-                    cell.imgCPBannerWidthConstraint.constant = [UIScreen mainScreen].bounds.size.width;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageWidth / aspectRatio;
-                } else {
-                    cell.imgCPBannerWidthConstraint.constant = block.imageWidth;
-                    cell.imgCPBannerHeightConstraint.constant = block.imageHeight;
-                }
+            CGFloat aspectRatio = block.imageWidth / block.imageHeight;
+            if (isnan(aspectRatio) || aspectRatio == 0.0) {
+                aspectRatio = 1.0;
+            }
+            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 
         NSString *imageUrl;
@@ -112,10 +113,12 @@
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
 
         CPAppBannerButtonBlock *block = (CPAppBannerButtonBlock*)self.blocks[indexPath.row];
+        NSString *buttonText = block.text;
 
-        [cell.btnCPBanner setTitle:block.text forState:UIControlStateNormal];
+        [cell.btnCPBanner setTitle:buttonText forState:UIControlStateNormal];
         if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-            [cell.btnCPBanner setTitle:[CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text] forState:UIControlStateNormal];
+            buttonText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
+            [cell.btnCPBanner setTitle:buttonText forState:UIControlStateNormal];
         }
 
         UIColor *titleColor;
@@ -156,10 +159,21 @@
         }
         cell.btnCPBanner.backgroundColor = backgroundColor;
 
+        CGSize maxSize = CGSizeMake(cell.btnCPBanner.frame.size.width - (15.0 * 2), CGFLOAT_MAX);
+        CGRect titleRect = [buttonText boundingRectWithSize:maxSize
+                                                     options:NSStringDrawingUsesLineFragmentOrigin
+                                                  attributes:@{NSFontAttributeName: cell.btnCPBanner.titleLabel.font}
+                                                     context:nil];
+        CGFloat titleHeight = ceil(titleRect.size.height);
+        titleHeight = titleHeight + 10;
+
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
+        cell.btnCPBanner.titleLabel.numberOfLines = 0;
+        cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
+        cell.btnCPBannerHeightConstraint.constant = titleHeight;
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
@@ -212,18 +226,29 @@
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
         CPAppBannerHTMLBlock *block = (CPAppBannerHTMLBlock*)self.blocks[indexPath.row];
 
-        if (block.url != nil && ![block.url isKindOfClass:[NSNull class]]) {
+        cell.webConfiguration = [[WKWebViewConfiguration alloc] init];
+        cell.userController = [[WKUserContentController alloc] init];
+
+        for (NSString *name in [CPUtils scriptMessageNames]) {
+            [cell.userController addScriptMessageHandler:self name:name];
+        }
+
+        cell.webConfiguration.userContentController = cell.userController;
+
+        if (block.content != nil && ![block.content isKindOfClass:[NSNull class]]) {
             cell.webHTMLBlock.scrollView.scrollEnabled = false;
-            cell.webHTMLBlock.scrollView.bounces = false;
-            cell.webHTMLBlock.opaque = false;
             cell.webHTMLBlock.backgroundColor = UIColor.clearColor;
             cell.webHTMLBlock.scrollView.backgroundColor = UIColor.clearColor;
-            cell.webHTMLBlock.allowsBackForwardNavigationGestures = false;
-            cell.webHTMLBlock.contentMode = UIViewContentModeScaleToFill;
             cell.webHTMLBlock.layer.cornerRadius = 15.0;
-            NSURL *url = [NSURL URLWithString:block.url];
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            [cell.webHTMLBlock loadRequest:request];
+            cell.webHTMLBlock.navigationDelegate = self;
+            [CPUtils configureWebView:cell.webHTMLBlock];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [cell.webHTMLBlock loadHTMLString:[CPUtils generateBannerHTMLStringWithFunctions:block.content] baseURL:nil];
+            });
+
+            cell.webHTMLBlock = [[WKWebView alloc] initWithFrame:CGRectMake(cell.contentView.frame.origin.x, cell.contentView.frame.origin.y, cell.contentView.frame.size.width, self.contentView.frame.size.height) configuration:cell.webConfiguration];
+            [cell.contentView addSubview:cell.webHTMLBlock];
         }
         return cell;
     }
@@ -242,6 +267,14 @@
         return block.height;
     } else {
         return UITableViewAutomaticDimension;
+    }
+}
+
+#pragma mark - UIWebView Delgate Method
+- (void)userContentController:(WKUserContentController*)userContentController
+      didReceiveScriptMessage:(WKScriptMessage*)message {
+    if (message != nil && message.body != nil && message.name != nil) {
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
     }
 }
 
@@ -342,7 +375,15 @@
         return;
     }
 
-    [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+        if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
+            [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+        } else {
+            [self.imgviewBackground setBackgroundColor:[UIColor whiteColor]];
+        }
+    } else {
+        [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+    }
 }
 
 - (void)setUpPageControl {
@@ -362,9 +403,17 @@
     [self.contentView setBackgroundColor:[UIColor clearColor]];
 
     if (self.data.type == CPAppBannerTypeFull) {
-        [self.contentView setBackgroundColor:[UIColor whiteColor]];
-        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
-            [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+        if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+            if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
+                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+            } else {
+                [self.contentView setBackgroundColor:[UIColor whiteColor]];
+            }
+        } else {
+            [self.contentView setBackgroundColor:[UIColor whiteColor]];
+            if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            }
         }
     }
 }
