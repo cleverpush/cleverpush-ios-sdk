@@ -86,6 +86,7 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
+static const NSInteger apiMaxRetryCount = 3;
 int maximumNotifications = 100;
 static UIViewController *customTopViewController = nil;
 
@@ -146,6 +147,8 @@ int sessionVisits;
 long sessionStartedTimestamp;
 double channelTopicsPickerShownAt;
 id currentAppBannerUrlOpenedCallback;
+
+NSOperationQueue *retryQueue;
 
 static id isNil(id object) {
     return object ?: [NSNull null];
@@ -1710,6 +1713,32 @@ static id isNil(id object) {
 }
 
 #pragma mark - Generalised Api call.
+- (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    if (!retryQueue) {
+        retryQueue = [[NSOperationQueue alloc] init];
+        retryQueue.maxConcurrentOperationCount = 1;
+    }
+
+    NSBlockOperation *retryOperation = [NSBlockOperation blockOperationWithBlock:^{
+        [self enqueueRequest:request onSuccess:^(id _Nullable result) {
+            if (successBlock) {
+                successBlock(result);
+            }
+        } onFailure:^(NSError * _Nullable error) {
+            if (error && error.code != NSURLErrorCancelled && retryCount < apiMaxRetryCount) {
+                NSInteger updatedRetryCount = retryCount + 1;
+                [self enqueueFailedRequest:request withRetryCount:updatedRetryCount onSuccess:successBlock onFailure:failureBlock];
+            } else {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }
+        }];
+    }];
+
+    [retryQueue addOperation:retryOperation];
+}
+
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
     NSURLRequest *modifiedRequest;
@@ -1745,8 +1774,10 @@ static id isNil(id object) {
 
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:modifiedRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (successBlock != nil || failureBlock != nil) {
+        if (successBlock != nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+        } else {
+            [self enqueueFailedRequest:request withRetryCount:3 onSuccess:successBlock onFailure:failureBlock];
         }
     }] resume];
 }

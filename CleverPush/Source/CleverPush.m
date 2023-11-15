@@ -177,6 +177,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
 }
 
+- (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance enqueueFailedRequest:request onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [self.CPSharedInstance handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
 }
