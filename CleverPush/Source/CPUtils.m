@@ -577,6 +577,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return result;
 }
 
+#pragma mark - Find the particular word in the url and replace it in the original url.
++ (NSURL *)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement {
+    if (url == nil || replacement == nil) {
+        return nil;
+    }
+
+    NSString *urlString = [url absoluteString];
+    NSString *replacedURLString = [self replaceString:@"{voucherCode}" withReplacement:replacement inString:urlString];
+    NSString *encodedURLString = [replacedURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    return [NSURL URLWithString:encodedURLString];
+}
+
 #pragma mark - CleverPush Javascript functions
 + (NSString *)cleverPushJavaScript {
     return @"\
@@ -718,6 +731,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark - Callback event for tracking clicks
 + (void)actionCallback:(CPAppBannerAction*)action{
     [self actionCallback:action];
+}
+
+#pragma mark - Check string is nil, null or empty
++ (BOOL)isNullOrEmpty:(NSString *)string {
+    if (string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark - String validation of a key exists or not
++ (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary {
+    if (!dictionary || dictionary.count == 0) {
+        return nil;
+    }
+    NSString *voucherCode = dictionary[key];
+    return voucherCode;
 }
 
 @end
