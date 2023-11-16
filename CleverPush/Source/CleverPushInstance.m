@@ -86,7 +86,6 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
-static const NSInteger apiMaxRetryCount = 3;
 int maximumNotifications = 100;
 static UIViewController *customTopViewController = nil;
 
@@ -1610,7 +1609,7 @@ static id isNil(id object) {
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
 
     // save notification to user defaults
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -1665,7 +1664,7 @@ static id isNil(id object) {
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
 }
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
@@ -1714,32 +1713,30 @@ static id isNil(id object) {
 
 #pragma mark - Generalised Api call.
 - (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    if (!retryQueue) {
-        retryQueue = [[NSOperationQueue alloc] init];
-        retryQueue.maxConcurrentOperationCount = 1;
-    }
-
-    NSBlockOperation *retryOperation = [NSBlockOperation blockOperationWithBlock:^{
-        [self enqueueRequest:request onSuccess:^(id _Nullable result) {
-            if (successBlock) {
-                successBlock(result);
-            }
-        } onFailure:^(NSError * _Nullable error) {
-            if (error && error.code != NSURLErrorCancelled && retryCount < apiMaxRetryCount) {
-                NSInteger updatedRetryCount = retryCount + 1;
-                [self enqueueFailedRequest:request withRetryCount:updatedRetryCount onSuccess:successBlock onFailure:failureBlock];
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (response != nil && successBlock != nil) {
+            [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+        } else {
+            if (retryCount < 3) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self enqueueFailedRequest:request withRetryCount:retryCount + 1 onSuccess:successBlock onFailure:failureBlock];
+                });
             } else {
                 if (failureBlock) {
                     failureBlock(error);
                 }
             }
-        }];
+        }
     }];
-
-    [retryQueue addOperation:retryOperation];
+    [task resume];
 }
 
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self enqueueRequest:request onSuccess:successBlock onFailure:failureBlock withRetry:YES];
+}
+
+- (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
     NSURLRequest *modifiedRequest;
     if (authorizationToken != nil && ![authorizationToken isKindOfClass:[NSNull class]] && ![authorizationToken isEqualToString:@""]) {
@@ -1774,10 +1771,16 @@ static id isNil(id object) {
 
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:modifiedRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (successBlock != nil) {
+        if (response != nil && successBlock != nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         } else {
-            [self enqueueFailedRequest:request withRetryCount:3 onSuccess:successBlock onFailure:failureBlock];
+            if (retryOnFailure) {
+                [self enqueueFailedRequest:request withRetryCount:0 onSuccess:successBlock onFailure:failureBlock];
+            } else {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }
         }
     }] resume];
 }
