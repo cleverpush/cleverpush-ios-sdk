@@ -127,6 +127,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
+CPInitializedBlock handleInitialized;
 CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
@@ -254,16 +255,26 @@ static id isNil(id object) {
     return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
 }
 
-#pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions
                   channelId:(NSString*)newChannelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
            handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
                autoRegister:(BOOL)autoRegisterParam {
+    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam initialized:NULL];
+}
+
+#pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
+- (id)initWithLaunchOptions:(NSDictionary*)launchOptions
+                  channelId:(NSString*)newChannelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
+           handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
+               autoRegister:(BOOL)autoRegisterParam initialized:(CPInitializedBlock)initializedCallback {
     [self setSubscribeHandler:subscribedCallback];
     handleNotificationReceived = receivedCallback;
     handleNotificationOpened = openedCallback;
+    handleInitialized = initializedCallback;
     autoRegister = autoRegisterParam;
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
     channelConfig = nil;
@@ -401,6 +412,9 @@ static id isNil(id object) {
                 }
                 if (handleSubscribedInternal) {
                     handleSubscribedInternal(subscriptionId);
+                }
+                if (handleInitialized) {
+                    handleInitialized(YES);
                 }
             }
         }];
