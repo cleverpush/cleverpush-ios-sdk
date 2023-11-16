@@ -673,7 +673,7 @@ NSInteger currentScreenIndex = 0;
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
-                    action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];;
+                    action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];
                 }
                 [[UIApplication sharedApplication] openURL:action.url];
             }
