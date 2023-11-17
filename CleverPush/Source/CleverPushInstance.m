@@ -546,7 +546,7 @@ static id isNil(id object) {
         NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
         NSUInteger targetConsentIndex = 1139;
         
-        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""] && vendorConsents.length > targetConsentIndex) {
+        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""] && vendorConsents.length > targetConsentIndex - 1) {
             unichar consentStatus = [vendorConsents characterAtIndex:targetConsentIndex - 1];
             BOOL hasConsent = (consentStatus == '1');
 
