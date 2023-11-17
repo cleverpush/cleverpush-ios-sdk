@@ -2044,10 +2044,10 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                 channelId, @"channelId",
-                                                 tagId, @"tagId",
-                                                 subscriptionId, @"subscriptionId",
-                                                 nil];
+                                     channelId, @"channelId",
+                                     tagId, @"tagId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
@@ -2106,14 +2106,14 @@ static id isNil(id object) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
             }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                         channelId, @"channelId",
-                                                         attributeId, @"attributeId",
-                                                         value, @"value",
-                                                         subscriptionId, @"subscriptionId",
-                                                         nil];
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2163,14 +2163,14 @@ static id isNil(id object) {
             [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
             [userDefaults synchronize];
 
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                         channelId, @"channelId",
-                                                         attributeId, @"attributeId",
-                                                         value, @"value",
-                                                         subscriptionId, @"subscriptionId",
-                                                         nil];
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2208,14 +2208,14 @@ static id isNil(id object) {
             [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
             [userDefaults synchronize];
 
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                         channelId, @"channelId",
-                                                         attributeId, @"attributeId",
-                                                         value, @"value",
-                                                         subscriptionId, @"subscriptionId",
-                                                         nil];
+                                         channelId, @"channelId",
+                                         attributeId, @"attributeId",
+                                         value, @"value",
+                                         subscriptionId, @"subscriptionId",
+                                         nil];
 
                 NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                 [request setHTTPBody:postData];
@@ -2751,7 +2751,7 @@ static id isNil(id object) {
 }
 
 - (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         [self waitForTrackingConsent:^{
             [self getSubscriptionId:^(NSString* subscriptionId) {
                 if (subscriptionId == nil) {
@@ -2982,7 +2982,7 @@ static id isNil(id object) {
 #pragma mark - track Session Start by api call subscription/session/start
 - (void)trackSessionStart {
     [self waitForTrackingConsent:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
@@ -2998,11 +2998,11 @@ static id isNil(id object) {
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                 channelId, @"channelId",
-                                                                 subscriptionId, @"subscriptionId",
-                                                                 deviceToken, @"apnsToken",
-                                                                 isNil(lastNotificationId), @"lastNotificationId",
-                                                                 nil];
+                                             channelId, @"channelId",
+                                             subscriptionId, @"subscriptionId",
+                                             deviceToken, @"apnsToken",
+                                             isNil(lastNotificationId), @"lastNotificationId",
+                                             nil];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
@@ -3026,7 +3026,7 @@ static id isNil(id object) {
 #pragma mark - session time gets end by calling this end point subscription/session/end
 - (void)trackSessionEnd {
     [self waitForTrackingConsent:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
