@@ -79,61 +79,30 @@
 }
 
 - (void)testVerifyApiCallAddTags {
-    void (^consentHandlerBlock)(void) = ^{
-        [self.cleverPush addSubscriptionTag:@"tagId"];
-        OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
-    };
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    [self.cleverPush addSubscriptionTag:@"tagId"];
 
-    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
-        OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-        OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-        [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-            void (^handler)(void);
-            [invocation getArgument:&handler atIndex:2];
-            handler();
-            consentHandlerBlock();
-        }];
-        OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
-    } else {
-        OCMStub([self.cleverPush getSubscribeConsentRequired]).andReturn(false);
-        OCMStub([self.cleverPush getHasSubscribeConsent]).andReturn(true);
-        [OCMStub([self.cleverPush waitForSubscribeConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-            void (^handler)(void);
-            [invocation getArgument:&handler atIndex:2];
-            handler();
-            consentHandlerBlock();
-        }];
-        OCMVerify([self.cleverPush waitForSubscribeConsent:[OCMArg any]]);
-    }
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
 - (void)testVerifyApiCallRemoveTags {
-    void (^consentHandlerBlock)(void) = ^{
-        [self.cleverPush removeSubscriptionTag:@"tagId"];
-        OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
-    };
-
-    if ([CleverPush getIabTcfMode] != CPIabTcfModeSubscribeWaitForConsent) {
-        OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-        OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-        [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-            void (^handler)(void);
-            [invocation getArgument:&handler atIndex:2];
-            handler();
-            consentHandlerBlock();
-        }];
-        OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
-    } else {
-        OCMStub([self.cleverPush getSubscribeConsentRequired]).andReturn(false);
-        OCMStub([self.cleverPush getHasSubscribeConsent]).andReturn(true);
-        [OCMStub([self.cleverPush waitForSubscribeConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-            void (^handler)(void);
-            [invocation getArgument:&handler atIndex:2];
-            handler();
-            consentHandlerBlock();
-        }];
-        OCMVerify([self.cleverPush waitForSubscribeConsent:[OCMArg any]]);
-    }
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    [self.cleverPush removeSubscriptionTag:@"tagId"];
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
 - (void)tearDown {
