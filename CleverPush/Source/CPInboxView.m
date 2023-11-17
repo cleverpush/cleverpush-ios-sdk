@@ -468,7 +468,7 @@ CPNotificationClickBlock handleClick;
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     } else {
         if (banner.multipleScreensEnabled) {
             dataDic[@"isScreenAlreadyShown"] = @(banner.screens[self.currentScreenIndex].isScreenAlreadyShown);
