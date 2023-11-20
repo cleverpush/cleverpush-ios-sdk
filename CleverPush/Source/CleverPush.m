@@ -372,6 +372,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
 }
 
++ (void)setAutoRequestNotificationPermission:(BOOL)autoRequest {
+    [self.CPSharedInstance setAutoRequestNotificationPermission:autoRequest];
+}
+
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
     [self.CPSharedInstance setKeepTargetingDataOnUnsubscribe:keepData];
 }

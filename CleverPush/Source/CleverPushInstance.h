@@ -149,6 +149,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setIncrementBadge:(BOOL)increment;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
+- (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 - (void)addChatView:(CPChatView*)chatView;
 - (void)showTopicsDialog;

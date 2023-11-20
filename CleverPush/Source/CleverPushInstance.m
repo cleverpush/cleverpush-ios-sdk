@@ -85,6 +85,7 @@ static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
+static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
@@ -3380,6 +3381,10 @@ static id isNil(id object) {
 
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     ignoreDisabledNotificationPermission = ignore;
+}
+
+- (void)setAutoRequestNotificationPermission:(BOOL)autoRequest {
+    autoRequestNotificationPermission = autoRequest;
 }
 
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
