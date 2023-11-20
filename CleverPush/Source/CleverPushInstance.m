@@ -148,8 +148,6 @@ long sessionStartedTimestamp;
 double channelTopicsPickerShownAt;
 id currentAppBannerUrlOpenedCallback;
 
-NSOperationQueue *retryQueue;
-
 static id isNil(id object) {
     return object ?: [NSNull null];
 }
