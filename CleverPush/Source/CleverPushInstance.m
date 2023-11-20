@@ -88,12 +88,14 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 int maximumNotifications = 100;
+int iabtcfVendorConsentPosition = 1139;
 static UIViewController *customTopViewController = nil;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSString* lastClickedSessionNotificationId;
+static NSString* iabtcfVendorConsents = @"IABTCF_VendorConsents";
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
 
@@ -524,7 +526,7 @@ static id isNil(id object) {
 #pragma mark - Initialised Iab Tcf Functionality.
 - (void)initIabTcf {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([userDefaults objectForKey:@"IABTCF_VendorConsents"] != nil) {
+    if ([userDefaults objectForKey:iabtcfVendorConsents] != nil) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enableIabTcfMode:) name:NSUserDefaultsDidChangeNotification object:nil];
     }
 }
@@ -543,11 +545,10 @@ static id isNil(id object) {
     NSDictionary *notificationObject = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 
     if (notificationObject.count > 0) {
-        NSString *vendorConsents = notificationObject[@"IABTCF_VendorConsents"];
-        NSUInteger targetConsentIndex = 1139;
-        
-        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""] && vendorConsents.length > targetConsentIndex - 1) {
-            unichar consentStatus = [vendorConsents characterAtIndex:targetConsentIndex - 1];
+        NSString *vendorConsents = notificationObject[iabtcfVendorConsents];
+
+        if (vendorConsents != nil && ![vendorConsents isKindOfClass:[NSNull class]] && ![vendorConsents isEqualToString:@""] && vendorConsents.length > iabtcfVendorConsentPosition - 1) {
+            unichar consentStatus = [vendorConsents characterAtIndex:iabtcfVendorConsentPosition - 1];
             BOOL hasConsent = (consentStatus == '1');
 
             if (hasConsent) {
