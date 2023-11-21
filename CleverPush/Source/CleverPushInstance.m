@@ -86,7 +86,8 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
-static const NSInteger failureUrlRequestRetries = 3;
+static const NSInteger httpRequestRetryCount = 3;
+static const NSInteger httpRequestRetryBackoffMultiplier = 2;
 int maximumNotifications = 100;
 static UIViewController *customTopViewController = nil;
 
@@ -1717,9 +1718,9 @@ static id isNil(id object) {
         if (successBlock != nil && error == nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         } else {
-            if (retryCount < failureUrlRequestRetries) {
-                NSTimeInterval delayInSeconds = pow(2, retryCount);
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (retryCount < httpRequestRetryCount) {
+                NSTimeInterval httpRequestRetryBackoffSeconds = pow(httpRequestRetryBackoffMultiplier, retryCount);
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(httpRequestRetryBackoffSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self enqueueFailedRequest:request withRetryCount:retryCount + 1 onSuccess:successBlock onFailure:failureBlock];
                 });
             } else {
