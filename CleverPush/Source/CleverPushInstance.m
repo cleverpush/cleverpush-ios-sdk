@@ -1378,8 +1378,11 @@ static id isNil(id object) {
                                     isNil(country), @"country",
                                     isNil(timezone), @"timezone",
                                     isNil(language), @"language",
-                                    [NSNumber numberWithBool:autoRequestNotificationPermission], @"hasNotificationPermission",
                                     nil];
+
+    [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+        [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+    }];
 
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
@@ -2194,13 +2197,17 @@ static id isNil(id object) {
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+        NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
                                  activityId, @"iosLiveActivityId",
                                  token, @"iosLiveActivityToken",
                                  subscriptionId, @"subscriptionId",
-                                 [NSNumber numberWithBool:autoRequestNotificationPermission], @"hasNotificationPermission",
                                  nil];
+
+        [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+            [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+        }];
+
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
