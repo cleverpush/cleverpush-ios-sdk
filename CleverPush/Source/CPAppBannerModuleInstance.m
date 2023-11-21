@@ -21,6 +21,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
+CPAppBannerDisplayBlock handleBannerDisplayed;
 
 BOOL initialized = NO;
 BOOL showDrafts = NO;
@@ -57,6 +58,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
     handleBannerShown = callback;
+}
+
+#pragma mark - Callback while banner has been successfully ready to display
+- (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    handleBannerDisplayed = callback;
 }
 
 #pragma mark - load the events
@@ -757,7 +763,11 @@ NSInteger currentScreenIndex = 0;
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
-    [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    if (handleBannerDisplayed) {
+        handleBannerDisplayed(appBannerViewController);
+    } else {
+        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {

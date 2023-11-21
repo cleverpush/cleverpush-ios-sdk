@@ -448,6 +448,12 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController *viewController) {
+        callback(viewController);
+    }];
+}
+
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback {
     [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray *callbackInner) {
         callback(callbackInner);
