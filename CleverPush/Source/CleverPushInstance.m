@@ -413,8 +413,10 @@ static id isNil(id object) {
     if (subscriptionId != nil) {
         [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
-                [CPLog info:@"notification authorization revoked, unsubscribing"];
-                [self unsubscribe];
+                if (autoRequestNotificationPermission) {
+                    [CPLog info:@"notification authorization revoked, unsubscribing"];
+                    [self unsubscribe];
+                }
             } else if ([self shouldSync]) {
                 [CPLog debug:@"syncSubscription called from initWithChannelId"];
                 [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
@@ -505,8 +507,10 @@ static id isNil(id object) {
             }
         } else {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
-                [CPLog info:@"notification authorization revoked, unsubscribing"];
-                [self unsubscribe];
+                if (autoRequestNotificationPermission) {
+                    [CPLog info:@"notification authorization revoked, unsubscribing"];
+                    [self unsubscribe];
+                }
             }
         }
     }];
@@ -1039,6 +1043,29 @@ static id isNil(id object) {
                                         }
                                     }
                                 }];
+<<<<<<< HEAD
+=======
+
+                                if (subscribedBlock) {
+                                    [self getSubscriptionId:^(NSString* subscriptionId) {
+                                        if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
+                                            subscribedBlock(subscriptionId);
+                                        } else {
+                                            [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
+                                        }
+                                    }];
+                                }
+                            } else if (subscribedBlock) {
+                                subscribedBlock(subscriptionId);
+                            }
+                        } else if (failureBlock) {
+                            failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                        }
+                    });
+                }];
+            }
+        }];
+>>>>>>> edb855b (feature/CP-7024-ios-auto-request-notification-permission)
 
                                 if (subscribedBlock) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
@@ -1251,7 +1278,7 @@ static id isNil(id object) {
 
         if (@available(iOS 10.0, *)) {
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
-                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized || (!autoRequestNotificationPermission && settings.authorizationStatus == UNAuthorizationStatusNotDetermined)) {
                     [CPLog debug:@"syncSubscription called from registerDeviceToken"];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
@@ -1351,6 +1378,7 @@ static id isNil(id object) {
                                     isNil(country), @"country",
                                     isNil(timezone), @"timezone",
                                     isNil(language), @"language",
+                                    [NSNumber numberWithBool:autoRequestNotificationPermission], @"hasNotificationPermission",
                                     nil];
 
     if (subscriptionId) {
@@ -2171,6 +2199,7 @@ static id isNil(id object) {
                                  activityId, @"iosLiveActivityId",
                                  token, @"iosLiveActivityToken",
                                  subscriptionId, @"subscriptionId",
+                                 [NSNumber numberWithBool:autoRequestNotificationPermission], @"hasNotificationPermission",
                                  nil];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
