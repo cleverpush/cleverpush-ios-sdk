@@ -413,10 +413,8 @@ static id isNil(id object) {
     if (subscriptionId != nil) {
         [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
-                if (autoRequestNotificationPermission) {
-                    [CPLog info:@"notification authorization revoked, unsubscribing"];
-                    [self unsubscribe];
-                }
+                [CPLog info:@"notification authorization revoked, unsubscribing"];
+                [self unsubscribe];
             } else if ([self shouldSync]) {
                 [CPLog debug:@"syncSubscription called from initWithChannelId"];
                 [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
@@ -507,10 +505,8 @@ static id isNil(id object) {
             }
         } else {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
-                if (autoRequestNotificationPermission) {
-                    [CPLog info:@"notification authorization revoked, unsubscribing"];
-                    [self unsubscribe];
-                }
+                [CPLog info:@"notification authorization revoked, unsubscribing"];
+                [self unsubscribe];
             }
         }
     }];
