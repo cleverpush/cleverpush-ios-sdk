@@ -525,10 +525,7 @@ static id isNil(id object) {
 
 #pragma mark - Initialised Iab Tcf Functionality.
 - (void)initIabTcf {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([userDefaults objectForKey:iabtcfVendorConsents] != nil) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enableIabTcfMode:) name:NSUserDefaultsDidChangeNotification object:nil];
-    }
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enableIabTcfMode:) name:NSUserDefaultsDidChangeNotification object:nil];
 }
 
 - (void)enableIabTcfMode:(NSNotification *)notification {
@@ -998,7 +995,7 @@ static id isNil(id object) {
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
-    void (^subscribed)(void) = ^{
+    void (^handleSubscribe)(void) = ^{
         if (@available(iOS 10.0, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
@@ -1093,12 +1090,12 @@ static id isNil(id object) {
 
     if ([CleverPush getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
         void (^consentBlock)(void) = ^{
-            subscribed();
+            handleSubscribe();
         };
 
         [self waitForSubscribeConsent:consentBlock];
     } else {
-        subscribed();
+        handleSubscribe();
     }
 }
 
