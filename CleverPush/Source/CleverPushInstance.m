@@ -1376,9 +1376,6 @@ static id isNil(id object) {
                                     isNil(language), @"language",
                                     nil];
 
-    [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
-        [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
-    }];
 
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
@@ -1412,10 +1409,14 @@ static id isNil(id object) {
         }
     }
 
-    [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
+    [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+        [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
 
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
+        [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
+
+        NSData *postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+    }];
 }
 
 #pragma mark - add Subcription API call
@@ -2194,21 +2195,22 @@ static id isNil(id object) {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 activityId, @"iosLiveActivityId",
-                                 token, @"iosLiveActivityToken",
-                                 subscriptionId, @"subscriptionId",
-                                 nil];
+                                        channelId, @"channelId",
+                                        activityId, @"iosLiveActivityId",
+                                        token, @"iosLiveActivityToken",
+                                        subscriptionId, @"subscriptionId",
+                                        nil];
 
         [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
             [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
-        }];
 
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        } onFailure:^(NSError* error) {
-            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+            }];
         }];
     }
 }
