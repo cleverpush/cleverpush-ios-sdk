@@ -1463,8 +1463,9 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    NSString* notificationId = [payload cleverPushStringForKeyPath:@"notification._id"];
-    NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
+    NSMutableDictionary *payloadMutable = [payload mutableCopy];
+    NSString* notificationId = [payloadMutable cleverPushStringForKeyPath:@"notification._id"];
+    NSDictionary* notification = [payloadMutable cleverPushDictionaryForKey:@"notification"];
     NSString* action = actionIdentifier;
 
     if (!notification) {
@@ -1480,11 +1481,11 @@ static id isNil(id object) {
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
     }
-    [CPLog debug:@"handleNotificationOpened, %@, %@", action, payload];
+    [CPLog debug:@"handleNotificationOpened, %@, %@", action, payloadMutable];
 
     [self setNotificationClicked:notificationId
-                   withChannelId:[payload cleverPushStringForKeyPath:@"channel._id"]
-              withSubscriptionId:[payload cleverPushStringForKeyPath:@"subscription._id"]
+                   withChannelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"]
+              withSubscriptionId:[payloadMutable cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
     ];
 
@@ -1514,13 +1515,7 @@ static id isNil(id object) {
             [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
         }
 
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
-    }
-
-    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
-
-    if (!channelId) { // not init
-        pendingOpenedResult = result;
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
     }
 
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
@@ -1536,6 +1531,10 @@ static id isNil(id object) {
 
                     if ([selectedAction objectForKey:@"url"] != nil && ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[selectedAction objectForKey:@"url"] length] > 0) {
                         url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
+
+                        NSMutableDictionary *notificationDict = [payloadMutable[@"notification"] mutableCopy];
+                        [notificationDict setObject:[selectedAction objectForKey:@"url"] forKey:@"url"];
+                        [payloadMutable setObject:notificationDict forKey:@"notification"];
 
                         if ([[UIApplication sharedApplication] canOpenURL:url]) {
                             [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
@@ -1554,6 +1553,12 @@ static id isNil(id object) {
         }
     }
 
+    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payloadMutable action:action];
+
+    if (!channelId) { // not init
+        pendingOpenedResult = result;
+    }
+    
     if (!handleNotificationOpened) {
         if (hasWebViewOpened) {
             if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
