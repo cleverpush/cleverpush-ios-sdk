@@ -1526,9 +1526,31 @@ static id isNil(id object) {
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-            } 
+
+            if (action != nil && ![action isKindOfClass:[NSNull class]] && [notification objectForKey:@"actions"] != nil && ![[notification objectForKey:@"actions"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"actions"] isKindOfClass:[NSArray class]] && [[notification objectForKey:@"actions"] count] > 0) {
+                NSMutableArray *actionsArray = [notification[@"actions"] mutableCopy];
+                NSInteger actionValue = [action integerValue];
+
+                if (actionValue >= 0 && actionValue < [actionsArray count]) {
+                    NSDictionary *selectedAction = actionsArray[actionValue];
+
+                    if ([selectedAction objectForKey:@"url"] != nil && ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[selectedAction objectForKey:@"url"] length] > 0) {
+                        url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
+
+                        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                        }
+                    }
+                } else {
+                    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                    }
+                }
+            } else {
+                if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                }
+            }
         }
     }
 
