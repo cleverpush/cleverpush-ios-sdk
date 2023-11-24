@@ -1565,7 +1565,6 @@ static id isNil(id object) {
             if ([selectedAction objectForKey:@"url"] != nil &&
                 ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
                 [[selectedAction objectForKey:@"url"] length] > 0) {
-
                 url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
 
                 NSMutableDictionary *notificationDict = [updatedPayloadMutable[@"notification"] mutableCopy];
