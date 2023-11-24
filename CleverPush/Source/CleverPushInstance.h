@@ -56,6 +56,7 @@ typedef void (^CPFailureBlock)(NSError* error);
 
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
 typedef void (^CPAppBannerShownBlock)(CPAppBanner* appBanner);
+typedef void (^CPAppBannerDisplayBlock)(UIViewController *viewController);
 
 typedef void (^CPLogListener)(NSString* message);
 
@@ -167,6 +168,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
+- (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
 - (void)setAuthorizerToken:(NSString*)authorizerToken;
 - (void)setCustomTopViewController:(UIViewController*)viewController;
