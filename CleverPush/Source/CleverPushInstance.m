@@ -1578,7 +1578,6 @@ static id isNil(id object) {
     } else {
         [self validURLHandler:url];
     }
-
     return updatedPayloadMutable;
 }
 
