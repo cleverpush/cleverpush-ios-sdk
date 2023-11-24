@@ -834,7 +834,7 @@ NSInteger currentScreenIndex = 0;
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     } else {
         if (banner.multipleScreensEnabled) {
             dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
@@ -850,7 +850,7 @@ NSInteger currentScreenIndex = 0;
             if (banner.multipleScreensEnabled) {
                 banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     }
 }
 

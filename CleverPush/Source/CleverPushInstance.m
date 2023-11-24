@@ -86,6 +86,8 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
+static const NSInteger httpRequestRetryCount = 3;
+static const NSInteger httpRequestRetryBackoffMultiplier = 2;
 int maximumNotifications = 100;
 static UIViewController *customTopViewController = nil;
 
@@ -1607,7 +1609,7 @@ static id isNil(id object) {
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
 
     // save notification to user defaults
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -1662,7 +1664,7 @@ static id isNil(id object) {
 
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
-    [self enqueueRequest:request onSuccess:nil onFailure:nil];
+    [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
 }
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
@@ -1710,7 +1712,32 @@ static id isNil(id object) {
 }
 
 #pragma mark - Generalised Api call.
+- (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (successBlock != nil && error == nil) {
+            [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+        } else {
+            if (retryCount < httpRequestRetryCount) {
+                NSTimeInterval httpRequestRetryBackoffSeconds = pow(httpRequestRetryBackoffMultiplier, retryCount);
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(httpRequestRetryBackoffSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self enqueueFailedRequest:request withRetryCount:retryCount + 1 onSuccess:successBlock onFailure:failureBlock];
+                });
+            } else {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }
+        }
+    }];
+    [task resume];
+}
+
 - (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self enqueueRequest:request onSuccess:successBlock onFailure:failureBlock withRetry:YES];
+}
+
+- (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure {
     [CPLog info:@"[HTTP] -> %@ %@", [request HTTPMethod], [request URL].absoluteString];
     NSURLRequest *modifiedRequest;
     if (authorizationToken != nil && ![authorizationToken isKindOfClass:[NSNull class]] && ![authorizationToken isEqualToString:@""]) {
@@ -1745,8 +1772,16 @@ static id isNil(id object) {
 
     NSURLSession *session = [NSURLSession sharedSession];
     [[session dataTaskWithRequest:modifiedRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (successBlock != nil || failureBlock != nil) {
+        if (successBlock != nil && error == nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+        } else {
+            if (retryOnFailure) {
+                [self enqueueFailedRequest:request withRetryCount:0 onSuccess:successBlock onFailure:failureBlock];
+            } else {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }
         }
     }] resume];
 }
