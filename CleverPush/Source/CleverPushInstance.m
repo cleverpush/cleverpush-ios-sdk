@@ -1521,35 +1521,7 @@ static id isNil(id object) {
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-
-            if (action != nil && ![action isKindOfClass:[NSNull class]] && [notification objectForKey:@"actions"] != nil && ![[notification objectForKey:@"actions"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"actions"] isKindOfClass:[NSArray class]] && [[notification objectForKey:@"actions"] count] > 0) {
-                NSMutableArray *actionsArray = [notification[@"actions"] mutableCopy];
-                NSInteger actionValue = [action integerValue];
-
-                if (actionValue >= 0 && actionValue < [actionsArray count]) {
-                    NSDictionary *selectedAction = actionsArray[actionValue];
-
-                    if ([selectedAction objectForKey:@"url"] != nil && ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[selectedAction objectForKey:@"url"] length] > 0) {
-                        url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
-
-                        NSMutableDictionary *notificationDict = [payloadMutable[@"notification"] mutableCopy];
-                        [notificationDict setObject:[selectedAction objectForKey:@"url"] forKey:@"url"];
-                        [payloadMutable setObject:notificationDict forKey:@"notification"];
-
-                        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-                        }
-                    }
-                } else {
-                    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-                    }
-                }
-            } else {
-                if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-                }
-            }
+            payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
         }
     }
 
@@ -1570,6 +1542,46 @@ static id isNil(id object) {
     }
 
     handleNotificationOpened(result);
+}
+
+#pragma mark - Handle notification actions buttons events
+- (NSMutableDictionary *)handleActionInNotification:(NSDictionary *)notificationPayload withAction:(NSString *)actionIdentifier payloadMutable:(NSMutableDictionary *)payloadMutable {
+    NSMutableDictionary *updatedPayloadMutable = [payloadMutable mutableCopy];
+    NSURL *url = [NSURL URLWithString:[notificationPayload objectForKey:@"url"]];
+
+    BOOL hasActionIdentifier = actionIdentifier != nil && ![actionIdentifier isKindOfClass:[NSNull class]];
+    BOOL hasActionsArray = [notificationPayload objectForKey:@"actions"] != nil &&
+                           ![[notificationPayload objectForKey:@"actions"] isKindOfClass:[NSNull class]] &&
+                           [[notificationPayload objectForKey:@"actions"] isKindOfClass:[NSArray class]] &&
+                           [[notificationPayload objectForKey:@"actions"] count] > 0;
+
+    if (hasActionIdentifier && hasActionsArray) {
+        NSMutableArray *actionsArray = [notificationPayload[@"actions"] mutableCopy];
+        NSInteger actionValue = [actionIdentifier integerValue];
+
+        if (actionValue >= 0 && actionValue < [actionsArray count]) {
+            NSDictionary *selectedAction = actionsArray[actionValue];
+
+            if ([selectedAction objectForKey:@"url"] != nil &&
+                ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
+                [[selectedAction objectForKey:@"url"] length] > 0) {
+
+                url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
+
+                NSMutableDictionary *notificationDict = [updatedPayloadMutable[@"notification"] mutableCopy];
+                [notificationDict setObject:[selectedAction objectForKey:@"url"] forKey:@"url"];
+                [updatedPayloadMutable setObject:notificationDict forKey:@"notification"];
+
+                [self validURLHandler:url];
+            }
+        } else {
+            [self validURLHandler:url];
+        }
+    } else {
+        [self validURLHandler:url];
+    }
+
+    return updatedPayloadMutable;
 }
 
 #pragma mark - Update counts of the notification badge
@@ -3235,6 +3247,13 @@ static id isNil(id object) {
 
 - (UIViewController*)getCustomTopViewController {
     return customTopViewController;
+}
+
+#pragma mark - NSURL handler if url is valid
+- (void)validURLHandler:(NSURL *)url {
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }
 }
 
 #pragma mark - App Banner methods
