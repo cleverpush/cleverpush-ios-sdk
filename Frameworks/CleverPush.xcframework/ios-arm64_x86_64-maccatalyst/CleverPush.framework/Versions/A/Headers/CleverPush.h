@@ -21,6 +21,7 @@
 #import "CleverPushInstance.h"
 #import "CPInboxView.h"
 #import "CleverPushUserDefaults.h"
+#import "CPIabTcfMode.h"
 
 @interface CleverPush : NSObject
 
@@ -47,6 +48,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
++ (void)setSubscribeConsentRequired:(BOOL)required;
++ (void)setSubscribeConsent:(BOOL)consent;
 + (void)enableDevelopmentMode;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
@@ -64,6 +67,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
++ (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure;
++ (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*)error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTopic:(NSString*)topicId;
 + (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback;
@@ -125,9 +130,11 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showAppBanner:(NSString*)bannerId;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
++ (void)setIabTcfMode:(CPIabTcfMode)mode;
 + (void)setAuthorizerToken:(NSString*)authorizerToken;
 + (void)setCustomTopViewController:(UIViewController*)viewController;
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
@@ -155,6 +162,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)getApiEndpoint;
 + (NSString*)channelId;
 + (UIViewController*)getCustomTopViewController;
++ (CPIabTcfMode)getIabTcfMode;
 
 + (UIColor*)getBrandingColor;
 

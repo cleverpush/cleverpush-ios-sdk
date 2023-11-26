@@ -1,3 +1,8 @@
+## 1.29.0 (26.11.2023)
+* IAB TCF compatibility added
+* Automatic retry of failed API requests
+* App banner delegate to show banner on custom view controller
+
 ## 1.28.13
 * Optimizations for in app banners
 
