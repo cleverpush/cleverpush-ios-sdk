@@ -17,6 +17,7 @@
 #import "CPSubscription.h"
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
+#import "CPIabTcfMode.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
@@ -85,6 +86,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (void)setTrackingConsentRequired:(BOOL)required;
 - (void)setTrackingConsent:(BOOL)consent;
+- (void)setSubscribeConsentRequired:(BOOL)required;
+- (void)setSubscribeConsent:(BOOL)consent;
 - (void)enableDevelopmentMode;
 - (void)subscribe;
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
@@ -170,6 +173,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 - (void)setApiEndpoint:(NSString*)apiEndpoint;
+- (void)setIabTcfMode:(CPIabTcfMode)mode;
 - (void)setAuthorizerToken:(NSString*)authorizerToken;
 - (void)setCustomTopViewController:(UIViewController*)viewController;
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
@@ -194,6 +198,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSString*)getApiEndpoint;
 - (NSString*)channelId;
 - (UIViewController*)getCustomTopViewController;
+- (CPIabTcfMode)getIabTcfMode;
 
 - (UIColor*)getBrandingColor;
 
@@ -243,6 +248,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (CPHandleSubscribedBlock)getSubscribeHandler;
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback;
 - (void)initFeatures;
+- (void)initIabTcf;
 - (void)initAppReview;
 - (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter;
 - (NSInteger)secondsAfterLastCheck;
@@ -258,6 +264,10 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getHasTrackingConsent;
 - (BOOL)getHasTrackingConsentCalled;
 - (void)waitForTrackingConsent:(void(^)(void))callback;
+- (BOOL)getSubscribeConsentRequired;
+- (BOOL)getHasSubscribeConsent;
+- (BOOL)getHasSubscribeConsentCalled;
+- (void)waitForSubscribeConsent:(void(^)(void))callback;
 - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
 - (void)removeSubscriptionTagFromApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
 - (void)initTopicsDialogData:(NSDictionary*)config syncToBackend:(BOOL)syncToBackend;
