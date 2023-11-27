@@ -751,7 +751,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark -  URL Handling
-+ (void)validURLHandler:(NSURL *)url {
++ (void)tryOpenURL:(NSURL *)url {
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
         [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
     }
