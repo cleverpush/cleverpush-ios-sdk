@@ -914,34 +914,46 @@ static id isNil(id object) {
 }
 
 #pragma mark - Returns if the user has currently given the notification permission
-- (BOOL)areNotificationsEnabled {
+- (void)areNotificationsEnabled:(void(^)(BOOL))callback {
     __block BOOL isEnabled = NO;
-    __block dispatch_semaphore_t sema = nil;
 
     if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {
         if (@available(iOS 10.0, *)) {
-            sema = dispatch_semaphore_create(0);
-
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
-                isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
-                dispatch_semaphore_signal(sema);
-            }];
+                if (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                    isEnabled = YES;
+                }
 
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+                if (callback) {
+                    callback(isEnabled);
+                }
+            }];
         }
     } else {
-        [self ensureMainThreadSync:^{
-            if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-                UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                isEnabled = (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone));
-#pragma clang diagnostic pop
-            } else {
-                isEnabled = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
-            }
-        }];
-    }
+         [self ensureMainThreadSync:^{
+             if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
+ #pragma clang diagnostic push
+ #pragma clang diagnostic ignored "-Wdeprecated"
+                 UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+                 if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+                     isEnabled = NO;
+                 } else {
+                     isEnabled = YES;
+                 }
+ #pragma clang diagnostic pop
+             } else {
+                 if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
+                     isEnabled = YES;
+                 } else {
+                     isEnabled = NO;
+                 }
+             }
+
+             if (callback) {
+                 callback(isEnabled);
+             }
+         }];
+     }
     return isEnabled;
 }
 
@@ -1034,29 +1046,6 @@ static id isNil(id object) {
                                         }
                                     }
                                 }];
-<<<<<<< HEAD
-=======
-
-                                if (subscribedBlock) {
-                                    [self getSubscriptionId:^(NSString* subscriptionId) {
-                                        if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            subscribedBlock(subscriptionId);
-                                        } else {
-                                            [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
-                                        }
-                                    }];
-                                }
-                            } else if (subscribedBlock) {
-                                subscribedBlock(subscriptionId);
-                            }
-                        } else if (failureBlock) {
-                            failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
-                        }
-                    });
-                }];
-            }
-        }];
->>>>>>> edb855b (feature/CP-7024-ios-auto-request-notification-permission)
 
                                 if (subscribedBlock) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
@@ -2193,8 +2182,6 @@ static id isNil(id object) {
                                         token, @"iosLiveActivityToken",
                                         subscriptionId, @"subscriptionId",
                                         nil];
-
-        [dataDic setObject:@([CleverPush areNotificationsEnabled]) forKey:@"hasNotificationPermission"];
 
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
