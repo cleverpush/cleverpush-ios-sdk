@@ -77,6 +77,7 @@ NSString * const CLEVERPUSH_SDK_VERSION = @"1.29.0";
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
+static BOOL autoResubscribe = NO;
 static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
 static BOOL incrementBadge = NO;
@@ -496,7 +497,11 @@ static id isNil(id object) {
 
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
         if (subscriptionId == nil) {
+            if (autoResubscribe && notificationsEnabled) {
+                [self subscribe];
+            } else {
                 [CPLog debug:@"CleverPushInstance: applicationWillEnterForeground: There is no subscription for CleverPush SDK."];
+            }
         } else {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
                 [CPLog info:@"notification authorization revoked, unsubscribing"];
@@ -3320,6 +3325,10 @@ static id isNil(id object) {
 
 - (void)setAutoClearBadge:(BOOL)autoClear {
     autoClearBadge = autoClear;
+}
+
+- (void)setAutoResubscribe:(BOOL)resubscribe {
+    autoResubscribe = resubscribe;
 }
 
 - (void)setAppBannerDraftsEnabled:(BOOL)showDraft {

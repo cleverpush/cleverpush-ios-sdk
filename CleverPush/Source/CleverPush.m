@@ -356,6 +356,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
 
++ (void)setAutoResubscribe:(BOOL)resubscribe {
+    [self.CPSharedInstance setAutoResubscribe:resubscribe];
+}
+
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft {
     [self.CPSharedInstance setAppBannerDraftsEnabled:showDraft];
 }
