@@ -1518,9 +1518,16 @@ static id isNil(id object) {
         [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
     }
 
+    payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
+
+    if (action != nil) {
+        notification = [payloadMutable cleverPushDictionaryForKey:@"notification"];
+    }
+
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
+        NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
+            [self validURLHandler:url];
         }
     }
 
@@ -1544,15 +1551,16 @@ static id isNil(id object) {
 }
 
 #pragma mark - Handle notification actions buttons events
-- (NSMutableDictionary *)handleActionInNotification:(NSDictionary *)notificationPayload withAction:(NSString *)actionIdentifier payloadMutable:(NSMutableDictionary *)payloadMutable {
+- (NSMutableDictionary *)handleActionInNotification:(NSDictionary *)notificationPayload
+                                        withAction:(NSString *)actionIdentifier
+                                    payloadMutable:(NSMutableDictionary *)payloadMutable {
     NSMutableDictionary *updatedPayloadMutable = [payloadMutable mutableCopy];
-    NSURL *url = [NSURL URLWithString:[notificationPayload objectForKey:@"url"]];
 
     BOOL hasActionIdentifier = actionIdentifier != nil && ![actionIdentifier isKindOfClass:[NSNull class]];
-    BOOL hasActionsArray = [notificationPayload objectForKey:@"actions"] != nil &&
-                           ![[notificationPayload objectForKey:@"actions"] isKindOfClass:[NSNull class]] &&
-                           [[notificationPayload objectForKey:@"actions"] isKindOfClass:[NSArray class]] &&
-                           [[notificationPayload objectForKey:@"actions"] count] > 0;
+    BOOL hasActionsArray = notificationPayload[@"actions"] != nil &&
+                           ![notificationPayload[@"actions"] isKindOfClass:[NSNull class]] &&
+                           [notificationPayload[@"actions"] isKindOfClass:[NSArray class]] &&
+                           [notificationPayload[@"actions"] count] > 0;
 
     if (hasActionIdentifier && hasActionsArray) {
         NSMutableArray *actionsArray = [notificationPayload[@"actions"] mutableCopy];
@@ -1561,22 +1569,17 @@ static id isNil(id object) {
         if (actionValue >= 0 && actionValue < [actionsArray count]) {
             NSDictionary *selectedAction = actionsArray[actionValue];
 
-            if ([selectedAction objectForKey:@"url"] != nil &&
-                ![[selectedAction objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
-                [[selectedAction objectForKey:@"url"] length] > 0) {
-                url = [NSURL URLWithString:[selectedAction objectForKey:@"url"]];
+            NSString *selectedActionURL = selectedAction[@"url"];
+            BOOL hasURL = selectedActionURL != nil &&
+                          ![selectedActionURL isKindOfClass:[NSNull class]] &&
+                          [selectedActionURL length] > 0;
 
+            if (hasURL) {
                 NSMutableDictionary *notificationDict = [updatedPayloadMutable[@"notification"] mutableCopy];
-                [notificationDict setObject:[selectedAction objectForKey:@"url"] forKey:@"url"];
-                [updatedPayloadMutable setObject:notificationDict forKey:@"notification"];
-
-                [self validURLHandler:url];
+                notificationDict[@"url"] = selectedActionURL;
+                updatedPayloadMutable[@"notification"] = notificationDict;
             }
-        } else {
-            [self validURLHandler:url];
         }
-    } else {
-        [self validURLHandler:url];
     }
     return updatedPayloadMutable;
 }
