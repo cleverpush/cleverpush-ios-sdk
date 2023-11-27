@@ -85,6 +85,7 @@ static BOOL showNotificationsInForeground = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
+static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
@@ -917,7 +918,6 @@ static id isNil(id object) {
     __block BOOL isEnabled = NO;
 
     if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {
-
         if (@available(iOS 10.0, *)) {
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
                 if (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) {
@@ -1321,7 +1321,7 @@ static id isNil(id object) {
     }];
 }
 
-- (void)setSyncSubscriptionRequestData:(NSMutableURLRequest*)request {
+- (void)setSyncSubscriptionRequestData:(NSMutableURLRequest*)request notificationsEnabled:(BOOL)notificationsEnabled {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
     NSString* language = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
@@ -1351,6 +1351,7 @@ static id isNil(id object) {
                                     isNil(timezone), @"timezone",
                                     isNil(language), @"language",
                                     nil];
+
 
     if (subscriptionId) {
         [dataDic setObject:subscriptionId forKey:@"subscriptionId"];
@@ -1384,9 +1385,11 @@ static id isNil(id object) {
         }
     }
 
+    [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+
     [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
 
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
 }
 
@@ -1409,69 +1412,71 @@ static id isNil(id object) {
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
 
-    [self setSyncSubscriptionRequestData:request];
+    [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+        [self setSyncSubscriptionRequestData:request notificationsEnabled:notificationsEnabled];
 
-    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        [self setUnsubscribeStatus:NO];
-        [self updateDeselectFlag:NO];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            [self setUnsubscribeStatus:NO];
+            [self updateDeselectFlag:NO];
 
-        if ([results objectForKey:@"topics"] != nil) {
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableArray *arrTopics = [[NSMutableArray alloc] init];
-            [[results objectForKey:@"topics"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                if (![obj isKindOfClass:[NSNull class]]) {
-                    [arrTopics addObject:obj];
+            if ([results objectForKey:@"topics"] != nil) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableArray *arrTopics = [[NSMutableArray alloc] init];
+                [[results objectForKey:@"topics"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    if (![obj isKindOfClass:[NSNull class]]) {
+                        [arrTopics addObject:obj];
+                    }
+                }];
+
+                [userDefaults setObject:arrTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+                if ([results objectForKey:@"topicsVersion"] != nil) {
+                    [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
                 }
-            }];
-
-            [userDefaults setObject:arrTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-            if ([results objectForKey:@"topicsVersion"] != nil) {
-                [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-            }
-            [userDefaults synchronize];
-        }
-
-        if ([results objectForKey:@"id"] != nil) {
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            if (!subscriptionId) {
-                [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+                [userDefaults synchronize];
             }
 
-            NSString *newSubscriptionId = [results objectForKey:@"id"];
-            NSString *oldSubscriptionId;
-            if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
-                oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
-            }
-            BOOL isSubscriptionChanged = [newSubscriptionId isEqualToString:oldSubscriptionId];
-            [CleverPush setSubscriptionChanged:isSubscriptionChanged];
+            if ([results objectForKey:@"id"] != nil) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                if (!subscriptionId) {
+                    [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+                }
 
-            subscriptionId = [results objectForKey:@"id"];
-            [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
-            [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
-            [userDefaults synchronize];
+                NSString *newSubscriptionId = [results objectForKey:@"id"];
+                NSString *oldSubscriptionId;
+                if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
+                    oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+                }
+                BOOL isSubscriptionChanged = [newSubscriptionId isEqualToString:oldSubscriptionId];
+                [CleverPush setSubscriptionChanged:isSubscriptionChanged];
 
-            if (handleSubscribed && ![self getHandleSubscribedCalled]) {
-                handleSubscribed(subscriptionId);
-                [self setHandleSubscribedCalled:YES];
-            }
-            if (handleSubscribedInternal) {
-                handleSubscribedInternal(subscriptionId);
-            }
-            for (id (^listener)() in pendingSubscriptionListeners) {
-                listener(subscriptionId);
-            }
-            pendingSubscriptionListeners = [NSMutableArray new];
-        }
+                subscriptionId = [results objectForKey:@"id"];
+                [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
+                [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
+                [userDefaults synchronize];
 
-        if (successBlock) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                successBlock();
-            });
-        }
-    } onFailure:^(NSError* error) {
-        if (failureBlock) {
-            failureBlock(error);
-        }
+                if (handleSubscribed && ![self getHandleSubscribedCalled]) {
+                    handleSubscribed(subscriptionId);
+                    [self setHandleSubscribedCalled:YES];
+                }
+                if (handleSubscribedInternal) {
+                    handleSubscribedInternal(subscriptionId);
+                }
+                for (id (^listener)() in pendingSubscriptionListeners) {
+                    listener(subscriptionId);
+                }
+                pendingSubscriptionListeners = [NSMutableArray new];
+            }
+
+            if (successBlock) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    successBlock();
+                });
+            }
+        } onFailure:^(NSError* error) {
+            if (failureBlock) {
+                failureBlock(error);
+            }
+        }];
     }];
 }
 
@@ -2165,12 +2170,13 @@ static id isNil(id object) {
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
-        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 channelId, @"channelId",
-                                 activityId, @"iosLiveActivityId",
-                                 token, @"iosLiveActivityToken",
-                                 subscriptionId, @"subscriptionId",
-                                 nil];
+        NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        channelId, @"channelId",
+                                        activityId, @"iosLiveActivityId",
+                                        token, @"iosLiveActivityToken",
+                                        subscriptionId, @"subscriptionId",
+                                        nil];
+
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
@@ -3380,6 +3386,10 @@ static id isNil(id object) {
 
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     ignoreDisabledNotificationPermission = ignore;
+}
+
+- (void)setAutoRequestNotificationPermission:(BOOL)autoRequest {
+    autoRequestNotificationPermission = autoRequest;
 }
 
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
