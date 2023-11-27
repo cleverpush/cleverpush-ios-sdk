@@ -648,10 +648,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getUnsubscribeStatus];
 }
 
-+ (BOOL)areNotificationsEnabled {
-    return [self.CPSharedInstance areNotificationsEnabled];
-}
-
 + (void)setLogListener:(CPLogListener)listener {
     [self.CPSharedInstance setLogListener:listener];
 }
