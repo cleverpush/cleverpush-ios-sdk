@@ -40,6 +40,6 @@
 + (BOOL)isNullOrEmpty:(NSString *)string;
 + (NSURL*)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement;
 + (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary;
-+ (void)validURLHandler:(NSURL*)url;
++ (void)validURLHandler:(NSURL *)url;
 
 @end
