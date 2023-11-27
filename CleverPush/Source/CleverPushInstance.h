@@ -205,6 +205,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (NSMutableArray*)getAvailableAttributes __attribute__((deprecated));
 - (NSDictionary*)getSubscriptionAttributes;
+- (NSMutableDictionary*)handleActionInNotification:(NSDictionary*)notificationPayload withAction:(NSString*)actionIdentifier
+    payloadMutable:(NSMutableDictionary *)payloadMutable;
 
 - (BOOL)isDevelopmentModeEnabled;
 - (BOOL)getAppBannerDraftsEnabled;

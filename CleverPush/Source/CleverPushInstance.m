@@ -1597,8 +1597,9 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    NSString* notificationId = [payload cleverPushStringForKeyPath:@"notification._id"];
-    NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
+    NSMutableDictionary* payloadMutable = [payload mutableCopy];
+    NSString* notificationId = [payloadMutable cleverPushStringForKeyPath:@"notification._id"];
+    NSDictionary* notification = [payloadMutable cleverPushDictionaryForKey:@"notification"];
     NSString* action = actionIdentifier;
 
     if (!notification) {
@@ -1614,11 +1615,11 @@ static id isNil(id object) {
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
     }
-    [CPLog debug:@"handleNotificationOpened, %@, %@", action, payload];
+    [CPLog debug:@"handleNotificationOpened, %@, %@", action, payloadMutable];
 
     [self setNotificationClicked:notificationId
-                   withChannelId:[payload cleverPushStringForKeyPath:@"channel._id"]
-              withSubscriptionId:[payload cleverPushStringForKeyPath:@"subscription._id"]
+                   withChannelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"]
+              withSubscriptionId:[payloadMutable cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
     ];
 
@@ -1648,24 +1649,28 @@ static id isNil(id object) {
             [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
         }
 
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payload cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
     }
 
-    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payload action:action];
+    payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
 
-    if (!channelId) { // not init
-        pendingOpenedResult = result;
+    if (action != nil) {
+        notification = [payloadMutable cleverPushDictionaryForKey:@"notification"];
     }
 
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-            } 
+            [CPUtils tryOpenURL:url];
         }
     }
 
+    CPNotificationOpenedResult * result = [[CPNotificationOpenedResult alloc] initWithPayload:payloadMutable action:action];
+
+    if (!channelId) { // not init
+        pendingOpenedResult = result;
+    }
+    
     if (!handleNotificationOpened) {
         if (hasWebViewOpened) {
             if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
@@ -1677,6 +1682,40 @@ static id isNil(id object) {
     }
 
     handleNotificationOpened(result);
+}
+
+#pragma mark - Handle notification actions buttons events
+- (NSMutableDictionary *)handleActionInNotification:(NSDictionary *)notificationPayload
+                                        withAction:(NSString *)actionIdentifier
+                                    payloadMutable:(NSMutableDictionary *)payloadMutable {
+    NSMutableDictionary* updatedPayloadMutable = [payloadMutable mutableCopy];
+
+    BOOL hasActionIdentifier = actionIdentifier != nil && ![actionIdentifier isKindOfClass:[NSNull class]];
+    BOOL hasActionsArray = notificationPayload[@"actions"] != nil &&
+                           ![notificationPayload[@"actions"] isKindOfClass:[NSNull class]] &&
+                           [notificationPayload[@"actions"] isKindOfClass:[NSArray class]] &&
+                           [notificationPayload[@"actions"] count] > 0;
+
+    if (hasActionIdentifier && hasActionsArray) {
+        NSMutableArray* actionsArray = [notificationPayload[@"actions"] mutableCopy];
+        NSInteger actionValue = [actionIdentifier integerValue];
+
+        if (actionValue >= 0 && actionValue < [actionsArray count]) {
+            NSDictionary *selectedAction = actionsArray[actionValue];
+
+            NSString* selectedActionURL = selectedAction[@"url"];
+            BOOL hasURL = selectedActionURL != nil &&
+                          ![selectedActionURL isKindOfClass:[NSNull class]] &&
+                          [selectedActionURL length] > 0;
+
+            if (hasURL) {
+                NSMutableDictionary *notificationDict = [updatedPayloadMutable[@"notification"] mutableCopy];
+                notificationDict[@"url"] = selectedActionURL;
+                updatedPayloadMutable[@"notification"] = notificationDict;
+            }
+        }
+    }
+    return updatedPayloadMutable;
 }
 
 #pragma mark - Update counts of the notification badge
