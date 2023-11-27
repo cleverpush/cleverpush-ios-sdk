@@ -179,6 +179,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
++ (BOOL)areNotificationsEnabled;
 + (void)setConfirmAlertShown;
 + (void)areNotificationsEnabled:(void(^)(BOOL))callback;
 

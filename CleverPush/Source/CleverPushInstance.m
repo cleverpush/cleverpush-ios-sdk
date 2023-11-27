@@ -914,21 +914,20 @@ static id isNil(id object) {
 }
 
 #pragma mark - Returns if the user has currently given the notification permission
-- (void)areNotificationsEnabled:(void(^)(BOOL))callback {
+- (BOOL)areNotificationsEnabled {
     __block BOOL isEnabled = NO;
+    __block dispatch_semaphore_t sema = nil;
 
     if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion) { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 }]) {
-
         if (@available(iOS 10.0, *)) {
-            [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
-                if (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) {
-                    isEnabled = YES;
-                }
+            sema = dispatch_semaphore_create(0);
 
-                if (callback) {
-                    callback(isEnabled);
-                }
+            [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
+                isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
+                dispatch_semaphore_signal(sema);
             }];
+
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
         }
     } else {
         [self ensureMainThreadSync:^{
@@ -936,24 +935,20 @@ static id isNil(id object) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
                 UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-                    isEnabled = NO;
-                } else {
-                    isEnabled = YES;
-                }
+                isEnabled = (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone));
 #pragma clang diagnostic pop
             } else {
-                if ([[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-                    isEnabled = YES;
-                } else {
-                    isEnabled = NO;
-                }
-            }
-
-            if (callback) {
-                callback(isEnabled);
+                isEnabled = [[UIApplication sharedApplication] isRegisteredForRemoteNotifications];
             }
         }];
+    }
+    return isEnabled;
+}
+
+- (void)areNotificationsEnabled:(void(^)(BOOL))callback {
+    BOOL isEnabled = [self areNotificationsEnabled];
+    if (callback) {
+        callback(isEnabled);
     }
 }
 
@@ -1274,7 +1269,7 @@ static id isNil(id object) {
 
         if (@available(iOS 10.0, *)) {
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
-                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized || (!autoRequestNotificationPermission && settings.authorizationStatus == UNAuthorizationStatusNotDetermined)) {
+                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
                     [CPLog debug:@"syncSubscription called from registerDeviceToken"];
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
@@ -1409,14 +1404,12 @@ static id isNil(id object) {
         }
     }
 
-    [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
-        [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+    [dataDic setObject:@([CleverPush areNotificationsEnabled]) forKey:@"hasNotificationPermission"];
 
-        [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
+    [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
 
-        NSData *postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-    }];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+    [request setHTTPBody:postData];
 }
 
 #pragma mark - add Subcription API call
@@ -2201,16 +2194,13 @@ static id isNil(id object) {
                                         subscriptionId, @"subscriptionId",
                                         nil];
 
-        [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
-            [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+        [dataDic setObject:@([CleverPush areNotificationsEnabled]) forKey:@"hasNotificationPermission"];
 
-            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-            [request setHTTPBody:postData];
-
-            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-            } onFailure:^(NSError* error) {
-                [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
-            }];
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        } onFailure:^(NSError* error) {
+            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
         }];
     }
 }
