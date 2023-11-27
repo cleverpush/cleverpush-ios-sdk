@@ -105,6 +105,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setNormalTintColor:(UIColor *)color;
 + (UIColor*)getNormalTintColor;
 + (void)setAutoClearBadge:(BOOL)autoClear;
++ (void)setAutoResubscribe:(BOOL)resubscribe;
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 + (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 + (void)setIncrementBadge:(BOOL)increment;
