@@ -143,11 +143,13 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setNormalTintColor:(UIColor *)color;
 - (UIColor*)getNormalTintColor;
 - (void)setAutoClearBadge:(BOOL)autoClear;
+- (void)setAutoResubscribe:(BOOL)resubscribe;
 - (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 - (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 - (void)setIncrementBadge:(BOOL)increment;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
+- (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 - (void)addChatView:(CPChatView*)chatView;
 - (void)showTopicsDialog;
@@ -204,6 +206,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 - (NSMutableArray*)getAvailableAttributes __attribute__((deprecated));
 - (NSDictionary*)getSubscriptionAttributes;
+- (NSMutableDictionary*)handleActionInNotification:(NSDictionary*)notificationPayload withAction:(NSString*)actionIdentifier
+    payloadMutable:(NSMutableDictionary *)payloadMutable;
 
 - (BOOL)isDevelopmentModeEnabled;
 - (BOOL)getAppBannerDraftsEnabled;

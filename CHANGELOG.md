@@ -1,3 +1,8 @@
+## 1.29.1 (27.11.2023)
+* Automatic handling of URLs in Notification Actions
+* Support for `setAutoRequestNotificationPermission(false)` added
+* Support for `setAutoResubscribe(true)` added
+
 ## 1.29.0 (26.11.2023)
 * IAB TCF compatibility added
 * Automatic retry of failed API requests
