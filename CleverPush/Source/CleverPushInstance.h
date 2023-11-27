@@ -255,7 +255,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getTrackingConsentRequired;
 - (BOOL)getHasTrackingConsent;
 - (BOOL)getHasTrackingConsentCalled;
-- (void)validURLHandler:(NSURL *)url;
 - (void)waitForTrackingConsent:(void(^)(void))callback;
 - (void)addSubscriptionTagToApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
 - (void)removeSubscriptionTagFromApi:(NSString*)tagId callback:(void (^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;

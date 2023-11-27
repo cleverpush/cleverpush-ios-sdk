@@ -750,4 +750,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return voucherCode;
 }
 
+#pragma mark -  URL Handling
++ (void)validURLHandler:(NSURL *)url {
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }
+}
+
 @end

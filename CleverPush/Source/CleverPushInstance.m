@@ -1463,7 +1463,7 @@ static id isNil(id object) {
 }
 
 - (void)handleNotificationOpened:(NSDictionary*)payload isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
-    NSMutableDictionary *payloadMutable = [payload mutableCopy];
+    NSMutableDictionary* payloadMutable = [payload mutableCopy];
     NSString* notificationId = [payloadMutable cleverPushStringForKeyPath:@"notification._id"];
     NSDictionary* notification = [payloadMutable cleverPushDictionaryForKey:@"notification"];
     NSString* action = actionIdentifier;
@@ -1527,7 +1527,7 @@ static id isNil(id object) {
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL *url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            [self validURLHandler:url];
+            [CPUtils validURLHandler:url];
         }
     }
 
@@ -1554,7 +1554,7 @@ static id isNil(id object) {
 - (NSMutableDictionary *)handleActionInNotification:(NSDictionary *)notificationPayload
                                         withAction:(NSString *)actionIdentifier
                                     payloadMutable:(NSMutableDictionary *)payloadMutable {
-    NSMutableDictionary *updatedPayloadMutable = [payloadMutable mutableCopy];
+    NSMutableDictionary* updatedPayloadMutable = [payloadMutable mutableCopy];
 
     BOOL hasActionIdentifier = actionIdentifier != nil && ![actionIdentifier isKindOfClass:[NSNull class]];
     BOOL hasActionsArray = notificationPayload[@"actions"] != nil &&
@@ -1563,13 +1563,13 @@ static id isNil(id object) {
                            [notificationPayload[@"actions"] count] > 0;
 
     if (hasActionIdentifier && hasActionsArray) {
-        NSMutableArray *actionsArray = [notificationPayload[@"actions"] mutableCopy];
+        NSMutableArray* actionsArray = [notificationPayload[@"actions"] mutableCopy];
         NSInteger actionValue = [actionIdentifier integerValue];
 
         if (actionValue >= 0 && actionValue < [actionsArray count]) {
             NSDictionary *selectedAction = actionsArray[actionValue];
 
-            NSString *selectedActionURL = selectedAction[@"url"];
+            NSString* selectedActionURL = selectedAction[@"url"];
             BOOL hasURL = selectedActionURL != nil &&
                           ![selectedActionURL isKindOfClass:[NSNull class]] &&
                           [selectedActionURL length] > 0;
@@ -3247,13 +3247,6 @@ static id isNil(id object) {
 
 - (UIViewController*)getCustomTopViewController {
     return customTopViewController;
-}
-
-#pragma mark - NSURL handler if url is valid
-- (void)validURLHandler:(NSURL *)url {
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-    }
 }
 
 #pragma mark - App Banner methods
