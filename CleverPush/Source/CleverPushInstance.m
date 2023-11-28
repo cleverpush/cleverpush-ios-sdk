@@ -2167,6 +2167,7 @@ static id isNil(id object) {
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
     [self startLiveActivity:activityId pushToken:token onSuccess:nil onFailure:nil];
 }
+
 - (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     if (subscriptionId != nil) {
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
@@ -2186,8 +2187,17 @@ static id isNil(id object) {
     }
 }
 
-#pragma mark - Set subscription attribute tag by calling api. subscription/attribute
+#pragma mark - Set subscription attribute (single-value) by calling api. subscription/attribute
 - (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback {
+    [self setSubscriptionAttribute:attributeId objectValue:value callback:callback];
+}
+
+#pragma mark - Set subscription attribute (multi-value) by calling api. subscription/attribute
+- (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value callback:(void(^)())callback {
+    [self setSubscriptionAttribute:attributeId objectValue:value callback:callback];
+}
+
+- (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString *subscriptionId) {
             if (subscriptionId == nil) {
