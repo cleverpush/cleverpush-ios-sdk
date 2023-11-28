@@ -414,9 +414,6 @@ static id isNil(id object) {
                 if (handleSubscribedInternal) {
                     handleSubscribedInternal(subscriptionId);
                 }
-                if (handleInitialized) {
-                    handleInitialized(YES);
-                }
             }
         }];
     } else {
@@ -3334,10 +3331,12 @@ static id isNil(id object) {
             channelConfig = result;
         }
 
+        [self handleInitialization:YES error:nil];
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
-        [CPLog error:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
-
+        NSString *failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
+        [CPLog error:failureMessage];
+        [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];
 }
@@ -3364,17 +3363,23 @@ static id isNil(id object) {
                     channelConfig = testsResult;
                 }
 
+                [self handleInitialization:YES error:Nil];
                 [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
-                [CPLog error:@"Failed getting the channel config %@", error];
+                NSString *failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
+                [CPLog error:failureMessage];
+                [self handleInitialization:NO error:failureMessage];
                 [self fireChannelConfigListeners];
             }];
             return;
         }
 
+        [self handleInitialization:YES error:nil];
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
-        [CPLog error:@"Failed getting the channel config %@", error];
+        NSString *failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
+        [CPLog error:failureMessage];
+        [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];
 }
@@ -3412,6 +3417,12 @@ static id isNil(id object) {
 
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback {
     handleSubscribed = subscribedCallback;
+}
+
+- (void)handleInitialization:(BOOL)success error:(NSString * _Nullable)error {
+    if (handleInitialized) {
+        handleInitialized(success, error);
+    }
 }
 
 - (void)setLogListener:(CPLogListener)listener {

@@ -50,7 +50,7 @@ typedef void (^CPTopicsChangedBlock)();
 
 typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* result);
 typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* result);
-typedef void (^CPInitializedBlock)(BOOL);
+typedef void (^CPInitializedBlock)(BOOL success, NSString* _Nullable failureMessage);
 
 typedef void (^CPResultSuccessBlock)(NSDictionary* result);
 typedef void (^CPFailureBlock)(NSError* error);
@@ -242,6 +242,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getHandleSubscribedCalled;
 - (CPHandleSubscribedBlock)getSubscribeHandler;
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback;
+- (void)handleInitialization:(BOOL)success failureMessage:(NSString * _Nullable)error;
 - (void)initFeatures;
 - (void)initAppReview;
 - (BOOL)hasNewTopicAfterOneHour:(NSDictionary*)config initialDifference:(NSInteger)initialDifference displayDialogDifference:(NSInteger)displayAfter;
