@@ -1,3 +1,6 @@
+## 1.29.2 
+*  Added new method `setSubscriptionAttribute` to support multiple attribute value as array
+
 ## 1.29.1 (27.11.2023)
 * Automatic handling of URLs in Notification Actions
 * Support for `setAutoRequestNotificationPermission(false)` added
