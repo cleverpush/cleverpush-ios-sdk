@@ -108,6 +108,7 @@ NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
+NSString *appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
@@ -3424,6 +3425,10 @@ static id isNil(id object) {
     apiEndpoint = endpoint;
 }
 
+- (void)setAppGroupIdentifierSuffix:(NSString*)suffix {
+    appGroupIdentifier = suffix;
+}
+
 - (void)setIabTcfMode:(CPIabTcfMode)mode {
     currentIabTcfMode = mode;
 }
@@ -3438,6 +3443,10 @@ static id isNil(id object) {
 
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
+}
+
+- (NSString *)getAppGroupIdentifierSuffix {
+    return appGroupIdentifier;
 }
 
 - (CPIabTcfMode)getIabTcfMode {

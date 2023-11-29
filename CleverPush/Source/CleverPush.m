@@ -502,6 +502,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setApiEndpoint:apiEndpoint];
 }
 
++ (void)setAppGroupIdentifierSuffix:(NSString*)suffix {
+    [self.CPSharedInstance setAppGroupIdentifierSuffix:suffix];
+}
+
 + (void)setIabTcfMode:(CPIabTcfMode)mode {
     [self.CPSharedInstance setIabTcfMode:mode];
 }
@@ -592,6 +596,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getApiEndpoint {
     return [self.CPSharedInstance getApiEndpoint];
+}
+
++ (NSString*)getAppGroupIdentifierSuffix {
+    return [self.CPSharedInstance getAppGroupIdentifierSuffix];
 }
 
 + (CPIabTcfMode)getIabTcfMode {
