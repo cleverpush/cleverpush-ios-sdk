@@ -274,10 +274,6 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
-+ (void)removeSubscriptionTagsAndAttributes {
-    [self.CPSharedInstance removeSubscriptionTagsAndAttributes];
-}
-
 + (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
     [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
 }

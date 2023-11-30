@@ -125,7 +125,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
 - (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
 - (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds;
-- (void)removeSubscriptionTagsAndAttributes;
 - (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback;
 - (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value callback:(void(^)())callback;
 - (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;

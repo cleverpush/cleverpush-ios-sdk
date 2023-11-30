@@ -176,14 +176,18 @@ static id isNil(id object) {
 }
 
 - (void)setTrackingConsent:(BOOL)consent {
+    BOOL previousTrackingConsent = hasTrackingConsent;
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
 
-    if (hasTrackingConsent) {
-        [self fireTrackingConsentListeners];
-    } else {
+    if (!hasTrackingConsent && previousTrackingConsent) {
         [self removeSubscriptionTagsAndAttributes];
-        pendingTrackingConsentListeners = [NSMutableArray new];
+    } else {
+        if (hasTrackingConsent) {
+            [self fireTrackingConsentListeners];
+        } else {
+            pendingTrackingConsentListeners = [NSMutableArray new];
+        }
     }
 }
 
@@ -2166,24 +2170,26 @@ static id isNil(id object) {
 
 - (void)removeSubscriptionTagsAndAttributes {
     [self getSubscriptionId:^(NSString *subscriptionId) {
-        if (subscriptionId != nil) {
-            NSArray *subscriptionTags = [CleverPush getSubscriptionTags];
-            NSDictionary *attributes = [CleverPush getSubscriptionAttributes];
-
-            if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
-                [self removeSubscriptionTags:subscriptionTags];
-            }
-
-            if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
-                for (NSString *key in attributes) {
-                    id value = [attributes objectForKey:key];
-
-                    if (value != nil) {
-                        if ([value isKindOfClass:[NSString class]]) {
-                            [CleverPush setSubscriptionAttribute:key value:@""];
-                        } else if ([value isKindOfClass:[NSArray class]]) {
-                            [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
-                        }
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: removeSubscriptionTagsAndAttributes: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        NSArray *subscriptionTags = [CleverPush getSubscriptionTags];
+        NSDictionary *attributes = [CleverPush getSubscriptionAttributes];
+        
+        if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
+            [self removeSubscriptionTags:subscriptionTags];
+        }
+        
+        if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
+            for (NSString *key in attributes) {
+                id value = [attributes objectForKey:key];
+                
+                if (value != nil) {
+                    if ([value isKindOfClass:[NSString class]]) {
+                        [CleverPush setSubscriptionAttribute:key value:@""];
+                    } else if ([value isKindOfClass:[NSArray class]]) {
+                        [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
                     }
                 }
             }
