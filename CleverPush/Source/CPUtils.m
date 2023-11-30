@@ -549,7 +549,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
-    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.%@", [bundle bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@%@", [bundle bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
     return userDefaults;
 }
 
