@@ -180,13 +180,12 @@ static id isNil(id object) {
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
 
-    if (!hasTrackingConsent && previousTrackingConsent) {
-        [self removeSubscriptionTagsAndAttributes];
+    if (hasTrackingConsent) {
+        [self fireTrackingConsentListeners];
     } else {
-        if (hasTrackingConsent) {
-            [self fireTrackingConsentListeners];
-        } else {
-            pendingTrackingConsentListeners = [NSMutableArray new];
+        pendingTrackingConsentListeners = [NSMutableArray new];
+        if (!previousTrackingConsent) {
+            [self removeSubscriptionTagsAndAttributes];
         }
     }
 }
