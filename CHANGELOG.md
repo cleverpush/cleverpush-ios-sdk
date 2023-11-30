@@ -1,3 +1,7 @@
+## 1.29.3
+*  Added new method `setAppGroupIdentifierSuffix` to support customisable app group identifiers
+*  Optimized `setTrackingConsent` behaviour: If called with `NO` for subscription tags and attributes
+
 ## 1.29.2 
 *  Added new method `setSubscriptionAttribute` to support multiple attribute value as array
 
