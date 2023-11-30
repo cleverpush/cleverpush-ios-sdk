@@ -1,4 +1,5 @@
 #import "CPNotificationCategoryController.h"
+#import "CleverPush.h"
 
 #define CATEGORY_FORMAT_STRING(notificationId) [NSString stringWithFormat:@"__CLEVERPUSH__%@", notificationId]
 
@@ -28,14 +29,14 @@
         [mutableExisting removeObjectsInRange:NSMakeRange(0, mutableExisting.count - MAX_CATEGORIES_SIZE)];
     }
     
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@%@", [[NSBundle mainBundle] bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
     [userDefaults setObject:mutableExisting forKey:CLEVERPUSH_NOTIFICATION_CATEGORIES_KEY];
     [userDefaults synchronize];
 }
 
 #pragma mark - Check the existance of the notification's categories stores in to UserDefault or not
 - (NSArray<NSString *> *)existingRegisteredCategoryIds {
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [[NSBundle mainBundle] bundleIdentifier]]];
+    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@%@", [[NSBundle mainBundle] bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
     if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATION_CATEGORIES_KEY] != nil) {
         return [userDefaults objectForKey:CLEVERPUSH_NOTIFICATION_CATEGORIES_KEY];
     }
