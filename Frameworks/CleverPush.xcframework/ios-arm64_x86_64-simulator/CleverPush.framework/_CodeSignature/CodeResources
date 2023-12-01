@@ -168,6 +168,10 @@
 		<data>
 		5V8JW6L+IGt7d6yzoDTXMklZIaU=
 		</data>
+		<key>Headers/CPIabTcfMode.h</key>
+		<data>
+		JPqi4iGSM+8nfnQHTGhQkOwYkXI=
+		</data>
 		<key>Headers/CPInboxView.h</key>
 		<data>
 		0Cp3XhB12x6K8+vqqMOYOm8BI6M=
@@ -210,7 +214,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		dvFxwjGPHokWbMEoWWwuy3p0S1E=
+		cjmaXVwzsZEoB82D3z3FEnqZWjs=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -234,7 +238,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		Y/yqxW5Hb3qnC2H0UD8rsGp6wnM=
+		OuUE+s/cHbNxfsr+uY+PbuNErkc=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -242,7 +246,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		Ho4q41OJA8HsYTV+OLDgsVzmR00=
+		YOgi69a8p1maJ+uwBYB1pRp2Kps=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -254,7 +258,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		ASdHnFR7v65PQc/9EYuuN+r//lg=
+		brTE3HPEW0jiosW4fjyVQVlHOX4=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -714,6 +718,17 @@
 			n944nk2fXgQMjySz3KtzCcGhWZQR+TVRR0QUfGKug64=
 			</data>
 		</dict>
+		<key>Headers/CPIabTcfMode.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			JPqi4iGSM+8nfnQHTGhQkOwYkXI=
+			</data>
+			<key>hash2</key>
+			<data>
+			5BlP7T3QO4O/suuybltyzsL+lCOFSDvQlPBGllklzeg=
+			</data>
+		</dict>
 		<key>Headers/CPInboxView.h</key>
 		<dict>
 			<key>hash</key>
@@ -828,11 +843,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			dvFxwjGPHokWbMEoWWwuy3p0S1E=
+			cjmaXVwzsZEoB82D3z3FEnqZWjs=
 			</data>
 			<key>hash2</key>
 			<data>
-			S/veLQhDFd5hl9a9omrIVWzceJJvO+C/4BB27p0UDXw=
+			EuJ9uXAkgToAaPph2tW8CyaodFnHBrqyE08QatfPDw0=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
@@ -894,11 +909,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Y/yqxW5Hb3qnC2H0UD8rsGp6wnM=
+			OuUE+s/cHbNxfsr+uY+PbuNErkc=
 			</data>
 			<key>hash2</key>
 			<data>
-			/Ayk9av2JHPjh0KugzPZR/BqOaemLBSbYzJ2TLauZ7I=
+			mU06Khc7ePl9G8rgaA+UELbWxECLAueOR+r1hoC/bus=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -916,11 +931,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Ho4q41OJA8HsYTV+OLDgsVzmR00=
+			YOgi69a8p1maJ+uwBYB1pRp2Kps=
 			</data>
 			<key>hash2</key>
 			<data>
-			7nFuwJiA4sqB5FYwmCBXVryl+Dqhuu1WZZXiqWlbb+s=
+			Gj2x2JpCSuJzagduFGflJGUSNsGA9G0akScVTaRa7eM=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

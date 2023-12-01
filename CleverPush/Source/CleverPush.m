@@ -113,6 +113,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTrackingConsent:consent];
 }
 
++ (void)setSubscribeConsentRequired:(BOOL)required {
+    [self.CPSharedInstance setSubscribeConsentRequired:required];
+}
+
++ (void)setSubscribeConsent:(BOOL)consent {
+    [self.CPSharedInstance setSubscribeConsent:consent];
+}
+
 + (void)enableDevelopmentMode {
     [self.CPSharedInstance enableDevelopmentMode];
 }
@@ -175,6 +183,14 @@ static CleverPush* singleInstance = nil;
 
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
+}
+
++ (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure {
+    [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock withRetry:retryOnFailure];
+}
+
++ (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
+    [self.CPSharedInstance enqueueFailedRequest:request withRetryCount:retryCount onSuccess:successBlock onFailure:failureBlock];
 }
 
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
@@ -274,6 +290,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value callback:callback];
 }
 
++ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value {
+    [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:nil];
+}
+
++ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value callback:(void(^)())callback {
+    [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:callback];
+}
+
 + (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
     [self.CPSharedInstance pushSubscriptionAttributeValue:attributeId value:value];
 }
@@ -340,6 +364,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAutoClearBadge:autoClear];
 }
 
++ (void)setAutoResubscribe:(BOOL)resubscribe {
+    [self.CPSharedInstance setAutoResubscribe:resubscribe];
+}
+
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft {
     [self.CPSharedInstance setAppBannerDraftsEnabled:showDraft];
 }
@@ -350,6 +378,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore {
     [self.CPSharedInstance setIgnoreDisabledNotificationPermission:ignore];
+}
+
++ (void)setAutoRequestNotificationPermission:(BOOL)autoRequest {
+    [self.CPSharedInstance setAutoRequestNotificationPermission:autoRequest];
 }
 
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
@@ -448,6 +480,12 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController *viewController) {
+        callback(viewController);
+    }];
+}
+
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback {
     [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray *callbackInner) {
         callback(callbackInner);
@@ -462,6 +500,14 @@ static CleverPush* singleInstance = nil;
 
 + (void)setApiEndpoint:(NSString*)apiEndpoint {
     [self.CPSharedInstance setApiEndpoint:apiEndpoint];
+}
+
++ (void)setAppGroupIdentifierSuffix:(NSString*)suffix {
+    [self.CPSharedInstance setAppGroupIdentifierSuffix:suffix];
+}
+
++ (void)setIabTcfMode:(CPIabTcfMode)mode {
+    [self.CPSharedInstance setIabTcfMode:mode];
 }
 
 + (void)setAuthorizerToken:(NSString *)authorizerToken {
@@ -554,6 +600,14 @@ static CleverPush* singleInstance = nil;
 
 + (NSString*)getApiEndpoint {
     return [self.CPSharedInstance getApiEndpoint];
+}
+
++ (NSString*)getAppGroupIdentifierSuffix {
+    return [self.CPSharedInstance getAppGroupIdentifierSuffix];
+}
+
++ (CPIabTcfMode)getIabTcfMode {
+    return [self.CPSharedInstance getIabTcfMode];
 }
 
 + (UIViewController*)getCustomTopViewController {

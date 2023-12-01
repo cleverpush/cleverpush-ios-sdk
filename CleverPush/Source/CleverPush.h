@@ -21,6 +21,7 @@
 #import "CleverPushInstance.h"
 #import "CPInboxView.h"
 #import "CleverPushUserDefaults.h"
+#import "CPIabTcfMode.h"
 
 @interface CleverPush : NSObject
 
@@ -47,6 +48,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
++ (void)setSubscribeConsentRequired:(BOOL)required;
++ (void)setSubscribeConsent:(BOOL)consent;
 + (void)enableDevelopmentMode;
 + (void)subscribe;
 + (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock;
@@ -64,6 +67,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
++ (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure;
++ (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*)error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTopic:(NSString*)topicId;
 + (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback;
@@ -83,6 +88,8 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback;
++ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value;
++ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value callback:(void(^)())callback;
 + (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
 + (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
 + (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value;
@@ -100,11 +107,13 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)setNormalTintColor:(UIColor *)color;
 + (UIColor*)getNormalTintColor;
 + (void)setAutoClearBadge:(BOOL)autoClear;
++ (void)setAutoResubscribe:(BOOL)resubscribe;
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 + (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 + (void)setIncrementBadge:(BOOL)increment;
 + (void)setShowNotificationsInForeground:(BOOL)show;
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
++ (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 + (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
@@ -125,9 +134,12 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)showAppBanner:(NSString*)bannerId;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
 + (void)setApiEndpoint:(NSString*)apiEndpoint;
++ (void)setAppGroupIdentifierSuffix:(NSString*)suffix;
++ (void)setIabTcfMode:(CPIabTcfMode)mode;
 + (void)setAuthorizerToken:(NSString*)authorizerToken;
 + (void)setCustomTopViewController:(UIViewController*)viewController;
 + (void)setLocalEventTrackingRetentionDays:(int)days;
@@ -154,6 +166,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
 + (NSString*)getSubscriptionId;
 + (NSString*)getApiEndpoint;
++ (NSString*)getAppGroupIdentifierSuffix;
 + (NSString*)channelId;
 + (UIViewController*)getCustomTopViewController;
 + (int)getLocalEventTrackingRetentionDays;

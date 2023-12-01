@@ -549,7 +549,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@%@", [bundle bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
     return userDefaults;
 }
 
@@ -585,6 +585,17 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSDate *currentDate = [NSDate date];
     NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
     return currentTimeStamp;
+#pragma mark - Find the particular word in the url and replace it in the original url.
++ (NSURL *)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement {
+    if (url == nil || replacement == nil) {
+        return nil;
+    }
+
+    NSString *urlString = [url absoluteString];
+    NSString *replacedURLString = [self replaceString:@"{voucherCode}" withReplacement:replacement inString:urlString];
+    NSString *encodedURLString = [replacedURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    return [NSURL URLWithString:encodedURLString];
 }
 
 #pragma mark - CleverPush Javascript functions
@@ -728,6 +739,30 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark - Callback event for tracking clicks
 + (void)actionCallback:(CPAppBannerAction*)action{
     [self actionCallback:action];
+}
+
+#pragma mark - Check string is nil, null or empty
++ (BOOL)isNullOrEmpty:(NSString *)string {
+    if (string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark - String validation of a key exists or not
++ (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary {
+    if (!dictionary || dictionary.count == 0) {
+        return nil;
+    }
+    NSString *voucherCode = dictionary[key];
+    return voucherCode;
+}
+
+#pragma mark -  URL Handling
++ (void)tryOpenURL:(NSURL *)url {
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }
 }
 
 @end

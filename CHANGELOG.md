@@ -1,3 +1,20 @@
+## 1.29.3
+*  Added new method `setAppGroupIdentifierSuffix` to support customisable app group identifiers
+*  Optimized `setTrackingConsent` behaviour: If called with `NO` for subscription tags and attributes
+
+## 1.29.2 
+*  Added new method `setSubscriptionAttribute` to support multiple attribute value as array
+
+## 1.29.1 (27.11.2023)
+* Automatic handling of URLs in Notification Actions
+* Support for `setAutoRequestNotificationPermission(false)` added
+* Support for `setAutoResubscribe(true)` added
+
+## 1.29.0 (26.11.2023)
+* IAB TCF compatibility added
+* Automatic retry of failed API requests
+* App banner delegate to show banner on custom view controller
+
 ## 1.28.13
 * Optimizations for in app banners
 

@@ -23,6 +23,7 @@ NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
 CPSQLiteManager *sqlManager;
+CPAppBannerDisplayBlock handleBannerDisplayed;
 
 BOOL initialized = NO;
 BOOL showDrafts = NO;
@@ -59,6 +60,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
     handleBannerShown = callback;
+}
+
+#pragma mark - Callback while banner has been successfully ready to display
+- (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    handleBannerDisplayed = callback;
 }
 
 #pragma mark - load the events
@@ -763,6 +769,7 @@ NSInteger currentScreenIndex = 0;
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
             NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
             NSString *type;
+            NSString *voucherCode;
 
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
@@ -817,7 +824,12 @@ NSInteger currentScreenIndex = 0;
                 handleBannerOpened(action);
             }
 
+            voucherCode = [CPUtils valueForKey:banner.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
+
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];
+                }
                 [[UIApplication sharedApplication] openURL:action.url];
             }
 
@@ -860,6 +872,9 @@ NSInteger currentScreenIndex = 0;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    pasteboard.string = voucherCode;
+                }
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
@@ -897,7 +912,11 @@ NSInteger currentScreenIndex = 0;
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
-    [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    if (handleBannerDisplayed) {
+        handleBannerDisplayed(appBannerViewController);
+    } else {
+        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -974,7 +993,7 @@ NSInteger currentScreenIndex = 0;
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     } else {
         if (banner.multipleScreensEnabled) {
             dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
@@ -990,7 +1009,7 @@ NSInteger currentScreenIndex = 0;
             if (banner.multipleScreensEnabled) {
                 banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     }
 }
 

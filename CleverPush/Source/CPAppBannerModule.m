@@ -37,6 +37,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setBannerShownCallback:callback];
 }
 
+#pragma mark - Callback while banner has been ready to display
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    [self.moduleInstance setShowAppBannerCallback:callback];
+}
+
 #pragma mark - load the events
 + (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
     [self.moduleInstance triggerEvent:eventId properties:properties];
