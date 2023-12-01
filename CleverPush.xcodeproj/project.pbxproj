@@ -212,8 +212,6 @@
 		9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
 		9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
 		9310FD712A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
-		9315C4DD2AFDE77900B4C93F /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9315C4DC2AFDE77900B4C93F /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9315C4DE2AFDE77900B4C93F /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9315C4DC2AFDE77900B4C93F /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		934D88F92A654CEA00B0E319 /* CPInboxDetailContainer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */; };
 		934D88FC2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */; };
 		934D88FD2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */; };
@@ -245,6 +243,8 @@
 		93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
 		93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */; };
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
+		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
@@ -531,7 +531,6 @@
 		9310FD662A602D1F004B400B /* CPInboxDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailView.h; sourceTree = "<group>"; };
 		9310FD672A602D1F004B400B /* CPInboxDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailView.m; sourceTree = "<group>"; };
 		9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailView.xib; sourceTree = "<group>"; };
-		9315C4DC2AFDE77900B4C93F /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
 		934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailContainer.xib; sourceTree = "<group>"; };
 		934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailContainer.h; sourceTree = "<group>"; };
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
@@ -542,6 +541,7 @@
 		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
+		93F417DD2B19C03900B908DB /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -739,6 +739,7 @@
 				CB1B65CC27577B6E0087AC49 /* CleverPushTests */,
 				297B4DF61E589AFE00BAF990 /* Products */,
 				29C1BAF01E58B89500815CD6 /* Frameworks */,
+				93F417D72B19BCE700B908DB /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -969,6 +970,7 @@
 				93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */,
 				935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */,
 				935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */,
+				93F417DD2B19C03900B908DB /* CPIabTcfMode.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -980,6 +982,13 @@
 				297C34D023FB710100314A84 /* CleverPushLocation.m */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		93F417D72B19BCE700B908DB /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		CB1B65CC27577B6E0087AC49 /* CleverPushTests */ = {
@@ -1050,8 +1059,8 @@
 				93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */,
 				294B19D728672217003A9FCD /* CPLog.h in Headers */,
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
+				93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
-				9315C4DE2AFDE77900B4C93F /* CPIabTcfMode.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
 				935A5F182AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */,
 				9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */,
@@ -1113,7 +1122,6 @@
 				29DB578C23D75C9B0040E823 /* CPNotificationCategoryController.h in Headers */,
 				CBA989A42679D625003DE995 /* CPWidgetModule.h in Headers */,
 				29DB95EF23FC3360008FC985 /* CleverPushSelectorHelpers.h in Headers */,
-				9315C4DD2AFDE77900B4C93F /* CPIabTcfMode.h in Headers */,
 				29052188276B880A00D81148 /* CPAspectKeepImageView.h in Headers */,
 				CBA1906926DE5909001B8F39 /* CPTopicDialogCell.h in Headers */,
 				2906A126258557670078FD61 /* CPAppBannerStopAtType.h in Headers */,
@@ -1122,6 +1130,7 @@
 				CBA989AC2679D63A003DE995 /* CPStoryContentMeta.h in Headers */,
 				29052183276B778D00D81148 /* CleverPushInstance.h in Headers */,
 				29052186276B77A600D81148 /* CPInboxView.h in Headers */,
+				93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
 				2906A15B258557BB0078FD61 /* CPAppBannerBackground.h in Headers */,
 				291FCE64252B5F1F00F5185E /* CPTopicsViewController.h in Headers */,
 				29563FF725881F6F00FE7611 /* CPAppBannerTriggerConditionType.h in Headers */,

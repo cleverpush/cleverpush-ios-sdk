@@ -170,6 +170,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (NSString*)channelId;
 + (UIViewController*)getCustomTopViewController;
 + (int)getLocalEventTrackingRetentionDays;
++ (CPIabTcfMode)getIabTcfMode;
 
 + (UIColor*)getBrandingColor;
 

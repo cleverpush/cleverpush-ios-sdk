@@ -1734,7 +1734,7 @@ static id isNil(id object) {
     BOOL hasActionsArray = notificationPayload[@"actions"] != nil &&
                            ![notificationPayload[@"actions"] isKindOfClass:[NSNull class]] &&
                            [notificationPayload[@"actions"] isKindOfClass:[NSArray class]] &&
-                           [notificationPayload[@"actions"] count] > 0;
+                            [((NSArray *)notificationPayload[@"actions"]) count] > 0;
 
     if (hasActionIdentifier && hasActionsArray) {
         NSMutableArray* actionsArray = [notificationPayload[@"actions"] mutableCopy];
@@ -2242,11 +2242,15 @@ static id isNil(id object) {
                                         subscriptionId, @"subscriptionId",
                                         nil];
 
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        } onFailure:^(NSError* error) {
-            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+        [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+            [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+            }];
         }];
     }
 }
