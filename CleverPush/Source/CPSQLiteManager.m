@@ -82,7 +82,7 @@ sqlite3 *database;
 }
 
 #pragma mark - to insert the record in the database
-- (BOOL)insert:(NSString *)bannerID eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdAt:(NSString *)createdAt updatedAt:(NSString *)updatedAt fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
+- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdAt:(NSString *)createdAt updatedAt:(NSString *)updatedAt fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
 
     if (![self databaseTableExists:databaseTable]) {
         if (![self createTable]) {
@@ -93,7 +93,7 @@ sqlite3 *database;
     if (!count) {
         count = @(0);
     }
-    if (!bannerID) bannerID = @"";
+    if (!bannerId) bannerId = @"";
     if (!eventId) eventId = @"";
     if (!property) property = @"";
     if (!value) value = @"";
@@ -111,7 +111,7 @@ sqlite3 *database;
         sqlite3_stmt *selectStatement;
 
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_text(selectStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 1, [bannerId UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 2, [eventId UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
@@ -130,7 +130,7 @@ sqlite3 *database;
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
                     sqlite3_bind_int(updateStatement, 1, updatedCount);
                     sqlite3_bind_text(updateStatement, 2, [updatedAt UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 3, [bannerID UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 3, [bannerId UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 4, [eventId UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 5, [property UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 6, [value UTF8String], -1, SQLITE_STATIC);
@@ -151,7 +151,7 @@ sqlite3 *database;
         sqlite3_stmt *insertStatement;
 
         if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_text(insertStatement, 1, [bannerID UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(insertStatement, 1, [bannerId UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 2, [eventId UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
