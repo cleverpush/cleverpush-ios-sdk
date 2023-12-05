@@ -1,9 +1,12 @@
-## 1.29.3
-*  Added new method `setAppGroupIdentifierSuffix` to support customisable app group identifiers
-*  Optimized `setTrackingConsent` behaviour: If called with `NO` for subscription tags and attributes
+## 1.29.4 (05.12.2023)
+* Support app banner targeting from previously tracked events
 
-## 1.29.2 
-*  Added new method `setSubscriptionAttribute` to support multiple attribute value as array
+## 1.29.3 (30.11.2023)
+* Added new method `setAppGroupIdentifierSuffix` to support customisable app group identifiers
+* Optimized `setTrackingConsent` behaviour: If called with `NO` for subscription tags and attributes
+
+## 1.29.2 (28.11.2023)
+* Added new method `setSubscriptionAttribute` to support multiple attribute value as array
 
 ## 1.29.1 (27.11.2023)
 * Automatic handling of URLs in Notification Actions

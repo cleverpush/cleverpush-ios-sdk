@@ -72,7 +72,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.29.3";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.29.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -181,13 +181,15 @@ static id isNil(id object) {
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
 
+    if (!hasTrackingConsent && previousTrackingConsent) {
+        [self removeSubscriptionTagsAndAttributes];
+        [self stopCampaigns];
+    }
+
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
     } else {
         pendingTrackingConsentListeners = [NSMutableArray new];
-        if (!previousTrackingConsent) {
-            [self removeSubscriptionTagsAndAttributes];
-        }
     }
 }
 
@@ -2195,6 +2197,23 @@ static id isNil(id object) {
             }
         }
     }];
+}
+
+- (void)stopCampaigns {
+    if (subscriptionId != nil) {
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/stop-campaigns"];
+        NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                        channelId, @"channelId",
+                                        subscriptionId, @"subscriptionId",
+                                        nil];
+
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+        } onFailure:^(NSError* error) {
+            [CPLog error:@"Failed while doing stopCampaigns request: %@", error.description];
+        }];
+    }
 }
 
 #pragma mark - Live Activity
