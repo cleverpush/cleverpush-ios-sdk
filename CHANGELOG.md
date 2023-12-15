@@ -1,3 +1,6 @@
+## 1.29.5 (15.12.2024)
+* Fixed a behaviour which prevented the subscription being synchronized automatically every 3 days
+
 ## 1.29.4 (05.12.2023)
 * Support app banner targeting from previously tracked events
 

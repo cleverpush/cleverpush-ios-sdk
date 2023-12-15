@@ -72,7 +72,7 @@
 
 @implementation CleverPushInstance
 
-NSString * const CLEVERPUSH_SDK_VERSION = @"1.29.4";
+NSString * const CLEVERPUSH_SDK_VERSION = @"1.29.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -424,7 +424,9 @@ static id isNil(id object) {
                 [self unsubscribe];
             } else if ([self shouldSync]) {
                 [CPLog debug:@"syncSubscription called from initWithChannelId"];
-                [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+                [self ensureMainThreadSync:^{
+                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
+                }];
             } else {
                 [self ensureMainThreadSync:^{
                     [[UIApplication sharedApplication] registerForRemoteNotifications];
@@ -1259,13 +1261,15 @@ static id isNil(id object) {
             [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
                 if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
                     [CPLog debug:@"syncSubscription called from registerDeviceToken"];
-                    dispatch_async(dispatch_get_main_queue(), ^{
+                    [self ensureMainThreadSync:^{
                         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-                    });
+                    }];
                 }
             }];
         } else {
-            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+            [self ensureMainThreadSync:^{
+                [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+            }];
         }
         return;
     }
@@ -1286,7 +1290,10 @@ static id isNil(id object) {
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+
+    [self ensureMainThreadSync:^{
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+    }];
 }
 
 - (BOOL)isSubscriptionInProgress {
@@ -2534,9 +2541,9 @@ static id isNil(id object) {
         [userDefaults setObject:language forKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
         [userDefaults synchronize];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self ensureMainThreadSync:^{
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-        });
+        }];
     }
 }
 
@@ -2548,9 +2555,9 @@ static id isNil(id object) {
         [userDefaults setObject:country forKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY];
         [userDefaults synchronize];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
+        [self ensureMainThreadSync:^{
             [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-        });
+        }];
     }
 }
 
@@ -2672,9 +2679,9 @@ static id isNil(id object) {
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>*)topics {
     [self setDefaultCheckedTopics:topics];
-    dispatch_async(dispatch_get_main_queue(), ^{
+    [self ensureMainThreadSync:^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-    });
+    }];
 }
 
 #pragma mark - Retrieving notifications which has been stored in NSUserDefaults by key "CleverPush_NOTIFICATIONS"
