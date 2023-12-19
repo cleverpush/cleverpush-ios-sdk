@@ -5,7 +5,7 @@
 @implementation CPSQLiteManager
 
 static CPSQLiteManager *sharedInstance = nil;
-NSString *databaseTable = @"cleverpush_table_banner_track_event";
+NSString *databaseTable = @"cleverpush_tracked_events";
 sqlite3 *database;
 
 + (CPSQLiteManager *)sharedManager {
@@ -64,7 +64,7 @@ sqlite3 *database;
 - (BOOL)createTable {
     if (![self databaseTableExists:databaseTable]) {
         if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, eventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdAt TEXT, updatedAt TEXT, fromValue TEXT, toValue TEXT);", databaseTable];
+            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, eventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdDateTime TEXT, updatedDateTime TEXT, fromValue TEXT, toValue TEXT);", databaseTable];
             char *errMsg;
 
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
@@ -82,7 +82,7 @@ sqlite3 *database;
 }
 
 #pragma mark - to insert the record in the database
-- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdAt:(NSString *)createdAt updatedAt:(NSString *)updatedAt fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
+- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
 
     if (![self databaseTableExists:databaseTable]) {
         if (![self createTable]) {
@@ -98,8 +98,8 @@ sqlite3 *database;
     if (!property) property = @"";
     if (!value) value = @"";
     if (!relation) relation = @"";
-    if (!createdAt) createdAt = @"";
-    if (!updatedAt) updatedAt = @"";
+    if (!createdDateTime) createdDateTime = @"";
+    if (!updatedDateTime) updatedDateTime = @"";
     if (!fromValue) fromValue = @"";
     if (!toValue) toValue = @"";
 
@@ -123,13 +123,13 @@ sqlite3 *database;
                 sqlite3_finalize(selectStatement);
 
                 NSString *updateSQL = [NSString stringWithFormat:
-                                       @"UPDATE %@ SET count = ?, updatedAt = ? "
+                                       @"UPDATE %@ SET count = ?, updatedDateTime = ? "
                                        "WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ?;", databaseTable];
                 sqlite3_stmt *updateStatement;
 
                 if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
                     sqlite3_bind_int(updateStatement, 1, updatedCount);
-                    sqlite3_bind_text(updateStatement, 2, [updatedAt UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(updateStatement, 2, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 3, [bannerId UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 4, [eventId UTF8String], -1, SQLITE_STATIC);
                     sqlite3_bind_text(updateStatement, 5, [property UTF8String], -1, SQLITE_STATIC);
@@ -146,7 +146,7 @@ sqlite3 *database;
         }
 
         NSString *insertSQL = [NSString stringWithFormat:
-                               @"INSERT INTO %@ (bannerId, eventId, property, value, relation, count, createdAt, updatedAt, fromValue, toValue) "
+                               @"INSERT INTO %@ (bannerId, eventId, property, value, relation, count, createdDateTime, updatedDateTime, fromValue, toValue) "
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", databaseTable];
         sqlite3_stmt *insertStatement;
 
@@ -157,8 +157,8 @@ sqlite3 *database;
             sqlite3_bind_text(insertStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 5, [relation UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_int(insertStatement, 6, 1);
-            sqlite3_bind_text(insertStatement, 7, [createdAt UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 8, [updatedAt UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(insertStatement, 7, [createdDateTime UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(insertStatement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 9, [fromValue UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(insertStatement, 10, [toValue UTF8String], -1, SQLITE_STATIC);
 
@@ -195,8 +195,8 @@ sqlite3 *database;
                     @"value": (const char *)sqlite3_column_text(statement, 4) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 4)] : @"",
                     @"relation": (const char *)sqlite3_column_text(statement, 5) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 5)] : @"",
                     @"count" : [NSString stringWithFormat:@"%d", sqlite3_column_int(statement, 6)] ?: @"",
-                    @"createdAt": (const char *)sqlite3_column_text(statement, 7) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 7)] : @"",
-                    @"updatedAt": (const char *)sqlite3_column_text(statement, 8) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 8)] : @"",
+                    @"createdDateTime": (const char *)sqlite3_column_text(statement, 7) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 7)] : @"",
+                    @"updatedDateTime": (const char *)sqlite3_column_text(statement, 8) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 8)] : @"",
                     @"fromValue": (const char *)sqlite3_column_text(statement, 9) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 9)] : @"",
                     @"toValue": (const char *)sqlite3_column_text(statement, 10) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 10)] : @"",
                 };
@@ -220,7 +220,7 @@ sqlite3 *database;
         [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:
-                               @"DELETE FROM %@ WHERE createdAt <= ?;", databaseTable];
+                               @"DELETE FROM %@ WHERE createdDateTime <= ?;", databaseTable];
         sqlite3_stmt *deleteStatement;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {

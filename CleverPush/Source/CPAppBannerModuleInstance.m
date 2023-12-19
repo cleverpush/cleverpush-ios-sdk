@@ -317,7 +317,7 @@ NSInteger currentScreenIndex = 0;
             if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
                 continue;
             }
-            [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@1 createdAt:currentTimeStamp updatedAt:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
+            [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
         }
 
         NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getAllRecords]];
