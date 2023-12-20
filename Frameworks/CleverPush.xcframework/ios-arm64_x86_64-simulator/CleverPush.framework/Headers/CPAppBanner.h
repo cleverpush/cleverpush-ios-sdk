@@ -14,6 +14,7 @@
 #import "CPAppBannerTriggerType.h"
 #import "CPAppBannerHTMLBlock.h"
 #import "CPFilterRelationType.h"
+#import "CPAppBannerEventFilters.h"
 #import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
@@ -29,6 +30,7 @@
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
+@property (nonatomic, strong) NSMutableArray<CPAppBannerEventFilters*> *eventFilters;
 @property (nonatomic, strong) NSMutableArray<NSString*> *languages;
 @property (nonatomic, strong) NSMutableArray<NSString*> *connectedBanners;
 @property (nonatomic, strong) NSString *id;
