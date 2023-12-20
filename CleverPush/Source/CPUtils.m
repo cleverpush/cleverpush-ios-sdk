@@ -577,6 +577,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return result;
 }
 
+
+#pragma mark - Get the current time stamp in a particular date format.
++ (NSString *)getCurrentTimestampWithFormat:(NSString *)dateFormat {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:dateFormat];
+    NSDate *currentDate = [NSDate date];
+    NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
+    return currentTimeStamp;
+}
+
 #pragma mark - Find the particular word in the url and replace it in the original url.
 + (NSURL *)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement {
     if (url == nil || replacement == nil) {

@@ -180,6 +180,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setIabTcfMode:(CPIabTcfMode)mode;
 - (void)setAuthorizerToken:(NSString*)authorizerToken;
 - (void)setCustomTopViewController:(UIViewController*)viewController;
+- (void)setLocalEventTrackingRetentionDays:(int)days;
 - (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 - (void)addStoryView:(CPStoryView*)storyView;
 - (void)updateDeselectFlag:(BOOL)value;
@@ -203,6 +204,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (NSString*)getAppGroupIdentifierSuffix;
 - (NSString*)channelId;
 - (UIViewController*)getCustomTopViewController;
+- (int)getLocalEventTrackingRetentionDays;
 - (CPIabTcfMode)getIabTcfMode;
 
 - (UIColor*)getBrandingColor;
@@ -223,6 +225,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getUnsubscribeStatus;
 - (void)setConfirmAlertShown;
 - (void)areNotificationsEnabled:(void(^)(BOOL))callback;
+- (void)setDatabaseInfo;
 
 - (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
 - (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));

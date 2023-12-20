@@ -518,6 +518,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setCustomTopViewController:viewController];
 }
 
++ (void)setLocalEventTrackingRetentionDays:(int)days {
+    [self.CPSharedInstance setLocalEventTrackingRetentionDays:days];
+}
+
 + (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0)) {
     [self.CPSharedInstance updateBadge:replacementContent];
 }
@@ -608,6 +612,10 @@ static CleverPush* singleInstance = nil;
 
 + (UIViewController*)getCustomTopViewController {
     return [self.CPSharedInstance getCustomTopViewController];
+}
+
++ (int)getLocalEventTrackingRetentionDays {
+    return [self.CPSharedInstance getLocalEventTrackingRetentionDays];
 }
 
 + (NSString*)channelId {

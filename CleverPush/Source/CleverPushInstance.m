@@ -27,6 +27,7 @@
 #import "NSDictionary+SafeExpectations.h"
 #import "NSMutableArray+ContainsString.h"
 #import "NSString+VersionComparator.h"
+#import "CPSQLiteManager.h"
 #import "CPIabTcfMode.h"
 #endif
 
@@ -94,6 +95,7 @@ static const NSInteger httpRequestRetryBackoffMultiplier = 2;
 int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController *customTopViewController = nil;
+int localEventTrackingRetentionDays = 90;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -140,6 +142,7 @@ CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
 CPNotificationReceivedResult* pendingDeliveryResult = nil;
+CPSQLiteManager* databaseManager;
 CPIabTcfMode currentIabTcfMode;
 
 BOOL pendingChannelConfigRequest = NO;
@@ -415,6 +418,33 @@ static id isNil(id object) {
 
     if (autoRegister && ![self getUnsubscribeStatus]) {
         [self autoSubscribeWithDelays];
+    }
+
+    databaseManager = [CPSQLiteManager sharedManager];
+    if (![databaseManager databaseExists]) {
+        if ([databaseManager createDatabase] && [databaseManager createTable]) {
+            [self setDatabaseInfo];
+        }
+    } else {
+        if ([databaseManager createTable]) {
+            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+            BOOL databaseCreated = [defaults objectForKey:CLEVERPUSH_DATABASE_CREATED_KEY] != nil;
+
+            if (!databaseCreated) {
+                [self setDatabaseInfo];
+            } else {
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+                [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+                NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
+                
+                if (retentionDay != nil) {
+                    if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
+                       [databaseManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
+                    }
+                }
+            }
+        }
     }
 
     if (subscriptionId != nil) {
@@ -1713,7 +1743,7 @@ static id isNil(id object) {
     BOOL hasActionsArray = notificationPayload[@"actions"] != nil &&
                            ![notificationPayload[@"actions"] isKindOfClass:[NSNull class]] &&
                            [notificationPayload[@"actions"] isKindOfClass:[NSArray class]] &&
-                           [notificationPayload[@"actions"] count] > 0;
+                            [((NSArray *)notificationPayload[@"actions"]) count] > 0;
 
     if (hasActionIdentifier && hasActionsArray) {
         NSMutableArray* actionsArray = [notificationPayload[@"actions"] mutableCopy];
@@ -2238,11 +2268,15 @@ static id isNil(id object) {
                                         subscriptionId, @"subscriptionId",
                                         nil];
 
-        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-        [request setHTTPBody:postData];
-        [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        } onFailure:^(NSError* error) {
-            [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+        [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
+            [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"The live activity could not be synchronized because of %@", error.description];
+            }];
         }];
     }
 }
@@ -3501,6 +3535,10 @@ static id isNil(id object) {
     customTopViewController = viewController;
 }
 
+- (void)setLocalEventTrackingRetentionDays:(int)days {
+    localEventTrackingRetentionDays = days;
+}
+
 - (NSString*)getApiEndpoint {
     return apiEndpoint;
 }
@@ -3515,6 +3553,10 @@ static id isNil(id object) {
 
 - (UIViewController*)getCustomTopViewController {
     return customTopViewController;
+}
+
+- (int)getLocalEventTrackingRetentionDays {
+    return localEventTrackingRetentionDays;
 }
 
 #pragma mark - App Banner methods
@@ -3833,4 +3875,15 @@ static id isNil(id object) {
     allCategories = CPNotificationCategoryController.sharedInstance.existingCategories;
 }
 
+#pragma mark - Cleverpush database information
+- (void)setDatabaseInfo {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
+   [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
+   [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 @end
+

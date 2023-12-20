@@ -144,6 +144,13 @@
             }
         }
 
+        self.eventFilters = [NSMutableArray new];
+        if ([json objectForKey:@"eventFilters"] != nil) {
+            for (NSDictionary *eventFilterJson in [json objectForKey:@"eventFilters"]) {
+                [self.eventFilters addObject:[[CPAppBannerEventFilters alloc] initWithJson:eventFilterJson]];
+            }
+        }
+
         if ([[json cleverPushStringForKey:@"triggerType"] isEqual:@"conditions"]) {
             self.triggerType = CPAppBannerTriggerTypeConditions;
         } else {

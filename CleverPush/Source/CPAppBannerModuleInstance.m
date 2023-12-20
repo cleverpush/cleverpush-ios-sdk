@@ -3,6 +3,7 @@
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "NSString+VersionComparator.h"
+#import "CPSQLiteManager.h"
 
 @interface CPAppBannerModuleInstance()
 
@@ -22,6 +23,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
+CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 
 BOOL initialized = NO;
@@ -248,6 +250,9 @@ NSInteger currentScreenIndex = 0;
                     if (![self bannerTargetingAllowed:banner]) {
                         continue;
                     }
+                    if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                        continue;
+                    }
 
                     if (![self bannerTimeAllowed:banner]) {
                         continue;
@@ -273,6 +278,145 @@ NSInteger currentScreenIndex = 0;
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
     }];
+}
+
+#pragma mark - check the banner targeting with the events filter allowed or not.
+- (NSArray<CPAppBannerEventFilters *> *)compareTargetEvents:(NSArray<CPAppBannerEventFilters *> *)targetEvents
+                                          withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)targetEventsFromDatabase {
+    NSMutableArray<CPAppBannerEventFilters *> *filteredResults = [NSMutableArray array];
+
+    for (CPAppBannerEventFilters *eventsObject in targetEvents) {
+        for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
+            if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
+                [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
+                [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
+                [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
+                [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
+                [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue]) {
+                [filteredResults addObject:eventsObjectFromDatabase];
+                break;
+            }
+        }
+    }
+    return filteredResults;
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
+    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
+    __block BOOL allowed = YES;
+
+    if (banner.eventFilters.count > 0 ) {
+        sqlManager = [CPSQLiteManager sharedManager];
+        NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
+
+        for (CPAppBannerEventFilters *events in banner.eventFilters) {
+            if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
+                continue;
+            }
+            [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
+        }
+
+        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getAllRecords]];
+
+        for (CPAppBannerEventFilters *event in eventRecords) {
+            allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
+            if (allowed) {
+                break;
+            }
+        }
+    }
+    return allowed;
+}
+
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
+    if (relation == nil || compareValue == nil) {
+        allowed = NO;
+    }
+
+    NSDate *currentDate = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *createdDate = [dateFormatter dateFromString:createdAt];
+
+    if (createdDate != nil) {
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSCalendarUnit units = NSCalendarUnitDay;
+        NSDateComponents *components = [calendar components:units
+                                                   fromDate:currentDate
+                                                     toDate:createdDate
+                                                    options:0];
+        NSInteger daysDifference = [components day];
+
+        if (allowed && daysDifference > [property intValue]) {
+            allowed = NO;
+        }
+    }
+
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (![value isEqualToVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (![value isEqualOrOlderThanVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (![value isEqualOrNewerThanVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        if (![compareValue isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (![value isEqualToVersion:compareValue]) {
+            allowed = NO;
+        }
+    }
+    return allowed;
+}
+
+- (BOOL)isValidTargetValuesWithEvent:(NSString *)event property:(NSString *)property relation:(NSString *)relation value:(NSString *)value fromValue:(NSString *)fromValue toValue:(NSString *)toValue bannerId:(NSString *)bannerId {
+    if (event == nil || [event isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: track event is not valid", bannerId];
+        return NO;
+    }
+    if (![self isValidIntegerValue:property]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: property value is not valid", bannerId];
+        return NO;
+    }
+    if (relation == nil || [relation isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: relation is not valid", bannerId];
+        return NO;
+    }
+    if ([relation isEqualToString:@"between"]) {
+        if (![self isValidIntegerValue:fromValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: from value is not valid", bannerId];
+            return NO;
+        }
+        if (![self isValidIntegerValue:toValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: to value is not valid", bannerId];
+            return NO;
+        }
+    } else {
+        if (![self isValidIntegerValue:value]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: value is not valid", bannerId];
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (BOOL)isValidIntegerValue:(NSString *)value {
+    if (value == nil || [value isEqualToString:@""] || [value doubleValue] < 0 || [value doubleValue] != (int)[value doubleValue]) {
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - check the banner triggering allowed or not.
@@ -627,6 +771,11 @@ NSInteger currentScreenIndex = 0;
                 return;
             }
 
+            if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                [CPLog debug:@"Skipping banner because: event filters not allowed"];
+                return;
+            }
+
             if (![self bannerTimeAllowed:banner]) {
                 [CPLog debug:@"Skipping banner because: date is after stop date"];
                 return;
@@ -843,7 +992,7 @@ NSInteger currentScreenIndex = 0;
                     subscriptionId, @"subscriptionId",
                     nil] mutableCopy];
     }
-    
+
     if ([event isEqualToString:@"clicked"]) {
         if ([type isEqualToString:@"button"]) {
             if (block != nil) {
@@ -866,7 +1015,7 @@ NSInteger currentScreenIndex = 0;
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
-        
+
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
@@ -935,12 +1084,12 @@ NSInteger currentScreenIndex = 0;
 - (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    
+
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
         NSDate *bannerStartdate1;
         NSDate *bannerStartdate2;
         NSComparisonResult result;
-        
+
         if (bannerElement1[@"startAt"] != nil && ![bannerElement1[@"startAt"] isKindOfClass:[NSNull class]]) {
             bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
         }
