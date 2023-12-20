@@ -48,6 +48,10 @@
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner;
 - (void)createBanners:(NSMutableArray*)banners;
 - (void)scheduleBanners;
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay;
+- (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners;
+- (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners;
+- (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner;
 - (void)showBanner:(CPAppBanner*)banner;
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner;
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner;
@@ -57,6 +61,7 @@
 - (void)disableBanners;
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
+- (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
 - (void)setBanners:(NSMutableArray*)appBanner;

@@ -12,6 +12,7 @@
 
 #pragma mark - Class Variables
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
+NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -559,25 +560,52 @@ NSInteger currentScreenIndex = 0;
         return;
     }
 
-    for (CPAppBanner* banner in [self getActiveBanners]) {
-        if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
-            if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:NO];
-                });
-            } else {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:NO];
-                });
+    NSArray<CPAppBanner *> *activeBanners = [self getActiveBanners];
+
+    if (currentEventId != nil && ![currentEventId isKindOfClass:[NSNull class]] && ![currentEventId isEqualToString:@""]) {
+        [self scheduleBannersForEvent:currentEventId fromActiveBanners:activeBanners];
+    } else {
+        [self scheduleBannersForNoEventFromActiveBanners:activeBanners];
+    }
+}
+
+- (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
+    for (CPAppBanner *banner in activeBanners) {
+        for (CPAppBannerTrigger *trigger in banner.triggers) {
+            for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
+                if ([condition.event isEqualToString:eventId]) {
+                    NSTimeInterval delay = [self calculateDelayForBanner:banner];
+                    [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+                    break;
+                }
             }
-        } else {
-            double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
-            double totalDelay = startAtDelay + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self showBanner:banner force:NO];
-            });
         }
     }
+}
+
+- (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
+    for (CPAppBanner *banner in activeBanners) {
+        NSTimeInterval delay = [self calculateDelayForBanner:banner];
+        [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+    }
+}
+
+- (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner {
+    if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
+        return banner.delaySeconds;
+    } else {
+        NSTimeInterval startAtDelay = [banner.startAt timeIntervalSinceNow];
+        return startAtDelay + banner.delaySeconds;
+    }
+}
+
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay {
+    dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+    dispatch_after(dispatchTime, queue, ^(void) {
+        [self showBanner:banner force:NO];
+    });
 }
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
@@ -735,8 +763,12 @@ NSInteger currentScreenIndex = 0;
         }
 
         // remove banner so it will not show again this session
-        [banners removeObject:banner];
-        [activeBanners removeObject:banner];
+        if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
+            [banners removeObject:banner];
+            [activeBanners removeObject:banner];
+        } else {
+            currentEventId = @"";
+        }
 
         [self presentAppBanner:appBannerViewController banner:banner];
     });
@@ -893,6 +925,10 @@ NSInteger currentScreenIndex = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+- (void)setCurrentEventId:(NSString*)eventId {
+    currentEventId = eventId;
 }
 
 #pragma mark - Group array of objects by dates and alphabets.
