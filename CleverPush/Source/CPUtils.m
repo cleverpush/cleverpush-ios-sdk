@@ -246,7 +246,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  Openup given URL in a SFSafariViewController.
 + (void)openSafari:(NSURL*)URL {
-    if (URL) {
+    if ([self isValidURL:URL]) {
         if ([SFSafariViewController class] != nil) {
             SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
             safariController.modalPresentationStyle = UIModalPresentationPageSheet;
@@ -274,7 +274,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if (URL) {
+            if ([self isValidURL:URL]) {
                 if ([SFSafariViewController class] != nil) {
                     SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
                     safariController.modalPresentationStyle = UIModalPresentationPageSheet;
@@ -765,6 +765,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
         [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
     }
+}
+
++ (BOOL)isValidURL:(NSURL *)url {
+    if (url == nil || [url isKindOfClass:[NSNull class]] || ([[url absoluteString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) || (url.scheme == nil || [url.scheme isEqualToString:@""])) {
+        return NO;
+    }
+    return YES;
 }
 
 @end
