@@ -226,6 +226,8 @@
 		935A5F1B2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		935A5F1C2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
+		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
 		93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */; };
 		93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */; };
@@ -536,6 +538,8 @@
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
 		935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPSQLiteManager.h; sourceTree = "<group>"; };
 		935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSQLiteManager.m; sourceTree = "<group>"; };
+		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
+		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
 		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
 		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
@@ -650,7 +654,9 @@
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
 				2913D82D25141324002BA52C /* WebKit.framework in Frameworks */,
 				29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */,
+				93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */,
 				29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */,
+				93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */,
 				29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */,
 				2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */,
 			);
@@ -777,6 +783,8 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				93D458342B3599D9000F4A80 /* MobileCoreServices.framework */,
+				93D458322B3598C4000F4A80 /* ImageIO.framework */,
 				93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */,
 				2917E92428E9F3B800CF6458 /* QuartzCore.framework */,
 				29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */,
