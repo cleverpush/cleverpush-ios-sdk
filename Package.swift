@@ -38,6 +38,8 @@ let package = Package(
                 .linkedFramework("WebKit"),
                 .linkedFramework("JavaScriptCore"),
                 .linkedFramework("SafariServices"),
+                .linkedFramework("ImageIO"),
+                .linkedFramework("MobileCoreServices"),
 
             ]),
     ]
