@@ -249,6 +249,37 @@
     XCTAssertThrows([self.cleverPush checkTags:urlStr params:params], @"Expected an exception to be thrown");
 }
 
+- (void)testAutoAssignTagMatchesSuccess {
+    CPChannelTag *tag = [[CPChannelTag alloc] init];
+    NSString *pathname = @"example/path";
+    NSDictionary *params = @{@"key": @"value"};
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Callback called"];
+
+    [self.cleverPush autoAssignTagMatches:tag pathname:pathname params:params callback:^(BOOL success) {
+        XCTAssertTrue(success, @"Expected success for autoAssignTagMatches");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+}
+
+- (void)testAutoAssignTagMatchesFailure {
+    CPChannelTag *tag = nil;
+    NSString *pathname = @"example/path";
+    NSDictionary *params = @{@"key": @"value"};
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Callback called"];
+
+    [self.cleverPush autoAssignTagMatches:tag pathname:pathname params:params callback:^(BOOL success) {
+        XCTAssertFalse(success, @"Expected failure for autoAssignTagMatches");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+}
+
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
@@ -266,11 +297,3 @@
 }
 
 @end
-
-
-/*
-
- - (void)checkTags:(NSString*)urlStr params:(NSDictionary*)params;
- - (void)autoAssignTagMatches:(CPChannelTag*)tag pathname:(NSString*)pathname params:(NSDictionary*)params callback:(void(^)(BOOL))callback;
-
- */
