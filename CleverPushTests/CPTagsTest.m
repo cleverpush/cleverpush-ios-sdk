@@ -334,7 +334,7 @@
         XCTFail(@"Failure block should not be called");
     }];
 
-    [self waitForExpectations:@[expectation] timeout:5.0]; // Adjust timeout as needed
+    [self waitForExpectations:@[expectation] timeout:5.0];
 
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
     OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
@@ -345,7 +345,7 @@
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
     [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Failure callback called"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Failure callback called"0];
 
     [self.cleverPush addSubscriptionTag:@"tagId" callback:^(NSString *result) {
         XCTFail(@"Callback should not be called");
@@ -371,6 +371,28 @@
     OCMStub([self.cleverPush getAvailableTags]).andReturn(nil);
     NSArray *retrievedTags = [self.cleverPush getAvailableTags];
     OCMVerify([self.cleverPush getAvailableTags]);
+    XCTAssertNil(retrievedTags, @"Returned tags should be nil in case of failure");
+}
+
+- (void)testGetSubscriptionTagsSuccess {
+    NSArray<NSString *> *expectedTags = @[@"tag1", @"tag2", @"tag3"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(expectedTags);
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    OCMVerify([self.cleverPush getSubscriptionTags]);
+    XCTAssertEqualObjects(retrievedTags, expectedTags, @"Returned tags should match expected tags");
+}
+
+- (void)testGetSubscriptionTagsEmpty {
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(@[]);
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    OCMVerify([self.cleverPush getSubscriptionTags]);
+    XCTAssertEqual(retrievedTags.count, 0, @"There should be no tags");
+}
+
+- (void)testGetSubscriptionTagsFailure {
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(nil);
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    OCMVerify([self.cleverPush getSubscriptionTags]);
     XCTAssertNil(retrievedTags, @"Returned tags should be nil in case of failure");
 }
 
