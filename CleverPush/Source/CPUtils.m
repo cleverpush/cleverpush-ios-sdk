@@ -246,7 +246,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  Openup given URL in a SFSafariViewController.
 + (void)openSafari:(NSURL*)URL {
-    if (URL) {
+    if ([self isValidURL:URL]) {
         if ([SFSafariViewController class] != nil) {
             SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
             safariController.modalPresentationStyle = UIModalPresentationPageSheet;
@@ -274,7 +274,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if (URL) {
+            if ([self isValidURL:URL]) {
                 if ([SFSafariViewController class] != nil) {
                     SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
                     safariController.modalPresentationStyle = UIModalPresentationPageSheet;
@@ -549,7 +549,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         // Peel off two directory levels - MY_APP.app/PlugIns/MY_APP_EXTENSION.appex
         bundle = [NSBundle bundleWithURL:[[bundle.bundleURL URLByDeletingLastPathComponent] URLByDeletingLastPathComponent]];
     }
-    NSUserDefaults* userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@.cleverpush", [bundle bundleIdentifier]]];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"group.%@%@", [bundle bundleIdentifier], [CleverPush getAppGroupIdentifierSuffix]]];
     return userDefaults;
 }
 
@@ -575,6 +575,29 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSString *)replaceString:(NSString *)originalString withReplacement:(NSString *)replacement inString:(NSString *)inputString {
     NSString *result = [inputString stringByReplacingOccurrencesOfString:originalString withString:replacement];
     return result;
+}
+
+
+#pragma mark - Get the current time stamp in a particular date format.
++ (NSString *)getCurrentTimestampWithFormat:(NSString *)dateFormat {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:dateFormat];
+    NSDate *currentDate = [NSDate date];
+    NSString *currentTimeStamp = [dateFormatter stringFromDate:currentDate];
+    return currentTimeStamp;
+}
+
+#pragma mark - Find the particular word in the url and replace it in the original url.
++ (NSURL *)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement {
+    if (url == nil || replacement == nil) {
+        return nil;
+    }
+
+    NSString *urlString = [url absoluteString];
+    NSString *replacedURLString = [self replaceString:@"{voucherCode}" withReplacement:replacement inString:urlString];
+    NSString *encodedURLString = [replacedURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
+    return [NSURL URLWithString:encodedURLString];
 }
 
 #pragma mark - CleverPush Javascript functions
@@ -718,6 +741,37 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 #pragma mark - Callback event for tracking clicks
 + (void)actionCallback:(CPAppBannerAction*)action{
     [self actionCallback:action];
+}
+
+#pragma mark - Check string is nil, null or empty
++ (BOOL)isNullOrEmpty:(NSString *)string {
+    if (string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark - String validation of a key exists or not
++ (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary {
+    if (!dictionary || dictionary.count == 0) {
+        return nil;
+    }
+    NSString *voucherCode = dictionary[key];
+    return voucherCode;
+}
+
+#pragma mark -  URL Handling
++ (void)tryOpenURL:(NSURL *)url {
+    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    }
+}
+
++ (BOOL)isValidURL:(NSURL *)url {
+    if (url == nil || [url isKindOfClass:[NSNull class]] || ([[url absoluteString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) || (url.scheme == nil || [url.scheme isEqualToString:@""])) {
+        return NO;
+    }
+    return YES;
 }
 
 @end

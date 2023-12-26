@@ -13,9 +13,7 @@
         return;
     }
 
-    if ([CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] != nil && ([[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id] != nil)) {
-        self.voucherCode = [[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder] objectForKey:self.data.id];
-    }
+    self.voucherCode = [CPUtils valueForKey:self.data.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
 
     [self conditionalPresentation];
     [self setOrientation];

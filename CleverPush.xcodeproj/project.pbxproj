@@ -219,6 +219,15 @@
 		934D88FF2A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
 		934D89002A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
 		934D89012A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */; };
+		935A5F172AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		935A5F182AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		935A5F192AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		935A5F1A2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		935A5F1B2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		935A5F1C2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
+		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
+		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
 		93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */; };
 		93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */; };
@@ -227,7 +236,17 @@
 		93DACB212959651900177B08 /* CPBannerCardContainer.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */; };
 		93DACB222959651900177B08 /* CPTopicDialogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */; };
 		93DACB232959651900177B08 /* CPInboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */; };
+		93E5F0E52ADE6B8D00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0E82ADE6BC000D76057 /* CPAppBannerEventFilters.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
+		93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */; };
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
+		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
@@ -517,8 +536,16 @@
 		934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailContainer.xib; sourceTree = "<group>"; };
 		934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailContainer.h; sourceTree = "<group>"; };
 		934D88FB2A654CFB00B0E319 /* CPInboxDetailContainer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailContainer.m; sourceTree = "<group>"; };
+		935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPSQLiteManager.h; sourceTree = "<group>"; };
+		935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSQLiteManager.m; sourceTree = "<group>"; };
+		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
+		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
+		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
+		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
+		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
+		93F417DD2B19C03900B908DB /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -620,13 +647,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */,
 				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
 				2913D82D25141324002BA52C /* WebKit.framework in Frameworks */,
 				29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */,
+				93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */,
 				29C1BAF41E58B89900815CD6 /* UIKit.framework in Frameworks */,
+				93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */,
 				29C1BAF21E58B89500815CD6 /* SystemConfiguration.framework in Frameworks */,
 				2969757924C0FD8F009563C6 /* JavaScriptCore.framework in Frameworks */,
 			);
@@ -715,6 +745,7 @@
 				CB1B65CC27577B6E0087AC49 /* CleverPushTests */,
 				297B4DF61E589AFE00BAF990 /* Products */,
 				29C1BAF01E58B89500815CD6 /* Frameworks */,
+				93F417D72B19BCE700B908DB /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -752,6 +783,9 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				93D458342B3599D9000F4A80 /* MobileCoreServices.framework */,
+				93D458322B3598C4000F4A80 /* ImageIO.framework */,
+				93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */,
 				2917E92428E9F3B800CF6458 /* QuartzCore.framework */,
 				29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */,
 				CB1B65F9275780260087AC49 /* Foundation.framework */,
@@ -850,6 +884,8 @@
 				29563FF625881F6F00FE7611 /* CPAppBannerTriggerConditionType.h */,
 				2965AF3B29B7E4A100D52B75 /* CPAppBannerTriggerConditionEventProperty.h */,
 				2965AF3C29B7E4E400D52B75 /* CPAppBannerTriggerConditionEventProperty.m */,
+				93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */,
+				93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */,
 				295640002588224100FE7611 /* CPAppBannerTriggerType.h */,
 				298676F62572D08B0002E9F1 /* CPAppBannerType.h */,
 				18B5BD83283FB14C0046577F /* CPFilterRelationType.h */,
@@ -940,6 +976,9 @@
 				2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */,
 				93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */,
 				93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */,
+				935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */,
+				935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */,
+				93F417DD2B19C03900B908DB /* CPIabTcfMode.h */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -951,6 +990,13 @@
 				297C34D023FB710100314A84 /* CleverPushLocation.m */,
 			);
 			path = Source;
+			sourceTree = "<group>";
+		};
+		93F417D72B19BCE700B908DB /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		CB1B65CC27577B6E0087AC49 /* CleverPushTests */ = {
@@ -1018,10 +1064,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */,
 				294B19D728672217003A9FCD /* CPLog.h in Headers */,
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
+				93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
+				935A5F182AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */,
 				9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */,
 				934D88FD2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */,
 				29DB961723FC8970008FC985 /* CleverPush.h in Headers */,
@@ -1035,6 +1084,7 @@
 			files = (
 				2906A152258557B60078FD61 /* CPAppBannerBlock.h in Headers */,
 				2906A140258557B00078FD61 /* CPAppBannerAlignment.h in Headers */,
+				93E5F0E82ADE6BC000D76057 /* CPAppBannerEventFilters.h in Headers */,
 				296A139725BE230900A2BEED /* CPSubscription.h in Headers */,
 				2906A164258557BE0078FD61 /* CPAppBannerButtonBlock.h in Headers */,
 				2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */,
@@ -1088,6 +1138,7 @@
 				CBA989AC2679D63A003DE995 /* CPStoryContentMeta.h in Headers */,
 				29052183276B778D00D81148 /* CleverPushInstance.h in Headers */,
 				29052186276B77A600D81148 /* CPInboxView.h in Headers */,
+				93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
 				2906A15B258557BB0078FD61 /* CPAppBannerBackground.h in Headers */,
 				291FCE64252B5F1F00F5185E /* CPTopicsViewController.h in Headers */,
 				29563FF725881F6F00FE7611 /* CPAppBannerTriggerConditionType.h in Headers */,
@@ -1101,6 +1152,7 @@
 				298F4FC325002F1B00F086D3 /* CPUtils.h in Headers */,
 				297B4E261E58A16600BAF990 /* CleverPush.h in Headers */,
 				CBA989A22679D61F003DE995 /* CPStoriesController.h in Headers */,
+				935A5F172AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */,
 				2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */,
 				2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */,
 				9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */,
@@ -1323,7 +1375,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935A5F1A2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
 				297C34D123FB710100314A84 /* CleverPushLocation.m in Sources */,
+				93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6B2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				934D88FF2A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */,
 			);
@@ -1378,6 +1432,8 @@
 				294B19D3286717A2003A9FCD /* CPLog.m in Sources */,
 				2960686A25743744002159D0 /* UIColor+HexString.m in Sources */,
 				CBA989AB2679D637003DE995 /* CPStory.m in Sources */,
+				935A5F192AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
+				93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */,
 				CBA989BD2679D6A7003DE995 /* CPStoryView.m in Sources */,
 				296D0AD6257460E800531EFF /* UIControl+CPBlockActions.m in Sources */,
@@ -1423,6 +1479,7 @@
 				291FCD2D2525DC2800F5185E /* DWAlertView.m in Sources */,
 				CBA989992679D58C003DE995 /* CPStoryContent.m in Sources */,
 				29DB95F323FC33C6008FC985 /* UNUserNotificationCenter+CleverPush.m in Sources */,
+				935A5F1B2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
 				CB88F900262FE91E0037787E /* CPWKWebKitView.m in Sources */,
 				296068AC25744C89002159D0 /* CPAppBannerAction.m in Sources */,
 				2986772A2572DFAC0002E9F1 /* CPAppBannerBackground.m in Sources */,
@@ -1441,6 +1498,7 @@
 				291FCD292525DC2800F5185E /* DWAlertViewActionButton.m in Sources */,
 				CB73FF9A272C3EAA0099B648 /* CPImageBlockCell.m in Sources */,
 				CB8F47B5275F393D00FC19A7 /* CPInboxView.m in Sources */,
+				93E5F0E52ADE6B8D00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				2986773D2572DFC40002E9F1 /* CPAppBannerButtonBlock.m in Sources */,
 				29D9052D25698B7F002D6F9E /* CPTranslate.m in Sources */,
 				29DB95F623FC33CF008FC985 /* CleverPushSelectorHelpers.m in Sources */,
@@ -1500,7 +1558,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935A5F1C2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
 				29DB961C23FD6EB0008FC985 /* CleverPushLocation.m in Sources */,
+				93E5F0EA2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6D2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				934D89012A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */,
 			);
@@ -1511,8 +1571,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB1B65DA27577BB60087AC49 /* CPTopicDialogueTest.m in Sources */,
+				935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
 				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
 				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
+				93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */,
 				CB1B65D827577BA70087AC49 /* CPAttributesTests.m in Sources */,

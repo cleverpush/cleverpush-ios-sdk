@@ -37,6 +37,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setBannerShownCallback:callback];
 }
 
+#pragma mark - Callback while banner has been ready to display
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    [self.moduleInstance setShowAppBannerCallback:callback];
+}
+
 #pragma mark - load the events
 + (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
     [self.moduleInstance triggerEvent:eventId properties:properties];
@@ -110,6 +115,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     return [self.moduleInstance bannerTargetingAllowed:banner];
 }
 
+#pragma mark - check the banner targeting with the events filter allowed or not.
++ (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
+    return [self.moduleInstance bannerTargetingWithEventFiltersAllowed:banner];
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 + (void)createBanners:(NSMutableArray*)banners {
     [self.moduleInstance createBanners:banners];
@@ -158,6 +168,10 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 
 + (void)setTrackingEnabled:(BOOL)enabled {
     [self.moduleInstance setTrackingEnabled:enabled];
+}
+
++ (void)setCurrentEventId:(NSString*)eventId {
+    [self.moduleInstance setCurrentEventId:eventId];
 }
 
 @end

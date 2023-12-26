@@ -2,6 +2,7 @@
 #import "CPLog.h"
 
 #import <objc/runtime.h>
+#import <MobileCoreServices/MobileCoreServices.h>
 
 static char kCPSessionDataTaskKey;
 
@@ -91,13 +92,18 @@ static char kCPSessionDataTaskKey;
             }
             else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
-                if (200 == httpResponse.statusCode) {
-                    UIImage * image = [UIImage imageWithData:data];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        strongSelf.image = image;
-                        [strongSelf updateAspectConstraint];
-                        callback(true);
-                    });
+                if (httpResponse.statusCode == 200) {
+                    UIImage *image = [strongSelf imageWithData:data];
+                    if (image) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            strongSelf.image = image;
+                            [strongSelf updateAspectConstraint];
+                            callback(true);
+                        });
+                    } else {
+                        [CPLog error:@"Error creating image from data"];
+                        callback(false);
+                    }
                 } else {
                     [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
                     callback(false);
@@ -105,10 +111,9 @@ static char kCPSessionDataTaskKey;
             }
         }];
         [self.dataTask resume];
+    } else {
+        callback(false);
     }
-    callback(false);
-
-    return;
 }
 
 #pragma mark - set image with URL
@@ -126,12 +131,16 @@ static char kCPSessionDataTaskKey;
             }
             else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
-                if (200 == httpResponse.statusCode) {
-                    UIImage * image = [UIImage imageWithData:data];
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        strongSelf.image = image;
-                        [strongSelf updateAspectConstraint];
-                    });
+                if (httpResponse.statusCode == 200) {
+                    UIImage *image = [strongSelf imageWithData:data];
+                    if (image) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            strongSelf.image = image;
+                            [strongSelf updateAspectConstraint];
+                        });
+                    } else {
+                        [CPLog error:@"Error creating image from data"];
+                    }
                 } else {
                     [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
                 }
@@ -140,6 +149,54 @@ static char kCPSessionDataTaskKey;
         [self.dataTask resume];
     }
     return;
+}
+
+#pragma mark - Image Handling
+- (UIImage *)imageWithData:(NSData *)data {
+    if (!data) {
+        return nil;
+    }
+
+    if ([self isGIFData:data]) {
+        UIImage *gifImage = [self createGIFImageWithData:data];
+        return gifImage;
+    }
+
+    UIImage *image = [UIImage imageWithData:data];
+    return image;
+}
+
+- (BOOL)isGIFData:(NSData *)data {
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    if (source) {
+        CFStringRef type = CGImageSourceGetType(source);
+        BOOL isGIF = UTTypeConformsTo(type, kUTTypeGIF);
+        CFRelease(source);
+        return isGIF;
+    }
+    return NO;
+}
+
+- (UIImage *)createGIFImageWithData:(NSData *)data {
+    CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+
+    if (imageSource) {
+        size_t frameCount = CGImageSourceGetCount(imageSource);
+        NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:frameCount];
+        for (size_t i = 0; i < frameCount; i++) {
+            CGImageRef frameImageRef = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
+            if (frameImageRef) {
+                UIImage *frameImage = [UIImage imageWithCGImage:frameImageRef];
+                [frames addObject:frameImage];
+                CGImageRelease(frameImageRef);
+            }
+        }
+
+        UIImage *gifImage = [UIImage animatedImageWithImages:frames duration:0.0];
+        CFRelease(imageSource);
+        return gifImage;
+    }
+    return nil;
 }
 
 @end

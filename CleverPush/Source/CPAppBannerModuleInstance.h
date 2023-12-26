@@ -31,6 +31,7 @@
 - (void)saveSessions;
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
+- (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 - (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force;
@@ -45,8 +46,13 @@
 - (void)getBanners:(NSString*)channelId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner;
+- (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner;
 - (void)createBanners:(NSMutableArray*)banners;
 - (void)scheduleBanners;
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay;
+- (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners;
+- (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners;
+- (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner;
 - (void)showBanner:(CPAppBanner*)banner;
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner;
 - (void)showNextActivePendingBanner:(CPAppBanner*)banner;
@@ -56,6 +62,7 @@
 - (void)disableBanners;
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
+- (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
 - (void)setBanners:(NSMutableArray*)appBanner;

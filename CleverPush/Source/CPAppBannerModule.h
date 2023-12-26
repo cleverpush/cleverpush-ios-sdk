@@ -31,6 +31,7 @@
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 + (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 + (void)presentAppBanner:(UIViewController*)controller banner:(CPAppBanner*)banner;
 + (void)showNextActivePendingBanner:(CPAppBanner*)banner;
@@ -40,5 +41,6 @@
 + (void)enableBanners;
 + (void)setTrackingEnabled:(BOOL)enabled;
 + (void)resetInitialization;
++ (void)setCurrentEventId:(NSString*)eventId;
 
 @end

@@ -3,6 +3,7 @@
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "NSString+VersionComparator.h"
+#import "CPSQLiteManager.h"
 
 @interface CPAppBannerModuleInstance()
 
@@ -12,6 +13,7 @@
 
 #pragma mark - Class Variables
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
+NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -21,6 +23,8 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
+CPSQLiteManager *sqlManager;
+CPAppBannerDisplayBlock handleBannerDisplayed;
 
 BOOL initialized = NO;
 BOOL showDrafts = NO;
@@ -57,6 +61,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
     handleBannerShown = callback;
+}
+
+#pragma mark - Callback while banner has been successfully ready to display
+- (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
+    handleBannerDisplayed = callback;
 }
 
 #pragma mark - load the events
@@ -241,6 +250,9 @@ NSInteger currentScreenIndex = 0;
                     if (![self bannerTargetingAllowed:banner]) {
                         continue;
                     }
+                    if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                        continue;
+                    }
 
                     if (![self bannerTimeAllowed:banner]) {
                         continue;
@@ -266,6 +278,145 @@ NSInteger currentScreenIndex = 0;
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
     }];
+}
+
+#pragma mark - check the banner targeting with the events filter allowed or not.
+- (NSArray<CPAppBannerEventFilters *> *)compareTargetEvents:(NSArray<CPAppBannerEventFilters *> *)targetEvents
+                                          withDatabaseArray:(NSArray<CPAppBannerEventFilters *> *)targetEventsFromDatabase {
+    NSMutableArray<CPAppBannerEventFilters *> *filteredResults = [NSMutableArray array];
+
+    for (CPAppBannerEventFilters *eventsObject in targetEvents) {
+        for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
+            if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
+                [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
+                [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
+                [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
+                [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
+                [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue]) {
+                [filteredResults addObject:eventsObjectFromDatabase];
+                break;
+            }
+        }
+    }
+    return filteredResults;
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo property:(NSString*)property createdAt:(NSString*)createdAt {
+    return [self checkEventFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed property:property createdAt:createdAt];
+}
+
+#pragma mark - check the banner triggering allowed as per selected event filters.
+- (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
+    __block BOOL allowed = YES;
+
+    if (banner.eventFilters.count > 0 ) {
+        sqlManager = [CPSQLiteManager sharedManager];
+        NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
+
+        for (CPAppBannerEventFilters *events in banner.eventFilters) {
+            if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
+                continue;
+            }
+            [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
+        }
+
+        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getAllRecords]];
+
+        for (CPAppBannerEventFilters *event in eventRecords) {
+            allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
+            if (allowed) {
+                break;
+            }
+        }
+    }
+    return allowed;
+}
+
+- (BOOL)checkEventFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed property:(NSString*)property createdAt:(NSString*)createdAt {
+    if (relation == nil || compareValue == nil) {
+        allowed = NO;
+    }
+
+    NSDate *currentDate = [NSDate date];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *createdDate = [dateFormatter dateFromString:createdAt];
+
+    if (createdDate != nil) {
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSCalendarUnit units = NSCalendarUnitDay;
+        NSDateComponents *components = [calendar components:units
+                                                   fromDate:currentDate
+                                                     toDate:createdDate
+                                                    options:0];
+        NSInteger daysDifference = [components day];
+
+        if (allowed && daysDifference > [property intValue]) {
+            allowed = NO;
+        }
+    }
+
+    if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {
+        if (![value isEqualToVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeGreaterThan)]) {
+        if (![value isEqualOrOlderThanVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
+        if (![value isEqualOrNewerThanVersion:compareValue]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        if (![compareValue isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
+        if (![value isEqualToVersion:compareValue]) {
+            allowed = NO;
+        }
+    }
+    return allowed;
+}
+
+- (BOOL)isValidTargetValuesWithEvent:(NSString *)event property:(NSString *)property relation:(NSString *)relation value:(NSString *)value fromValue:(NSString *)fromValue toValue:(NSString *)toValue bannerId:(NSString *)bannerId {
+    if (event == nil || [event isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: track event is not valid", bannerId];
+        return NO;
+    }
+    if (![self isValidIntegerValue:property]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: property value is not valid", bannerId];
+        return NO;
+    }
+    if (relation == nil || [relation isEqualToString:@""]) {
+        [CPLog debug:@"Skipping Target in banner %@ because: relation is not valid", bannerId];
+        return NO;
+    }
+    if ([relation isEqualToString:@"between"]) {
+        if (![self isValidIntegerValue:fromValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: from value is not valid", bannerId];
+            return NO;
+        }
+        if (![self isValidIntegerValue:toValue]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: to value is not valid", bannerId];
+            return NO;
+        }
+    } else {
+        if (![self isValidIntegerValue:value]) {
+            [CPLog debug:@"Skipping Target in banner %@ because: value is not valid", bannerId];
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (BOOL)isValidIntegerValue:(NSString *)value {
+    if (value == nil || [value isEqualToString:@""] || [value doubleValue] < 0 || [value doubleValue] != (int)[value doubleValue]) {
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - check the banner triggering allowed or not.
@@ -553,25 +704,52 @@ NSInteger currentScreenIndex = 0;
         return;
     }
 
-    for (CPAppBanner* banner in [self getActiveBanners]) {
-        if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
-            if (banner.delaySeconds > 0) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * banner.delaySeconds), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:NO];
-                });
-            } else {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                    [self showBanner:banner force:NO];
-                });
+    NSArray<CPAppBanner *> *activeBanners = [self getActiveBanners];
+
+    if (currentEventId != nil && ![currentEventId isKindOfClass:[NSNull class]] && ![currentEventId isEqualToString:@""]) {
+        [self scheduleBannersForEvent:currentEventId fromActiveBanners:activeBanners];
+    } else {
+        [self scheduleBannersForNoEventFromActiveBanners:activeBanners];
+    }
+}
+
+- (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
+    for (CPAppBanner *banner in activeBanners) {
+        for (CPAppBannerTrigger *trigger in banner.triggers) {
+            for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
+                if ([condition.event isEqualToString:eventId]) {
+                    NSTimeInterval delay = [self calculateDelayForBanner:banner];
+                    [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+                    break;
+                }
             }
-        } else {
-            double startAtDelay = [banner.startAt timeIntervalSinceDate:[NSDate date]];
-            double totalDelay = startAtDelay + banner.delaySeconds;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * totalDelay), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                [self showBanner:banner force:NO];
-            });
         }
     }
+}
+
+- (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
+    for (CPAppBanner *banner in activeBanners) {
+        NSTimeInterval delay = [self calculateDelayForBanner:banner];
+        [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+    }
+}
+
+- (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner {
+    if (!banner.startAt || [banner.startAt compare:[NSDate date]] == NSOrderedAscending) {
+        return banner.delaySeconds;
+    } else {
+        NSTimeInterval startAtDelay = [banner.startAt timeIntervalSinceNow];
+        return startAtDelay + banner.delaySeconds;
+    }
+}
+
+- (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay {
+    dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+
+    dispatch_after(dispatchTime, queue, ^(void) {
+        [self showBanner:banner force:NO];
+    });
 }
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
@@ -590,6 +768,11 @@ NSInteger currentScreenIndex = 0;
 
             if (![self bannerTargetingAllowed:banner]) {
                 [CPLog debug:@"Skipping banner because: targeting not allowed"];
+                return;
+            }
+
+            if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
+                [CPLog debug:@"Skipping banner because: event filters not allowed"];
                 return;
             }
 
@@ -614,6 +797,7 @@ NSInteger currentScreenIndex = 0;
             NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
             NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
             NSString *type;
+            NSString *voucherCode;
 
             if (banner.multipleScreensEnabled && banner.screens.count > 0) {
                 for (CPAppBannerCarouselBlock *screensList in banner.screens) {
@@ -668,7 +852,12 @@ NSInteger currentScreenIndex = 0;
                 handleBannerOpened(action);
             }
 
+            voucherCode = [CPUtils valueForKey:banner.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
+
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];
+                }
                 [[UIApplication sharedApplication] openURL:action.url];
             }
 
@@ -711,6 +900,9 @@ NSInteger currentScreenIndex = 0;
             if (action && [action.type isEqualToString:@"copyToClipboard"]) {
                 UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                 pasteboard.string = action.name;
+                if (![CPUtils isNullOrEmpty:voucherCode]) {
+                    pasteboard.string = voucherCode;
+                }
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
@@ -720,8 +912,12 @@ NSInteger currentScreenIndex = 0;
         }
 
         // remove banner so it will not show again this session
-        [banners removeObject:banner];
-        [activeBanners removeObject:banner];
+        if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
+            [banners removeObject:banner];
+            [activeBanners removeObject:banner];
+        } else {
+            currentEventId = @"";
+        }
 
         [self presentAppBanner:appBannerViewController banner:banner];
     });
@@ -748,7 +944,11 @@ NSInteger currentScreenIndex = 0;
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
-    [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    if (handleBannerDisplayed) {
+        handleBannerDisplayed(appBannerViewController);
+    } else {
+        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+    }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -792,7 +992,7 @@ NSInteger currentScreenIndex = 0;
                     subscriptionId, @"subscriptionId",
                     nil] mutableCopy];
     }
-    
+
     if ([event isEqualToString:@"clicked"]) {
         if ([type isEqualToString:@"button"]) {
             if (block != nil) {
@@ -815,7 +1015,7 @@ NSInteger currentScreenIndex = 0;
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
         }
-        
+
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
@@ -825,7 +1025,7 @@ NSInteger currentScreenIndex = 0;
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
                     screen.isScreenClicked = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     } else {
         if (banner.multipleScreensEnabled) {
             dataDic[@"isScreenAlreadyShown"] = @(banner.screens[currentScreenIndex].isScreenAlreadyShown);
@@ -841,7 +1041,7 @@ NSInteger currentScreenIndex = 0;
             if (banner.multipleScreensEnabled) {
                 banner.screens[currentScreenIndex].isScreenAlreadyShown = true;
             }
-        } onFailure:nil];
+        } onFailure:nil withRetry:NO];
     }
 }
 
@@ -876,16 +1076,20 @@ NSInteger currentScreenIndex = 0;
     trackingEnabled = enabled;
 }
 
+- (void)setCurrentEventId:(NSString*)eventId {
+    currentEventId = eventId;
+}
+
 #pragma mark - Group array of objects by dates and alphabets.
 - (NSArray *)sortArrayByDateAndAlphabet:(NSArray *)array {
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-    
+
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
         NSDate *bannerStartdate1;
         NSDate *bannerStartdate2;
         NSComparisonResult result;
-        
+
         if (bannerElement1[@"startAt"] != nil && ![bannerElement1[@"startAt"] isKindOfClass:[NSNull class]]) {
             bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];
         }

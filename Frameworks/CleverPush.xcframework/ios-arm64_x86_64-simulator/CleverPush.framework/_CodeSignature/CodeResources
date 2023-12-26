@@ -34,7 +34,7 @@
 		</data>
 		<key>CPInboxCell.nib</key>
 		<data>
-		97nFOBdSD3yYQtEcozCAj9aLDdE=
+		eyxJnlnWjsqUPMDihEUiPcQSZ1k=
 		</data>
 		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
 		<data>
@@ -62,11 +62,11 @@
 		</data>
 		<key>CPTopicDialogCell.nib</key>
 		<data>
-		CaopOZTWIH9/Ni9o4UryfdttdVs=
+		hRBiE1Wsv7i4+c1cqmW7igN248E=
 		</data>
 		<key>Headers/CPAppBanner.h</key>
 		<data>
-		5tbeJsThFrLMn7U8fps5VjLtm5A=
+		II7xfBwlEIXPdPhYWAh1DPJVVZE=
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
@@ -100,9 +100,13 @@
 		<data>
 		HJIOUYzsCu9CPtcU0/s7Qygo18w=
 		</data>
+		<key>Headers/CPAppBannerEventFilters.h</key>
+		<data>
+		Rbm5iVIsWjWJu+74PpH67KQvy1Y=
+		</data>
 		<key>Headers/CPAppBannerFrequency.h</key>
 		<data>
-		RX4n7sCokJfzf0JG4fZrnxWoDAU=
+		NXiHAFhbr0nQSaIVQnLne0xcujs=
 		</data>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
 		<data>
@@ -168,6 +172,10 @@
 		<data>
 		5V8JW6L+IGt7d6yzoDTXMklZIaU=
 		</data>
+		<key>Headers/CPIabTcfMode.h</key>
+		<data>
+		JPqi4iGSM+8nfnQHTGhQkOwYkXI=
+		</data>
 		<key>Headers/CPInboxView.h</key>
 		<data>
 		0Cp3XhB12x6K8+vqqMOYOm8BI6M=
@@ -179,6 +187,10 @@
 		<key>Headers/CPNotificationViewController.h</key>
 		<data>
 		P3NUXwVgmOIFNcY7GhtTjmUKl1U=
+		</data>
+		<key>Headers/CPSQLiteManager.h</key>
+		<data>
+		sO+eOE3JwBK1uIP0UuuYB1iQQcM=
 		</data>
 		<key>Headers/CPStory.h</key>
 		<data>
@@ -210,7 +222,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		dvFxwjGPHokWbMEoWWwuy3p0S1E=
+		UntDK75OWSasNvi9Df8U6F6snbY=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -234,7 +246,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		Y/yqxW5Hb3qnC2H0UD8rsGp6wnM=
+		DUtR/VjTADR9J4Y/kNucmDNnSYE=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -242,11 +254,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		Ho4q41OJA8HsYTV+OLDgsVzmR00=
+		BhCS1ValQRw7gblFKkRVsPcQ+d0=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		1pH7/S2GmhveG32Gcja7lH6WkYQ=
+		BXIraGHvq18vPEoOHZuUqYs1nLY=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -254,7 +266,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		ASdHnFR7v65PQc/9EYuuN+r//lg=
+		lW8xLxhOPphVGNOcHz08g9AbA0Q=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -344,11 +356,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			97nFOBdSD3yYQtEcozCAj9aLDdE=
+			eyxJnlnWjsqUPMDihEUiPcQSZ1k=
 			</data>
 			<key>hash2</key>
 			<data>
-			/aDEe8SF36uXN7DsvFgmCZnz7MB5IPLAhkP22CUWsHs=
+			2mpi4a+5+juV234aUFAqxbI+Cy9m3eOdegjNoaPTygU=
 			</data>
 		</dict>
 		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
@@ -421,22 +433,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			CaopOZTWIH9/Ni9o4UryfdttdVs=
+			hRBiE1Wsv7i4+c1cqmW7igN248E=
 			</data>
 			<key>hash2</key>
 			<data>
-			GFNqDyi5YevlibLOnDuq/hzmTElyo/I/iftwH3tC7Ww=
+			5OFFaicjFRwEApqhb2fcFHOj657v75vTft5tyTJrV2I=
 			</data>
 		</dict>
 		<key>Headers/CPAppBanner.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			5tbeJsThFrLMn7U8fps5VjLtm5A=
+			II7xfBwlEIXPdPhYWAh1DPJVVZE=
 			</data>
 			<key>hash2</key>
 			<data>
-			E5Wgreno/mCnGECEU6TboEM8rf4YYfMSn886zYGf1So=
+			/U9v/1Sx3Mioni3ESLGbAO0ZIj2wh9WchnK/ForHoss=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
@@ -527,15 +539,26 @@
 			7JNeFneunsV2tTCVPX4JNzIQJdNiQmJhXZ+KPAwXBP4=
 			</data>
 		</dict>
+		<key>Headers/CPAppBannerEventFilters.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			Rbm5iVIsWjWJu+74PpH67KQvy1Y=
+			</data>
+			<key>hash2</key>
+			<data>
+			BLqb1BkBGlDT6Ef+42nPm4eHJ5ZyV8f3+gu+GSWRRUk=
+			</data>
+		</dict>
 		<key>Headers/CPAppBannerFrequency.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			RX4n7sCokJfzf0JG4fZrnxWoDAU=
+			NXiHAFhbr0nQSaIVQnLne0xcujs=
 			</data>
 			<key>hash2</key>
 			<data>
-			tWLT+UZ8Bvi/JmcheFe5raHqKht1EfZMXLTuJ+AVI1c=
+			gX2UTcP1JKf9CrL0563cKtZp0a6m8QWDYLZxOKYVE5I=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
@@ -714,6 +737,17 @@
 			n944nk2fXgQMjySz3KtzCcGhWZQR+TVRR0QUfGKug64=
 			</data>
 		</dict>
+		<key>Headers/CPIabTcfMode.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			JPqi4iGSM+8nfnQHTGhQkOwYkXI=
+			</data>
+			<key>hash2</key>
+			<data>
+			5BlP7T3QO4O/suuybltyzsL+lCOFSDvQlPBGllklzeg=
+			</data>
+		</dict>
 		<key>Headers/CPInboxView.h</key>
 		<dict>
 			<key>hash</key>
@@ -745,6 +779,17 @@
 			<key>hash2</key>
 			<data>
 			AaIr5Dzdn9/KwrlurFPq74gIWyrIWz4ki8BlFEmRA8M=
+			</data>
+		</dict>
+		<key>Headers/CPSQLiteManager.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			sO+eOE3JwBK1uIP0UuuYB1iQQcM=
+			</data>
+			<key>hash2</key>
+			<data>
+			tyfmkc8STxCxswT8LUTTVR4OPqZfQqb1QKcN0v5L804=
 			</data>
 		</dict>
 		<key>Headers/CPStory.h</key>
@@ -828,11 +873,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			dvFxwjGPHokWbMEoWWwuy3p0S1E=
+			UntDK75OWSasNvi9Df8U6F6snbY=
 			</data>
 			<key>hash2</key>
 			<data>
-			S/veLQhDFd5hl9a9omrIVWzceJJvO+C/4BB27p0UDXw=
+			fsx9WItsz/oib7QVMerhqHwVdQMoPVupAwJNRUo4gtM=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
@@ -894,11 +939,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Y/yqxW5Hb3qnC2H0UD8rsGp6wnM=
+			DUtR/VjTADR9J4Y/kNucmDNnSYE=
 			</data>
 			<key>hash2</key>
 			<data>
-			/Ayk9av2JHPjh0KugzPZR/BqOaemLBSbYzJ2TLauZ7I=
+			BCX13oyDt1wSIAQz0DVzO5kqo7mwRb1rVrkTOczMSfk=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -916,22 +961,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Ho4q41OJA8HsYTV+OLDgsVzmR00=
+			BhCS1ValQRw7gblFKkRVsPcQ+d0=
 			</data>
 			<key>hash2</key>
 			<data>
-			7nFuwJiA4sqB5FYwmCBXVryl+Dqhuu1WZZXiqWlbb+s=
+			uSe61zIQ2+IzPcAu5/QtWQAWSXjp+DODd0VqUYsje0E=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			1pH7/S2GmhveG32Gcja7lH6WkYQ=
+			BXIraGHvq18vPEoOHZuUqYs1nLY=
 			</data>
 			<key>hash2</key>
 			<data>
-			pNcFTT+0vX4adi9h4rNDmLaJTwxpuVMGxul+0Xg9g80=
+			mA/b2ihb8AbDdG+etx21QZnkGi9FyPVAbaz1cXsHBv8=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

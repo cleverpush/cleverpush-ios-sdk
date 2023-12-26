@@ -87,7 +87,6 @@
         handler();
     }];
     [self.cleverPush addSubscriptionTag:@"tagId"];
-    
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
     OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
