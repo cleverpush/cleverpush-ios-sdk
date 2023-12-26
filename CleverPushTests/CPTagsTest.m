@@ -279,6 +279,100 @@
     [self waitForExpectations:@[expectation] timeout:5.0];
 }
 
+- (void)testVerifyApiCallAddSubscriptionTag {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Callback called"];
+
+    [self.cleverPush addSubscriptionTag:@"tagId" callback:^(NSString *result) {
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testVerifyApiCallAddSubscriptionTagFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
+    [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Callback called"];
+
+    [self.cleverPush addSubscriptionTag:@"tagId" callback:^(NSString *result) {
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testAddSubscriptionTagSuccess {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Success callback called"];
+
+    [self.cleverPush addSubscriptionTag:@"tagId" callback:^(NSString *result) {
+        [expectation fulfill];
+    } onFailure:^(NSError *error) {
+        XCTFail(@"Failure block should not be called");
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0]; // Adjust timeout as needed
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testAddSubscriptionTagFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
+    [[self.cleverPush reject] waitForTrackingConsent:[OCMArg any]];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Failure callback called"];
+
+    [self.cleverPush addSubscriptionTag:@"tagId" callback:^(NSString *result) {
+        XCTFail(@"Callback should not be called");
+    } onFailure:^(NSError *error) {
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[expectation] timeout:5.0];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTagToApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testDeprecatedGetAvailableTagsSuccess {
+    NSArray *expectedTags = @[@"tag1", @"tag2", @"tag3"];
+    OCMStub([self.cleverPush getAvailableTags]).andReturn(expectedTags);
+    NSArray *retrievedTags = [self.cleverPush getAvailableTags];
+    OCMVerify([self.cleverPush getAvailableTags]);
+    XCTAssertEqualObjects(retrievedTags, expectedTags, @"Returned tags should match expected tags");
+}
+
+- (void)testDeprecatedGetAvailableTagsFailure {
+    OCMStub([self.cleverPush getAvailableTags]).andReturn(nil);
+    NSArray *retrievedTags = [self.cleverPush getAvailableTags];
+    OCMVerify([self.cleverPush getAvailableTags]);
+    XCTAssertNil(retrievedTags, @"Returned tags should be nil in case of failure");
+}
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
