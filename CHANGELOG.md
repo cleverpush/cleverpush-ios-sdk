@@ -1,3 +1,30 @@
+## 1.30.0 (20.12.2023)
+* Support app banner targeting from previously tracked events
+* Support every time on trigger app banner trigger type
+
+## 1.29.5 (15.12.2023)
+* Fixed a behaviour which prevented the subscription being synchronized automatically every 3 days
+
+## 1.29.4 (05.12.2023)
+* Support app banner targeting from previously tracked events
+
+## 1.29.3 (30.11.2023)
+* Added new method `setAppGroupIdentifierSuffix` to support customisable app group identifiers
+* Optimized `setTrackingConsent` behaviour: If called with `NO` for subscription tags and attributes
+
+## 1.29.2 (28.11.2023)
+* Added new method `setSubscriptionAttribute` to support multiple attribute value as array
+
+## 1.29.1 (27.11.2023)
+* Automatic handling of URLs in Notification Actions
+* Support for `setAutoRequestNotificationPermission(false)` added
+* Support for `setAutoResubscribe(true)` added
+
+## 1.29.0 (26.11.2023)
+* IAB TCF compatibility added
+* Automatic retry of failed API requests
+* App banner delegate to show banner on custom view controller
+
 ## 1.28.13
 * Optimizations for in app banners
 

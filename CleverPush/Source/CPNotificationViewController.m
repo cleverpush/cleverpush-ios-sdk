@@ -46,7 +46,7 @@
 
 #pragma mark - Set view controller's background color
 - (void)setBackgroundColor {
-    self.view.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1.0];;
+    self.view.backgroundColor = [UIColor colorWithRed:0.93 green:0.93 blue:0.93 alpha:1.0];
 }
 
 #pragma mark - Release memories of carousel

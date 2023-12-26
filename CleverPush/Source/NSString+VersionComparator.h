@@ -9,5 +9,6 @@
 - (BOOL)isEqualToVersion:(NSString *)version;
 - (BOOL)isEqualOrOlderThanVersion:(NSString *)version;
 - (BOOL)isEqualOrNewerThanVersion:(NSString *)version;
+- (BOOL)isBetweenVersion:(NSString *)lowerVersion andVersion:(NSString *)upperVersion;
 
 @end
