@@ -104,6 +104,32 @@
     OCMVerify([self.cleverPush removeSubscriptionTagFromApi:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testAddSubscriptionTagsSuccess {
+    NSMutableArray *tags = [[NSMutableArray alloc] init];
+    [tags addObject:@"tagId"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToAdd = @[@"tagIdTwo"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags added successfully"];
+    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testAddSubscriptionTagsFailure {
+    NSMutableArray *tags = [[NSMutableArray alloc] init];
+    [tags addObject:@"tagId"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToAdd = @[@"tagId"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags not added"];
+    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertFalse([resultTags containsObject:@"tagId"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
