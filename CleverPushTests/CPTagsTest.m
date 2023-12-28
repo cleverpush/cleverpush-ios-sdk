@@ -214,6 +214,87 @@
     OCMVerify([self.cleverPush addSubscriptionTag:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testRemoveSubscriptionTagSuccessWithCallbacks {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSString *tagId = @"tagId";
+    void (^successCallback)(NSString *) = ^(NSString *result) {
+        XCTAssertNotNil(result);
+    };
+
+    [self.cleverPush removeSubscriptionTag:tagId callback:successCallback onFailure:^(NSError *error) {
+        XCTFail("Unexpected failure block invocation in success case");
+    }];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTag:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testRemoveSubscriptionTagFailureWithCallbacks {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSString *tagId = @"tagId";
+    void (^failureCallback)(NSString *) = ^(NSString *result) {
+        XCTFail("Unexpected success block invocation in failure case");
+    };
+
+    NSError *testError = [NSError errorWithDomain:@"TestErrorDomain" code:500 userInfo:nil];
+
+    [OCMStub([self.cleverPush removeSubscriptionTag:tagId callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^onFailure)(NSError *);
+        [invocation getArgument:&onFailure atIndex:4];
+        onFailure(testError);
+    }];
+
+    [self.cleverPush removeSubscriptionTag:tagId callback:^(NSString *result) {
+        XCTFail("Unexpected success block invocation in failure case");
+    } onFailure:^(NSError *error) {
+        XCTAssertEqualObjects(error.domain, @"TestErrorDomain");
+        XCTAssertEqual(error.code, 500);
+    }];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTag:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testAddSubscriptionTagsSuccess {
+    NSMutableArray *tags = [[NSMutableArray alloc] init];
+    [tags addObject:@"tagId"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToAdd = @[@"tagIdTwo"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags added successfully"];
+    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testAddSubscriptionTagsFailure {
+    NSMutableArray *tags = [[NSMutableArray alloc] init];
+    [tags addObject:@"tagId"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToAdd = @[@"tagId"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags not added"];
+    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertFalse([resultTags containsObject:@"tagId"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 - (void)testVerifyApiCallRemoveTags {
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
@@ -247,32 +328,6 @@
     [self.cleverPush removeSubscriptionTag:tagId];
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
     OCMVerify([self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
-}
-
-- (void)testAddSubscriptionTagsSuccess {
-    NSMutableArray *tags = [[NSMutableArray alloc] init];
-    [tags addObject:@"tagId"];
-    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-    NSArray<NSString *> *tagsToAdd = @[@"tagIdTwo"];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags added successfully"];
-    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
-        XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
-}
-
-- (void)testAddSubscriptionTagsFailure {
-    NSMutableArray *tags = [[NSMutableArray alloc] init];
-    [tags addObject:@"tagId"];
-    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-    NSArray<NSString *> *tagsToAdd = @[@"tagId"];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Tags not added"];
-    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
-        XCTAssertFalse([resultTags containsObject:@"tagId"]);
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
 - (void)testRemoveSubscriptionTagsSuccessWithCallback {
