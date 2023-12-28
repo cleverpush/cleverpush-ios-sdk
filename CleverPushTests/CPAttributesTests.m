@@ -168,6 +168,32 @@
     XCTAssertEqual([mockResult valueForKey:@"id"], @"attribute_id");
 }
 
+- (void)testSetSubscriptionAttributeSuccess {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute set successfully"];
+
+    [self.cleverPush setSubscriptionAttribute:attributeId value:value callback:^{
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testSetSubscriptionAttributeFailure {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute failed to set"];
+
+    [self.cleverPush setSubscriptionAttribute:attributeId value:value callback:^{
+        XCTFail(@"Callback should not be invoked for failure");
+    }];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
