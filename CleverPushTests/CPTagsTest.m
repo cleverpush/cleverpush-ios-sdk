@@ -354,6 +354,30 @@
     [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
+- (void)testRemoveSubscriptionTagsSuccess {
+    NSMutableArray *tags = [[NSMutableArray alloc] initWithObjects:@"tagId", @"tagIdTwo", nil];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToRemove = @[@"tagId"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tag removed successfully"];
+    [self.cleverPush removeSubscriptionTags:tagsToRemove callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertFalse([resultTags containsObject:@"tagId"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testRemoveSubscriptionTagsFailure {
+    NSMutableArray *tags = [[NSMutableArray alloc] initWithObjects:@"tagId", @"tagIdTwo", nil];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+    NSArray<NSString *> *tagsToRemove = @[@"tagIdNotPresent"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Tag not removed"];
+    [self.cleverPush removeSubscriptionTags:tagsToRemove callback:^(NSArray<NSString *> *resultTags) {
+        XCTAssertTrue([resultTags containsObject:@"tagId"]);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
