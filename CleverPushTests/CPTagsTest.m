@@ -378,6 +378,21 @@
     [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
+- (void)testGetSubscriptionTagsSuccess {
+    NSArray<NSString *> *tags = @[@"tagId", @"tagIdTwo"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    XCTAssertTrue([retrievedTags containsObject:@"tagId"]);
+}
+
+- (void)testGetSubscriptionTagsFailure {
+    NSArray<NSString *> *tags = @[@"tagId", @"tagIdTwo"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    XCTAssertFalse([retrievedTags containsObject:@"tagIdNotPresent"]);
+}
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
