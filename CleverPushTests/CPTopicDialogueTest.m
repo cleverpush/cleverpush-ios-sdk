@@ -141,6 +141,41 @@
         OCMVerify([self.cleverPush initTopicsDialogData:responseObject syncToBackend:NO]);
     });
 }
+
+- (void)testVerifyApiCallAddTopics {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+    [self.cleverPush addSubscriptionTopic:@"topicId"];
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testVerifyApiCallAddTopicsFailure {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    [OCMStub([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^onFailure)(NSError *);
+        [invocation getArgument:&onFailure atIndex:4];
+        NSError *error = [NSError errorWithDomain:@"TestErrorDomain" code:500 userInfo:nil];
+        onFailure(error);
+    }];
+
+    [self.cleverPush addSubscriptionTopic:@"topicId"];
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
