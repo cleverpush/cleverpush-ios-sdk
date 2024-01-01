@@ -92,6 +92,17 @@
     [[self.cleverPush verify] isSubscribed];
 }
 
+- (void)testGetSubscriptionChanged {
+    BOOL initialSubscriptionChanged = [CleverPush getSubscriptionChanged];
+    XCTAssertFalse(initialSubscriptionChanged, @"Initial subscription change flag should be false");
+    [CleverPush setSubscriptionChanged:YES];
+    BOOL updatedSubscriptionChanged = [CleverPush getSubscriptionChanged];
+    XCTAssertTrue(updatedSubscriptionChanged, @"Subscription change flag should be true after setting");
+    [CleverPush setSubscriptionChanged:NO];
+    BOOL revertedSubscriptionChanged = [CleverPush getSubscriptionChanged];
+    XCTAssertFalse(revertedSubscriptionChanged, @"Subscription change flag should be false after resetting");
+}
+
 - (void)testIncrementAppOpens {
     OCMStub([self.cleverPush isSubscribed]).andReturn(YES);
     NSInteger beforeExpectation = [self.cleverPush getAppOpens];
