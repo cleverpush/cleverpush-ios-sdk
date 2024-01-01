@@ -103,6 +103,30 @@
     XCTAssertFalse(revertedSubscriptionChanged, @"Subscription change flag should be false after resetting");
 }
 
+- (void)testGetAppBannerDraftsEnabled {
+    BOOL initialBannerDraftsEnabled = [CleverPush getAppBannerDraftsEnabled];
+    XCTAssertFalse(initialBannerDraftsEnabled, @"Initial app banner drafts flag should be false");
+    [CleverPush setAppBannerDraftsEnabled:YES];
+    BOOL updatedBannerDraftsEnabled = [CleverPush getAppBannerDraftsEnabled];
+    XCTAssertTrue(updatedBannerDraftsEnabled, @"App banner drafts flag should be true after setting");
+    [CleverPush setAppBannerDraftsEnabled:NO];
+    BOOL revertedBannerDraftsEnabled = [CleverPush getAppBannerDraftsEnabled];
+    XCTAssertFalse(revertedBannerDraftsEnabled, @"App banner drafts flag should be false after resetting");
+}
+
+- (void)testGetSubscriptionAttributes {
+    NSDictionary *testAttributes = @{@"key1": @"value1", @"key2": @"value2"};
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:testAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+    [userDefaults synchronize];
+    NSDictionary *retrievedAttributes = [CleverPush getSubscriptionAttributes];
+    XCTAssertEqualObjects(retrievedAttributes, testAttributes, @"Retrieved attributes should match the test data");
+    [userDefaults removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+    [userDefaults synchronize];
+    NSDictionary *emptyAttributes = [CleverPush getSubscriptionAttributes];
+    XCTAssertEqual(emptyAttributes.count, 0, @"Empty dictionary should be returned when no attributes are set");
+}
+
 - (void)testIncrementAppOpens {
     OCMStub([self.cleverPush isSubscribed]).andReturn(YES);
     NSInteger beforeExpectation = [self.cleverPush getAppOpens];
