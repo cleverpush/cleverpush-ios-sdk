@@ -118,6 +118,38 @@
     OCMVerify([self.cleverPush clearBadge:false]);
 }
 
+- (void)testNotificationsEnabledSuccess {
+    void (^successBlock)(BOOL) = ^(BOOL isEnabled) {
+        XCTAssertTrue(isEnabled, @"Notifications should be enabled for success.");
+    };
+
+    id mockNotificationClass = OCMClassMock([CleverPush class]);
+    OCMStub([mockNotificationClass areNotificationsEnabled:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(BOOL) = nil;
+        [invocation getArgument:&callback atIndex:2];
+        callback(YES);
+    });
+
+    [CleverPush areNotificationsEnabled:successBlock];
+    OCMVerify(successBlock);
+}
+
+- (void)testNotificationsEnabledFailure {
+    void (^failureBlock)(BOOL) = ^(BOOL isEnabled) {
+        XCTAssertFalse(isEnabled, @"Notifications should not be enabled for failure.");
+    };
+
+    id mockNotificationClass = OCMClassMock([CleverPush class]);
+    OCMStub([mockNotificationClass areNotificationsEnabled:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(BOOL) = nil;
+        [invocation getArgument:&callback atIndex:2];
+        callback(NO);
+    });
+
+    [CleverPush areNotificationsEnabled:failureBlock];
+    OCMVerify(failureBlock);
+}
+
 - (void)testSubscriptionIdIsNotNilAndNotificationNotEnableThanVerifyUnsubscribe {
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
