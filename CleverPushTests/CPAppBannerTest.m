@@ -316,6 +316,21 @@ dispatch_queue_t dispatchQueue = nil;
     }];
 }
 
+- (void)testCustomTopViewControllerSuccess {
+    UIViewController *testViewController = [[UIViewController alloc] init];
+    [CleverPush setCustomTopViewController:testViewController];
+    UIViewController *retrievedViewController = [CleverPush getCustomTopViewController];
+    XCTAssertEqualObjects(retrievedViewController, testViewController, @"Retrieved view controller should match the test view controller");
+}
+
+- (void)testCustomTopViewControllerFailure {
+    UIViewController *testViewController = [[UIViewController alloc] init];
+    UIViewController *anotherViewController = [[UIViewController alloc] init];
+    [CleverPush setCustomTopViewController:testViewController];
+    UIViewController *retrievedViewController = [CleverPush getCustomTopViewController];
+    XCTAssertNotEqualObjects(retrievedViewController, anotherViewController, @"Retrieved view controller should not match a different view controller");
+}
+
 - (void) backgroundMethodWithCallback: (void(^)(void)) callback {
     dispatch_queue_t backgroundQueue;
     backgroundQueue = dispatch_queue_create("background.queue", NULL);
