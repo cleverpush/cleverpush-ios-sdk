@@ -20,11 +20,11 @@
 }
 
 - (void)testGetBrandingColorWithFailure {
-    UIColor *testColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
-    OCMStub([CleverPush getBrandingColor]).andReturn(testColor);
-    [CleverPush setBrandingColor:[UIColor colorWithRed:0.1 green:0.5 blue:0.0 alpha:0.1]];
+    UIColor *expectedColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    UIColor *differentColor = [UIColor redColor];
+    OCMStub([CleverPush getBrandingColor]).andReturn(differentColor);
     UIColor *retrievedColor = [CleverPush getBrandingColor];
-    XCTAssertEqualObjects(retrievedColor, testColor, @"Retrieved color should match the test color");
+    XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
 }
 
 - (void)setUp {
