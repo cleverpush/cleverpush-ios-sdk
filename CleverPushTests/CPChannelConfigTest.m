@@ -441,6 +441,23 @@
     [self waitForExpectationsWithTimeout:5 handler:nil];
 }
 
+- (void)testSetMaximumNotificationCountSuccess {
+    int expectedLimit = 10;
+    id mockClass = OCMClassMock([CleverPush class]);
+    OCMExpect([mockClass setMaximumNotificationCount:expectedLimit]);
+    [CleverPush setMaximumNotificationCount:expectedLimit];
+    OCMVerifyAll(mockClass);
+}
+
+- (void)testSetMaximumNotificationCountFailure {
+    int expectedLimit = 10;
+    int differentLimit = 20;
+    id mockClass = OCMClassMock([CleverPush class]);
+    OCMExpect([mockClass setMaximumNotificationCount:expectedLimit]);
+    [CleverPush setMaximumNotificationCount:differentLimit];
+    OCMVerifyAll(mockClass);
+}
+
 - (void)tearDown {
 }
 
