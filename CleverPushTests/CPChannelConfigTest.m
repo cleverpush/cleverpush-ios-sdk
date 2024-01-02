@@ -401,6 +401,46 @@
     XCTAssertNotEqualObjects(retrievedEndpoint, differentEndpoint, @"Retrieved endpoint should not match a different endpoint");
 }
 
+- (void)testGetSubscriptionIdSuccess {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Get Subscription ID"];
+    NSString *expectedSubscriptionId = @"test_subscription_id";
+
+    id mockClass = OCMClassMock([CleverPush class]);
+    OCMStub([mockClass getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(NSString *callbackString);
+        [invocation getArgument:&callback atIndex:2];
+        callback(expectedSubscriptionId);
+    });
+
+    [CleverPush getSubscriptionId:^(NSString *callbackString) {
+        XCTAssertEqualObjects(callbackString, expectedSubscriptionId, @"Subscription ID should match the expected value");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
+- (void)testGetSubscriptionIdFailure {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Get Subscription ID"];
+
+    NSString *expectedSubscriptionId = @"test_subscription_id";
+    NSString *differentSubscriptionId = @"different_subscription_id";
+
+    id mockClass = OCMClassMock([CleverPush class]);
+    OCMStub([mockClass getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(NSString *callbackString);
+        [invocation getArgument:&callback atIndex:2];
+        callback(expectedSubscriptionId);
+    });
+
+    [CleverPush getSubscriptionId:^(NSString *callbackString) {
+        XCTAssertNotEqualObjects(callbackString, differentSubscriptionId, @"Subscription ID should not match a different value");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 - (void)tearDown {
 }
 
