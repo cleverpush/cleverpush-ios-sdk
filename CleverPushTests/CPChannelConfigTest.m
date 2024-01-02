@@ -362,6 +362,30 @@
     XCTAssertNotEqual(retrievedValue, differentValue, @"Retrieved value should not match a different value");
 }
 
+- (void)testGetUserDefaultsAppGroupSuccess {
+    id mockBundle = OCMClassMock([NSBundle class]);
+    OCMStub([mockBundle mainBundle]).andReturn(mockBundle);
+    NSURL *mockURL = [NSURL URLWithString:@"file:///path/to/app"];
+    OCMStub([mockBundle bundleURL]).andReturn(mockURL);
+    NSString *testGroupIdentifierSuffix = @"testGroup";
+    OCMStub([CleverPush getAppGroupIdentifierSuffix]).andReturn(testGroupIdentifierSuffix);
+    NSUserDefaults *retrievedUserDefaults = [CPUtils getUserDefaultsAppGroup];
+    XCTAssertNotNil(retrievedUserDefaults, @"Retrieved user defaults should not be nil");
+    [mockBundle stopMocking];
+}
+
+- (void)testGetUserDefaultsAppGroupFailure {
+    id mockBundle = OCMClassMock([NSBundle class]);
+    OCMStub([mockBundle mainBundle]).andReturn(mockBundle);
+    NSURL *mockURL = [NSURL URLWithString:@"file:///path/to/app"];
+    OCMStub([mockBundle bundleURL]).andReturn(mockURL);
+    NSString *differentGroupIdentifierSuffix = @"differentGroup";
+    OCMStub([CleverPush getAppGroupIdentifierSuffix]).andReturn(differentGroupIdentifierSuffix);
+    NSUserDefaults *retrievedUserDefaults = [CPUtils getUserDefaultsAppGroup];
+    XCTAssertNil(retrievedUserDefaults, @"Retrieved user defaults should be nil as the suffix doesn't match");
+    [mockBundle stopMocking];
+}
+
 - (void)tearDown {
 }
 
