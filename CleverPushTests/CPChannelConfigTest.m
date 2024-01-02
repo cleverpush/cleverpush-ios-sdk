@@ -347,6 +347,21 @@
     }];
 }
 
+- (void)testLocalEventTrackingRetentionDaysSuccess {
+    int testValue = 10;
+    [CleverPush setLocalEventTrackingRetentionDays:testValue];
+    int retrievedValue = [CleverPush getLocalEventTrackingRetentionDays];
+    XCTAssertEqual(retrievedValue, testValue, @"Retrieved value should match the test value");
+}
+
+- (void)testLocalEventTrackingRetentionDaysFailure {
+    int testValue = 10;
+    [CleverPush setLocalEventTrackingRetentionDays:testValue];
+    int differentValue = 20;
+    int retrievedValue = [CleverPush getLocalEventTrackingRetentionDays];
+    XCTAssertNotEqual(retrievedValue, differentValue, @"Retrieved value should not match a different value");
+}
+
 - (void)tearDown {
 }
 
