@@ -386,6 +386,21 @@
     [mockBundle stopMocking];
 }
 
+- (void)testApiEndpointSuccess {
+    NSString *testEndpoint = @"https://test-api.example.com";
+    [CleverPush setApiEndpoint:testEndpoint];
+    NSString *retrievedEndpoint = [CleverPush getApiEndpoint];
+    XCTAssertEqualObjects(retrievedEndpoint, testEndpoint, @"Retrieved endpoint should match the test endpoint");
+}
+
+- (void)testApiEndpointFailure {
+    NSString *testEndpoint = @"https://test-api.example.com";
+    NSString *differentEndpoint = @"https://different-api.example.com";
+    [CleverPush setApiEndpoint:testEndpoint];
+    NSString *retrievedEndpoint = [CleverPush getApiEndpoint];
+    XCTAssertNotEqualObjects(retrievedEndpoint, differentEndpoint, @"Retrieved endpoint should not match a different endpoint");
+}
+
 - (void)tearDown {
 }
 
