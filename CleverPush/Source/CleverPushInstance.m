@@ -88,6 +88,7 @@ static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
+static BOOL hasCalledSubscribe = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -448,6 +449,7 @@ static id isNil(id object) {
     }
 
     if (subscriptionId != nil) {
+        hasCalledSubscribe = YES;
         [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
                 [CPLog info:@"notification authorization revoked, unsubscribing"];
@@ -1042,6 +1044,7 @@ static id isNil(id object) {
 
 - (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     void (^handleSubscribe)(void) = ^{
+        hasCalledSubscribe = YES;
         if (@available(iOS 10.0, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
@@ -1340,6 +1343,11 @@ static id isNil(id object) {
 }
 
 - (void)syncSubscription:(CPFailureBlock)failureBlock {
+    if (!hasCalledSubscribe) {
+        [CPLog debug:@"CleverPushInstance: syncSubscription: Cleverpush SDK not initialised"];
+        return;
+    }
+
     if ([self isSubscriptionInProgress]) {
         [CPLog debug:@"syncSubscription aborted - registration already in progress"];
         return;
