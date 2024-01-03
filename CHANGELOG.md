@@ -1,3 +1,6 @@
+## 1.30.2 (03.01.2024)
+* Fixed previous release
+
 ## 1.30.1 (03.01.2024)
 * Added a feature to support GIFs in-app banners
 * Optimised behaviour for the URL open handler
