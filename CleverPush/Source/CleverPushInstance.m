@@ -139,6 +139,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
+CPInitializedBlock handleInitialized;
 CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController *channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
@@ -292,16 +293,27 @@ static id isNil(id object) {
     return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
 }
 
-#pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
 - (id)initWithLaunchOptions:(NSDictionary*)launchOptions
                   channelId:(NSString*)newChannelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
            handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
                autoRegister:(BOOL)autoRegisterParam {
+    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
+}
+
+#pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
+- (id)initWithLaunchOptions:(NSDictionary*)launchOptions
+                  channelId:(NSString*)newChannelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
+           handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
+               autoRegister:(BOOL)autoRegisterParam
+          handleInitialized:(CPInitializedBlock)initializedCallback {
     [self setSubscribeHandler:subscribedCallback];
     handleNotificationReceived = receivedCallback;
     handleNotificationOpened = openedCallback;
+    handleInitialized = initializedCallback;
     autoRegister = autoRegisterParam;
     brandingColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
     channelConfig = nil;
@@ -3680,10 +3692,12 @@ static id isNil(id object) {
             channelConfig = result;
         }
 
+        [self handleInitialization:YES error:nil];
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
-        [CPLog error:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
-
+        NSString *failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
+        [CPLog error:failureMessage];
+        [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];
 }
@@ -3710,17 +3724,23 @@ static id isNil(id object) {
                     channelConfig = testsResult;
                 }
 
+                [self handleInitialization:YES error:Nil];
                 [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
-                [CPLog error:@"Failed getting the channel config %@", error];
+                NSString *failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
+                [CPLog error:failureMessage];
+                [self handleInitialization:NO error:failureMessage];
                 [self fireChannelConfigListeners];
             }];
             return;
         }
 
+        [self handleInitialization:YES error:nil];
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
-        [CPLog error:@"Failed getting the channel config %@", error];
+        NSString *failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
+        [CPLog error:failureMessage];
+        [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];
 }
@@ -3758,6 +3778,12 @@ static id isNil(id object) {
 
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback {
     handleSubscribed = subscribedCallback;
+}
+
+- (void)handleInitialization:(BOOL)success error:(NSString * _Nullable)error {
+    if (handleInitialized) {
+        handleInitialized(success, error);
+    }
 }
 
 - (void)setLogListener:(CPLogListener)listener {
