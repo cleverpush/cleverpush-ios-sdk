@@ -1,3 +1,7 @@
+## 1.30.3 (04.01.2024)
+* Fixed latest release for SPM
+* Added `handleInitialized` listener
+
 ## 1.30.2 (03.01.2024)
 * Fixed previous release
 

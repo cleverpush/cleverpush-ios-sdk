@@ -261,7 +261,6 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (BOOL)getHandleSubscribedCalled;
 - (CPHandleSubscribedBlock)getSubscribeHandler;
 - (void)setSubscribeHandler:(CPHandleSubscribedBlock)subscribedCallback;
-- (void)handleInitialization:(BOOL)success failureMessage:(NSString * _Nullable)error;
 - (void)initFeatures;
 - (void)initIabTcf;
 - (void)initAppReview;
