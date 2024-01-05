@@ -1,3 +1,15 @@
+## 1.30.3 (04.01.2024)
+* Fixed latest release for SPM
+* Added `handleInitialized` listener
+
+## 1.30.2 (03.01.2024)
+* Fixed previous release
+
+## 1.30.1 (03.01.2024)
+* Added a feature to support GIFs in-app banners
+* Optimised behaviour for the URL open handler
+* Improved `syncsubscription` behaviour
+
 ## 1.30.0 (20.12.2023)
 * Support app banner targeting from previously tracked events
 * Support every time on trigger app banner trigger type

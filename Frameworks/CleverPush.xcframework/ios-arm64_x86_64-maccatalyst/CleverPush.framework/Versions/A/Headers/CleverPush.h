@@ -44,6 +44,9 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
++ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister handleInitialized:(CPInitializedBlock)initializedCallback;
 + (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
 
 + (void)setTrackingConsentRequired:(BOOL)required;
