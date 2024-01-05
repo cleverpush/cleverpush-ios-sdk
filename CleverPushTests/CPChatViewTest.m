@@ -53,6 +53,32 @@
     XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
 }
 
+- (void)testChatSenderBubbleBackgroundColorWithSuccess {
+    UIColor *testColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    [self.chatView setChatSenderBubbleBackgroundColor:[UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0]];
+    UIColor *retrievedColor = [self.chatView getChatSenderBubbleBackgroundColor];
+    XCTAssertEqualObjects(retrievedColor, testColor, @"Retrieved color should match the test color");
+}
+
+- (void)testChatSenderBubbleBackgroundColorWithFailure {
+    UIColor *expectedColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    UIColor *retrievedColor = [self.chatView getChatSenderBubbleBackgroundColor];
+    XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
+}
+
+- (void)testChatSendButtonBackgroundColorWithSuccess {
+    UIColor *testColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    [self.chatView setChatSendButtonBackgroundColor:[UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0]];
+    UIColor *retrievedColor = [self.chatView getChatSendButtonBackgroundColor];
+    XCTAssertEqualObjects(retrievedColor, testColor, @"Retrieved color should match the test color");
+}
+
+- (void)testChatSendButtonBackgroundColorWithFailure {
+    UIColor *expectedColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    UIColor *retrievedColor = [self.chatView getChatSendButtonBackgroundColor];
+    XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
+}
+
 - (void)setUp {
     self.chatView = [[CPChatView alloc] init];
 }
