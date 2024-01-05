@@ -6,7 +6,7 @@
 #import "CPStoriesController.h"
 
 @interface CPChatViewTest : XCTestCase
-
+@property (nonatomic, strong) CPChatView *chatView;
 @end
 
 @implementation CPChatViewTest
@@ -27,8 +27,34 @@
     XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
 }
 
+- (void)testChatBackgroundColorWithSuccess {
+    UIColor *testColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    [self.chatView setChatBackgroundColor:[UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0]];
+    UIColor *retrievedColor = [self.chatView getChatBackgroundColor];
+    XCTAssertEqualObjects(retrievedColor, testColor, @"Retrieved color should match the test color");
+}
+
+- (void)testChatBackgroundColorWithFailure {
+    UIColor *expectedColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    UIColor *retrievedColor = [self.chatView getChatBackgroundColor];
+    XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
+}
+
+- (void)testChatSenderBubbleTextColorWithSuccess {
+    UIColor *testColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    [self.chatView setChatSenderBubbleTextColor:[UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0]];
+    UIColor *retrievedColor = [self.chatView getChatSenderBubbleTextColor];
+    XCTAssertEqualObjects(retrievedColor, testColor, @"Retrieved color should match the test color");
+}
+
+- (void)testChatSenderBubbleTextColorWithFailure {
+    UIColor *expectedColor = [UIColor colorWithRed:0.2 green:0.4 blue:0.6 alpha:1.0];
+    UIColor *retrievedColor = [self.chatView getChatSenderBubbleTextColor];
+    XCTAssertNotEqualObjects(retrievedColor, expectedColor, @"Retrieved color should not match the expected color");
+}
+
 - (void)setUp {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+    self.chatView = [[CPChatView alloc] init];
 }
 
 - (void)tearDown {
