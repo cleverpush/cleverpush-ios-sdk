@@ -326,8 +326,8 @@
 }
 
 - (void)testSyncUnsubscribeWhenSubscriptionIdExists{
-    OCMStub([self.cleverPush subscriptionId]).andReturn(@"S9cA4fr2doS24d2f6");
-    OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
+    OCMStub([self.cleverPush subscriptionId]).andReturn(@"YOUR_SUBSCRIPTION_ID_HERE");
+    OCMStub([self.cleverPush channelId]).andReturn(@"YOUR_CHANNEL_ID_HERE");
     [self.cleverPush unsubscribe:^(BOOL success) {
         if (success) {
             OCMVerify([self.cleverPush clearSubscriptionData]);
@@ -339,7 +339,7 @@
 }
 - (void)testSyncUnsubscribeWhenSubscriptionIdNotExists {
     OCMStub([self.cleverPush subscriptionId]).andReturn(nil);
-    OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
+    OCMStub([self.cleverPush channelId]).andReturn(@"YOUR_CHANNEL_ID_HERE");
     [self.cleverPush unsubscribe:^(BOOL failed) {
         if (failed) {
             OCMVerify([self.cleverPush clearSubscriptionData]);

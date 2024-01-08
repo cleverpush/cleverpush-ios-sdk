@@ -36,38 +36,38 @@
 }
 
 - (void)testInitiasationOfTopicsWhenNewAdded {
-    OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
+    OCMStub([self.cleverPush channelId]).andReturn(@"YOUR_CHANNEL_ID_HERE");
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     [self.cleverPush getChannelConfig:^(NSDictionary *channelConfig) {
         NSLog(@"%@", channelConfig);
         OCMStub([self.cleverPush hasNewTopicAfterOneHour:channelConfig initialDifference:0 displayDialogDifference:3600]).andReturn(true);
     }];
-    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"64ipj2EG2gGNGkEr7" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"YOUR_CHANNEL_ID_HERE" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
     [_testUtilInstance performSelector:@selector(showTopicsDialog) withObject:self.cleverPush afterDelay:1.0f];
     [_testUtilInstance performSelector:@selector(showTopicDialogOnNewAdded) withObject:self.cleverPush afterDelay:1.0f];
     OCMVerify([CPUtils updateLastTimeAutomaticallyShowed]);
 }
 
 - (void)testInitiasationOfTopicsWhenThereIsNoNewTopics {
-    OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
+    OCMStub([self.cleverPush channelId]).andReturn(@"YOUR_CHANNEL_ID_HERE");
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     [self.cleverPush getChannelConfig:^(NSDictionary *channelConfig) {
         NSLog(@"%@", channelConfig);
         OCMStub([self.cleverPush hasNewTopicAfterOneHour:channelConfig initialDifference:0 displayDialogDifference:3600]).andReturn(false);
     }];
-    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"64ipj2EG2gGNGkEr7" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"YOUR_CHANNEL_ID_HERE" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
     [_testUtilInstance performSelector:@selector(showTopicDialogOnNewAdded) withObject:self.cleverPush afterDelay:1.0f];
     [_testUtilInstance performSelector:@selector(showPendingTopicsDialog) withObject:self.cleverPush afterDelay:1.0f];
 }
 
 - (void)testShowTopicsDialog {
-    OCMStub([self.cleverPush channelId]).andReturn(@"64ipj2EG2gGNGkEr7");
+    OCMStub([self.cleverPush channelId]).andReturn(@"YOUR_CHANNEL_ID_HERE");
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     [self.cleverPush getChannelConfig:^(NSDictionary *channelConfig) {
         NSLog(@"%@", channelConfig);
         OCMStub([self.cleverPush hasNewTopicAfterOneHour:channelConfig initialDifference:0 displayDialogDifference:3600]).andReturn(false);
     }];
-    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"64ipj2EG2gGNGkEr7" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"YOUR_CHANNEL_ID_HERE" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
     [_testUtilInstance performSelector:@selector(showTopicDialogOnNewAdded) withObject:self.cleverPush afterDelay:1.0f];
     [_testUtilInstance performSelector:@selector(showPendingTopicsDialog) withObject:self.cleverPush afterDelay:1.0f];
 }
