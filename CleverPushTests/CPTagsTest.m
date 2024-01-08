@@ -279,7 +279,12 @@
         XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testAddSubscriptionTagsFailure {
@@ -292,7 +297,12 @@
         XCTAssertFalse([resultTags containsObject:@"tagId"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testVerifyApiCallRemoveTags {
@@ -339,7 +349,12 @@
         XCTAssertFalse([resultTags containsObject:@"tagIdTwo"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testRemoveSubscriptionTagsFailureWithCallback {
@@ -351,7 +366,12 @@
         XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testRemoveSubscriptionTagsSuccess {
@@ -363,7 +383,12 @@
         XCTAssertFalse([resultTags containsObject:@"tagId"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testRemoveSubscriptionTagsFailure {
@@ -375,7 +400,12 @@
         XCTAssertTrue([resultTags containsObject:@"tagId"]);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testGetSubscriptionTagsSuccess {

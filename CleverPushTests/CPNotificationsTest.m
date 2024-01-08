@@ -101,6 +101,20 @@
     self.notification2.expiresAt = [NSDate dateWithTimeIntervalSinceNow:7200];
 }
 
+- (void)testGetNotificationsReturnsExpectedData {
+    NSArray<CPNotification *> *expectedNotifications = @[self.notification1, self.notification2];
+    OCMStub([CleverPush getNotifications]).andReturn(expectedNotifications);
+    NSArray<CPNotification *> *retrievedNotifications = [CleverPush getNotifications];
+    XCTAssertEqualObjects(retrievedNotifications, expectedNotifications, @"Retrieved notifications should match the expected notifications");
+}
+
+- (void)testGetNotificationsReturnsUnexpectedData {
+    NSArray<CPNotification *> *expectedNotifications = @[self.notification1, self.notification2];
+    OCMStub([CleverPush getNotifications]).andReturn(expectedNotifications);
+    NSArray<CPNotification *> *retrievedNotifications = [CleverPush getNotifications];
+    XCTAssertNotEqualObjects(retrievedNotifications, expectedNotifications, @"Retrieved notifications should not match the expected notifications");
+}
+
 - (void)tearDown {
 }
 

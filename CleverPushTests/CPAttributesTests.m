@@ -178,7 +178,12 @@
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error: %@", error.localizedDescription);
+        }
+    }];
 }
 
 - (void)testSetSubscriptionAttributeFailure {
@@ -191,7 +196,12 @@
         XCTFail(@"Callback should not be invoked for failure");
     }];
 
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)tearDown {

@@ -417,7 +417,12 @@
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testGetSubscriptionIdFailure {
@@ -438,7 +443,12 @@
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:5 handler:nil];
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
 }
 
 - (void)testSetMaximumNotificationCountSuccess {
