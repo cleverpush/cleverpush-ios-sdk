@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-completeness"
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <WebKit/WKWebView.h>
@@ -289,3 +292,5 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 - (void)setLogListener:(CPLogListener)listener;
 
 @end
+
+#pragma clang diagnostic pop
