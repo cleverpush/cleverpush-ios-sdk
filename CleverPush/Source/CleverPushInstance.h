@@ -21,20 +21,20 @@
 
 @interface CPNotificationReceivedResult : NSObject
 
-@property(readonly)NSDictionary* payload;
-@property(readonly)CPNotification* notification;
-@property(readonly)CPSubscription* subscription;
-- (instancetype)initWithPayload:(NSDictionary *)payload;
+@property(readonly)NSDictionary* _Nullable payload;
+@property(readonly)CPNotification* _Nullable notification;
+@property(readonly)CPSubscription* _Nullable subscription;
+- (instancetype _Nullable)initWithPayload:(NSDictionary * _Nullable)payload;
 
 @end;
 
 @interface CPNotificationOpenedResult : NSObject
 
-@property(readonly)NSDictionary* payload;
-@property(readonly)CPNotification* notification;
-@property(readonly)CPSubscription* subscription;
-@property(readonly)NSString* action;
-- (instancetype)initWithPayload:(NSDictionary *)payload action:(NSString*)action;
+@property(readonly)NSDictionary* _Nullable payload;
+@property(readonly)CPNotification* _Nullable notification;
+@property(readonly)CPSubscription* _Nullable subscription;
+@property(readonly)NSString* _Nullable action;
+- (instancetype _Nullable)initWithPayload:(NSDictionary * _Nullable)payload action:(NSString* _Nullable)action;
 
 @end;
 
@@ -42,51 +42,51 @@
 @class CPChannelTopic;
 @class CPAppBanner;
 
-typedef void (^CPResultSuccessBlock)(NSDictionary* result);
-typedef void (^CPFailureBlock)(NSError* error);
+typedef void (^CPResultSuccessBlock)(NSDictionary* _Nullable result);
+typedef void (^CPFailureBlock)(NSError* _Nullable error);
 
-typedef void (^CPHandleSubscribedBlock)(NSString * result);
+typedef void (^CPHandleSubscribedBlock)(NSString * _Nullable result);
 
 typedef void (^CPTopicsChangedBlock)();
 
-typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* result);
-typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* result);
+typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* _Nullable result);
+typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* _Nullable result);
 typedef void (^CPInitializedBlock)(BOOL success, NSString* _Nullable failureMessage);
 
-typedef void (^CPResultSuccessBlock)(NSDictionary* result);
-typedef void (^CPFailureBlock)(NSError* error);
+typedef void (^CPResultSuccessBlock)(NSDictionary* _Nullable result);
+typedef void (^CPFailureBlock)(NSError* _Nullable error);
 
-typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* action);
-typedef void (^CPAppBannerShownBlock)(CPAppBanner* appBanner);
-typedef void (^CPAppBannerDisplayBlock)(UIViewController *viewController);
+typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* _Nullable action);
+typedef void (^CPAppBannerShownBlock)(CPAppBanner* _Nullable appBanner);
+typedef void (^CPAppBannerDisplayBlock)(UIViewController * _Nullable viewController);
 
-typedef void (^CPLogListener)(NSString* message);
+typedef void (^CPLogListener)(NSString* _Nullable message);
 
 @interface CleverPushInstance : NSObject
 
-extern NSString * const CLEVERPUSH_SDK_VERSION;
+extern NSString * _Nullable const CLEVERPUSH_SDK_VERSION;
 
 #pragma mark - Initialise with launch options
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
- handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
-   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
- handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
-   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister  handleInitialized:(CPInitializedBlock)initializedCallback;
-- (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister  handleInitialized:(CPInitializedBlock _Nullable)initializedCallback;
+- (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
 
 - (void)setTrackingConsentRequired:(BOOL)required;
 - (void)setTrackingConsent:(BOOL)consent;
