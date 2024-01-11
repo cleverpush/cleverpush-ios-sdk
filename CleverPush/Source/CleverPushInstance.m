@@ -450,7 +450,7 @@ static id isNil(id object) {
                 [dateFormatter setTimeZone:[NSTimeZone localTimeZone]];
                 [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
                 NSDate *retentionDay = [[dateFormatter dateFromString:[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY]] dateByAddingTimeInterval:(60 * 60 * 24 * [CleverPush getLocalEventTrackingRetentionDays])];
-                
+
                 if (retentionDay != nil) {
                     if ([[NSDate date] compare:retentionDay] == NSOrderedDescending || [[NSDate date] compare:retentionDay] == NSOrderedSame) {
                        [databaseManager deleteDataBasedOnRetentionDays:[CleverPush getLocalEventTrackingRetentionDays]];
@@ -1433,7 +1433,7 @@ static id isNil(id object) {
     ) {
         [dataDic setObject:[channelConfig objectForKey:@"confirmAlertTestId"] forKey:@"confirmAlertTestId"];
     }
-    
+
     if ([channelConfig objectForKey:@"preventDuplicatePushesEnabled"] != nil && [[channelConfig objectForKey:@"preventDuplicatePushesEnabled"] boolValue] == YES) {
           [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
         }
@@ -1739,7 +1739,7 @@ static id isNil(id object) {
     if (!channelId) { // not init
         pendingOpenedResult = result;
     }
-    
+
     if (!handleNotificationOpened) {
         if (hasWebViewOpened) {
             if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
@@ -2235,15 +2235,15 @@ static id isNil(id object) {
         }
         NSArray *subscriptionTags = [CleverPush getSubscriptionTags];
         NSDictionary *attributes = [CleverPush getSubscriptionAttributes];
-        
+
         if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
             [self removeSubscriptionTags:subscriptionTags];
         }
-        
+
         if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
             for (NSString *key in attributes) {
                 id value = [attributes objectForKey:key];
-                
+
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
                         [CleverPush setSubscriptionAttribute:key value:@""];
@@ -3920,4 +3920,3 @@ static id isNil(id object) {
 }
 
 @end
-
