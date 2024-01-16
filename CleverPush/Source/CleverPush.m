@@ -314,53 +314,53 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance hasSubscriptionAttributeValue:attributeId value:value];
 }
 
-+ (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback {
++ (void)getAvailableTags:(void(^ _Nullable)(NSArray <CPChannelTag*>*))callback {
     [self.CPSharedInstance getAvailableTags:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback {
++ (void)getAvailableTopics:(void(^ _Nullable)(NSArray <CPChannelTopic*>*))callback {
     [self.CPSharedInstance getAvailableTopics:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getAvailableAttributes:(void(^)(NSMutableArray*))callback {
++ (void)getAvailableAttributes:(void(^ _Nullable)(NSMutableArray* _Nullable))callback {
     [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)setSubscriptionLanguage:(NSString*)language {
++ (void)setSubscriptionLanguage:(NSString* _Nullable)language {
     [self.CPSharedInstance setSubscriptionLanguage:language];
 }
 
-+ (void)setSubscriptionCountry:(NSString*)country {
++ (void)setSubscriptionCountry:(NSString* _Nullable)country {
     [self.CPSharedInstance setSubscriptionCountry:country];
 }
 
-+ (void)setTopicsDialogWindow:(UIWindow*)window {
++ (void)setTopicsDialogWindow:(UIWindow* _Nullable)window {
     [self.CPSharedInstance setTopicsDialogWindow:window];
 }
 
-+ (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock {
++ (void)setTopicsChangedListener:(CPTopicsChangedBlock _Nullable)changedBlock {
     [self.CPSharedInstance setTopicsChangedListener:changedBlock];
 }
 
-+ (void)setSubscriptionTopics:(NSMutableArray*)topics {
++ (void)setSubscriptionTopics:(NSMutableArray* _Nullable)topics {
     [self.CPSharedInstance setSubscriptionTopics:topics];
 }
 
-+ (void)setBrandingColor:(UIColor*)color {
++ (void)setBrandingColor:(UIColor* _Nullable)color {
     [self.CPSharedInstance setBrandingColor:color];
 }
 
-+ (void)setNormalTintColor:(UIColor*)color {
++ (void)setNormalTintColor:(UIColor* _Nullable)color {
     [self.CPSharedInstance setNormalTintColor:color];
 }
 
-+ (UIColor*)getNormalTintColor {
++ (UIColor* _Nullable)getNormalTintColor {
     return [self.CPSharedInstance getNormalTintColor];
 }
 
@@ -400,7 +400,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setShowNotificationsInForeground:show];
 }
 
-+ (void)addChatView:(CPChatView*)chatView {
++ (void)addChatView:(CPChatView* _Nullable)chatView {
     [self.CPSharedInstance addChatView:chatView];
 }
 
@@ -412,27 +412,27 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance showTopicDialogOnNewAdded];
 }
 
-+ (void)showTopicsDialog:(UIWindow*)targetWindow {
++ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow {
     [self.CPSharedInstance showTopicsDialog:targetWindow];
 }
 
-+ (void)showTopicsDialog:(UIWindow*)targetWindow callback:(void(^)())callback {
++ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)())callback {
     [self.CPSharedInstance showTopicsDialog:targetWindow callback:callback];
 }
 
-+ (void)getChannelConfig:(void(^)(NSDictionary*))callback {
++ (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
     [self.CPSharedInstance getChannelConfig:^(NSDictionary*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getSubscriptionId:(void(^)(NSString*))callback {
++ (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance getSubscriptionId:^(NSString*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getDeviceToken:(void(^)(NSString*))callback {
++ (void)getDeviceToken:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance getDeviceToken:callback];
 }
 
