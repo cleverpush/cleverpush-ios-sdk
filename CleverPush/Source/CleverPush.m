@@ -278,39 +278,39 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
-+ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token {
++ (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token {
     [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
 }
 
-+ (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance startLiveActivity:activityId pushToken:token onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value callback:nil];
 }
 
-+ (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)())callback {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value callback:callback];
 }
 
-+ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:nil];
 }
 
-+ (void)setSubscriptionAttribute:(NSString*)attributeId arrayValue:(NSArray <NSString*>*)value callback:(void(^)())callback {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)())callback {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:callback];
 }
 
-+ (void)pushSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
++ (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance pushSubscriptionAttributeValue:attributeId value:value];
 }
 
-+ (void)pullSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
++ (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance pullSubscriptionAttributeValue:attributeId value:value];
 }
 
-+ (BOOL)hasSubscriptionAttributeValue:(NSString*)attributeId value:(NSString*)value {
++ (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     return [self.CPSharedInstance hasSubscriptionAttributeValue:attributeId value:value];
 }
 
