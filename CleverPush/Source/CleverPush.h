@@ -25,29 +25,29 @@
 
 @interface CleverPush : NSObject
 
-extern NSString * const CLEVERPUSH_SDK_VERSION;
+extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 
 #pragma mark - Initialise with launch options
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback autoRegister:(BOOL)autoRegister;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
- handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
-   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId
- handleNotificationReceived:(CPHandleNotificationReceivedBlock)receivedCallback
-   handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister handleInitialized:(CPInitializedBlock)initializedCallback;
-+ (id)initWithLaunchOptions:(NSDictionary*)launchOptions channelId:(NSString*)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback autoRegister:(BOOL)autoRegister;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+   handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister handleInitialized:(CPInitializedBlock _Nullable)initializedCallback;
++ (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
 
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
@@ -71,23 +71,23 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure;
-+ (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
++ (void)enqueueFailedRequest:(NSURLRequest*)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*)error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTopic:(NSString*)topicId;
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback;
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString*))callback;
++ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString*))callback onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
 + (void)addSubscriptionTag:(NSString*)tagId;
-+ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
-+ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
++ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString*))callback;
++ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString*))callback onFailure:(CPFailureBlock)failureBlock;
 + (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds;
 + (void)removeSubscriptionTopic:(NSString*)topicId;
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback;
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString*))callback;
++ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString*))callback onFailure:(CPFailureBlock)failureBlock;
 + (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback;
 + (void)removeSubscriptionTag:(NSString*)tagId;
-+ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback;
-+ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock;
++ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString*))callback;
++ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString*))callback onFailure:(CPFailureBlock)failureBlock;
 + (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value;
 + (void)setSubscriptionAttribute:(NSString*)attributeId value:(NSString*)value callback:(void(^)())callback;
@@ -100,14 +100,14 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)startLiveActivity:(NSString*)activityId pushToken:(NSString*)token onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock;
 + (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback;
 + (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback;
-+ (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback;
++ (void)getAvailableAttributes:(void(^)(NSMutableArray*))callback;
 + (void)setSubscriptionLanguage:(NSString*)language;
 + (void)setSubscriptionCountry:(NSString*)country;
-+ (void)setTopicsDialogWindow:(UIWindow *)window;
++ (void)setTopicsDialogWindow:(UIWindow*)window;
 + (void)setTopicsChangedListener:(CPTopicsChangedBlock)changedBlock;
-+ (void)setSubscriptionTopics:(NSMutableArray *)topics;
-+ (void)setBrandingColor:(UIColor *)color;
-+ (void)setNormalTintColor:(UIColor *)color;
++ (void)setSubscriptionTopics:(NSMutableArray*)topics;
++ (void)setBrandingColor:(UIColor*)color;
++ (void)setNormalTintColor:(UIColor*)color;
 + (UIColor*)getNormalTintColor;
 + (void)setAutoClearBadge:(BOOL)autoClear;
 + (void)setAutoResubscribe:(BOOL)resubscribe;
@@ -121,11 +121,11 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (void)addChatView:(CPChatView*)chatView;
 + (void)showTopicsDialog;
 + (void)showTopicDialogOnNewAdded;
-+ (void)showTopicsDialog:(UIWindow *)targetWindow;
-+ (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback;
-+ (void)getChannelConfig:(void(^)(NSDictionary *))callback;
-+ (void)getSubscriptionId:(void(^)(NSString *))callback;
-+ (void)getDeviceToken:(void(^)(NSString *))callback;
++ (void)showTopicsDialog:(UIWindow*)targetWindow;
++ (void)showTopicsDialog:(UIWindow*)targetWindow callback:(void(^)())callback;
++ (void)getChannelConfig:(void(^)(NSDictionary*))callback;
++ (void)getSubscriptionId:(void(^)(NSString*))callback;
++ (void)getDeviceToken:(void(^)(NSString*))callback;
 + (void)trackEvent:(NSString*)eventName;
 + (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
 + (void)trackEvent:(NSString*)eventName properties:(NSDictionary*)properties;
@@ -184,7 +184,7 @@ extern NSString * const CLEVERPUSH_SDK_VERSION;
 + (BOOL)getAppBannerDraftsEnabled;
 + (BOOL)getSubscriptionChanged;
 + (BOOL)isSubscribed;
-+ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
++ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void(^)(UIBackgroundFetchResult))completionHandler;
 + (BOOL)hasSubscriptionTag:(NSString*)tagId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
