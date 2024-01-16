@@ -126,79 +126,79 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback;
 + (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback;
 + (void)getDeviceToken:(void(^ _Nullable)(NSString* _Nullable))callback;
-+ (void)trackEvent:(NSString*)eventName;
-+ (void)trackEvent:(NSString*)eventName amount:(NSNumber*)amount;
-+ (void)trackEvent:(NSString*)eventName properties:(NSDictionary*)properties;
-+ (void)triggerFollowUpEvent:(NSString*)eventName;
-+ (void)triggerFollowUpEvent:(NSString*)eventName parameters:(NSDictionary*)parameters;
-+ (void)trackPageView:(NSString*)url;
-+ (void)trackPageView:(NSString*)url params:(NSDictionary*)params;
++ (void)trackEvent:(NSString* _Nullable)eventName;
++ (void)trackEvent:(NSString* _Nullable)eventName amount:(NSNumber* _Nullable)amount;
++ (void)trackEvent:(NSString* _Nullable)eventName properties:(NSDictionary* _Nullable)properties;
++ (void)triggerFollowUpEvent:(NSString* _Nullable)eventName;
++ (void)triggerFollowUpEvent:(NSString* _Nullable)eventName parameters:(NSDictionary* _Nullable)parameters;
++ (void)trackPageView:(NSString* _Nullable)url;
++ (void)trackPageView:(NSString* _Nullable)url params:(NSDictionary* _Nullable)params;
 + (void)increaseSessionVisits;
-+ (void)showAppBanner:(NSString*)bannerId;
-+ (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback;
-+ (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback;
-+ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
-+ (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
-+ (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback;
-+ (void)setApiEndpoint:(NSString*)apiEndpoint;
-+ (void)setAppGroupIdentifierSuffix:(NSString*)suffix;
++ (void)showAppBanner:(NSString* _Nullable)bannerId;
++ (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback;
++ (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback;
++ (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback;
++ (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;
++ (void)getAppBannersByGroup:(NSString* _Nullable)groupId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;
++ (void)setApiEndpoint:(NSString* _Nullable)apiEndpoint;
++ (void)setAppGroupIdentifierSuffix:(NSString* _Nullable)suffix;
 + (void)setIabTcfMode:(CPIabTcfMode)mode;
-+ (void)setAuthorizerToken:(NSString*)authorizerToken;
-+ (void)setCustomTopViewController:(UIViewController*)viewController;
++ (void)setAuthorizerToken:(NSString* _Nullable)authorizerToken;
++ (void)setCustomTopViewController:(UIViewController* _Nullable)viewController;
 + (void)setLocalEventTrackingRetentionDays:(int)days;
-+ (void)updateBadge:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
-+ (void)addStoryView:(CPStoryView*)storyView;
++ (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
++ (void)addStoryView:(CPStoryView* _Nullable)storyView;
 + (void)updateDeselectFlag:(BOOL)value;
 + (void)setOpenWebViewEnabled:(BOOL)opened;
 + (void)setUnsubscribeStatus:(BOOL)status;
-+ (UIViewController*)topViewController;
-+ (BOOL)hasSubscriptionTopic:(NSString*)topicId;
++ (UIViewController* _Nullable)topViewController;
++ (BOOL)hasSubscriptionTopic:(NSString* _Nullable)topicId;
 
-+ (NSArray*)getAvailableTags __attribute__((deprecated));
-+ (NSArray*)getAvailableTopics __attribute__((deprecated));
-+ (NSArray<NSString*>*)getSubscriptionTags;
-+ (NSArray<CPNotification*>*)getNotifications;
-+ (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback;
-+ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback;
-+ (void)removeNotification:(NSString*)notificationId;
++ (NSArray* _Nullable)getAvailableTags __attribute__((deprecated));
++ (NSArray* _Nullable)getAvailableTopics __attribute__((deprecated));
++ (NSArray<NSString*>* _Nullable)getSubscriptionTags;
++ (NSArray<CPNotification*>* _Nullable)getNotifications;
++ (void)getNotifications:(BOOL)combineWithApi callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback;
++ (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback;
++ (void)removeNotification:(NSString* _Nullable)notificationId;
 
-+ (NSArray<NSString*>*)getSeenStories;
-+ (NSMutableArray<NSString*>*)getSubscriptionTopics;
++ (NSArray<NSString*>* _Nullable)getSeenStories;
++ (NSMutableArray<NSString*>* _Nullable)getSubscriptionTopics;
 + (void)setMaximumNotificationCount:(int)limit;
 
-+ (NSObject*)getSubscriptionAttribute:(NSString*)attributeId;
-+ (NSString*)getSubscriptionId;
-+ (NSString*)getApiEndpoint;
-+ (NSString*)getAppGroupIdentifierSuffix;
-+ (NSString*)channelId;
-+ (UIViewController*)getCustomTopViewController;
++ (NSObject* _Nullable)getSubscriptionAttribute:(NSString* _Nullable)attributeId;
++ (NSString* _Nullable)getSubscriptionId;
++ (NSString* _Nullable)getApiEndpoint;
++ (NSString* _Nullable)getAppGroupIdentifierSuffix;
++ (NSString* _Nullable)channelId;
++ (UIViewController* _Nullable)getCustomTopViewController;
 + (int)getLocalEventTrackingRetentionDays;
 + (CPIabTcfMode)getIabTcfMode;
 
-+ (UIColor*)getBrandingColor;
++ (UIColor* _Nullable)getBrandingColor;
 
-+ (NSMutableArray*)getAvailableAttributes __attribute__((deprecated));
-+ (NSDictionary*)getSubscriptionAttributes;
++ (NSMutableArray* _Nullable)getAvailableAttributes __attribute__((deprecated));
++ (NSDictionary* _Nullable)getSubscriptionAttributes;
 
 + (BOOL)isDevelopmentModeEnabled;
 + (BOOL)getAppBannerDraftsEnabled;
 + (BOOL)getSubscriptionChanged;
 + (BOOL)isSubscribed;
-+ (BOOL)handleSilentNotificationReceived:(UIApplication*)application UserInfo:(NSDictionary*)messageDict completionHandler:(void(^)(UIBackgroundFetchResult))completionHandler;
-+ (BOOL)hasSubscriptionTag:(NSString*)tagId;
++ (BOOL)handleSilentNotificationReceived:(UIApplication* _Nullable)application UserInfo:(NSDictionary* _Nullable)messageDict completionHandler:(void(^ _Nullable)(UIBackgroundFetchResult))completionHandler;
++ (BOOL)hasSubscriptionTag:(NSString* _Nullable)tagId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
 + (void)setConfirmAlertShown;
-+ (void)areNotificationsEnabled:(void(^)(BOOL))callback;
++ (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;
 
-+ (void)setLogListener:(CPLogListener)listener;
++ (void)setLogListener:(CPLogListener _Nullable)listener;
 
-+ (UNMutableNotificationContent*)didReceiveNotificationExtensionRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
-+ (UNMutableNotificationContent*)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest*)request withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent API_AVAILABLE(ios(10.0));
++ (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
++ (UNMutableNotificationContent* _Nullable)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-+ (void)processLocalActionBasedNotification:(UILocalNotification*) notification actionIdentifier:(NSString*)actionIdentifier;
++ (void)processLocalActionBasedNotification:(UILocalNotification* _Nullable) notification actionIdentifier:(NSString* _Nullable)actionIdentifier;
 #pragma clang diagnostic pop
 
 @end
