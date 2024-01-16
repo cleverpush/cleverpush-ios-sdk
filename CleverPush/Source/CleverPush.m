@@ -32,7 +32,7 @@ static CleverPush* singleInstance = nil;
 
 #pragma mark - Singleton shared instance of the cleverpush.
 
-+ (CleverPushInstance *)CPSharedInstance {
++ (CleverPushInstance*)CPSharedInstance {
     if (singletonInstance == nil) singletonInstance = [[CleverPushInstance alloc] init];
     return singletonInstance;
 }
@@ -133,11 +133,11 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance subscribe];
 }
 
-+ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock {
++ (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock {
     [self.CPSharedInstance subscribe:subscribedBlock];
 }
 
-+ (void)subscribe:(CPHandleSubscribedBlock)subscribedBlock failure:(CPFailureBlock)failureBlock {
++ (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance subscribe:subscribedBlock failure:failureBlock];
 }
 
@@ -161,7 +161,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance unsubscribe];
 }
 
-+ (void)unsubscribe:(void(^)(BOOL))callback {
++ (void)unsubscribe:(void(^ _Nullable)(BOOL))callback {
     [self.CPSharedInstance unsubscribe:callback];
 }
 
@@ -169,111 +169,111 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance syncSubscription];
 }
 
-+ (void)didRegisterForRemoteNotifications:(UIApplication*)app deviceToken:(NSData*)inDeviceToken {
++ (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken {
     [self.CPSharedInstance didRegisterForRemoteNotifications:app deviceToken:inDeviceToken];
 }
 
-+ (void)handleDidFailRegisterForRemoteNotification:(NSError*)err {
++ (void)handleDidFailRegisterForRemoteNotification:(NSError* _Nullable)err {
     [self.CPSharedInstance handleDidFailRegisterForRemoteNotification:err];
 }
 
-+ (void)handleNotificationOpened:(NSDictionary*)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString*)actionIdentifier {
++ (void)handleNotificationOpened:(NSDictionary* _Nullable)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString* _Nullable)actionIdentifier {
     [self.CPSharedInstance handleNotificationOpened:messageDict isActive:isActive actionIdentifier:actionIdentifier];
 }
 
-+ (void)handleNotificationReceived:(NSDictionary*)messageDict isActive:(BOOL)isActive {
++ (void)handleNotificationReceived:(NSDictionary* _Nullable)messageDict isActive:(BOOL)isActive {
     [self.CPSharedInstance handleNotificationReceived:messageDict isActive:isActive];
 }
 
-+ (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)enqueueRequest:(NSURLRequest* _Nullable)request onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)enqueueRequest:(NSURLRequest*)request onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock withRetry:(BOOL)retryOnFailure {
++ (void)enqueueRequest:(NSURLRequest* _Nullable)request onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock withRetry:(BOOL)retryOnFailure {
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock withRetry:retryOnFailure];
 }
 
-+ (void)enqueueFailedRequest:(NSURLRequest *)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)enqueueFailedRequest:(NSURLRequest* _Nullable)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance enqueueFailedRequest:request withRetryCount:retryCount onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)handleJSONNSURLResponse:(NSURLResponse*) response data:(NSData*) data error:(NSError*) error onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
++ (void)handleJSONNSURLResponse:(NSURLResponse* _Nullable)response data:(NSData* _Nullable)data error:(NSError* _Nullable)error onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
 }
 
-+ (void)addSubscriptionTopic:(NSString*)topicId {
++ (void)addSubscriptionTopic:(NSString* _Nullable)topicId {
     [self.CPSharedInstance addSubscriptionTopic:topicId];
 }
 
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
++ (void)addSubscriptionTopic:(NSString* _Nullable)topicId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback];
 }
 
-+ (void)addSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
++ (void)addSubscriptionTopic:(NSString* _Nullable)topicId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance addSubscriptionTopic:topicId callback:callback onFailure:failureBlock];
 }
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId {
++ (void)removeSubscriptionTopic:(NSString* _Nullable)topicId {
     [self.CPSharedInstance removeSubscriptionTopic:topicId];
 }
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback {
++ (void)removeSubscriptionTopic:(NSString* _Nullable)topicId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback];
 }
 
-+ (void)removeSubscriptionTopic:(NSString*)topicId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
++ (void)removeSubscriptionTopic:(NSString* _Nullable)topicId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance removeSubscriptionTopic:topicId callback:callback onFailure:failureBlock];
 }
 
-+ (void)addSubscriptionTag:(NSString*)tagId {
++ (void)addSubscriptionTag:(NSString* _Nullable)tagId {
     [self.CPSharedInstance addSubscriptionTag:tagId];
 }
 
-+ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString *callbackInner) {
++ (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
+    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)addSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
-    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString *callbackInner) {
++ (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
         callback(callbackInner);
     } onFailure:failureBlock];
 }
 
-+ (void)addSubscriptionTags:(NSArray*)tagIds {
++ (void)addSubscriptionTags:(NSArray* _Nullable)tagIds {
     [self.CPSharedInstance addSubscriptionTags:tagIds];
 }
 
 
-+ (void)addSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
-    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
++ (void)addSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
+    [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)removeSubscriptionTag:(NSString*)tagId {
++ (void)removeSubscriptionTag:(NSString* _Nullable)tagId {
     [self.CPSharedInstance removeSubscriptionTag:tagId];
 }
 
-+ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback {
-    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString *callbackInner) {
++ (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
+    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)removeSubscriptionTag:(NSString*)tagId callback:(void(^)(NSString *))callback onFailure:(CPFailureBlock)failureBlock {
-    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString *callbackInner) {
++ (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
         callback(callbackInner);
     } onFailure:failureBlock];
 }
 
-+ (void)removeSubscriptionTags:(NSArray*)tagIds {
++ (void)removeSubscriptionTags:(NSArray* _Nullable)tagIds {
     [self.CPSharedInstance removeSubscriptionTags:tagIds];
 }
 
-+ (void)removeSubscriptionTags:(NSArray <NSString*>*)tagIds callback:(void(^)(NSArray <NSString*>*))callback {
-    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray *callbackInner) {
++ (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
+    [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
@@ -315,19 +315,19 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getAvailableTags:(void(^)(NSArray <CPChannelTag*>*))callback {
-    [self.CPSharedInstance getAvailableTags:^(NSArray *callbackInner) {
+    [self.CPSharedInstance getAvailableTags:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
 + (void)getAvailableTopics:(void(^)(NSArray <CPChannelTopic*>*))callback {
-    [self.CPSharedInstance getAvailableTopics:^(NSArray *callbackInner) {
+    [self.CPSharedInstance getAvailableTopics:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getAvailableAttributes:(void(^)(NSMutableArray *))callback {
-    [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray *callbackInner) {
++ (void)getAvailableAttributes:(void(^)(NSMutableArray*))callback {
+    [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray*callbackInner) {
         callback(callbackInner);
     }];
 }
@@ -340,7 +340,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionCountry:country];
 }
 
-+ (void)setTopicsDialogWindow:(UIWindow *)window {
++ (void)setTopicsDialogWindow:(UIWindow*)window {
     [self.CPSharedInstance setTopicsDialogWindow:window];
 }
 
@@ -348,15 +348,15 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setTopicsChangedListener:changedBlock];
 }
 
-+ (void)setSubscriptionTopics:(NSMutableArray *)topics {
++ (void)setSubscriptionTopics:(NSMutableArray*)topics {
     [self.CPSharedInstance setSubscriptionTopics:topics];
 }
 
-+ (void)setBrandingColor:(UIColor *)color {
++ (void)setBrandingColor:(UIColor*)color {
     [self.CPSharedInstance setBrandingColor:color];
 }
 
-+ (void)setNormalTintColor:(UIColor *)color {
++ (void)setNormalTintColor:(UIColor*)color {
     [self.CPSharedInstance setNormalTintColor:color];
 }
 
@@ -412,27 +412,27 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance showTopicDialogOnNewAdded];
 }
 
-+ (void)showTopicsDialog:(UIWindow *)targetWindow {
++ (void)showTopicsDialog:(UIWindow*)targetWindow {
     [self.CPSharedInstance showTopicsDialog:targetWindow];
 }
 
-+ (void)showTopicsDialog:(UIWindow *)targetWindow callback:(void(^)())callback {
++ (void)showTopicsDialog:(UIWindow*)targetWindow callback:(void(^)())callback {
     [self.CPSharedInstance showTopicsDialog:targetWindow callback:callback];
 }
 
-+ (void)getChannelConfig:(void(^)(NSDictionary *))callback {
-    [self.CPSharedInstance getChannelConfig:^(NSDictionary *callbackInner) {
++ (void)getChannelConfig:(void(^)(NSDictionary*))callback {
+    [self.CPSharedInstance getChannelConfig:^(NSDictionary*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getSubscriptionId:(void(^)(NSString *))callback {
-    [self.CPSharedInstance getSubscriptionId:^(NSString *callbackInner) {
++ (void)getSubscriptionId:(void(^)(NSString*))callback {
+    [self.CPSharedInstance getSubscriptionId:^(NSString*callbackInner) {
         callback(callbackInner);
     }];
 }
 
-+ (void)getDeviceToken:(void(^)(NSString *))callback {
++ (void)getDeviceToken:(void(^)(NSString*))callback {
     [self.CPSharedInstance getDeviceToken:callback];
 }
 
@@ -473,31 +473,31 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock)callback {
-    [self.CPSharedInstance setAppBannerOpenedCallback:^(CPAppBannerAction *action) {
+    [self.CPSharedInstance setAppBannerOpenedCallback:^(CPAppBannerAction*action) {
         callback(action);
     }];
 }
 
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock)callback {
-    [self.CPSharedInstance setAppBannerShownCallback:^(CPAppBanner *appBanner) {
+    [self.CPSharedInstance setAppBannerShownCallback:^(CPAppBanner*appBanner) {
         callback(appBanner);
     }];
 }
 
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
-    [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController *viewController) {
+    [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController*viewController) {
         callback(viewController);
     }];
 }
 
 + (void)getAppBanners:(NSString*)channelId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback {
-    [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray *callbackInner) {
+    [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray*callbackInner) {
         callback(callbackInner);
     }];
 }
 
 + (void)getAppBannersByGroup:(NSString*)groupId callback:(void(^)(NSMutableArray <CPAppBanner*>*))callback {
-    [self.CPSharedInstance getAppBannersByGroup:groupId callback:^(NSMutableArray *callbackInner) {
+    [self.CPSharedInstance getAppBannersByGroup:groupId callback:^(NSMutableArray*callbackInner) {
         callback(callbackInner);
     }];
 }
@@ -514,11 +514,11 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setIabTcfMode:mode];
 }
 
-+ (void)setAuthorizerToken:(NSString *)authorizerToken {
++ (void)setAuthorizerToken:(NSString*)authorizerToken {
     [self.CPSharedInstance setAuthorizerToken:authorizerToken];
 }
 
-+ (void)setCustomTopViewController:(UIViewController *)viewController {
++ (void)setCustomTopViewController:(UIViewController*)viewController {
     [self.CPSharedInstance setCustomTopViewController:viewController];
 }
 
@@ -575,13 +575,13 @@ static CleverPush* singleInstance = nil;
 }
 
 + (void)getNotifications:(BOOL)combineWithApi callback:(void(^)(NSArray<CPNotification*>*))callback {
-    [self.CPSharedInstance getNotifications:combineWithApi callback:^(NSArray<CPNotification*> *notifications) {
+    [self.CPSharedInstance getNotifications:combineWithApi callback:^(NSArray<CPNotification*>*notifications) {
         callback(notifications);
     }];
 }
 
 + (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^)(NSArray<CPNotification*>*))callback {
-    [self.CPSharedInstance getNotifications:combineWithApi limit:limit skip:skip callback:^(NSArray<CPNotification*> *notifications) {
+    [self.CPSharedInstance getNotifications:combineWithApi limit:limit skip:skip callback:^(NSArray<CPNotification*>*notifications) {
         callback(notifications);
     }];
 }
@@ -717,7 +717,7 @@ static CleverPush* singleInstance = nil;
 @implementation UIApplication (CleverPush)
 
 + (void)load {
-    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+    NSProcessInfo*processInfo = [NSProcessInfo processInfo];
     if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"]) {
         return;
     }
@@ -749,7 +749,7 @@ static CleverPush* singleInstance = nil;
 
     [CleverPushUNUserNotificationCenter injectSelectors];
 
-    if (@available(iOS 10.0, *)) {
+    if (@available(iOS 10.0,*)) {
         UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
         if (!currentNotificationCenter.delegate) {
             currentNotificationCenter.delegate = (id)[CleverPush sharedInstance];
