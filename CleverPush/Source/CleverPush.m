@@ -290,7 +290,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value callback:nil];
 }
 
-+ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)())callback {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId value:value callback:callback];
 }
 
@@ -298,7 +298,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:nil];
 }
 
-+ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)())callback {
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback {
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:callback];
 }
 
@@ -416,7 +416,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance showTopicsDialog:targetWindow];
 }
 
-+ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)())callback {
++ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)(void))callback {
     [self.CPSharedInstance showTopicsDialog:targetWindow callback:callback];
 }
 

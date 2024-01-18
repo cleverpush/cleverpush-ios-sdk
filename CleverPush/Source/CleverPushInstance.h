@@ -47,7 +47,7 @@ typedef void (^CPFailureBlock)(NSError* _Nullable error);
 
 typedef void (^CPHandleSubscribedBlock)(NSString * _Nullable result);
 
-typedef void (^CPTopicsChangedBlock)();
+typedef void (^CPTopicsChangedBlock)(void);
 
 typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* _Nullable result);
 typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* _Nullable result);
@@ -129,8 +129,8 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback;
 - (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds;
-- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)())callback;
-- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)())callback;
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback;
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 - (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
 - (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
 - (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
@@ -159,7 +159,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)addChatView:(CPChatView* _Nullable)chatView;
 - (void)showTopicsDialog;
 - (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow;
-- (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)())callback;
+- (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)(void))callback;
 - (void)showTopicDialogOnNewAdded;
 - (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback;
 - (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback;

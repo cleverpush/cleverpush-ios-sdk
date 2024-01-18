@@ -99,7 +99,7 @@ double geoFenceTimerInterval = 1.0;
 
 #pragma mark - Location delegates
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    [CPLog info:@"LocationManager: didChangeAuthorizationStatus %@", status];
+    [CPLog info:@"LocationManager: didChangeAuthorizationStatus %d", status];
 }
 
 + (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {

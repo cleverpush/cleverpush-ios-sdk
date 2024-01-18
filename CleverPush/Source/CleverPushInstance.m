@@ -2302,12 +2302,12 @@ static id isNil(id object) {
 }
 
 #pragma mark - Set subscription attribute (single-value) by calling api. subscription/attribute
-- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)())callback {
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback {
     [self setSubscriptionAttribute:attributeId objectValue:value callback:callback];
 }
 
 #pragma mark - Set subscription attribute (multi-value) by calling api. subscription/attribute
-- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)())callback {
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback {
     [self setSubscriptionAttribute:attributeId objectValue:value callback:callback];
 }
 
@@ -3327,7 +3327,7 @@ static id isNil(id object) {
     [self showTopicsDialog:targetWindow callback:nil];
 }
 
-- (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)())callback {
+- (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)(void))callback {
     [self getAvailableTopics:^(NSArray* channelTopics_) {
         channelTopics = channelTopics_;
         if ([channelTopics count] == 0) {
@@ -3696,7 +3696,7 @@ static id isNil(id object) {
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
-        [CPLog error:failureMessage];
+        [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];
@@ -3728,7 +3728,7 @@ static id isNil(id object) {
                 [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
                 NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
-                [CPLog error:failureMessage];
+                [CPLog error:@"%@", failureMessage];
                 [self handleInitialization:NO error:failureMessage];
                 [self fireChannelConfigListeners];
             }];
@@ -3739,7 +3739,7 @@ static id isNil(id object) {
         [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
-        [CPLog error:failureMessage];
+        [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
         [self fireChannelConfigListeners];
     }];

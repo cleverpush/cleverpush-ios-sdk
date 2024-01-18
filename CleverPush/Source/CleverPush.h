@@ -8,6 +8,9 @@
 #import <UserNotifications/UserNotifications.h>
 #endif
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wquoted-include-in-framework-header"
+
 #import "CPChatView.h"
 #import "CPStoryView.h"
 #import "CPNotificationViewController.h"
@@ -22,6 +25,10 @@
 #import "CPInboxView.h"
 #import "CleverPushUserDefaults.h"
 #import "CPIabTcfMode.h"
+#import "CPSQLiteManager.h"
+#import "CPWKWebKitView.h"
+
+#pragma clang diagnostic pop
 
 @interface CleverPush : NSObject
 
@@ -90,9 +97,9 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 + (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
-+ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)())callback;
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value;
-+ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)())callback;
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 + (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
 + (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
 + (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
@@ -122,7 +129,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)showTopicsDialog;
 + (void)showTopicDialogOnNewAdded;
 + (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow;
-+ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)())callback;
++ (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)(void))callback;
 + (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback;
 + (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback;
 + (void)getDeviceToken:(void(^ _Nullable)(NSString* _Nullable))callback;
@@ -202,3 +209,4 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 #pragma clang diagnostic pop
 
 @end
+

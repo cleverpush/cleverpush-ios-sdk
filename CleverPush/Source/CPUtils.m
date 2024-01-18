@@ -204,7 +204,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSString *)hexStringFromColor:(UIColor *)color {
     CGColorSpaceModel colorSpace = CGColorSpaceGetModel(CGColorGetColorSpace(color.CGColor));
     const CGFloat *components = CGColorGetComponents(color.CGColor);
-    CGFloat r, g, b, a;
+    CGFloat r = 1.0, g = 1.0, b = 1.0, a = 1.0;
 
     if (colorSpace == kCGColorSpaceModelMonochrome) {
         r = components[0];
