@@ -299,7 +299,7 @@ static id isNil(id object) {
    handleNotificationOpened:(CPHandleNotificationOpenedBlock)openedCallback
            handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback
                autoRegister:(BOOL)autoRegisterParam {
-    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
+    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
 }
 
 #pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
