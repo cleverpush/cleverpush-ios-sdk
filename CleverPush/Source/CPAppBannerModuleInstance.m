@@ -1088,7 +1088,7 @@ NSInteger currentScreenIndex = 0;
     NSArray *sortedArray = [array sortedArrayUsingComparator:^NSComparisonResult(id bannerElement1, id bannerElement2) {
         NSDate *bannerStartdate1;
         NSDate *bannerStartdate2;
-        NSComparisonResult result;
+        NSComparisonResult result = NSOrderedSame;
 
         if (bannerElement1[@"startAt"] != nil && ![bannerElement1[@"startAt"] isKindOfClass:[NSNull class]]) {
             bannerStartdate1 = [dateFormatter dateFromString:bannerElement1[@"startAt"]];

@@ -88,7 +88,7 @@ static CPLogListener _logListener;
     }
 }
 
-+ (void)setLogListener:(CPLogListener)listener {
++ (void)setLogListener:(CPLogListener _Nullable)listener {
     _logListener = listener;
 }
 

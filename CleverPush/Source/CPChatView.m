@@ -285,11 +285,18 @@ UIColor* chatReceiverBubbleTextColor;
 
 #pragma mark - Clear webview cache memory
 - (void)clearWKWebViewCache {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        NSSet *websiteDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeDiskCache,WKWebsiteDataTypeOfflineWebApplicationCache,WKWebsiteDataTypeMemoryCache,WKWebsiteDataTypeLocalStorage,WKWebsiteDataTypeCookies,WKWebsiteDataTypeSessionStorage,WKWebsiteDataTypeIndexedDBDatabases,WKWebsiteDataTypeWebSQLDatabases,WKWebsiteDataTypeFetchCache,WKWebsiteDataTypeServiceWorkerRegistrations]];
+    dispatch_async(dispatch_get_main_queue(), ^{
         NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-        [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{
-        }];
+        NSSet *commonDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeOfflineWebApplicationCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeLocalStorage, WKWebsiteDataTypeCookies, WKWebsiteDataTypeSessionStorage, WKWebsiteDataTypeIndexedDBDatabases, WKWebsiteDataTypeWebSQLDatabases]];
+        NSSet *websiteDataTypes;
+
+        if (@available(iOS 11.3, *)) {
+            websiteDataTypes = [commonDataTypes setByAddingObjectsFromArray:@[WKWebsiteDataTypeFetchCache, WKWebsiteDataTypeServiceWorkerRegistrations]];
+        } else {
+            websiteDataTypes = commonDataTypes;
+        }
+
+        [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes modifiedSince:dateFrom completionHandler:^{}];
     });
 }
 
