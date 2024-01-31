@@ -659,6 +659,8 @@ NSInteger currentScreenIndex = 0;
                         }
                     } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
                         conditionTrue = [self checkEventTriggerCondition:condition];
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
+
                     } else {
                         conditionTrue = NO;
                     }

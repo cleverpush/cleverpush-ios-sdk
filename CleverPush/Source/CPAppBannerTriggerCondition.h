@@ -11,6 +11,8 @@
 @property (nonatomic, strong) NSString *event;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTriggerConditionEventProperty*> *eventProperties;
 @property (nonatomic, strong) NSString *relation;
+@property (nonatomic, strong) NSString *deepLink;
+@property (nonatomic, strong) NSString *value;
 @property (nonatomic) int sessions;
 @property (nonatomic) int seconds;
 
