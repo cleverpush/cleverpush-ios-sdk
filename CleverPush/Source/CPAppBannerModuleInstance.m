@@ -633,8 +633,6 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
-    NSURL *conditionDeepLink = [NSURL URLWithString:condition.deepLink];
-    
     for (id urlOrString in [CleverPush getDeepLinkURLS]) {
         NSURL *url = nil;
 
@@ -644,7 +642,7 @@ NSInteger currentScreenIndex = 0;
             url = [NSURL URLWithString:urlOrString];
         }
 
-        if (url && [conditionDeepLink isEqual:url]) {
+        if (url && [[NSURL URLWithString:condition.deepLink] isEqual:url]) {
             return YES;
         }
     }
