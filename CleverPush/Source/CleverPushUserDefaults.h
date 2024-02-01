@@ -42,7 +42,7 @@
 #define CLEVERPUSH_DATABASE_CREATED_KEY @"CleverPush_DATABASE_CREATED_AT_KEY"
 #define CLEVERPUSH_DATABASE_CREATED_TIME_KEY @"CleverPush_DATABASE_CREATED_TIME_KEY"
 
-#define CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY @"CleverPush_DEEP_LINKS_STORED_URLS"
+#define CLEVERPUSH_DEEP_LINKS_URLS_KEY @"CleverPush_DEEP_LINKS_URLs"
 
 #define CHECK_FILTER_EQUAL_TO(key, v)                  ([key compare:v options:NSNumericSearch] == NSOrderedSame)
 #define CHECK_FILTER_GREATER_THAN(key, v)              ([key compare:v options:NSNumericSearch] == NSOrderedDescending)

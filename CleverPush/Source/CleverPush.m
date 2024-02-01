@@ -526,8 +526,8 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setLocalEventTrackingRetentionDays:days];
 }
 
-+ (void)setDeepLinkURLS:(NSURL* _Nullable)url {
-    [self.CPSharedInstance setDeepLinkURLS:url];
++ (void)setDeepLinkURLs:(NSURL* _Nullable)url {
+    [self.CPSharedInstance setDeepLinkURLs:url];
 }
 
 + (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0)) {
@@ -626,8 +626,8 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getLocalEventTrackingRetentionDays];
 }
 
-+ (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLS {
-    return [self.CPSharedInstance getDeepLinkURLS];
++ (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
+    return [self.CPSharedInstance getDeepLinkURLs];
 }
 
 + (NSString* _Nullable)channelId {

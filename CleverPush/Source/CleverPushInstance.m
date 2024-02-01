@@ -1731,7 +1731,7 @@ static id isNil(id object) {
         NSURL*url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
             if ([CPUtils isValidURL:url]) {
-                [CleverPush setDeepLinkURLS:[CPUtils removeQueryParametersFromURL:url]];
+                [CleverPush setDeepLinkURLs:[CPUtils removeQueryParametersFromURL:url]];
             }
             [CPUtils tryOpenURL:url];
         }
@@ -3562,9 +3562,9 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
-- (void)setDeepLinkURLS:(NSURL* _Nullable)url {
-    if (url && url.absoluteString.length > 0) {
-        NSMutableArray *existingURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY] mutableCopy];
+- (void)setDeepLinkURLs:(NSURL* _Nullable)url {
+    if ([CPUtils isValidURL:url]) {
+        NSMutableArray *existingURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY] mutableCopy];
 
         if (!existingURLs) {
             existingURLs = [NSMutableArray array];
@@ -3578,14 +3578,14 @@ static id isNil(id object) {
             [existingURLs addObject:url.absoluteString];
         }
 
-        [[NSUserDefaults standardUserDefaults] setObject:existingURLs forKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY];
+        [[NSUserDefaults standardUserDefaults] setObject:existingURLs forKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
-- (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLS {
-    NSMutableArray *deepLinkURLS = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY] mutableCopy];
-    return deepLinkURLS ?: [NSMutableArray array];
+- (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
+    NSMutableArray *deepLinkURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY] mutableCopy];
+    return deepLinkURLs ?: [NSMutableArray array];
 }
 
 - (NSString* _Nullable)getApiEndpoint {

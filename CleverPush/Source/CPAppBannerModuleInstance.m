@@ -633,7 +633,7 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
-    for (id urlOrString in [CleverPush getDeepLinkURLS]) {
+    for (id urlOrString in [CleverPush getDeepLinkURLs]) {
         NSURL *url = nil;
 
         if ([urlOrString isKindOfClass:[NSURL class]]) {
