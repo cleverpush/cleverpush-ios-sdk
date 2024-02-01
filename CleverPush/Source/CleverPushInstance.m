@@ -3559,6 +3559,32 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
+- (void)setDeepLinkURLS:(NSURL* _Nullable)url {
+    if (url && url.absoluteString.length > 0) {
+        NSMutableArray *existingURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY] mutableCopy];
+
+        if (!existingURLs) {
+            existingURLs = [NSMutableArray array];
+        }
+
+        NSUInteger indexOfURL = [existingURLs indexOfObject:url.absoluteString];
+
+        if (indexOfURL != NSNotFound) {
+            [existingURLs replaceObjectAtIndex:indexOfURL withObject:url.absoluteString];
+        } else {
+            [existingURLs addObject:url.absoluteString];
+        }
+
+        [[NSUserDefaults standardUserDefaults] setObject:existingURLs forKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
+
+- (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLS {
+    NSMutableArray *deepLinkURLS = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_STORED_URLS_KEY] mutableCopy];
+    return deepLinkURLS ?: [NSMutableArray array];
+}
+
 - (NSString* _Nullable)getApiEndpoint {
     return apiEndpoint;
 }

@@ -632,6 +632,26 @@ NSInteger currentScreenIndex = 0;
     return NO;
 }
 
+- (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
+    NSURL *conditionDeepLink = [NSURL URLWithString:condition.deepLink];
+    
+    for (id urlOrString in [CleverPush getDeepLinkURLS]) {
+        NSURL *url = nil;
+
+        if ([urlOrString isKindOfClass:[NSURL class]]) {
+            url = (NSURL *)urlOrString;
+        } else if ([urlOrString isKindOfClass:[NSString class]]) {
+            url = [NSURL URLWithString:urlOrString];
+        }
+
+        if (url && [conditionDeepLink isEqual:url]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     NSMutableArray *bannersCopy = [banners mutableCopy];
@@ -660,7 +680,7 @@ NSInteger currentScreenIndex = 0;
                     } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
                         conditionTrue = [self checkEventTriggerCondition:condition];
                     } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
-
+                        conditionTrue = [self checkDeepLinkTriggerCondition:condition];
                     } else {
                         conditionTrue = NO;
                     }
