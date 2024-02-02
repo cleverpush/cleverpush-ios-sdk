@@ -864,15 +864,20 @@ static id isNil(id object) {
         return subscriptionId;
     }
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    __block NSString *result = nil;
 
-    handleSubscribedInternal = ^(NSString*subscriptionIdNew) {
-        dispatch_semaphore_signal(sema);
-    };
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        handleSubscribedInternal = ^(NSString *subscriptionIdNew) {
+            result = subscriptionIdNew;
+            dispatch_semaphore_signal(sema);
+        };
 
-    return subscriptionId;
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    });
+
+    return result;
 }
 
 #pragma mark - perform on main thread.
