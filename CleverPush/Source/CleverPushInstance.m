@@ -1062,6 +1062,8 @@ static id isNil(id object) {
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     void(^handleSubscribe)(void) = ^{
         hasCalledSubscribe = YES;
+        __block BOOL hasCalledSubscribedBlock = NO;
+
         if (@available(iOS 10.0,*)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
@@ -1098,7 +1100,8 @@ static id isNil(id object) {
                                     }
                                 }];
 
-                                if (subscribedBlock) {
+                                if (subscribedBlock && !hasCalledSubscribedBlock) {
+                                    hasCalledSubscribedBlock = YES;
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                                             subscribedBlock(subscriptionId);
@@ -1107,7 +1110,8 @@ static id isNil(id object) {
                                         }
                                     }];
                                 }
-                            } else if (subscribedBlock) {
+                            } else if (subscribedBlock && !hasCalledSubscribedBlock) {
+                                hasCalledSubscribedBlock = YES;
                                 subscribedBlock(subscriptionId);
                             }
                         } else if (failureBlock) {
