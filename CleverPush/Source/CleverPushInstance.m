@@ -1115,7 +1115,7 @@ static id isNil(id object) {
                                     }];
                                 }
                             } else if (subscribedBlock) {
-                                if (successBlockCalled) {
+                                if (!successBlockCalled) {
                                     subscribedBlock(subscriptionId);
                                     successBlockCalled = YES;
                                 } else {
