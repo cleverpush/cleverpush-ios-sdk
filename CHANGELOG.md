@@ -1,3 +1,8 @@
+## 1.30.5 (14.02.2024)
+* Optimised `subscribe` method for calling multiple times
+* Optimised `waitForTrackingConsent` method for tracking events
+* Optimised `getSubscriptionId` method
+
 ## 1.30.4 (23.01.2024)
 * Added missing SPM header files
 * Optimised `handleNotificationReceived` listener
