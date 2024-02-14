@@ -609,15 +609,15 @@ static id isNil(id object) {
             unichar consentStatus = [vendorConsents characterAtIndex:iabtcfVendorConsentPosition - 1];
             BOOL hasConsent = (consentStatus == '1');
 
-            if (hasConsent) {
-                if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
-                    [self setTrackingConsent:YES];
-                }
+            if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
+                [self setTrackingConsent:hasConsent];
+            }
 
-                if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
-                    [self setSubscribeConsent:YES];
-                }
-            } else {
+            if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
+                [self setSubscribeConsent:hasConsent];
+            }
+
+            if (!hasConsent) {
                 [CPLog debug:@"The vendor does not have consent."];
             }
         } else {
@@ -2936,25 +2936,27 @@ static id isNil(id object) {
             NSDictionary*event = [channelEvents objectAtIndex:eventIndex];
             NSString*eventId = [event cleverPushStringForKey:@"_id"];
 
-            [self getSubscriptionId:^(NSString* subscriptionId) {
-                if (subscriptionId == nil) {
-                    [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
-                }
-                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         eventId, @"eventId",
-                                         subscriptionId, @"subscriptionId",
-                                         isNil(properties), @"properties",
-                                         isNil(lastClickedSessionNotificationId), @"notificationId",
-                                         nil];
-
-                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                [request setHTTPBody:postData];
-
-                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-
-                } onFailure:nil];
+            [self waitForTrackingConsent:^{
+                [self getSubscriptionId:^(NSString* subscriptionId) {
+                    if (subscriptionId == nil) {
+                        [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
+                    }
+                    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
+                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             channelId, @"channelId",
+                                             eventId, @"eventId",
+                                             subscriptionId, @"subscriptionId",
+                                             isNil(properties), @"properties",
+                                             isNil(lastClickedSessionNotificationId), @"notificationId",
+                                             nil];
+                    
+                    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                    [request setHTTPBody:postData];
+                    
+                    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                        
+                    } onFailure:nil];
+                }];
             }];
 
             [CPAppBannerModule setCurrentEventId:eventId];
