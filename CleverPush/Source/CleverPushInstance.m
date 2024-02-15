@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.4";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.5";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -609,15 +609,15 @@ static id isNil(id object) {
             unichar consentStatus = [vendorConsents characterAtIndex:iabtcfVendorConsentPosition - 1];
             BOOL hasConsent = (consentStatus == '1');
 
-            if (hasConsent) {
-                if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
-                    [self setTrackingConsent:YES];
-                }
+            if (tcfMode == CPIabTcfModeTrackingWaitForConsent) {
+                [self setTrackingConsent:hasConsent];
+            }
 
-                if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
-                    [self setSubscribeConsent:YES];
-                }
-            } else {
+            if (tcfMode == CPIabTcfModeSubscribeWaitForConsent) {
+                [self setSubscribeConsent:hasConsent];
+            }
+
+            if (!hasConsent) {
                 [CPLog debug:@"The vendor does not have consent."];
             }
         } else {
@@ -1060,6 +1060,8 @@ static id isNil(id object) {
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    __block BOOL successBlockCalled = NO;
+
     void(^handleSubscribe)(void) = ^{
         hasCalledSubscribe = YES;
         if (@available(iOS 10.0,*)) {
@@ -1101,14 +1103,24 @@ static id isNil(id object) {
                                 if (subscribedBlock) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            subscribedBlock(subscriptionId);
+                                            if (!successBlockCalled) {
+                                                subscribedBlock(subscriptionId);
+                                                successBlockCalled = YES;
+                                            } else {
+                                                [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
+                                            }
                                         } else {
                                             [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
                                         }
                                     }];
                                 }
                             } else if (subscribedBlock) {
-                                subscribedBlock(subscriptionId);
+                                if (!successBlockCalled) {
+                                    subscribedBlock(subscriptionId);
+                                    successBlockCalled = YES;
+                                } else {
+                                    [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
+                                }
                             }
                         } else if (failureBlock) {
                             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
@@ -1534,11 +1546,14 @@ static id isNil(id object) {
                     listener(subscriptionId);
                 }
                 pendingSubscriptionListeners = [NSMutableArray new];
-            }
 
-            if (successBlock) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    successBlock();
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    if (successBlock) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            successBlock();
+                        });
+                    }
                 });
             }
         } onFailure:^(NSError* error) {
@@ -2939,25 +2954,27 @@ static id isNil(id object) {
             NSDictionary*event = [channelEvents objectAtIndex:eventIndex];
             NSString*eventId = [event cleverPushStringForKey:@"_id"];
 
-            [self getSubscriptionId:^(NSString* subscriptionId) {
-                if (subscriptionId == nil) {
-                    [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
-                }
-                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         eventId, @"eventId",
-                                         subscriptionId, @"subscriptionId",
-                                         isNil(properties), @"properties",
-                                         isNil(lastClickedSessionNotificationId), @"notificationId",
-                                         nil];
-
-                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                [request setHTTPBody:postData];
-
-                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-
-                } onFailure:nil];
+            [self waitForTrackingConsent:^{
+                [self getSubscriptionId:^(NSString* subscriptionId) {
+                    if (subscriptionId == nil) {
+                        [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
+                    }
+                    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
+                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             channelId, @"channelId",
+                                             eventId, @"eventId",
+                                             subscriptionId, @"subscriptionId",
+                                             isNil(properties), @"properties",
+                                             isNil(lastClickedSessionNotificationId), @"notificationId",
+                                             nil];
+                    
+                    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+                    [request setHTTPBody:postData];
+                    
+                    [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                        
+                    } onFailure:nil];
+                }];
             }];
 
             [CPAppBannerModule setCurrentEventId:eventId];
