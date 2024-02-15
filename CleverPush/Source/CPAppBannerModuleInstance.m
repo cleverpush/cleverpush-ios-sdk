@@ -642,7 +642,7 @@ NSInteger currentScreenIndex = 0;
             url = [NSURL URLWithString:urlOrString];
         }
 
-        if (url && [[NSURL URLWithString:condition.deepLink] isEqual:url]) {
+        if (url && [url.absoluteString containsString:condition.deepLink]) {
             return YES;
         }
     }
