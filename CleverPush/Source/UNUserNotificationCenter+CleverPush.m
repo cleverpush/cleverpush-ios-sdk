@@ -7,6 +7,8 @@
 #import "CleverPush.h"
 #import "CPUtils.h"
 #import "CPLog.h"
+#import "NSDictionary+SafeExpectations.h"
+#import "CPAppBannerModuleInstance.h"
 
 @interface CleverPush (UN_extra)
 
@@ -76,6 +78,10 @@ __weak static id previousDelegate;
                  willPresentNotification:(UNNotification *)notification
                    withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler API_AVAILABLE(ios(10.0)) {
     NSUInteger completionHandlerOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
+    NSMutableDictionary* payload = [notification.request.content.userInfo mutableCopy];
+    NSDictionary* notificationDict = [payload cleverPushDictionaryForKey:@"notification"];
+    NSString* appBanner = [[payload cleverPushDictionaryForKey:@"notification"] cleverPushStringForKey:@"appBanner"];
+    bool isSilent = [notificationDict objectForKey:@"silent"] != nil && ![[notificationDict objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notificationDict objectForKey:@"silent"] boolValue];
 
     [CPLog info:@"cleverPushUserNotificationCenter willPresentNotification"];
 
@@ -100,6 +106,10 @@ __weak static id previousDelegate;
         if (!showInForeground) {
             completionHandlerOptions = UNNotificationPresentationOptionNone;
         }
+    }
+
+    if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
+        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:[payload cleverPushStringForKeyPath:@"notification._id"]];
     }
 
     completionHandler(completionHandlerOptions);
