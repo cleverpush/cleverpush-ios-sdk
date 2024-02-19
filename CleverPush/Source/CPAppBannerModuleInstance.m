@@ -15,7 +15,6 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
-NSMutableArray *silentPushAppBannersIDs;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
