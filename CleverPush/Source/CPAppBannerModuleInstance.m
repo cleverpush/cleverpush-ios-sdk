@@ -922,9 +922,7 @@ NSInteger currentScreenIndex = 0;
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
-        if (banner.frequency == CPAppBannerFrequencyOnce) {
-            [self setBannerIsShown:banner];
-        }
+        [self setBannerIsShown:banner];
 
         // remove banner so it will not show again this session
         if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
