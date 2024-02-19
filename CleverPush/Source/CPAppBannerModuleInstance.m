@@ -491,7 +491,6 @@ NSInteger currentScreenIndex = 0;
     }
 
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
-        allowed = NO;
 
         if (![CleverPush isSubscribed]) {
             return allowed;
@@ -511,8 +510,9 @@ NSInteger currentScreenIndex = 0;
             }
 
             BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
-            if (attributeFilterAllowed) {
-                allowed = YES;
+
+            if (!attributeFilterAllowed) {
+                allowed = NO;
                 break;
             }
         }
