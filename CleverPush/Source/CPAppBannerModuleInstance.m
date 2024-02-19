@@ -275,20 +275,6 @@ NSInteger currentScreenIndex = 0;
             }
             [self setPendingBannerRequest:NO];
             [self setPendingBannerListeners:[NSMutableArray new]];
-
-            NSMutableArray *appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIDs] mutableCopy];
-            NSMutableArray *objectsToRemove = [NSMutableArray array];
-
-            for (NSMutableDictionary *eventsObject in appBanners) {
-                [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
-                [objectsToRemove addObject:eventsObject];
-            }
-
-            [appBanners removeObjectsInArray:objectsToRemove];
-
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
@@ -1137,38 +1123,6 @@ NSInteger currentScreenIndex = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
-}
-
-#pragma mark - Get app banner ids from silent push
-+ (void)setSilentPushAppBannersIDs:(NSString *)appBannerID notificationID:(NSString *)notificationID {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-
-    if (!existingArray) {
-        existingArray = [NSMutableArray new];
-    }
-
-    BOOL found = NO;
-
-    for (NSMutableDictionary *existingDict in existingArray) {
-        if ([existingDict[@"notificationId"] isEqualToString:notificationID]) {
-            [existingDict setObject:appBannerID forKey:@"appBanner"];
-            found = YES;
-            break;
-        }
-    }
-
-    if (!found) {
-        [existingArray addObject:[NSMutableDictionary dictionaryWithDictionary:@{ @"notificationId": notificationID, @"appBanner": appBannerID }]];
-    }
-
-    [defaults setObject:existingArray forKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-    [defaults synchronize];
-}
-
-+ (NSMutableArray *)getSilentPushAppBannersIDs {
-    silentPushAppBannersIDs = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-    return silentPushAppBannersIDs;
 }
 
 #pragma mark - Get the value of pageControl from current index
