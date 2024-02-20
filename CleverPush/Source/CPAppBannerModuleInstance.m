@@ -922,9 +922,7 @@ NSInteger currentScreenIndex = 0;
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
-        if (banner.frequency == CPAppBannerFrequencyOnce) {
-            [self setBannerIsShown:banner];
-        }
+        [self setBannerIsShown:banner];
 
         // remove banner so it will not show again this session
         if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
@@ -1014,8 +1012,8 @@ NSInteger currentScreenIndex = 0;
                 if (block.id != nil) {
                     [dataDic setObject:block.id forKey:@"blockId"];
                 }
-                if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
-                    [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                if ((banner.screens != nil && banner.screens.count > 0) && banner.multipleScreensEnabled) {
+                    [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(block.isButtonClicked);
             }
@@ -1024,8 +1022,8 @@ NSInteger currentScreenIndex = 0;
                 if (image.id != nil) {
                     [dataDic setObject:image.id forKey:@"blockId"];
                 }
-                if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
-                    [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                if ((banner.screens != nil && banner.screens.count > 0) && banner.multipleScreensEnabled) {
+                    [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
