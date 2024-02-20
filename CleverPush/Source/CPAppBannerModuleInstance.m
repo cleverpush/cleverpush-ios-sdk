@@ -476,7 +476,6 @@ NSInteger currentScreenIndex = 0;
     }
 
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
-
         if (![CleverPush isSubscribed]) {
             return allowed;
         }
