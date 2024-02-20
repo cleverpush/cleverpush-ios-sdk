@@ -1645,6 +1645,8 @@ static id isNil(id object) {
         [CleverPush handleNotificationReceived:messageDict isActive:NO];
     }
 
+    [CleverPush handleSilentNotificationReceived:messageDict];
+
     return startedBackgroundJob;
 }
 
@@ -1771,6 +1773,26 @@ static id isNil(id object) {
     }
 
     handleNotificationOpened(result);
+}
+
+- (void)handleSilentNotificationReceived:(NSDictionary* _Nullable)messageDict {
+    NSDictionary* notification = [messageDict cleverPushDictionaryForKey:@"notification"];
+    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
+    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
+
+    if (!notification) {
+        return;
+    }
+
+    NSString* notificationId = [notification cleverPushStringForKey:@"_id"];
+
+    if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
+        return;
+    }
+
+    if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
+        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:notificationId];
+    }
 }
 
 #pragma mark - Handle notification actions buttons events
