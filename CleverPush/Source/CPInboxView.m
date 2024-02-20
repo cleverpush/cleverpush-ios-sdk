@@ -447,7 +447,7 @@ CPNotificationClickBlock handleClick;
                 if (block.id != nil) {
                     [dataDic setObject:block.id forKey:@"blockId"];
                 }
-                if (banner.multipleScreensEnabled) {
+                if (banner.multipleScreensEnabled && banner.screens != nil && banner.screens.count > 0) {
                     [dataDic setObject:banner.screens[self.currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(block.isButtonClicked);
@@ -457,7 +457,7 @@ CPNotificationClickBlock handleClick;
                 if (image.id != nil) {
                     [dataDic setObject:image.id forKey:@"blockId"];
                 }
-                if (banner.multipleScreensEnabled) {
+                if (banner.multipleScreensEnabled && banner.screens != nil && banner.screens.count > 0) {
                     [dataDic setObject:banner.screens[self.currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
