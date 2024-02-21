@@ -485,8 +485,10 @@ NSInteger currentScreenIndex = 0;
             NSString *compareAttributeValue = [attribute cleverPushStringForKey:@"value"];
             NSString *fromValue = [attribute cleverPushStringForKey:@"fromValue"];
             NSString *toValue = [attribute cleverPushStringForKey:@"toValue"];
+            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
+            NSString *relation = [attribute cleverPushStringForKey:@"relation"];
 
-            if (![CPUtils isNullOrEmpty:compareAttributeValue]) {
+            if ([CPUtils isNullOrEmpty:compareAttributeValue]) {
                 compareAttributeValue = @"";
             }
 
@@ -498,13 +500,11 @@ NSInteger currentScreenIndex = 0;
                 toValue = @"";
             }
 
-            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
             if ([CPUtils isNullOrEmpty:attributeValue]) {
                 return NO;
             }
 
-            NSString *relation = [attribute cleverPushStringForKey:@"relation"];
-            if (!relation || [relation isKindOfClass:[NSNull class]]) {
+            if ([CPUtils isNullOrEmpty:relation]) {
                 relation = @"equals";
             }
 
