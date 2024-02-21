@@ -477,23 +477,38 @@ NSInteger currentScreenIndex = 0;
 
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
         if (![CleverPush isSubscribed]) {
-            return allowed;
+            return NO;
         }
 
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute cleverPushStringForKey:@"id"];
             NSString *compareAttributeValue = [attribute cleverPushStringForKey:@"value"];
-            if (!compareAttributeValue || [compareAttributeValue isKindOfClass:[NSNull class]]) {
+            NSString *fromValue = [attribute cleverPushStringForKey:@"fromValue"];
+            NSString *toValue = [attribute cleverPushStringForKey:@"toValue"];
+
+            if (![CPUtils isNullOrEmpty:compareAttributeValue]) {
                 compareAttributeValue = @"";
             }
 
+            if ([CPUtils isNullOrEmpty:fromValue]) {
+                fromValue = @"";
+            }
+
+            if ([CPUtils isNullOrEmpty:toValue]) {
+                toValue = @"";
+            }
+
             NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
+            if ([CPUtils isNullOrEmpty:attributeValue]) {
+                return NO;
+            }
+
             NSString *relation = [attribute cleverPushStringForKey:@"relation"];
             if (!relation || [relation isKindOfClass:[NSNull class]]) {
                 relation = @"equals";
             }
 
-            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
 
             if (!attributeFilterAllowed) {
                 allowed = NO;
@@ -503,7 +518,9 @@ NSInteger currentScreenIndex = 0;
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
-    allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    if (allowed) {
+        allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:TRUE compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    }
     return allowed;
 }
 
