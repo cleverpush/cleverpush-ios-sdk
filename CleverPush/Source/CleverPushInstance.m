@@ -3613,7 +3613,7 @@ static id isNil(id object) {
     return localEventTrackingRetentionDays;
 }
 
-- (void)getBadgeCountWithCompletionHandler:(void (^ _Nullable)(NSInteger))completionHandler {
+- (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler {
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
         NSInteger badgeCount = [notifications count];
         dispatch_async(dispatch_get_main_queue(), ^{
