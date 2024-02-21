@@ -1824,7 +1824,7 @@ static id isNil(id object) {
         } else {
             [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (@available(iOS 17.0, *)) {
+                    if (@available(iOS 16.0, *)) {
                         [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:[notifications count] withCompletionHandler:nil];
                     } else {
                         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
@@ -3586,7 +3586,7 @@ static id isNil(id object) {
 }
 
 - (void)setBadgeCount:(NSInteger)count {
-    if (@available(iOS 16, *)) {
+    if (@available(iOS 16.0, *)) {
         [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
     } else {
         [UIApplication sharedApplication].applicationIconBadgeNumber = count;
