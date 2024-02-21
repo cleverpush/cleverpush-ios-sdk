@@ -97,7 +97,6 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
-static NSInteger badgeCount = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -3586,7 +3585,7 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
-+ (void)setBadgeCount:(NSInteger)count {
+- (void)setBadgeCount:(NSInteger)count {
     if (@available(iOS 16, *)) {
         [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
     } else {
@@ -3614,7 +3613,7 @@ static id isNil(id object) {
     return localEventTrackingRetentionDays;
 }
 
-- (void)getBadgeCountWithCompletionHandler:(void (^)(NSInteger))completionHandler {
+- (void)getBadgeCountWithCompletionHandler:(void (^ _Nullable)(NSInteger))completionHandler {
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
         NSInteger badgeCount = [notifications count];
         dispatch_async(dispatch_get_main_queue(), ^{
