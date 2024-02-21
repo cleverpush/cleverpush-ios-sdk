@@ -526,6 +526,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setLocalEventTrackingRetentionDays:days];
 }
 
++ (void)setBadgeCount:(NSInteger)count {
+    [self.CPSharedInstance setBadgeCount:count];
+}
+
 + (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0)) {
     [self.CPSharedInstance updateBadge:replacementContent];
 }
@@ -620,6 +624,10 @@ static CleverPush* singleInstance = nil;
 
 + (int)getLocalEventTrackingRetentionDays {
     return [self.CPSharedInstance getLocalEventTrackingRetentionDays];
+}
+
++ (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler {
+    return [self.CPSharedInstance getBadgeCount:completionHandler];
 }
 
 + (NSString* _Nullable)channelId {

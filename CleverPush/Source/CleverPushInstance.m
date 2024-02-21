@@ -1824,7 +1824,11 @@ static id isNil(id object) {
         } else {
             [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                    if (@available(iOS 16.0, *)) {
+                        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:[notifications count] withCompletionHandler:nil];
+                    } else {
+                        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                    }
                 });
             }];
         }
@@ -3581,6 +3585,14 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
+- (void)setBadgeCount:(NSInteger)count {
+    if (@available(iOS 16.0, *)) {
+        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
+    } else {
+        [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+    }
+}
+
 - (NSString* _Nullable)getApiEndpoint {
     return apiEndpoint;
 }
@@ -3599,6 +3611,15 @@ static id isNil(id object) {
 
 - (int)getLocalEventTrackingRetentionDays {
     return localEventTrackingRetentionDays;
+}
+
+- (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler {
+    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
+        NSInteger badgeCount = [notifications count];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(badgeCount);
+        });
+    }];
 }
 
 #pragma mark - App Banner methods
