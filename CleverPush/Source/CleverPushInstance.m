@@ -3586,8 +3586,7 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
-- (void)setBadgeCount:(NSInteger)count {
-    badgeCount = count;
++ (void)setBadgeCount:(NSInteger)count {
     if (@available(iOS 16, *)) {
         [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
     } else {
@@ -3617,6 +3616,7 @@ static id isNil(id object) {
 
 - (void)getBadgeCountWithCompletionHandler:(void (^)(NSInteger))completionHandler {
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
+        NSInteger badgeCount = [notifications count];
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(badgeCount);
         });
