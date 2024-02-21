@@ -246,7 +246,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		5rnYLr/m+JdD/nWxbBvckeI0qY0=
+		uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -254,7 +254,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		STIcFQGt5dBmqrmmskJr/mLjYwU=
+		qL5TxBtuRTHWs/q8PMuYCReoBb4=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -939,11 +939,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			5rnYLr/m+JdD/nWxbBvckeI0qY0=
+			uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			/2tcDgKoj0MJyS/GDklq4vPG22HEUm881FyMmX1XtWU=
+			TYhFY5fmXV4Y/MOIWB8xhj9CPW8VP30H0hzFT8LP9EE=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -961,11 +961,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			STIcFQGt5dBmqrmmskJr/mLjYwU=
+			qL5TxBtuRTHWs/q8PMuYCReoBb4=
 			</data>
 			<key>hash2</key>
 			<data>
-			0VnfLQJsj4T0H0xUwxyWO/WH97BCpG0FOZ1+KxSjwPI=
+			W/liwsuOnc149jrQFseHkLCsqZu7ldwJHEdSEoBfdJ8=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
