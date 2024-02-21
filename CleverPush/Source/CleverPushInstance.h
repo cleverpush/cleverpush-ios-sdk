@@ -210,8 +210,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (NSString* _Nullable)channelId;
 - (UIViewController* _Nullable)getCustomTopViewController;
 - (int)getLocalEventTrackingRetentionDays;
-- (NSInteger)getBadgeCount;
-- (void)getBadgeCountWithCompletion:(void (^ _Nullable)(NSInteger))completion;
+- (void)getBadgeCountWithCompletionHandler:(void (^)(NSInteger))completionHandler;
 - (CPIabTcfMode)getIabTcfMode;
 
 - (UIColor* _Nullable)getBrandingColor;

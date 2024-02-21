@@ -97,7 +97,7 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
-NSInteger badgeCount = 0;
+static NSInteger badgeCount = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -1825,7 +1825,11 @@ static id isNil(id object) {
         } else {
             [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                    if (@available(iOS 17.0, *)) {
+                        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:[notifications count] withCompletionHandler:nil];
+                    } else {
+                        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                    }
                 });
             }];
         }
@@ -3584,6 +3588,11 @@ static id isNil(id object) {
 
 - (void)setBadgeCount:(NSInteger)count {
     badgeCount = count;
+    if (@available(iOS 16, *)) {
+        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
+    } else {
+        [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+    }
 }
 
 - (NSString* _Nullable)getApiEndpoint {
@@ -3606,13 +3615,11 @@ static id isNil(id object) {
     return localEventTrackingRetentionDays;
 }
 
-- (NSInteger)getBadgeCount {
-    return badgeCount;
-}
-
-- (void)getBadgeCountWithCompletion:(void (^)(NSInteger))completion {
-    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
-        completion([self getBadgeCount]);
+- (void)getBadgeCountWithCompletionHandler:(void (^)(NSInteger))completionHandler {
+    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> * _Nonnull notifications) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(badgeCount);
+        });
     }];
 }
 

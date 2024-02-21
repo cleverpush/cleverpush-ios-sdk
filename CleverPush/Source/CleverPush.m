@@ -626,12 +626,8 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getLocalEventTrackingRetentionDays];
 }
 
-+ (NSInteger)getBadgeCount{
-    return [self.CPSharedInstance getBadgeCount];
-}
-
-+ (void)getBadgeCountWithCompletion:(void (^)(NSInteger))completion {
-    [self.CPSharedInstance getBadgeCountWithCompletion:completion];
++ (void)getBadgeCountWithCompletionHandler:(void (^)(NSInteger))completionHandler {
+    return [self.CPSharedInstance getBadgeCountWithCompletionHandler:completionHandler];
 }
 
 + (NSString* _Nullable)channelId {
