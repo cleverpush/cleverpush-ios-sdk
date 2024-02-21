@@ -97,6 +97,7 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
+NSInteger badgeCount = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -3581,6 +3582,10 @@ static id isNil(id object) {
     localEventTrackingRetentionDays = days;
 }
 
+- (void)setBadgeCount:(NSInteger)count {
+    badgeCount = count;
+}
+
 - (NSString* _Nullable)getApiEndpoint {
     return apiEndpoint;
 }
@@ -3599,6 +3604,16 @@ static id isNil(id object) {
 
 - (int)getLocalEventTrackingRetentionDays {
     return localEventTrackingRetentionDays;
+}
+
+- (NSInteger)getBadgeCount {
+    return badgeCount;
+}
+
+- (void)getBadgeCountWithCompletion:(void (^)(NSInteger))completion {
+    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
+        completion([self getBadgeCount]);
+    }];
 }
 
 #pragma mark - App Banner methods
