@@ -1682,6 +1682,13 @@ static id isNil(id object) {
         return;
     }
 
+    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
+    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
+
+    if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
+        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:notificationId];
+    }
+
     CPNotificationReceivedResult* result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
 
     handleNotificationReceived(result);
@@ -1777,8 +1784,6 @@ static id isNil(id object) {
 
 - (void)handleSilentNotificationReceived:(NSDictionary* _Nullable)messageDict {
     NSDictionary* notification = [messageDict cleverPushDictionaryForKey:@"notification"];
-    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
-    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (!notification) {
         return;
@@ -1786,12 +1791,8 @@ static id isNil(id object) {
 
     NSString* notificationId = [notification cleverPushStringForKey:@"_id"];
 
-    if ([CPUtils isEmpty:notificationId] || ([notificationId isEqualToString:lastNotificationReceivedId] && ![notificationId isEqualToString:@"chat"])) {
+    if (![CPUtils isNullOrEmpty:notificationId] && ![notificationId isEqualToString:@"chat"]) {
         return;
-    }
-
-    if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:notificationId];
     }
 }
 
