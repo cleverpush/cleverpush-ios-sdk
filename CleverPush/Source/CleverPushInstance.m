@@ -1645,7 +1645,7 @@ static id isNil(id object) {
         [CleverPush handleNotificationReceived:messageDict isActive:NO];
     }
 
-    [CleverPush handleSilentNotificationReceived:messageDict];
+    [CleverPush handleSilentNotificationReceivedWithAppBanner:messageDict];
 
     return startedBackgroundJob;
 }
