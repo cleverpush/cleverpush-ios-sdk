@@ -1682,13 +1682,6 @@ static id isNil(id object) {
         return;
     }
 
-    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
-    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
-
-    if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:notificationId];
-    }
-
     CPNotificationReceivedResult* result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
 
     handleNotificationReceived(result);
