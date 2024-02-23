@@ -1679,7 +1679,7 @@ static id isNil(id object) {
     }
 
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
-    if (![CPUtils isNullOrEmpty:[notification cleverPushStringForKey:@"appBanner"]] && isSilent && [UIApplication sharedApplication].applicationState == UIApplicationStateInactive) {
+    if (![CPUtils isNullOrEmpty:[notification cleverPushStringForKey:@"appBanner"]] && isSilent) {
         [CPAppBannerModuleInstance setSilentPushAppBannersIDs:[notification cleverPushStringForKey:@"appBanner"] notificationID:notificationId];
     }
 

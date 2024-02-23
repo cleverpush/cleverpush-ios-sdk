@@ -1168,14 +1168,17 @@ NSInteger currentScreenIndex = 0;
 
     for (NSMutableDictionary *existingDict in existingArray) {
         if ([existingDict[@"notificationId"] isEqualToString:notificationID]) {
-            [existingDict setObject:appBannerID forKey:@"appBanner"];
+            NSMutableDictionary *mutableExistingDict = [existingDict mutableCopy];
+            [mutableExistingDict setObject:appBannerID forKey:@"appBanner"];
+            [existingArray removeObject:existingDict];
+            [existingArray addObject:mutableExistingDict];
             found = YES;
             break;
         }
     }
 
     if (!found) {
-        [existingArray addObject:[NSMutableDictionary dictionaryWithDictionary:@{ @"notificationId": notificationID, @"appBanner": appBannerID }]];
+        [existingArray addObject:@{ @"notificationId": notificationID, @"appBanner": appBannerID }];
     }
 
     [defaults setObject:existingArray forKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
