@@ -1,14 +1,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <UserNotifications/UserNotifications.h>
-
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CleverPush.h"
 #import "CPUtils.h"
 #import "CPLog.h"
-#import "NSDictionary+SafeExpectations.h"
-#import "CPAppBannerModuleInstance.h"
 
 @interface CleverPush (UN_extra)
 
@@ -103,7 +100,6 @@ __weak static id previousDelegate;
             completionHandlerOptions = UNNotificationPresentationOptionNone;
         }
     }
-
 
     completionHandler(completionHandlerOptions);
 }
