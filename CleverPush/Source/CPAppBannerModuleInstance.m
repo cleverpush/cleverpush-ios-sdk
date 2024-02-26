@@ -277,7 +277,7 @@ NSInteger currentScreenIndex = 0;
             [self setPendingBannerListeners:[NSMutableArray new]];
 
             NSMutableArray *appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
-            NSMutableArray *objectsToRemove = [NSMutableArray array];
+            NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
 
             for (NSMutableDictionary *eventsObject in appBanners) {
                 [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
