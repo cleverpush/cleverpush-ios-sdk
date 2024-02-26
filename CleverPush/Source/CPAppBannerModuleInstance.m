@@ -15,7 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
-NSMutableArray *silentPushAppBannersIDs;
+NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
@@ -276,7 +276,7 @@ NSInteger currentScreenIndex = 0;
             [self setPendingBannerRequest:NO];
             [self setPendingBannerListeners:[NSMutableArray new]];
 
-            NSMutableArray *appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIDs] mutableCopy];
+            NSMutableArray *appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
             NSMutableArray *objectsToRemove = [NSMutableArray array];
 
             for (NSMutableDictionary *eventsObject in appBanners) {
@@ -1155,8 +1155,8 @@ NSInteger currentScreenIndex = 0;
     return currentVoucherCodePlaceholder;
 }
 
-#pragma mark - Get app banner ids from silent push
-+ (void)setSilentPushAppBannersIDs:(NSString *)appBannerID notificationID:(NSString *)notificationID {
+#pragma mark - set app banner ids from silent push
++ (void)setSilentPushAppBannersIds:(NSString *)appBannerId notificationId:(NSString *)notificationId {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableArray *existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
 
@@ -1164,30 +1164,24 @@ NSInteger currentScreenIndex = 0;
         existingArray = [NSMutableArray new];
     }
 
-    BOOL found = NO;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"notificationId == %@", notificationId];
+    NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
 
-    for (NSMutableDictionary *existingDict in existingArray) {
-        if ([existingDict[@"notificationId"] isEqualToString:notificationID]) {
-            NSMutableDictionary *mutableExistingDict = [existingDict mutableCopy];
-            [mutableExistingDict setObject:appBannerID forKey:@"appBanner"];
-            [existingArray removeObject:existingDict];
-            [existingArray addObject:mutableExistingDict];
-            found = YES;
-            break;
-        }
-    }
-
-    if (!found) {
-        [existingArray addObject:@{ @"notificationId": notificationID, @"appBanner": appBannerID }];
+    if (filteredArray.count > 0) {
+        NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
+        existingDict[@"appBanner"] = appBannerId;
+    } else {
+        [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
     }
 
     [defaults setObject:existingArray forKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
     [defaults synchronize];
 }
 
-+ (NSMutableArray *)getSilentPushAppBannersIDs {
-    silentPushAppBannersIDs = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-    return silentPushAppBannersIDs;
+#pragma mark - get app banner ids from silent push
++ (NSMutableArray *)getSilentPushAppBannersIds {
+    silentPushAppBannersIds = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    return silentPushAppBannersIds;
 }
 
 #pragma mark - Get the value of pageControl from current index

@@ -1777,8 +1777,6 @@ static id isNil(id object) {
 
 - (void)handleSilentNotificationReceivedWithAppBanner:(NSDictionary* _Nullable)messageDict {
     NSDictionary* notification = [messageDict cleverPushDictionaryForKey:@"notification"];
-    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
-    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (!notification) {
         return;
@@ -1790,8 +1788,11 @@ static id isNil(id object) {
         return;
     }
 
+    NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
+    bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
+
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        [CPAppBannerModuleInstance setSilentPushAppBannersIDs:appBanner notificationID:notificationId];
+        [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
     }
 }
 
