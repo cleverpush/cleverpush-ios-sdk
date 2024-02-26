@@ -276,19 +276,21 @@ NSInteger currentScreenIndex = 0;
             [self setPendingBannerRequest:NO];
             [self setPendingBannerListeners:[NSMutableArray new]];
 
-            NSMutableArray *appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
-            NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
+            NSMutableArray *appBanners = [[NSMutableArray alloc] init];
+            appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
+            if (appBanners != nil && appBanners.count > 0) {
+                NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
 
-            for (NSMutableDictionary *eventsObject in appBanners) {
-                [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
-                [objectsToRemove addObject:eventsObject];
-            }
+                for (NSMutableDictionary *eventsObject in appBanners) {
+                    [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
+                    [objectsToRemove addObject:eventsObject];
+                }
 
-            [appBanners removeObjectsInArray:objectsToRemove];
+                [appBanners removeObjectsInArray:objectsToRemove];
 
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            } 
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
