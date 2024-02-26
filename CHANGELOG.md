@@ -1,3 +1,10 @@
+## 1.30.6 (21.02.2024)
+* Optimised the showBanner method for always saving banner IDs in preferences.
+* Resolved the issue of the wrong screen ID passing in the app banner for buttons.
+* Added a `silent` field in the notification payload model
+* Resolved the issue of set subscription attributes not working with AND conditions in-app banners.
+* implemented `setBadgeCount` and `getBadgeCount` methods for updating the notification badge count.
+ 
 ## 1.30.5 (14.02.2024)
 * Optimised `subscribe` method for calling multiple times
 * Optimised `waitForTrackingConsent` method for tracking events
