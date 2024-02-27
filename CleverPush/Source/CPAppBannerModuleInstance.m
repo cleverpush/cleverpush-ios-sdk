@@ -1159,17 +1159,23 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - set app banner ids from silent push
 + (void)setSilentPushAppBannersIds:(NSString *)appBannerId notificationId:(NSString *)notificationId {
+    if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog debug:@"CPAppBannerModuleInstance: setSilentPushAppBannersIds: appBannerId or notification ID is blank, null, or empty."];
+        return;
+    }
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    NSMutableArray *existingArray = [[NSMutableArray alloc] init];
+    existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
 
     if (!existingArray) {
-        existingArray = [NSMutableArray new];
+        existingArray = [[NSMutableArray alloc] init];
     }
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"notificationId == %@", notificationId];
     NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
 
-    if (filteredArray.count > 0) {
+    if (filteredArray != nil && filteredArray.count > 0) {
         NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
         existingDict[@"appBanner"] = appBannerId;
     } else {
