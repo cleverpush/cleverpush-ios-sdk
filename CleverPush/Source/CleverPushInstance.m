@@ -1784,7 +1784,7 @@ static id isNil(id object) {
 
     NSString* notificationId = [notification cleverPushStringForKey:@"_id"];
 
-    if ([CPUtils isEmpty:notificationId] && [notificationId isEqualToString:@"chat"]) {
+    if ([CPUtils isEmpty:notificationId]) {
         return;
     }
 
