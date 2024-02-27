@@ -185,10 +185,6 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance handleNotificationReceived:messageDict isActive:isActive];
 }
 
-+ (void)handleSilentNotificationReceivedWithAppBanner:(NSDictionary* _Nullable)messageDict {
-    [self.CPSharedInstance handleSilentNotificationReceivedWithAppBanner:messageDict];
-}
-
 + (void)enqueueRequest:(NSURLRequest* _Nullable)request onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance enqueueRequest:request onSuccess:successBlock onFailure:failureBlock];
 }
