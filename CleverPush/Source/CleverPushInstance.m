@@ -122,6 +122,7 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
+NSMutableArray* deepLinkUrls;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -2928,7 +2929,6 @@ static id isNil(id object) {
     return [self trackEvent:eventName properties:nil];
 }
 
-
 - (void)trackEvent:(NSString* _Nullable)eventName amount:(NSNumber* _Nullable)amount {
     NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys:
                              isNil(amount), @"amount",
@@ -3590,27 +3590,23 @@ static id isNil(id object) {
 
 - (void)setDeepLinkURLs:(NSURL* _Nullable)url {
     if ([CPUtils isValidURL:url]) {
-        NSMutableArray *existingURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY] mutableCopy];
 
-        if (!existingURLs) {
-            existingURLs = [NSMutableArray array];
+        if (!deepLinkUrls) {
+            deepLinkUrls = [[NSMutableArray alloc] init];
         }
 
-        NSUInteger indexOfURL = [existingURLs indexOfObject:url.absoluteString];
+        NSUInteger indexOfURL = [deepLinkUrls indexOfObject:url.absoluteString];
 
         if (indexOfURL != NSNotFound) {
-            [existingURLs replaceObjectAtIndex:indexOfURL withObject:url.absoluteString];
+            [deepLinkUrls replaceObjectAtIndex:indexOfURL withObject:url.absoluteString];
         } else {
-            [existingURLs addObject:url.absoluteString];
+            [deepLinkUrls addObject:url.absoluteString];
         }
-
-        [[NSUserDefaults standardUserDefaults] setObject:existingURLs forKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
 - (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
-    NSMutableArray *deepLinkURLs = [[[NSUserDefaults standardUserDefaults] arrayForKey:CLEVERPUSH_DEEP_LINKS_URLS_KEY] mutableCopy];
+    NSMutableArray *deepLinkURLs = [deepLinkUrls mutableCopy];
     return deepLinkURLs ?: [NSMutableArray array];
 }
 

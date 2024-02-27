@@ -528,6 +528,8 @@ static CleverPush* singleInstance = nil;
 
 + (void)setDeepLinkURLs:(NSURL* _Nullable)url {
     [self.CPSharedInstance setDeepLinkURLs:url];
+}
+
 + (void)setBadgeCount:(NSInteger)count {
     [self.CPSharedInstance setBadgeCount:count];
 }
@@ -630,6 +632,8 @@ static CleverPush* singleInstance = nil;
 
 + (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
     return [self.CPSharedInstance getDeepLinkURLs];
+}
+
 + (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler {
     return [self.CPSharedInstance getBadgeCount:completionHandler];
 }
