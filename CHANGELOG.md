@@ -1,3 +1,6 @@
+## 1.30.7 (28.02.2024)
+* Added a feature to support in-app banners for silent push notifications.
+
 ## 1.30.6 (21.02.2024)
 * Optimised the showBanner method for always saving banner IDs in preferences.
 * Resolved the issue of the wrong screen ID passing in the app banner for buttons.
