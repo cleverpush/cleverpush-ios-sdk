@@ -100,6 +100,11 @@
     } else {
         self.customData = [[NSDictionary alloc] init];
     }
+
+    self.silent = NO;
+    if ([json objectForKey:@"silent"] && [json objectForKey:@"silent"] != nil && ![[json objectForKey:@"silent"] isKindOfClass:[NSNull class]]) {
+        self.silent = [[json objectForKey:@"silent"] boolValue];
+    }
 }
 
 @end

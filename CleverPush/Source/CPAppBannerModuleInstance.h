@@ -89,5 +89,7 @@
 - (BOOL)getBannersDisabled;
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
++ (void)setSilentPushAppBannersIds:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (NSMutableArray*)getSilentPushAppBannersIds;
 
 @end

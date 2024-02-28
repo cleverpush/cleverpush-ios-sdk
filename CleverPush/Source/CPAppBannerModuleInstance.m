@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
@@ -274,6 +275,22 @@ NSInteger currentScreenIndex = 0;
             }
             [self setPendingBannerRequest:NO];
             [self setPendingBannerListeners:[NSMutableArray new]];
+
+            NSMutableArray *appBanners = [[NSMutableArray alloc] init];
+            appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
+            if (appBanners != nil && appBanners.count > 0) {
+                NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
+
+                for (NSMutableDictionary *eventsObject in appBanners) {
+                    [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
+                    [objectsToRemove addObject:eventsObject];
+                }
+
+                [appBanners removeObjectsInArray:objectsToRemove];
+
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            } 
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
@@ -476,35 +493,51 @@ NSInteger currentScreenIndex = 0;
     }
 
     if (allowed && banner.attributes && [banner.attributes count] > 0) {
-        allowed = NO;
-
         if (![CleverPush isSubscribed]) {
-            return allowed;
+            return NO;
         }
 
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute cleverPushStringForKey:@"id"];
             NSString *compareAttributeValue = [attribute cleverPushStringForKey:@"value"];
-            if (!compareAttributeValue || [compareAttributeValue isKindOfClass:[NSNull class]]) {
+            NSString *fromValue = [attribute cleverPushStringForKey:@"fromValue"];
+            NSString *toValue = [attribute cleverPushStringForKey:@"toValue"];
+            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
+            NSString *relation = [attribute cleverPushStringForKey:@"relation"];
+
+            if ([CPUtils isNullOrEmpty:compareAttributeValue]) {
                 compareAttributeValue = @"";
             }
 
-            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
-            NSString *relation = [attribute cleverPushStringForKey:@"relation"];
-            if (!relation || [relation isKindOfClass:[NSNull class]]) {
+            if ([CPUtils isNullOrEmpty:fromValue]) {
+                fromValue = @"";
+            }
+
+            if ([CPUtils isNullOrEmpty:toValue]) {
+                toValue = @"";
+            }
+
+            if ([CPUtils isNullOrEmpty:attributeValue]) {
+                return NO;
+            }
+
+            if ([CPUtils isNullOrEmpty:relation]) {
                 relation = @"equals";
             }
 
-            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
-            if (attributeFilterAllowed) {
-                allowed = YES;
+            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
+
+            if (!attributeFilterAllowed) {
+                allowed = NO;
                 break;
             }
         }
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
-    allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:allowed compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    if (allowed) {
+        allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:TRUE compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
+    }
     return allowed;
 }
 
@@ -907,9 +940,7 @@ NSInteger currentScreenIndex = 0;
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
-        if (banner.frequency == CPAppBannerFrequencyOnce) {
-            [self setBannerIsShown:banner];
-        }
+        [self setBannerIsShown:banner];
 
         // remove banner so it will not show again this session
         if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
@@ -999,8 +1030,8 @@ NSInteger currentScreenIndex = 0;
                 if (block.id != nil) {
                     [dataDic setObject:block.id forKey:@"blockId"];
                 }
-                if (block.action != nil && block.action.screen != nil && ![block.action.screen isEqual: @""]) {
-                    [dataDic setObject:[[block valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                if ((banner.screens != nil && banner.screens.count > 0) && banner.multipleScreensEnabled) {
+                    [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(block.isButtonClicked);
             }
@@ -1009,8 +1040,8 @@ NSInteger currentScreenIndex = 0;
                 if (image.id != nil) {
                     [dataDic setObject:image.id forKey:@"blockId"];
                 }
-                if (image.action != nil && image.action.screen != nil && ![image.action.screen isEqual: @""]) {
-                    [dataDic setObject:[[image valueForKey:@"action"] valueForKey:@"screen"] forKey:@"screenId"];
+                if ((banner.screens != nil && banner.screens.count > 0) && banner.multipleScreensEnabled) {
+                    [dataDic setObject:banner.screens[currentScreenIndex].id forKey:@"screenId"];
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
@@ -1124,6 +1155,41 @@ NSInteger currentScreenIndex = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
+}
+
+#pragma mark - set app banner ids from silent push
++ (void)setSilentPushAppBannersIds:(NSString *)appBannerId notificationId:(NSString *)notificationId {
+    if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog debug:@"CPAppBannerModuleInstance: setSilentPushAppBannersIds: appBannerId or notification ID is blank, null, or empty."];
+        return;
+    }
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *existingArray = [[NSMutableArray alloc] init];
+    existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+
+    if (!existingArray) {
+        existingArray = [[NSMutableArray alloc] init];
+    }
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"notificationId == %@", notificationId];
+    NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
+
+    if (filteredArray != nil && filteredArray.count > 0) {
+        NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
+        existingDict[@"appBanner"] = appBannerId;
+    } else {
+        [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
+    }
+
+    [defaults setObject:existingArray forKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+    [defaults synchronize];
+}
+
+#pragma mark - get app banner ids from silent push
++ (NSMutableArray *)getSilentPushAppBannersIds {
+    silentPushAppBannersIds = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    return silentPushAppBannersIds;
 }
 
 #pragma mark - Get the value of pageControl from current index
