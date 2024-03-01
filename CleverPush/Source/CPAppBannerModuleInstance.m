@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableDictionary *bannersForDeepLink;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
 NSMutableArray<CPAppBanner*> *pendingBanners;
@@ -649,8 +650,14 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
-    for (id urlOrString in [CleverPush getDeepLinkURLs]) {
+    NSDictionary *getUrls = [CPAppBannerModuleInstance getBannersForDeepLink];
+    for (id key in getUrls) {
+        id urlOrString = getUrls[key];
         NSURL *url = nil;
+
+        if (urlOrString == nil || urlOrString == [NSNull null]) {
+            continue;
+        }
 
         if ([urlOrString isKindOfClass:[NSURL class]]) {
             url = (NSURL *)urlOrString;
@@ -658,11 +665,10 @@ NSInteger currentScreenIndex = 0;
             url = [NSURL URLWithString:urlOrString];
         }
 
-        if (url && [url.absoluteString containsString:condition.deepLink]) {
+        if (url && [url.absoluteString isEqualToString:condition.deepLink]) {
             return YES;
         }
     }
-
     return NO;
 }
 
@@ -1158,6 +1164,15 @@ NSInteger currentScreenIndex = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
+}
+
+#pragma mark - Get voucher code from appBannerwith DeepLink
++ (void)setBannersForDeepLink:(NSMutableDictionary *)appBanner {
+    bannersForDeepLink = appBanner;
+}
+
++  (NSMutableDictionary*)getBannersForDeepLink {
+    return bannersForDeepLink;
 }
 
 #pragma mark - Get the value of pageControl from current index

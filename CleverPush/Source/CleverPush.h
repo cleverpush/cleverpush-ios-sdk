@@ -153,7 +153,6 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)setAuthorizerToken:(NSString* _Nullable)authorizerToken;
 + (void)setCustomTopViewController:(UIViewController* _Nullable)viewController;
 + (void)setLocalEventTrackingRetentionDays:(int)days;
-+ (void)setDeepLinkURLs:(NSURL* _Nullable)url;
 + (void)setBadgeCount:(NSInteger)count;
 + (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
 + (void)addStoryView:(CPStoryView* _Nullable)storyView;
@@ -182,7 +181,6 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (NSString* _Nullable)channelId;
 + (UIViewController* _Nullable)getCustomTopViewController;
 + (int)getLocalEventTrackingRetentionDays;
-+ (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs;
 + (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler;
 + (CPIabTcfMode)getIabTcfMode;
 

@@ -526,10 +526,6 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setLocalEventTrackingRetentionDays:days];
 }
 
-+ (void)setDeepLinkURLs:(NSURL* _Nullable)url {
-    [self.CPSharedInstance setDeepLinkURLs:url];
-}
-
 + (void)setBadgeCount:(NSInteger)count {
     [self.CPSharedInstance setBadgeCount:count];
 }
@@ -628,10 +624,6 @@ static CleverPush* singleInstance = nil;
 
 + (int)getLocalEventTrackingRetentionDays {
     return [self.CPSharedInstance getLocalEventTrackingRetentionDays];
-}
-
-+ (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
-    return [self.CPSharedInstance getDeepLinkURLs];
 }
 
 + (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler {

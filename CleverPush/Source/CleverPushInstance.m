@@ -122,7 +122,6 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
-NSMutableArray* deepLinkUrls;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -1752,9 +1751,8 @@ static id isNil(id object) {
         NSURL*url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
             if ([CPUtils isValidURL:url]) {
-                [CleverPush setDeepLinkURLs:[CPUtils removeQueryParametersFromURL:url]];
+                [CPUtils tryOpenURL:url];
             }
-            [CPUtils tryOpenURL:url];
         }
     }
 
@@ -3586,28 +3584,6 @@ static id isNil(id object) {
 
 - (void)setLocalEventTrackingRetentionDays:(int)days {
     localEventTrackingRetentionDays = days;
-}
-
-- (void)setDeepLinkURLs:(NSURL* _Nullable)url {
-    if ([CPUtils isValidURL:url]) {
-
-        if (!deepLinkUrls) {
-            deepLinkUrls = [[NSMutableArray alloc] init];
-        }
-
-        NSUInteger indexOfURL = [deepLinkUrls indexOfObject:url.absoluteString];
-
-        if (indexOfURL != NSNotFound) {
-            [deepLinkUrls replaceObjectAtIndex:indexOfURL withObject:url.absoluteString];
-        } else {
-            [deepLinkUrls addObject:url.absoluteString];
-        }
-    }
-}
-
-- (NSMutableArray<NSURL *> * _Nullable)getDeepLinkURLs {
-    NSMutableArray *deepLinkURLs = [deepLinkUrls mutableCopy];
-    return deepLinkURLs ?: [NSMutableArray array];
 }
 
 - (void)setBadgeCount:(NSInteger)count {
