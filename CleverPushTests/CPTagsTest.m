@@ -30,15 +30,25 @@
     self.testableInstance = [[CleverPushInstance alloc] init];
     self.cleverPush = OCMPartialMock(self.testableInstance);
 }
-- (void)testGetSubscriptionTags {
-    NSMutableArray *tags = [[NSMutableArray alloc]init];
-    [tags addObject:@"tagId"];
+- (void)testGetSubscriptionTagsSuccess {
+    NSArray<NSString *> *tags = @[@"tagId"];
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-    NSMutableArray *expectedTags = [self.cleverPush getSubscriptionTags];
-    XCTAssertEqual(tags, expectedTags);
-    XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
 
+    NSArray<NSString *> *expectedTags = [self.cleverPush getSubscriptionTags];
+    XCTAssertEqualObjects(tags, expectedTags);
+
+    XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
 }
+
+- (void)testGetSubscriptionTagsFailure {
+    NSArray<NSString *> *tags = @[@"tagId", @"tagIdTwo"];
+    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
+
+    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
+    XCTAssertFalse([retrievedTags containsObject:@"tagIdNotPresent"]);
+    XCTAssertFalse([retrievedTags containsObject:@"tagIdTwo"]);
+}
+
 - (void)testHasSubscriptionTagWhenItIsFalse{
     NSMutableArray *tags = [[NSMutableArray alloc]init];
     [tags addObject:@"tagId"];
@@ -406,22 +416,6 @@
                NSLog(@"Error: %@", error.localizedDescription);
            }
        }];
-}
-
-- (void)testGetSubscriptionTagsSuccess {
-    NSArray<NSString *> *tags = @[@"tagId", @"tagIdTwo"];
-    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-
-    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
-    XCTAssertTrue([retrievedTags containsObject:@"tagId"]);
-}
-
-- (void)testGetSubscriptionTagsFailure {
-    NSArray<NSString *> *tags = @[@"tagId", @"tagIdTwo"];
-    OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-
-    NSArray<NSString *> *retrievedTags = [self.cleverPush getSubscriptionTags];
-    XCTAssertFalse([retrievedTags containsObject:@"tagIdNotPresent"]);
 }
 
 - (void)tearDown {
