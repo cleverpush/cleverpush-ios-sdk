@@ -122,7 +122,7 @@
         handler(tags);
     }];
     [self.cleverPush getAvailableTags:^(NSArray *Tags) {
-        XCTAssertFalse([Tags containsObject:@"tagIdTwo"]);
+        XCTAssertTrue([Tags containsObject:@"tagIdTwo"]);
     }];
 }
 
