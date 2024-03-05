@@ -36,7 +36,6 @@
 
     NSArray<NSString *> *expectedTags = [self.cleverPush getSubscriptionTags];
     XCTAssertEqualObjects(tags, expectedTags);
-
     XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
 }
 
@@ -53,13 +52,14 @@
     NSMutableArray *tags = [[NSMutableArray alloc]init];
     [tags addObject:@"tagId"];
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-    XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
+    XCTAssertFalse([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
 }
+
 - (void)testHasSubscriptionTagWhenItIsTrue{
     NSMutableArray *tags = [[NSMutableArray alloc]init];
     [tags addObject:@"tagId"];
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
-    XCTAssertFalse([[self.cleverPush getSubscriptionTags] containsObject:@"tagIdTwo"]);
+    XCTAssertTrue([[self.cleverPush getSubscriptionTags] containsObject:@"tagId"]);
 }
 
 - (void)testGetAvailableTagsContainsTagId {
