@@ -317,7 +317,7 @@
     OCMVerify([self.cleverPush addSubscriptionTag:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
-- (void)testAddSubscriptionTagsSuccess {
+- (void)testAddSubscriptionTagSuccess {
     NSMutableArray *tags = [[NSMutableArray alloc] init];
     [tags addObject:@"tagId"];
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
@@ -330,7 +330,7 @@
     [self waitForExpectationsWithTimeout:timeout handler:nil];
 }
 
-- (void)testAddSubscriptionTagsFailure {
+- (void)testAddSubscriptionTagFailure {
     NSMutableArray *tags = [[NSMutableArray alloc] init];
     [tags addObject:@"tagId"];
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
@@ -448,6 +448,31 @@
                NSLog(@"Error: %@", error.localizedDescription);
            }
        }];
+}
+
+- (void)testAddSubscriptionTagsSuccessWithCallback {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSArray<NSString *> *tagIds = @[@"tagId1", @"tagId2"];
+    void (^successCallback)(NSArray<NSString *> *) = ^(NSArray<NSString *> *result) {
+        XCTAssertNotNil(result);
+        XCTAssertEqual(result.count, tagIds.count);
+        XCTAssertTrue([result containsObject:@"tagId1"]);
+        XCTAssertTrue([result containsObject:@"tagId2"]);
+    };
+
+    [self.cleverPush addSubscriptionTags:tagIds callback:successCallback];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    for (NSString *tagId in tagIds) {
+        OCMVerify([self.cleverPush addSubscriptionTagToApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+    }
 }
 
 - (void)tearDown {
