@@ -392,11 +392,11 @@
         [expectation fulfill];
     }];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error: %@", error.localizedDescription);
+        }
+    }];
 }
 
 - (void)testRemoveSubscriptionTagsFailureWithCallback {
@@ -409,11 +409,11 @@
         [expectation fulfill];
     }];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error: %@", error.localizedDescription);
+        }
+    }];
 }
 
 - (void)testRemoveSubscriptionTagsSuccess {
@@ -426,11 +426,11 @@
         [expectation fulfill];
     }];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error: %@", error.localizedDescription);
+        }
+    }];
 }
 
 - (void)testRemoveSubscriptionTagsFailure {
@@ -443,11 +443,11 @@
         [expectation fulfill];
     }];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error: %@", error.localizedDescription);
+        }
+    }];
 }
 
 - (void)testAddSubscriptionTagsSuccessWithCallback {
