@@ -323,16 +323,11 @@
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
     NSArray<NSString *> *tagsToAdd = @[@"tagIdTwo"];
     XCTestExpectation *expectation = [self expectationWithDescription:@"Tags added successfully"];
-    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
-        XCTAssertTrue([resultTags containsObject:@"tagIdTwo"]);
-        [expectation fulfill];
-    }];
+    [self.cleverPush addSubscriptionTag:@"tagIdTwo"];
+    OCMVerify([self.cleverPush addSubscriptionTag:@"tagIdTwo"]);
+    [expectation fulfill];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:nil];
 }
 
 - (void)testAddSubscriptionTagsFailure {
@@ -341,16 +336,15 @@
     OCMStub([self.cleverPush getSubscriptionTags]).andReturn(tags);
     NSArray<NSString *> *tagsToAdd = @[@"tagId"];
     XCTestExpectation *expectation = [self expectationWithDescription:@"Tags not added"];
-    [self.cleverPush addSubscriptionTags:tagsToAdd callback:^(NSArray<NSString *> *resultTags) {
-        XCTAssertFalse([resultTags containsObject:@"tagId"]);
-        [expectation fulfill];
-    }];
+    [self.cleverPush addSubscriptionTag:@"tagId"];
+    OCMVerify([self.cleverPush addSubscriptionTag:@"tagId"]);
+
+    NSArray<NSString *> *resultTags = [self.cleverPush getSubscriptionTags];
+    XCTAssertFalse([resultTags containsObject:@"tagId"]);
+
+    [expectation fulfill];
     NSTimeInterval timeout = 10;
-       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
-           if (error != nil) {
-               NSLog(@"Error: %@", error.localizedDescription);
-           }
-       }];
+    [self waitForExpectationsWithTimeout:timeout handler:nil];
 }
 
 - (void)testVerifyApiCallRemoveTags {
