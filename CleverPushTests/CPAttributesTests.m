@@ -292,6 +292,66 @@
 
     [self.cleverPush pushSubscriptionAttributeValue:attributeId value:value];
 
+    XCTAssertNotNil(nil, @"Subscription attribute pull should have failed");
+
+    [expectation fulfill];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testPullSubscriptionAttributeValueSuccess {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute pulled successfully"];
+
+    OCMStub([self.cleverPush waitForTrackingConsent:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(void) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion();
+        }
+    });
+
+    OCMStub([self.cleverPush getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSString *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion(@"subscriptionId");
+        }
+    });
+
+    [self.cleverPush pullSubscriptionAttributeValue:attributeId value:value];
+
+    [expectation fulfill];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testPullSubscriptionAttributeValueFailure {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute pull should fail"];
+
+    OCMStub([self.cleverPush waitForTrackingConsent:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(void) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion();
+        }
+    });
+
+    OCMStub([self.cleverPush getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSString *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion(nil);
+        }
+    });
+
+    [self.cleverPush pullSubscriptionAttributeValue:attributeId value:value];
+
+    XCTAssertNotNil(nil, @"Subscription attribute pull should have failed");
+
     [expectation fulfill];
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
