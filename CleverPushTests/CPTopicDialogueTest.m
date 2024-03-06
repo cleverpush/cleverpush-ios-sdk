@@ -89,6 +89,15 @@
     XCTAssertTrue([self.cleverPush hasSubscriptionTopics]);
 }
 
+- (void)testSetSubscriptionTopicsFailure {
+    NSMutableArray *topics = [[NSMutableArray alloc] init];
+    [topics addObject:@"topicId"];
+    OCMStub([self.cleverPush hasSubscriptionTopics]).andReturn(true);
+    [self.cleverPush setSubscriptionTopics:topics];
+    XCTAssertFalse([[self.cleverPush getSubscriptionTopics] containsObject:@"topicId"]);
+    XCTAssertTrue([self.cleverPush hasSubscriptionTopics]);
+}
+
 - (void)testSubscribeWhenConfirmAlertHideChannelTopicsTrue {
     void (^channelConfigListenerAnswer)(NSInvocation *) = ^(NSInvocation *invocation) {
         NSDictionary *value = [[NSDictionary alloc]initWithObjectsAndKeys:@"true", @"confirmAlertHideChannelTopics", nil];
