@@ -204,6 +204,42 @@
        }];
 }
 
+- (void)testSetSubscriptionAttributeArrayValueWithCallbackSuccess {
+    NSString *attributeId = @"attributeId";
+    NSArray *value = @[@"value1", @"value2", @"value3"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute set successfully"];
+
+    [self.cleverPush setSubscriptionAttribute:attributeId arrayValue:value callback:^{
+        [expectation fulfill];
+    }];
+
+    NSTimeInterval timeout = 10;
+    [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+        if (error != nil) {
+            XCTFail(@"Expectation failed with error: %@", error.localizedDescription);
+        }
+    }];
+}
+
+- (void)testSetSubscriptionAttributeArrayValueWithCallbackFailure {
+    NSString *attributeId = @"attributeId";
+    NSArray *value = @[@"value1", @"value2", @"value3"];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute failed to set"];
+
+    [self.cleverPush setSubscriptionAttribute:attributeId arrayValue:value callback:^{
+        XCTFail(@"Callback should not be invoked for failure");
+    }];
+
+    NSTimeInterval timeout = 10;
+       [self waitForExpectationsWithTimeout:timeout handler:^(NSError *error) {
+           if (error != nil) {
+               NSLog(@"Error: %@", error.localizedDescription);
+           }
+       }];
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }

@@ -489,7 +489,7 @@
         XCTAssertNotNil(error);
     };
 
-    [self.cleverPush addSubscriptionTag:tagIds];
+    [self.cleverPush addSubscriptionTags:tagIds];
 
     OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
     for (NSString *tagId in tagIds) {
