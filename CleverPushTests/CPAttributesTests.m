@@ -240,6 +240,62 @@
        }];
 }
 
+- (void)testPushSubscriptionAttributeValueSuccess {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute pushed successfully"];
+
+    OCMStub([self.cleverPush waitForTrackingConsent:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(void) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion();
+        }
+    });
+
+    OCMStub([self.cleverPush getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSString *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion(@"subscriptionId");
+        }
+    });
+
+    [self.cleverPush pushSubscriptionAttributeValue:attributeId value:value];
+
+    [expectation fulfill];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
+- (void)testPushSubscriptionAttributeValueFailure {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Subscription attribute failed to push"];
+
+    OCMStub([self.cleverPush waitForTrackingConsent:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(void) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion();
+        }
+    });
+
+    OCMStub([self.cleverPush getSubscriptionId:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSString *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        if (completion) {
+            completion(nil);
+        }
+    });
+
+    [self.cleverPush pushSubscriptionAttributeValue:attributeId value:value];
+
+    [expectation fulfill];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
