@@ -356,6 +356,34 @@
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
 
+- (void)testHasSubscriptionAttributeValueSuccess {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    NSUserDefaults *mockUserDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *subscriptionAttributes = [NSMutableDictionary new];
+    subscriptionAttributes[attributeId] = [NSMutableArray arrayWithObject:value];
+    [mockUserDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+
+    BOOL hasValue = [self.cleverPush hasSubscriptionAttributeValue:attributeId value:value];
+
+    XCTAssertTrue(hasValue, @"Subscription attribute value should be present");
+}
+
+- (void)testHasSubscriptionAttributeValueFailure {
+    NSString *attributeId = @"attributeId";
+    NSString *value = @"attributeValue";
+
+    NSUserDefaults *mockUserDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *subscriptionAttributes = [NSMutableDictionary new];
+    subscriptionAttributes[attributeId] = [NSMutableArray arrayWithObject:@"differentValue"];
+    [mockUserDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+
+    BOOL hasValue = [self.cleverPush hasSubscriptionAttributeValue:attributeId value:value];
+
+    XCTAssertTrue(hasValue, @"Subscription attribute value should not be present");
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
