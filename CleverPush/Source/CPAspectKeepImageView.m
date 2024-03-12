@@ -195,7 +195,6 @@ static char kCPSessionDataTaskKey;
                 NSDictionary *gifProperties = frameProperties[(NSString *)kCGImagePropertyGIFDictionary];
                 NSNumber *delayTime = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
                 totalDuration += [delayTime doubleValue];
-
                 delayTime = @(MAX([delayTime doubleValue] * 0.1, 0.01));
 
                 CGImageRelease(frameImageRef);
