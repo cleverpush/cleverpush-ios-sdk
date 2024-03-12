@@ -315,6 +315,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
     [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
+    [cell setNeedsLayout];
     [cell layoutIfNeeded];
 }
 
