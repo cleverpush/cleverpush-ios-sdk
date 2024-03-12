@@ -194,6 +194,11 @@ static id isNil(id object) {
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
     } else {
+
+        if (trackingConsentRequired && !hasTrackingConsent && [pendingTrackingConsentListeners count] > 0) {
+            return;
+        }
+
         pendingTrackingConsentListeners = [NSMutableArray new];
     }
 }
@@ -209,6 +214,11 @@ static id isNil(id object) {
     if (hasSubscribeConsent) {
         [self fireSubscribeConsentListeners];
     } else {
+
+        if (subscribeConsentRequired && !hasSubscribeConsent && [pendingSubscribeConsentListeners count] > 0) {
+            return;
+        }
+
         pendingSubscribeConsentListeners = [NSMutableArray new];
     }
 }
@@ -909,7 +919,7 @@ static id isNil(id object) {
         return;
     }
 
-    if (![self getHasTrackingConsentCalled]) {
+    if (![self getHasTrackingConsentCalled] || ([self getHasTrackingConsentCalled] && ![self getHasTrackingConsent])) {
         [self addCallbacksToTrackingConsentListeners:callback];
     }
 }
@@ -950,7 +960,7 @@ static id isNil(id object) {
         return;
     }
 
-    if (![self getHasSubscribeConsentCalled]) {
+    if (![self getHasSubscribeConsentCalled] || ([self getHasSubscribeConsentCalled] && ![self getHasSubscribeConsent])) {
         [self addCallbacksToSubscribeConsentListeners:callback];
     }
 }
