@@ -2300,16 +2300,13 @@ static id isNil(id object) {
         NSDictionary*attributes = [CleverPush getSubscriptionAttributes];
 
         if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
-
             if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
-
                 dispatch_group_t group = dispatch_group_create();
                 for (NSString* tagId in subscriptionTags) {
                     dispatch_group_enter(group);
                     [self removeSubscriptionTagFromApi:tagId callback:nil onFailure:nil];
                     dispatch_group_leave(group);
                 }
-
             } else {
                 [self removeSubscriptionTags:subscriptionTags];
             }
@@ -2318,7 +2315,6 @@ static id isNil(id object) {
         if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
             for (NSString*key in attributes) {
                 id value = [attributes objectForKey:key];
-
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
                         if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
@@ -2400,10 +2396,14 @@ static id isNil(id object) {
     }];
 }
 
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
+}
+
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self getSubscriptionId:^(NSString*subscriptionId) {
         if (subscriptionId == nil) {
-            [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
+            [CPLog debug:@"CleverPushInstance: setSubscriptionAttributeObjectImplementation: There is no subscription for CleverPush SDK."];
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2433,10 +2433,6 @@ static id isNil(id object) {
             } onFailure:nil];
         });
     }];
-}
-
-- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
-    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
 }
 
 #pragma mark - Push subscription array attribute value.
