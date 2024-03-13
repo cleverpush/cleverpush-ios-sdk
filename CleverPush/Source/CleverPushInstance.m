@@ -111,7 +111,7 @@ NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
-NSString*appGroupIdentifier = @".cleverpush";
+NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
@@ -191,14 +191,16 @@ static id isNil(id object) {
         [self stopCampaigns];
     }
 
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !hasTrackingConsent) {
+        pendingTrackingConsentListeners = [NSMutableArray new];
+    }
+
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
     } else {
-
         if (trackingConsentRequired && !hasTrackingConsent && [pendingTrackingConsentListeners count] > 0) {
             return;
         }
-
         pendingTrackingConsentListeners = [NSMutableArray new];
     }
 }
@@ -211,14 +213,16 @@ static id isNil(id object) {
     hasSubscribeConsentCalled = YES;
     hasSubscribeConsent = consent;
 
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !hasSubscribeConsent) {
+        pendingSubscribeConsentListeners = [NSMutableArray new];
+    }
+
     if (hasSubscribeConsent) {
         [self fireSubscribeConsentListeners];
     } else {
-
         if (subscribeConsentRequired && !hasSubscribeConsent && [pendingSubscribeConsentListeners count] > 0) {
             return;
         }
-
         pendingSubscribeConsentListeners = [NSMutableArray new];
     }
 }
@@ -2296,7 +2300,19 @@ static id isNil(id object) {
         NSDictionary*attributes = [CleverPush getSubscriptionAttributes];
 
         if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
-            [self removeSubscriptionTags:subscriptionTags];
+
+            if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+
+                dispatch_group_t group = dispatch_group_create();
+                for (NSString* tagId in subscriptionTags) {
+                    dispatch_group_enter(group);
+                    [self removeSubscriptionTagFromApi:tagId callback:nil onFailure:nil];
+                    dispatch_group_leave(group);
+                }
+
+            } else {
+                [self removeSubscriptionTags:subscriptionTags];
+            }
         }
 
         if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
@@ -2305,9 +2321,17 @@ static id isNil(id object) {
 
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
-                        [CleverPush setSubscriptionAttribute:key value:@""];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key value:@""];
+                        }
                     } else if ([value isKindOfClass:[NSArray class]]) {
-                        [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
+                        }
                     }
                 }
             }
@@ -2372,39 +2396,47 @@ static id isNil(id object) {
 
 - (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
-        [self getSubscriptionId:^(NSString*subscriptionId) {
-            if (subscriptionId == nil) {
-                [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
-                return;
-            }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         attributeId, @"attributeId",
-                                         value, @"value",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
-
-                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                [request setHTTPBody:postData];
-                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                    if (!subscriptionAttributes) {
-                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
-                    }
-                    [subscriptionAttributes setObject:value forKey:attributeId];
-                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-                    [userDefaults synchronize];
-
-                    if (callback) {
-                        callback();
-                    }
-                } onFailure:nil];
-            });
-        }];
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback];
     }];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     value, @"value",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                if (!subscriptionAttributes) {
+                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                }
+                [subscriptionAttributes setObject:value forKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback();
+                }
+            } onFailure:nil];
+        });
+    }];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
 }
 
 #pragma mark - Push subscription array attribute value.
