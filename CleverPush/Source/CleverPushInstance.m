@@ -3710,7 +3710,7 @@ static id isNil(id object) {
 }
 
 - (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:true];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES];
 }
 
 - (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
