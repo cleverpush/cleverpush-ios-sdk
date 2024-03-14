@@ -158,12 +158,14 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
+    [cell setNeedsLayout];
     [cell layoutIfNeeded];
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
     [((CPInboxDetailContainer *)cell).tblCPBanner reloadData];
+    [cell setNeedsLayout];
     [cell layoutIfNeeded];
 }
 

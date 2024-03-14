@@ -183,16 +183,25 @@ static char kCPSessionDataTaskKey;
     if (imageSource) {
         size_t frameCount = CGImageSourceGetCount(imageSource);
         NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:frameCount];
+        NSTimeInterval totalDuration = 0.0;
+
         for (size_t i = 0; i < frameCount; i++) {
             CGImageRef frameImageRef = CGImageSourceCreateImageAtIndex(imageSource, i, NULL);
             if (frameImageRef) {
                 UIImage *frameImage = [UIImage imageWithCGImage:frameImageRef];
                 [frames addObject:frameImage];
+
+                NSDictionary *frameProperties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(imageSource, i, nil);
+                NSDictionary *gifProperties = frameProperties[(NSString *)kCGImagePropertyGIFDictionary];
+                NSNumber *delayTime = gifProperties[(NSString *)kCGImagePropertyGIFDelayTime];
+                totalDuration += [delayTime doubleValue];
+                delayTime = @(MAX([delayTime doubleValue] * 0.1, 0.01));
+
                 CGImageRelease(frameImageRef);
             }
         }
 
-        UIImage *gifImage = [UIImage animatedImageWithImages:frames duration:0.0];
+        UIImage *gifImage = [UIImage animatedImageWithImages:frames duration:totalDuration];
         CFRelease(imageSource);
         return gifImage;
     }
