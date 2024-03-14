@@ -191,7 +191,7 @@ static id isNil(id object) {
         [self stopCampaigns];
     }
 
-    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !hasTrackingConsent) {
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !previousTrackingConsent && hasTrackingConsent) {
         pendingTrackingConsentListeners = [NSMutableArray new];
     }
 
@@ -210,10 +210,11 @@ static id isNil(id object) {
 }
 
 - (void)setSubscribeConsent:(BOOL)consent {
+    BOOL previousSubscribeConsent = hasSubscribeConsent;
     hasSubscribeConsentCalled = YES;
     hasSubscribeConsent = consent;
 
-    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !hasSubscribeConsent) {
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !previousSubscribeConsent && hasSubscribeConsent) {
         pendingSubscribeConsentListeners = [NSMutableArray new];
     }
 
