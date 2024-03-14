@@ -30,7 +30,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
 		<data>
-		nOHTWsCdkqgqA+PvR2+VqNcFlt0=
+		FliggsD7V9ZT7QgylwvRn1xf+ZE=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxCell.nib</key>
 		<data>
@@ -66,15 +66,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		WZidi18aU9pwMSg1FFRGTX0CUNg=
+		JKZjIVUR5JY3n0dE6thva7Iz/68=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		nbWw5wXmB1bMGFFXD6qbwz2slVU=
+		aunHLS88XCR7elCbFCvJBWCpO18=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		DvwEDTGOltRjffSxKauANBNuHbk=
+		Uz0L1YeSCRWYOj37NCoWHWZ0nvQ=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -102,7 +102,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		1cm+aLqHGixANIu7cEfD/rGdckA=
+		pKWIEDA0Ziti4qYVMNpRJ18XW7c=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -181,11 +181,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			nOHTWsCdkqgqA+PvR2+VqNcFlt0=
+			FliggsD7V9ZT7QgylwvRn1xf+ZE=
 			</data>
 			<key>hash2</key>
 			<data>
-			97yAYA+fgqOYvSB16kxyFQi4HtKQwKs3pF+Z1soFDwE=
+			Unsct3ku3uII5Et04suQFAUo+1FoWpC8+MjRz3KA0mE=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxCell.nib</key>
@@ -280,33 +280,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			WZidi18aU9pwMSg1FFRGTX0CUNg=
+			JKZjIVUR5JY3n0dE6thva7Iz/68=
 			</data>
 			<key>hash2</key>
 			<data>
-			rS1thappOlKi81/v9R3MskMIsAviG/srdVptQjhzDbU=
+			rzLuEGxsaYfYimdVyeL+IwQr3U8RQHIkZW+YReIgUxo=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			nbWw5wXmB1bMGFFXD6qbwz2slVU=
+			aunHLS88XCR7elCbFCvJBWCpO18=
 			</data>
 			<key>hash2</key>
 			<data>
-			fB1gjwXlwalR3N6Nv3Wy81lutbSD9QVXyu5SJmQyyps=
+			BxCPfgpbuYRZt1NvSp3tvSeuMFr76GUeixGF+JP0Vck=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			DvwEDTGOltRjffSxKauANBNuHbk=
+			Uz0L1YeSCRWYOj37NCoWHWZ0nvQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			zYLH8zVUJKUd53XfS3ptyvysI7xvR4GReglxprUJU/w=
+			DB3DgKX55igUI/f43RLrjdKqR6fjwFt85KJEyhms1Fk=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
