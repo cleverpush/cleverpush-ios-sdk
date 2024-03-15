@@ -277,8 +277,7 @@
         } else {
             [self actionCallback:block.action from:NO];
         }
-
-    }
+   }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

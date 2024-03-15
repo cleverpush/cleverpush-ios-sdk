@@ -222,7 +222,11 @@
                                ![block.actions isKindOfClass:[NSNull class]] &&
                                [block.actions isKindOfClass:[NSArray class]] &&
                                 [(block.actions) count] > 0;
-        [self actionCallback:block.action actions:block.actions from:NO];
+        if (hasActionsArray) {
+            [self actionCallback:block.action actions:block.actions from:YES];
+        } else {
+            [self actionCallback:block.action from:YES];
+        }
     }
 }
 
