@@ -133,7 +133,15 @@
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
-            [self actionCallback:block.action from:YES];
+            BOOL hasActionsArray = block.actions != nil &&
+                                   ![block.actions isKindOfClass:[NSNull class]] &&
+                                   [block.actions isKindOfClass:[NSArray class]] &&
+                                    [(block.actions) count] > 0;
+            if (hasActionsArray) {
+                [self actionCallback:block.action actions:block.actions from:YES];
+            } else {
+                [self actionCallback:block.action from:YES];
+            }
         }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -210,7 +218,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
-        [self actionCallback:block.action from:NO];
+        BOOL hasActionsArray = block.actions != nil &&
+                               ![block.actions isKindOfClass:[NSNull class]] &&
+                               [block.actions isKindOfClass:[NSArray class]] &&
+                                [(block.actions) count] > 0;
+        [self actionCallback:block.action actions:block.actions from:NO];
     }
 }
 
@@ -231,7 +243,7 @@
     }
 }
 
-- (void)actionCallback:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
+- (void)performActionCallback:(CPAppBannerAction *)action {
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
@@ -252,6 +264,17 @@
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
         }
+    }
+}
+
+- (void)actionCallback:(CPAppBannerAction *)action from:(BOOL)buttonBlock {
+    self.actionCallback(action);
+    [self performActionCallback:action];
+}
+
+- (void)actionCallback:(CPAppBannerAction *)action actions:(NSMutableArray<CPAppBannerAction *> *)actions from:(BOOL)buttonBlock {
+    for (CPAppBannerAction *actionItem in actions) {
+        [self performActionCallback:actionItem];
     }
 }
 
