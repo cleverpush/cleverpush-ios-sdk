@@ -1,3 +1,9 @@
+## 1.30.8 (14.03.2024)
+* Optimized removing of tags and attributes after revoking tracking consent.
+* Optimized TCF2 API, do not replay queued events after consent is given.
+* Resolved the image resizing issue in the app banner.
+* Optimised the `setNotificationClicked` method for displaying wrong parameter values.
+
 ## 1.30.7 (28.02.2024)
 * Added a feature to support in-app banners for silent push notifications.
 
