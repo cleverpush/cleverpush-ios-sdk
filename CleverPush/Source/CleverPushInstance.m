@@ -1753,6 +1753,7 @@ static id isNil(id object) {
         NSURL*url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
             if ([CPUtils isValidURL:url]) {
+                [CPAppBannerModuleInstance updateBannersForDeepLinkWithURL:url];
                 [CPUtils tryOpenURL:url];
             }
         }

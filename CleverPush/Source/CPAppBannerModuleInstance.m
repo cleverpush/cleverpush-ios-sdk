@@ -15,7 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
-NSMutableDictionary *bannersForDeepLink;
+NSMutableArray *bannersForDeepLink;
 NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -667,22 +667,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
-    NSDictionary *getUrls = [CPAppBannerModuleInstance getBannersForDeepLink];
-    for (id key in getUrls) {
-        id urlOrString = getUrls[key];
-        NSURL *url = nil;
-
-        if (urlOrString == nil || urlOrString == [NSNull null]) {
-            continue;
-        }
-
-        if ([urlOrString isKindOfClass:[NSURL class]]) {
-            url = (NSURL *)urlOrString;
-        } else if ([urlOrString isKindOfClass:[NSString class]]) {
-            url = [NSURL URLWithString:urlOrString];
-        }
-
-        if (url && [url.absoluteString isEqualToString:condition.deepLink]) {
+    NSArray *getUrls = [CPAppBannerModuleInstance getBannersForDeepLink];
+    for (NSString *urlString in getUrls) {
+        if (![CPUtils isNullOrEmpty:urlString] && ![CPUtils isNullOrEmpty:condition.deepLinkUrl] && [urlString isEqualToString:condition.deepLinkUrl]) {
             return YES;
         }
     }
@@ -1183,13 +1170,37 @@ NSInteger currentScreenIndex = 0;
     return currentVoucherCodePlaceholder;
 }
 
-#pragma mark - Get voucher code from appBannerwith DeepLink
-+ (void)setBannersForDeepLink:(NSMutableDictionary *)appBanner {
+#pragma mark - Handle app banners with deep link url
++ (void)setBannersForDeepLink:(NSMutableArray *)appBanner {
     bannersForDeepLink = appBanner;
 }
 
-+  (NSMutableDictionary*)getBannersForDeepLink {
++  (NSMutableArray*)getBannersForDeepLink {
     return bannersForDeepLink;
+}
+
++ (void)updateBannersForDeepLinkWithURL:(NSURL* _Nullable)url {
+    NSMutableArray *existingArray = [[CPAppBannerModuleInstance getBannersForDeepLink] mutableCopy];
+
+    if (!existingArray) {
+        existingArray = [[NSMutableArray alloc] init];
+    }
+
+    NSString *urlString = [NSString stringWithFormat:@"%@",[CPUtils removeQueryParametersFromURL:url]];
+    BOOL urlExists = NO;
+
+    for (NSString *existingURL in existingArray) {
+        if ([existingURL isEqualToString:urlString]) {
+            urlExists = YES;
+            break;
+        }
+    }
+
+    if (!urlExists) {
+        [existingArray addObject:urlString];
+    }
+
+    [CPAppBannerModuleInstance setBannersForDeepLink:existingArray];
 }
 
 #pragma mark - set app banner ids from silent push

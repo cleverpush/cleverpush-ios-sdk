@@ -50,8 +50,8 @@
             self.seconds = [[json objectForKey:@"seconds"] intValue];
         }
 
-        if (![CPUtils isNullOrEmpty:[json objectForKey:@"deepLink"]]) {
-            self.deepLink = [json objectForKey:@"deepLink"];
+        if (![CPUtils isNullOrEmpty:[json objectForKey:@"deepLinkUrl"]]) {
+            self.deepLinkUrl = [json objectForKey:@"deepLinkUrl"];
         }
 
         if (![CPUtils isNullOrEmpty:[json objectForKey:@"value"]]) {

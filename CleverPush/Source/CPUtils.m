@@ -745,7 +745,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark - Check string is nil, null or empty
 + (BOOL)isNullOrEmpty:(NSString *)string {
-    if (string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
+    if (![string isKindOfClass:[NSString class]] || string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
         return YES;
     }
     return NO;
@@ -782,7 +782,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     components.query = nil;
 
-    return components.URL;
+    NSString *formattedURLString = [NSString stringWithFormat:@"%@%@", components.host, components.path];
+
+    return [NSURL URLWithString:formattedURLString];
 }
 
 @end
