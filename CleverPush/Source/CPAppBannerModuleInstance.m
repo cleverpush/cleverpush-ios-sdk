@@ -94,7 +94,8 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
-        for (CPAppBanner* banner in banners) {
+        NSMutableArray<CPAppBanner *> *bannersCopy = [banners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
             if ([banner.id isEqualToString:bannerId]) {
                 if ([self getBannersDisabled]) {
                     [pendingBanners addObject:banner];
@@ -714,7 +715,8 @@ NSInteger currentScreenIndex = 0;
         }
 
         BOOL contains = NO;
-        for (CPAppBanner* tryBanner in [self getActiveBanners]) {
+        NSMutableArray<CPAppBanner*> *bannersCopy = [[self getActiveBanners] mutableCopy];
+        for (CPAppBanner* tryBanner in bannersCopy) {
             if ([tryBanner.id isEqualToString:banner.id]) {
                 contains = YES;
                 break;
@@ -730,7 +732,8 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - manage the schedule to display the banner at a specific time
 - (void)scheduleBanners {
     if ([self getBannersDisabled]) {
-        for (CPAppBanner* banner in activeBanners) {
+        NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
             [pendingBanners addObject:banner];
         }
         [activeBanners removeObjectsInArray:pendingBanners];
@@ -747,7 +750,8 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
-    for (CPAppBanner *banner in activeBanners) {
+    NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+    for (CPAppBanner* banner in bannersCopy) {
         for (CPAppBannerTrigger *trigger in banner.triggers) {
             for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
                 if ([condition.event isEqualToString:eventId]) {
@@ -761,10 +765,11 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
-    for (CPAppBanner *banner in activeBanners) {
-        NSTimeInterval delay = [self calculateDelayForBanner:banner];
-        [self scheduleBannerDisplay:banner withDelaySeconds:delay];
-    }
+        NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
+            NSTimeInterval delay = [self calculateDelayForBanner:banner];
+            [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+        }
 }
 
 - (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner {
