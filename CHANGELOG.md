@@ -1,3 +1,6 @@
+## 1.30.9 (21.03.2024)
+* Optimized banner objects prevent crashes.
+
 ## 1.30.8 (14.03.2024)
 * Optimized removing of tags and attributes after revoking tracking consent.
 * Optimized TCF2 API, do not replay queued events after consent is given.
