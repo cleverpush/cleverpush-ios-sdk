@@ -227,7 +227,7 @@
 		935A5F1C2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		937390BB2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */; };
-		937390D62BADAB5900ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390D02BAD8AD500ADFA78 /* PrivacyInfo.xcprivacy */; };
+		937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */; };
 		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
 		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
@@ -541,7 +541,7 @@
 		935A5F152AE64FB7007A3F7F /* CPSQLiteManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPSQLiteManager.h; sourceTree = "<group>"; };
 		935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSQLiteManager.m; sourceTree = "<group>"; };
 		937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		937390D02BAD8AD500ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
 		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
@@ -780,7 +780,7 @@
 			children = (
 				29DB960323FC6039008FC985 /* Source */,
 				297C34CE23FB70D600314A84 /* Info.plist */,
-				937390D02BAD8AD500ADFA78 /* PrivacyInfo.xcprivacy */,
+				937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */,
 			);
 			path = CleverPushLocation;
 			sourceTree = "<group>";
@@ -1181,6 +1181,7 @@
 				294F7E7323FB5DB500806D23 /* Frameworks */,
 				294F7E8D23FB5DE100806D23 /* Headers */,
 				29F9086D28E9EBDA00D8D4D8 /* Embed Frameworks */,
+				937390DD2BADAFBE00ADFA78 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -1328,6 +1329,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		937390DD2BADAFBE00ADFA78 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93DACB1B2959651300177B08 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1338,7 +1347,6 @@
 				93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */,
 				93DACB1F2959651900177B08 /* CPHTMLBlockCell.xib in Resources */,
 				93DACB202959651900177B08 /* CPButtonBlockCell.xib in Resources */,
-				937390D62BADAB5900ADFA78 /* PrivacyInfo.xcprivacy in Resources */,
 				9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */,
 				934D88F92A654CEA00B0E319 /* CPInboxDetailContainer.xib in Resources */,
 				93DACB212959651900177B08 /* CPBannerCardContainer.xib in Resources */,
