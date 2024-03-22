@@ -32,6 +32,7 @@
         [self setContentVisibility:false];
         [self setDynamicBannerConstraints:self.data.marginEnabled];
         [self setDynamicCloseButton:NO];
+        [self setCollectionViewSwipeEnabled];
     }
 }
 
@@ -179,12 +180,11 @@
     self.centerYConstraint.active = center;
 }
 
-- (void)setUpPageControl {
+#pragma mark - App banners swipe configuration
+- (void)setCollectionViewSwipeEnabled {
     if (self.data.carouselEnabled == true) {
-        [self.pageControl setNumberOfPages:self.data.screens.count];
         [self.cardCollectionView setScrollEnabled:true];
     } else {
-        [self.pageControl setNumberOfPages:0];
         [self.cardCollectionView setScrollEnabled:false];
     }
 }
