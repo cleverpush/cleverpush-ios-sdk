@@ -669,8 +669,10 @@ NSInteger currentScreenIndex = 0;
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
     NSArray *getUrls = [CPAppBannerModuleInstance getBannersForDeepLink];
+    NSURL *deepLinkURL = [NSURL URLWithString:condition.deepLinkUrl];
+
     for (NSString *urlString in getUrls) {
-        if (![CPUtils isNullOrEmpty:urlString] && ![CPUtils isNullOrEmpty:condition.deepLinkUrl] && [urlString isEqualToString:condition.deepLinkUrl]) {
+        if (![CPUtils isNullOrEmpty:urlString] && deepLinkURL && [[NSURL URLWithString:urlString] isEqual:deepLinkURL]) {
             return YES;
         }
     }

@@ -782,9 +782,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     components.query = nil;
 
-    NSString *formattedURLString = [NSString stringWithFormat:@"%@%@", components.host, components.path];
-
-    return [NSURL URLWithString:formattedURLString];
+    return components.URL;
 }
 
 @end
