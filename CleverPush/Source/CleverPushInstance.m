@@ -1129,7 +1129,7 @@ static id isNil(id object) {
                                     }];
                                 }
 
-                                if(successBlockCalled) {
+                                if (successBlockCalled) {
                                     [self performSelector:@selector(syncSubscription:) withObject:nil];
                                 } else {
                                     [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
