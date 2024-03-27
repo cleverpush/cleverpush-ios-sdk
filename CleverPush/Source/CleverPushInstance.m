@@ -1131,7 +1131,7 @@ static id isNil(id object) {
 
                                 if(successBlockCalled) {
                                     [self performSelector:@selector(syncSubscription:) withObject:nil];
-                                }else {
+                                } else {
                                     [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                                 }
 
