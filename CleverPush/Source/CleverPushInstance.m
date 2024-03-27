@@ -1076,6 +1076,8 @@ static id isNil(id object) {
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     __block BOOL successBlockCalled = NO;
+    __block BOOL failureBlockCalled = NO;
+    __block BOOL hasCalledSyncSubscription = NO;
 
     void(^handleSubscribe)(void) = ^{
         hasCalledSubscribe = YES;
@@ -1098,7 +1100,6 @@ static id isNil(id object) {
                         if (granted || ignoreDisabledNotificationPermission) {
                             if (subscriptionId == nil) {
                                 [CPLog debug:@"syncSubscription called from subscribe"];
-                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
 
                                 [self getChannelConfig:^(NSDictionary* channelConfig) {
                                     if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1115,30 +1116,33 @@ static id isNil(id object) {
                                     }
                                 }];
 
-                                if (subscribedBlock) {
+                                if (subscribedBlock && !successBlockCalled) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            if (!successBlockCalled) {
-                                                subscribedBlock(subscriptionId);
-                                                successBlockCalled = YES;
-                                            } else {
-                                                [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
+                                            subscribedBlock(subscriptionId);
+                                            successBlockCalled = YES;
+
+                                            if (!hasCalledSyncSubscription && !failureBlockCalled) {
+                                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+                                                hasCalledSyncSubscription = YES;
                                             }
                                         } else {
                                             [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
                                         }
                                     }];
                                 }
-                            } else if (subscribedBlock) {
-                                if (!successBlockCalled) {
-                                    subscribedBlock(subscriptionId);
-                                    successBlockCalled = YES;
-                                } else {
-                                    [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
+                            } else if (subscribedBlock && !successBlockCalled) {
+                                subscribedBlock(subscriptionId);
+                                successBlockCalled = YES;
+
+                                if (!hasCalledSyncSubscription && !failureBlockCalled) {
+                                    [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+                                    hasCalledSyncSubscription = YES;
                                 }
                             }
-                        } else if (failureBlock) {
+                        } else if (failureBlock && !failureBlockCalled) {
                             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                            failureBlockCalled = YES;
                         }
                     });
                 }];
