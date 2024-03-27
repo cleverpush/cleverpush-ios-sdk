@@ -1076,7 +1076,6 @@ static id isNil(id object) {
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     __block BOOL successBlockCalled = NO;
-    __block BOOL failureBlockCalled = NO;
 
     void(^handleSubscribe)(void) = ^{
         hasCalledSubscribe = YES;
@@ -1115,7 +1114,7 @@ static id isNil(id object) {
                                     }
                                 }];
 
-                                if (!failureBlockCalled && subscribedBlock) {
+                                if (subscribedBlock) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                                             if (!successBlockCalled) {
@@ -1130,12 +1129,10 @@ static id isNil(id object) {
                                     }];
                                 }
 
-                                if (!failureBlockCalled) {
-                                    if (!successBlockCalled) {
-                                        [self performSelector:@selector(syncSubscription:) withObject:nil];
-                                    } else {
-                                        [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
-                                    }
+                                if(successBlockCalled) {
+                                    [self performSelector:@selector(syncSubscription:) withObject:nil];
+                                }else {
+                                    [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                                 }
 
                             } else if (subscribedBlock) {
@@ -1146,9 +1143,8 @@ static id isNil(id object) {
                                     [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
                                 }
                             }
-                        } else if (!failureBlockCalled && failureBlock) {
+                        } else if (failureBlock) {
                             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
-                            failureBlockCalled = YES;
                         }
                     });
                 }];
