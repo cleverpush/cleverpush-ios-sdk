@@ -1098,7 +1098,6 @@ static id isNil(id object) {
                         if (granted || ignoreDisabledNotificationPermission) {
                             if (subscriptionId == nil) {
                                 [CPLog debug:@"syncSubscription called from subscribe"];
-                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
 
                                 [self getChannelConfig:^(NSDictionary* channelConfig) {
                                     if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1119,13 +1118,19 @@ static id isNil(id object) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                                             if (!successBlockCalled) {
-                                                subscribedBlock(subscriptionId);
                                                 successBlockCalled = YES;
+                                                subscribedBlock(subscriptionId);
                                             } else {
                                                 [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
                                             }
                                         } else {
                                             [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
+                                        }
+
+                                        if (successBlockCalled) {
+                                            [self performSelector:@selector(syncSubscription:) withObject:nil];
+                                        } else {
+                                            [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                                         }
                                     }];
                                 }
