@@ -635,7 +635,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
-    for (NSDictionary* triggeredEvent in events) {
+    NSMutableArray<NSDictionary*> *eventsCopy = [events mutableCopy];
+
+    for (NSDictionary* triggeredEvent in eventsCopy) {
         if (![[triggeredEvent cleverPushStringForKey:@"id"] isEqualToString:condition.event]) {
             continue;
         }
@@ -1267,6 +1269,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (NSMutableArray<NSDictionary*>*)getEvents {
+    if (!events) {
+        events = [[NSMutableArray alloc]init];
+    }
     return events;
 }
 
