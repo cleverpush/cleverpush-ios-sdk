@@ -668,12 +668,16 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
-    NSArray *getUrls = [CPAppBannerModuleInstance getBannersForDeepLink];
-    NSURL *deepLinkURL = [NSURL URLWithString:condition.deepLinkUrl];
+    NSArray *urls = [CPAppBannerModuleInstance getBannersForDeepLink];
 
-    for (NSString *urlString in getUrls) {
-        if (![CPUtils isNullOrEmpty:urlString] && deepLinkURL && [[NSURL URLWithString:urlString] isEqual:deepLinkURL]) {
-            return YES;
+    for (NSString *urlString in urls) {
+        if (![CPUtils isNullOrEmpty:urlString] && ![CPUtils isNullOrEmpty:condition.deepLinkUrl]) {
+            NSString *trimmedUrlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *trimmedDeepLinkUrl = [condition.deepLinkUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+            if ([trimmedUrlString caseInsensitiveCompare:trimmedDeepLinkUrl] == NSOrderedSame) {
+                return YES;
+            }
         }
     }
     return NO;
