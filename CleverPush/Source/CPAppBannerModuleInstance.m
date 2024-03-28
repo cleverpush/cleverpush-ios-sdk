@@ -1269,6 +1269,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (NSMutableArray<NSDictionary*>*)getEvents {
+    if (!events) {
+        events = [[NSMutableArray alloc]init];
+    }
     return events;
 }
 
