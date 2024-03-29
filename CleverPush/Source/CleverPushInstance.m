@@ -89,6 +89,7 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
+static BOOL isSessionStartCalled = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -1247,6 +1248,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
+    isSessionStartCalled = NO;
 }
 
 #pragma mark - unsubscribe
@@ -1561,6 +1563,10 @@ static id isNil(id object) {
                     listener(subscriptionId);
                 }
                 pendingSubscriptionListeners = [NSMutableArray new];
+
+                if (!isSessionStartCalled) {
+                    [self trackSessionStart];
+                }
 
                 static dispatch_once_t onceToken;
                 dispatch_once(&onceToken, ^{
@@ -3295,6 +3301,7 @@ static id isNil(id object) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
+                    isSessionStartCalled = YES;
                     sessionVisits = 0;
                     sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
 
