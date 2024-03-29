@@ -1190,7 +1190,7 @@ NSInteger currentScreenIndex = 0;
     return bannersForDeepLink;
 }
 
-+ (void)updateBannersForDeepLinkWithURL:(NSURL* _Nullable)url {
++ (void)updateBannersForDeepLinkWithURL:(NSURL*)url {
     NSMutableArray *existingArray = [[CPAppBannerModuleInstance getBannersForDeepLink] mutableCopy];
 
     if (!existingArray) {
