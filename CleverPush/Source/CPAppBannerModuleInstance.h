@@ -91,8 +91,8 @@
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
 + (void)setBannersForDeepLink:(NSMutableArray*)appBanner;
 + (NSMutableArray*)getBannersForDeepLink;
++ (void)updateBannersForDeepLinkWithURL:(NSURL* _Nullable)url;
 + (void)setSilentPushAppBannersIds:(NSString*)appBannerId notificationId:(NSString*)notificationId;
 + (NSMutableArray*)getSilentPushAppBannersIds;
-+ (void)updateBannersForDeepLinkWithURL:(NSURL* _Nullable)url;
 
 @end

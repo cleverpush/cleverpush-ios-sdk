@@ -745,7 +745,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark - Check string is nil, null or empty
 + (BOOL)isNullOrEmpty:(NSString *)string {
-    if (![string isKindOfClass:[NSString class]] || string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
+    if (string == nil || [string isEqual:[NSNull null]] || [string isEqualToString:@""]) {
         return YES;
     }
     return NO;
