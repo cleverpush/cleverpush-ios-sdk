@@ -1076,6 +1076,21 @@ static id isNil(id object) {
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     __block BOOL successBlockCalled = NO;
+    static dispatch_semaphore_t semaphore;
+    static BOOL isSubscribing = NO;
+
+    if (!semaphore) {
+        semaphore = dispatch_semaphore_create(1);
+    }
+
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+
+    if (isSubscribing) {
+        dispatch_semaphore_signal(semaphore);
+        return;
+    }
+
+    isSubscribing = YES;
 
     void(^handleSubscribe)(void) = ^{
         hasCalledSubscribe = YES;
@@ -1098,6 +1113,7 @@ static id isNil(id object) {
                         if (granted || ignoreDisabledNotificationPermission) {
                             if (subscriptionId == nil) {
                                 [CPLog debug:@"syncSubscription called from subscribe"];
+                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
 
                                 [self getChannelConfig:^(NSDictionary* channelConfig) {
                                     if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1118,19 +1134,13 @@ static id isNil(id object) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                                             if (!successBlockCalled) {
-                                                successBlockCalled = YES;
                                                 subscribedBlock(subscriptionId);
+                                                successBlockCalled = YES;
                                             } else {
                                                 [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
                                             }
                                         } else {
                                             [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
-                                        }
-
-                                        if (successBlockCalled) {
-                                            [self performSelector:@selector(syncSubscription:) withObject:nil];
-                                        } else {
-                                            [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                                         }
                                     }];
                                 }
@@ -1195,6 +1205,9 @@ static id isNil(id object) {
     } else {
         handleSubscribe();
     }
+
+    dispatch_semaphore_signal(semaphore);
+    isSubscribing = NO;
 }
 
 - (void)autoSubscribeWithDelays {
