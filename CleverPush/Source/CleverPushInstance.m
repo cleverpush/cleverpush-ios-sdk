@@ -1075,25 +1075,10 @@ static id isNil(id object) {
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
-    __block BOOL successBlockCalled = NO;
-    static dispatch_semaphore_t semaphore;
-    static BOOL isSubscribing = NO;
-
-    if (!semaphore) {
-        semaphore = dispatch_semaphore_create(1);
-    }
-
-    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-
-    if (isSubscribing) {
-        dispatch_semaphore_signal(semaphore);
-        return;
-    }
-
-    isSubscribing = YES;
+    __block BOOL continuationResumed = NO;
+    hasCalledSubscribe = YES;
 
     void(^handleSubscribe)(void) = ^{
-        hasCalledSubscribe = YES;
         if (@available(iOS 10.0,*)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
@@ -1113,7 +1098,11 @@ static id isNil(id object) {
                         if (granted || ignoreDisabledNotificationPermission) {
                             if (subscriptionId == nil) {
                                 [CPLog debug:@"syncSubscription called from subscribe"];
-                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+                                if (failureBlock) {
+                                    [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+                                } else {
+                                    [self performSelector:@selector(syncSubscription:) withObject:nil];
+                                }
 
                                 [self getChannelConfig:^(NSDictionary* channelConfig) {
                                     if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1132,10 +1121,10 @@ static id isNil(id object) {
 
                                 if (subscribedBlock) {
                                     [self getSubscriptionId:^(NSString* subscriptionId) {
+                                        continuationResumed = YES;
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            if (!successBlockCalled) {
+                                            if (!continuationResumed) {
                                                 subscribedBlock(subscriptionId);
-                                                successBlockCalled = YES;
                                             } else {
                                                 [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
                                             }
@@ -1145,12 +1134,7 @@ static id isNil(id object) {
                                     }];
                                 }
                             } else if (subscribedBlock) {
-                                if (!successBlockCalled) {
-                                    subscribedBlock(subscriptionId);
-                                    successBlockCalled = YES;
-                                } else {
-                                    [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
-                                }
+                                subscribedBlock(subscriptionId);
                             }
                         } else if (failureBlock) {
                             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
@@ -1205,9 +1189,6 @@ static id isNil(id object) {
     } else {
         handleSubscribe();
     }
-
-    dispatch_semaphore_signal(semaphore);
-    isSubscribing = NO;
 }
 
 - (void)autoSubscribeWithDelays {
