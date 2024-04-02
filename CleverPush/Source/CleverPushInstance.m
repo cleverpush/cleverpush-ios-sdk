@@ -1109,10 +1109,7 @@ static id isNil(id object) {
     if (@available(iOS 10.0,*)) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
-            if (subscriptionId == nil && channelId != nil && notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
-                [self setConfirmAlertShown];
-            }
-            
+
             UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
             [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1175,19 +1172,6 @@ static id isNil(id object) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
         [self ensureMainThreadSync:^{
-            if (subscriptionId == nil && channelId != nil) {
-                if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
-                    UIUserNotificationSettings*notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                    if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-                        [self setConfirmAlertShown];
-                    }
-                } else {
-                    if (![[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-                        [self setConfirmAlertShown];
-                    }
-                }
-            }
-            
             if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
                 Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
                 
