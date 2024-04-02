@@ -1150,7 +1150,7 @@ static id isNil(id object) {
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                                             completion(subscriptionId, nil);
                                         } else {
-                                            completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                                            completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
                                         }
                                     }
                                 }];
