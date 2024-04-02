@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableArray *bannersForDeepLink;
 NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -635,7 +636,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
-    for (NSDictionary* triggeredEvent in events) {
+    NSMutableArray<NSDictionary*> *eventsCopy = [events mutableCopy];
+
+    for (NSDictionary* triggeredEvent in eventsCopy) {
         if (![[triggeredEvent cleverPushStringForKey:@"id"] isEqualToString:condition.event]) {
             continue;
         }
@@ -666,6 +669,22 @@ NSInteger currentScreenIndex = 0;
     return NO;
 }
 
+- (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
+    NSArray *urls = [CPAppBannerModuleInstance getBannersForDeepLink];
+
+    for (NSString *urlString in urls) {
+        if (![CPUtils isNullOrEmpty:urlString] && ![CPUtils isNullOrEmpty:condition.deepLinkUrl]) {
+            NSString *trimmedUrlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *trimmedDeepLinkUrl = [condition.deepLinkUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+            if ([trimmedUrlString caseInsensitiveCompare:trimmedDeepLinkUrl] == NSOrderedSame) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     NSMutableArray *bannersCopy = [banners mutableCopy];
@@ -693,6 +712,8 @@ NSInteger currentScreenIndex = 0;
                         }
                     } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
                         conditionTrue = [self checkEventTriggerCondition:condition];
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
+                        conditionTrue = [self checkDeepLinkTriggerCondition:condition];
                     } else {
                         conditionTrue = NO;
                     }
@@ -1162,6 +1183,39 @@ NSInteger currentScreenIndex = 0;
     return currentVoucherCodePlaceholder;
 }
 
+#pragma mark - Handle app banners with deep link url
++ (void)setBannersForDeepLink:(NSMutableArray *)appBanner {
+    bannersForDeepLink = appBanner;
+}
+
++  (NSMutableArray*)getBannersForDeepLink {
+    return bannersForDeepLink;
+}
+
++ (void)updateBannersForDeepLinkWithURL:(NSURL*)url {
+    NSMutableArray *existingArray = [[CPAppBannerModuleInstance getBannersForDeepLink] mutableCopy];
+
+    if (!existingArray) {
+        existingArray = [[NSMutableArray alloc] init];
+    }
+
+    NSString *urlString = [NSString stringWithFormat:@"%@",[CPUtils removeQueryParametersFromURL:url]];
+    BOOL urlExists = NO;
+
+    for (NSString *existingURL in existingArray) {
+        if ([existingURL isEqualToString:urlString]) {
+            urlExists = YES;
+            break;
+        }
+    }
+
+    if (!urlExists) {
+        [existingArray addObject:urlString];
+    }
+
+    [CPAppBannerModuleInstance setBannersForDeepLink:existingArray];
+}
+
 #pragma mark - set app banner ids from silent push
 + (void)setSilentPushAppBannersIds:(NSString *)appBannerId notificationId:(NSString *)notificationId {
     if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
@@ -1267,6 +1321,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (NSMutableArray<NSDictionary*>*)getEvents {
+    if (!events) {
+        events = [[NSMutableArray alloc]init];
+    }
     return events;
 }
 

@@ -89,6 +89,7 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
+static BOOL isSessionStartCalled = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -1257,6 +1258,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
+    isSessionStartCalled = NO;
 }
 
 #pragma mark - unsubscribe
@@ -1572,6 +1574,10 @@ static id isNil(id object) {
                 }
                 pendingSubscriptionListeners = [NSMutableArray new];
 
+                if (!isSessionStartCalled) {
+                    [self trackSessionStart];
+                }
+
                 static dispatch_once_t onceToken;
                 dispatch_once(&onceToken, ^{
                     if (successBlock) {
@@ -1777,7 +1783,10 @@ static id isNil(id object) {
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL*url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            [CPUtils tryOpenURL:url];
+            if ([CPUtils isValidURL:url]) {
+                [CPAppBannerModuleInstance updateBannersForDeepLinkWithURL:url];
+                [CPUtils tryOpenURL:url];
+            }
         }
     }
 
@@ -3004,7 +3013,6 @@ static id isNil(id object) {
     return [self trackEvent:eventName properties:nil];
 }
 
-
 - (void)trackEvent:(NSString* _Nullable)eventName amount:(NSNumber* _Nullable)amount {
     NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys:
                              isNil(amount), @"amount",
@@ -3305,6 +3313,7 @@ static id isNil(id object) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
+                    isSessionStartCalled = YES;
                     sessionVisits = 0;
                     sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
 
