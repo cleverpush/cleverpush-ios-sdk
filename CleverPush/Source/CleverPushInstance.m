@@ -90,6 +90,7 @@ static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
+static BOOL confirmAlertShown = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -1034,6 +1035,7 @@ static id isNil(id object) {
 
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
+        confirmAlertShown = YES;
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"channel/confirm-alert"]];
 
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -1083,9 +1085,6 @@ static id isNil(id object) {
         if (@available(iOS 10.0,*)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
-                if (subscriptionId == nil && channelId != nil && notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
-                    [self setConfirmAlertShown];
-                }
 
                 UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
                 [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
@@ -1152,19 +1151,6 @@ static id isNil(id object) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
             [self ensureMainThreadSync:^{
-                if (subscriptionId == nil && channelId != nil) {
-                    if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
-                        UIUserNotificationSettings*notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                        if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-                            [self setConfirmAlertShown];
-                        }
-                    } else {
-                        if (![[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-                            [self setConfirmAlertShown];
-                        }
-                    }
-                }
-
                 if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
                     Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
 
@@ -1566,6 +1552,10 @@ static id isNil(id object) {
 
                 if (!isSessionStartCalled) {
                     [self trackSessionStart];
+                }
+
+                if (![self isConfirmAlertShown]) {
+                    [self setConfirmAlertShown];
                 }
 
                 static dispatch_once_t onceToken;
@@ -3700,6 +3690,10 @@ static id isNil(id object) {
             completionHandler(badgeCount);
         });
     }];
+}
+
+- (BOOL)isConfirmAlertShown {
+    return confirmAlertShown;
 }
 
 #pragma mark - App Banner methods
