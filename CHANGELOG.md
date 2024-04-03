@@ -1,3 +1,12 @@
+## 1.30.10 (02.04.2024)
+* Resolved the issue of app banners still swiping if the carousel is disabled.
+* Resolved the issue of opt-ins are higher than opt-in prompts.
+* Resolved the issue of the track session start maybe not working correctly.
+* Added privacy manifests files.
+* Optimised banner objects prevent crashes.
+* Added support for app banner displaying by deep-link. 
+* Optimised subscribe function for async await-subscribe block called multiple times.
+
 ## 1.30.9 (21.03.2024)
 * Optimized banner objects prevent crashes.
 
