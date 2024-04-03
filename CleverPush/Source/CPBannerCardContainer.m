@@ -79,7 +79,7 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = block.imageWidth / block.imageHeight;
+            CGFloat aspectRatio = block.imageWidth / (CGFloat)block.imageHeight;
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
@@ -297,7 +297,6 @@
         }
     } else if (action.dismiss) {
         [self onDismiss];
-        [CPAppBannerModule showNextActivePendingBanner:self.data];
     } else {
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
@@ -310,6 +309,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.controller dismissViewControllerAnimated:NO completion:nil];
+        [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }
 
