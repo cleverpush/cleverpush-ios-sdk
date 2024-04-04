@@ -46,13 +46,11 @@
     if (self.tblCPBanner.contentSize.height > [CPUtils frameHeightWithoutSafeArea]) {
         self.tblCPBanner.frame = frame;
     } else {
-        if (self.data.type == CPAppBannerTypeFull) {
-            self.tblCPBanner.frame = frame;
-        } else {
+        if (self.data.type != CPAppBannerTypeFull) {
             frame.size = self.tblCPBanner.contentSize;
-            self.tblCPBanner.frame = frame;
         }
     }
+    self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
 }
 
@@ -83,7 +81,14 @@
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
+
+            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat scale = (CGFloat)block.scale / 100.0;
+            CGFloat imageViewWidth = screenWidth * scale;
+            CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+            cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
+            cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
         }
 
         NSString *imageUrl;

@@ -382,8 +382,12 @@
             aspectRatio = 1.0;
         }
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
-        return CGSizeMake(screenWidth, (screenWidth / aspectRatio) * (block.scale / 100.0));
-}
+        CGFloat scale = (CGFloat)block.scale / 100.0;
+        CGFloat imageViewWidth = screenWidth * scale;
+        CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+        return CGSizeMake(imageViewWidth, imageViewHeight);
+    }
     return flowLayout.itemSize;
 }
 
