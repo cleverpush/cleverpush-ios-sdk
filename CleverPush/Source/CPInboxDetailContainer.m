@@ -133,15 +133,7 @@
         [cell.btnCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
 
         [cell.btnCPBanner handleControlEvent:UIControlEventTouchUpInside withBlock:^{
-            BOOL hasActionsArray = block.actions != nil &&
-                                   ![block.actions isKindOfClass:[NSNull class]] &&
-                                   [block.actions isKindOfClass:[NSArray class]] &&
-                                    [(block.actions) count] > 0;
-            if (hasActionsArray) {
-                [self actionCallback:block.action actions:block.actions from:YES];
-            } else {
-                [self actionCallback:block.action from:YES];
-            }
+            [self actionCallback:block.action from:YES];
         }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -218,15 +210,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
-        BOOL hasActionsArray = block.actions != nil &&
-                               ![block.actions isKindOfClass:[NSNull class]] &&
-                               [block.actions isKindOfClass:[NSArray class]] &&
-                                [(block.actions) count] > 0;
-        if (hasActionsArray) {
-            [self actionCallback:block.action actions:block.actions from:YES];
-        } else {
-            [self actionCallback:block.action from:YES];
-        }
+        [self actionCallback:block.action from:NO];
     }
 }
 
