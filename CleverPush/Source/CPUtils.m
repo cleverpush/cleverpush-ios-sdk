@@ -774,4 +774,15 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return YES;
 }
 
++ (NSURL *)removeQueryParametersFromURL:(NSURL *)url {
+    if (!url) {
+        return nil;
+    }
+
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    components.query = nil;
+
+    return components.URL;
+}
+
 @end

@@ -138,7 +138,7 @@
 		</data>
 		<key>Headers/CPAppBannerTriggerCondition.h</key>
 		<data>
-		xJkZnTKWwo7Kxp/FnFNk0+8E5XQ=
+		QytS3KBA2HbVY0U7U+tn8IPVD4c=
 		</data>
 		<key>Headers/CPAppBannerTriggerConditionEventProperty.h</key>
 		<data>
@@ -146,7 +146,7 @@
 		</data>
 		<key>Headers/CPAppBannerTriggerConditionType.h</key>
 		<data>
-		xc0+CQQTKG1Ju/R+x/NW34ePX7M=
+		114tl++c511ELOqx/CAT34bP4uE=
 		</data>
 		<key>Headers/CPAppBannerTriggerType.h</key>
 		<data>
@@ -222,7 +222,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		C7+FODaB9X8R1I9DvmPA15nIhCw=
+		SBGYQ5GV5jfNpkHnOmdcf2atmoM=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -266,11 +266,15 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		aunHLS88XCR7elCbFCvJBWCpO18=
+		xEkbV40Hi5MFNH4OQACcieTxYVQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		JgjZqu1M0u8nf2O3Q3jo9O+GI7k=
+		</data>
+		<key>PrivacyInfo.xcprivacy</key>
+		<data>
+		YCnxQe5VWCnwripuT3LoorsTqmQ=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -642,11 +646,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			xJkZnTKWwo7Kxp/FnFNk0+8E5XQ=
+			QytS3KBA2HbVY0U7U+tn8IPVD4c=
 			</data>
 			<key>hash2</key>
 			<data>
-			zilbtwy2ZK0fqJOFuGRzTSwGvKTiMlze9VzIk0l8gVM=
+			n9T7EaIiZCM+/0eiUFUYRmpXVgyRtp32P/WGui3uu/k=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerTriggerConditionEventProperty.h</key>
@@ -664,11 +668,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			xc0+CQQTKG1Ju/R+x/NW34ePX7M=
+			114tl++c511ELOqx/CAT34bP4uE=
 			</data>
 			<key>hash2</key>
 			<data>
-			2slNZemZXdfSgR7/J+k5NGCZIisC+45JDinz63qclvU=
+			iEw9XibakZHVXU7fp6/BA0eTF6J1Z03Xk/qKOMiNwpk=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerTriggerType.h</key>
@@ -873,11 +877,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			C7+FODaB9X8R1I9DvmPA15nIhCw=
+			SBGYQ5GV5jfNpkHnOmdcf2atmoM=
 			</data>
 			<key>hash2</key>
 			<data>
-			SrhYK01u/M+jGZ7klTSwoMqZAqiyf0ULZ3JIYVOBwq8=
+			U8UDygasKDpBn9wZ/r8x9tFvvAsIc05LJO+AsSrbYXQ=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
@@ -999,6 +1003,17 @@
 			<key>hash2</key>
 			<data>
 			liBf0LHpG8Xnh4NONKK5P/xgDz42LSd86F737NM+6KY=
+			</data>
+		</dict>
+		<key>PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			YCnxQe5VWCnwripuT3LoorsTqmQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			+Dmha2tfhEl2/9L8+vGC3c80rXENKB3q6ZrUnRviRng=
 			</data>
 		</dict>
 	</dict>

@@ -66,15 +66,19 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		JKZjIVUR5JY3n0dE6thva7Iz/68=
+		3pHpD/Fpu8qDB9RjG6qiZHPC+hM=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		aunHLS88XCR7elCbFCvJBWCpO18=
+		xEkbV40Hi5MFNH4OQACcieTxYVQ=
+		</data>
+		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
+		<data>
+		YCnxQe5VWCnwripuT3LoorsTqmQ=
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		Uz0L1YeSCRWYOj37NCoWHWZ0nvQ=
+		h77fRGCbMKHou0yJLfyD3rsVZdg=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -102,11 +106,15 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		pKWIEDA0Ziti4qYVMNpRJ18XW7c=
+		3tXaznPfzI1Eqs9TVt1A50dfUkA=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
 		NKYsnQhcqgB8UNIYN8gDmRXx7e8=
+		</data>
+		<key>PrivacyInfo.xcprivacy</key>
+		<data>
+		n+7AU38UsZiRMym5tLg+LMFMwu0=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -280,33 +288,44 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			JKZjIVUR5JY3n0dE6thva7Iz/68=
+			3pHpD/Fpu8qDB9RjG6qiZHPC+hM=
 			</data>
 			<key>hash2</key>
 			<data>
-			rzLuEGxsaYfYimdVyeL+IwQr3U8RQHIkZW+YReIgUxo=
+			4Kc9BfC5F2hoiWOrggSD4TEB/PibZ4YeMMJESKWRL1I=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			aunHLS88XCR7elCbFCvJBWCpO18=
+			xEkbV40Hi5MFNH4OQACcieTxYVQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			BxCPfgpbuYRZt1NvSp3tvSeuMFr76GUeixGF+JP0Vck=
+			/uuyhO2uVTGg6m+fhgJ7e+akV/MMLIjXVna2GVGXVsU=
+			</data>
+		</dict>
+		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			YCnxQe5VWCnwripuT3LoorsTqmQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			+Dmha2tfhEl2/9L8+vGC3c80rXENKB3q6ZrUnRviRng=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Uz0L1YeSCRWYOj37NCoWHWZ0nvQ=
+			h77fRGCbMKHou0yJLfyD3rsVZdg=
 			</data>
 			<key>hash2</key>
 			<data>
-			DB3DgKX55igUI/f43RLrjdKqR6fjwFt85KJEyhms1Fk=
+			HRhq5t27+kibK73wQ5NDrb/bfMnurzqFP6DbI47+JkU=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
@@ -384,6 +403,17 @@
 			<key>hash2</key>
 			<data>
 			1hH97dwBZQpYsgOuqmvZPTphv3YoU7s3/V2QTBzXqfs=
+			</data>
+		</dict>
+		<key>PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			n+7AU38UsZiRMym5tLg+LMFMwu0=
+			</data>
+			<key>hash2</key>
+			<data>
+			tmQESk+Nx/PQyoHnHToFkRTSxk3pf3LnWJD9tRkrVek=
 			</data>
 		</dict>
 	</dict>
