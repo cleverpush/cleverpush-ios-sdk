@@ -52,6 +52,12 @@
     }
     self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
+    if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
+        self.tblCPBannerHeightConstraint.constant = frame.size.height - 30;
+        if (self.data.closeButtonPositionStaticEnabled) {
+            self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
+        }
+    }
 }
 
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
