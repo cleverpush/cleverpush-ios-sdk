@@ -231,7 +231,7 @@
     }
 }
 
-- (void)performActionCallback:(CPAppBannerAction *)action {
+- (void)actionCallback:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
@@ -252,17 +252,6 @@
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
         }
-    }
-}
-
-- (void)actionCallback:(CPAppBannerAction *)action from:(BOOL)buttonBlock {
-    self.actionCallback(action);
-    [self performActionCallback:action];
-}
-
-- (void)actionCallback:(CPAppBannerAction *)action actions:(NSMutableArray<CPAppBannerAction *> *)actions from:(BOOL)buttonBlock {
-    for (CPAppBannerAction *actionItem in actions) {
-        [self performActionCallback:actionItem];
     }
 }
 
