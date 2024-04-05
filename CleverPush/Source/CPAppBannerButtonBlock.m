@@ -8,6 +8,7 @@
     if (self) {
         self.type = CPAppBannerBlockTypeButton;
         self.isButtonClicked = NO;
+        self.actions = [[NSMutableArray alloc] init];
 
         self.text = @"";
         if ([json cleverPushStringForKey:@"text"]) {
@@ -62,6 +63,19 @@
         buttonBlockDic = [[json objectForKey:@"action"] mutableCopy];
         buttonBlockDic[@"blockId"] = self.id;
         self.action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
+
+        if ([json cleverPushArrayForKey:@"actions"] &&
+            [json cleverPushArrayForKey:@"actions"] != nil &&
+            ![[json cleverPushArrayForKey:@"actions"] isKindOfClass:[NSNull class]] &&
+            [[json cleverPushArrayForKey:@"actions"] isKindOfClass:[NSArray class]] &&
+            [json cleverPushArrayForKey:@"actions"].count > 0) {
+
+            for (NSDictionary *actionsDic in [json cleverPushArrayForKey:@"actions"]) {
+                CPAppBannerAction* actionBlock;
+                actionBlock = [[CPAppBannerAction alloc] initWithJson:actionsDic];
+                [self.actions addObject:actionBlock];
+            }
+        }
     }
     return self;
 }
