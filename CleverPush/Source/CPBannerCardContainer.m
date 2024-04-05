@@ -308,6 +308,7 @@
         }
     } else if (action.dismiss) {
         [self onDismiss];
+        [CPAppBannerModule showNextActivePendingBanner:self.data];
     } else {
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
@@ -320,7 +321,6 @@
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.controller dismissViewControllerAnimated:NO completion:nil];
-        [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }
 
