@@ -850,63 +850,8 @@ NSInteger currentScreenIndex = 0;
         }
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
-            CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
-            CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
-            NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
-            NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
-            NSString *type;
             NSString *voucherCode;
-
-            if (banner.multipleScreensEnabled && banner.screens.count > 0) {
-                for (CPAppBannerCarouselBlock *screensList in banner.screens) {
-                    if (!screensList.isScreenClicked) {
-                        screen = banner.screens[currentScreenIndex];
-                        break;
-                    }
-                }
-                for (CPAppBannerBlock *bannerBlock in screen.blocks) {
-                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
-                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
-                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    }
-                }
-            } else {
-                for (CPAppBannerBlock *bannerBlock in banner.blocks) {
-                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
-                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
-                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    }
-                }
-            }
-
-            for (CPAppBannerButtonBlock *button in buttonBlocks) {
-                if ([button.id isEqualToString:action.blockId]) {
-                    buttons = (CPAppBannerButtonBlock*)button;
-                    type = @"button";
-                    break;
-                }
-            }
-            for (CPAppBannerImageBlock *image in imageBlocks) {
-                if ([image.id isEqualToString:action.blockId]) {
-                    images = (CPAppBannerImageBlock*)image;
-                    type = @"image";
-                    break;
-                }
-            }
-
-            if ([type isEqualToString:@"button"]) {
-                if (screen != nil && buttons != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:buttons forImageBlock:nil blockType:type];
-                }
-            } else if ([type isEqualToString:@"image"]) {
-                if (screen != nil && images != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:nil forImageBlock:images blockType:type];
-                }
-            }
-
+            
             if (handleBannerOpened && action) {
                 handleBannerOpened(action);
             }
@@ -1080,7 +1025,9 @@ NSInteger currentScreenIndex = 0;
             ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
 
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
+                if (screen.id != nil) {
                     screen.isScreenClicked = true;
+                }
             }
         } onFailure:nil withRetry:NO];
     } else {

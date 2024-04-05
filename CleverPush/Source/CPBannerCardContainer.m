@@ -189,6 +189,19 @@
             } else {
                 [self actionCallback:block.action from:YES];
             }
+
+            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
+
+            if (self.data.multipleScreensEnabled && self.data.screens.count > 0) {
+                for (CPAppBannerCarouselBlock *screensList in self.data.screens) {
+                    if (!screensList.isScreenClicked) {
+                        screen = self.data.screens[self.currentScreenIndex];
+                        break;
+                    }
+                }
+            }
+
+            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:block forImageBlock:nil blockType:@"button"];
         }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -277,6 +290,18 @@
         } else {
             [self actionCallback:block.action from:NO];
         }
+
+        CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
+
+        if (self.data.multipleScreensEnabled && self.data.screens.count > 0) {
+            for (CPAppBannerCarouselBlock *screensList in self.data.screens) {
+                if (!screensList.isScreenClicked) {
+                    screen = self.data.screens[self.currentScreenIndex];
+                    break;
+                }
+            }
+        }
+        [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:nil forImageBlock:block blockType:@"image"];
    }
 }
 
