@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="2304" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4hC-1g-8za" customClass="CPUIBlockButton">
-                        <rect key="frame" x="10" y="0.0" width="396" height="48"/>
+                        <rect key="frame" x="10" y="7.5" width="396" height="48"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="48" id="J5f-NH-1Sw"/>
@@ -31,9 +31,9 @@
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
                     <constraint firstItem="4hC-1g-8za" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="WlK-F5-qTn"/>
-                    <constraint firstAttribute="bottom" secondItem="4hC-1g-8za" secondAttribute="bottom" constant="15" id="d6F-Nh-sSu"/>
+                    <constraint firstAttribute="bottom" secondItem="4hC-1g-8za" secondAttribute="bottom" constant="7.5" id="d6F-Nh-sSu"/>
                     <constraint firstAttribute="trailing" secondItem="4hC-1g-8za" secondAttribute="trailing" constant="10" id="swf-xz-zpj"/>
-                    <constraint firstItem="4hC-1g-8za" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="yQv-V1-jCb"/>
+                    <constraint firstItem="4hC-1g-8za" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="7.5" id="yQv-V1-jCb"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="cMP-DW-Kz4"/>

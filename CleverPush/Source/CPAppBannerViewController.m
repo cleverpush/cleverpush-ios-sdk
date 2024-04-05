@@ -377,9 +377,16 @@
     CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[indexPath.row];
 
     if (block.imageWidth > 0 && block.imageHeight > 0) {
-        CGFloat imageViewWidth = flowLayout.itemSize.width;
-        CGFloat imageViewHeight = imageViewWidth * block.scale / 100;
-        return CGSizeMake(flowLayout.itemSize.width, imageViewHeight);
+        CGFloat aspectRatio = block.imageWidth / (CGFloat)block.imageHeight;
+        if (isnan(aspectRatio) || aspectRatio == 0.0) {
+            aspectRatio = 1.0;
+        }
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat scale = (CGFloat)block.scale / 100.0;
+        CGFloat imageViewWidth = screenWidth * scale;
+        CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+        return CGSizeMake(imageViewWidth, imageViewHeight);
     }
     return flowLayout.itemSize;
 }

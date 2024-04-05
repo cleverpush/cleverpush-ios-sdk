@@ -46,14 +46,18 @@
     if (self.tblCPBanner.contentSize.height > [CPUtils frameHeightWithoutSafeArea]) {
         self.tblCPBanner.frame = frame;
     } else {
-        if (self.data.type == CPAppBannerTypeFull) {
-            self.tblCPBanner.frame = frame;
-        } else {
+        if (self.data.type != CPAppBannerTypeFull) {
             frame.size = self.tblCPBanner.contentSize;
-            self.tblCPBanner.frame = frame;
         }
     }
+    self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
+    if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
+        self.tblCPBannerHeightConstraint.constant = frame.size.height - 30;
+        if (self.data.closeButtonPositionStaticEnabled) {
+            self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
+        }
+    }
 }
 
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
@@ -79,11 +83,18 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = block.imageWidth / block.imageHeight;
+            CGFloat aspectRatio = block.imageWidth / (CGFloat)block.imageHeight;
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
+
+            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat scale = (CGFloat)block.scale / 100.0;
+            CGFloat imageViewWidth = screenWidth * scale;
+            CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+            cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
+            cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
         }
 
         NSString *imageUrl;
