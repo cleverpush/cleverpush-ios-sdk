@@ -184,11 +184,6 @@
                                    ![block.actions isKindOfClass:[NSNull class]] &&
                                    [block.actions isKindOfClass:[NSArray class]] &&
                                     [(block.actions) count] > 0;
-            if (hasActionsArray) {
-                [self actionCallback:block.action actions:block.actions from:YES];
-            } else {
-                [self actionCallback:block.action from:YES];
-            }
 
             CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
 
@@ -202,6 +197,12 @@
             }
 
             [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:block forImageBlock:nil blockType:@"button"];
+
+            if (hasActionsArray) {
+                [self actionCallback:block.action actions:block.actions from:YES];
+            } else {
+                [self actionCallback:block.action from:YES];
+            }
         }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -285,11 +286,6 @@
                                ![block.actions isKindOfClass:[NSNull class]] &&
                                [block.actions isKindOfClass:[NSArray class]] &&
                                 [(block.actions) count] > 0;
-        if (hasActionsArray) {
-            [self actionCallback:block.action actions:block.actions from:NO];
-        } else {
-            [self actionCallback:block.action from:NO];
-        }
 
         CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
 
@@ -302,7 +298,13 @@
             }
         }
         [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:nil forImageBlock:block blockType:@"image"];
-   }
+
+        if (hasActionsArray) {
+            [self actionCallback:block.action actions:block.actions from:NO];
+        } else {
+            [self actionCallback:block.action from:NO];
+        }
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
