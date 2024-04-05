@@ -1,3 +1,7 @@
+## 1.30.11 (05.04.2024)
+* Added a feature in `AppBanner` to support multiple actions on buttons and images.
+* Optimised for app banner image scaling.
+
 ## 1.30.10 (02.04.2024)
 * Resolved the issue of app banners still swiping if the carousel is disabled.
 * Resolved the issue of opt-ins are higher than opt-in prompts.
