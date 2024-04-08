@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.7";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.11";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -89,6 +89,8 @@ static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
+static BOOL isSessionStartCalled = NO;
+static BOOL confirmAlertShown = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -111,7 +113,7 @@ NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
 NSString* apiEndpoint = @"https://api.cleverpush.com";
-NSString*appGroupIdentifier = @".cleverpush";
+NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
@@ -191,9 +193,16 @@ static id isNil(id object) {
         [self stopCampaigns];
     }
 
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !previousTrackingConsent && hasTrackingConsent) {
+        pendingTrackingConsentListeners = [NSMutableArray new];
+    }
+
     if (hasTrackingConsent) {
         [self fireTrackingConsentListeners];
     } else {
+        if (trackingConsentRequired && !hasTrackingConsent && [pendingTrackingConsentListeners count] > 0) {
+            return;
+        }
         pendingTrackingConsentListeners = [NSMutableArray new];
     }
 }
@@ -203,12 +212,20 @@ static id isNil(id object) {
 }
 
 - (void)setSubscribeConsent:(BOOL)consent {
+    BOOL previousSubscribeConsent = hasSubscribeConsent;
     hasSubscribeConsentCalled = YES;
     hasSubscribeConsent = consent;
+
+    if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled && !previousSubscribeConsent && hasSubscribeConsent) {
+        pendingSubscribeConsentListeners = [NSMutableArray new];
+    }
 
     if (hasSubscribeConsent) {
         [self fireSubscribeConsentListeners];
     } else {
+        if (subscribeConsentRequired && !hasSubscribeConsent && [pendingSubscribeConsentListeners count] > 0) {
+            return;
+        }
         pendingSubscribeConsentListeners = [NSMutableArray new];
     }
 }
@@ -909,7 +926,7 @@ static id isNil(id object) {
         return;
     }
 
-    if (![self getHasTrackingConsentCalled]) {
+    if (![self getHasTrackingConsentCalled] || ([self getHasTrackingConsentCalled] && ![self getHasTrackingConsent])) {
         [self addCallbacksToTrackingConsentListeners:callback];
     }
 }
@@ -950,7 +967,7 @@ static id isNil(id object) {
         return;
     }
 
-    if (![self getHasSubscribeConsentCalled]) {
+    if (![self getHasSubscribeConsentCalled] || ([self getHasSubscribeConsentCalled] && ![self getHasSubscribeConsent])) {
         [self addCallbacksToSubscribeConsentListeners:callback];
     }
 }
@@ -1018,6 +1035,7 @@ static id isNil(id object) {
 
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
+        confirmAlertShown = YES;
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"channel/confirm-alert"]];
 
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -1060,120 +1078,114 @@ static id isNil(id object) {
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
-    __block BOOL successBlockCalled = NO;
+    if ([CleverPush getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
+        void(^consentBlock)(void) = ^{
+            [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        };
+        [self waitForSubscribeConsent:consentBlock];
+    } else {
+        [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    }
+}
 
-    void(^handleSubscribe)(void) = ^{
-        hasCalledSubscribe = YES;
-        if (@available(iOS 10.0,*)) {
-            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-            [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
-                if (subscriptionId == nil && channelId != nil && notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
-                    [self setConfirmAlertShown];
-                }
+- (void)handleSubscription:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    [self handleSubscriptionWithCompletion:^(NSString * _Nullable subscriptionId, NSError * _Nullable error) {
+        if (error) {
+            if (failureBlock) {
+                failureBlock(error);
+            }
+        } else {
+            if (subscribedBlock) {
+                subscribedBlock(subscriptionId);
+            }
+        }
+    } failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+}
 
-                UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
-                [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (error) {
-                            [CPLog error:@"requestAuthorizationWithOptions error: %@", error];
-                        } else if (!granted) {
-                            [CPLog info:@"requestAuthorizationWithOptions not granted"];
-                        }
+- (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    __block BOOL completionCalled = NO;
+    hasCalledSubscribe = YES;
+    
+    if (@available(iOS 10.0,*)) {
+        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+        [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
 
-                        if (granted || ignoreDisabledNotificationPermission) {
-                            if (subscriptionId == nil) {
-                                [CPLog debug:@"syncSubscription called from subscribe"];
-                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
-
-                                [self getChannelConfig:^(NSDictionary* channelConfig) {
-                                    if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                                        if (![self isSubscribed]) {
-                                            [self initTopicsDialogData:channelConfig syncToBackend:YES];
-                                        }
-
-                                        if (!skipTopicsDialog) {
-                                            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                            [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
-                                            [userDefaults synchronize];
-                                            [self showPendingTopicsDialog];
+            UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
+            [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (error) {
+                        [CPLog error:@"requestAuthorizationWithOptions error: %@", error];
+                    } else if (!granted) {
+                        [CPLog info:@"requestAuthorizationWithOptions not granted"];
+                    }
+                    
+                    if (granted || ignoreDisabledNotificationPermission) {
+                        if (subscriptionId == nil) {
+                            [CPLog debug:@"syncSubscription called from subscribe"];
+                            if (failureBlock) {
+                                [self performSelector:@selector(syncSubscription) withObject:failureBlock];
+                            } else {
+                                [self performSelector:@selector(syncSubscription) withObject:nil];
+                            }
+                            
+                            [self getChannelConfig:^(NSDictionary* channelConfig) {
+                                if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                                    if (![self isSubscribed]) {
+                                        [self initTopicsDialogData:channelConfig syncToBackend:YES];
+                                    }
+                                    
+                                    if (!skipTopicsDialog) {
+                                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                        [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
+                                        [userDefaults synchronize];
+                                        [self showPendingTopicsDialog];
+                                    }
+                                }
+                            }];
+                            
+                            if (completion) {
+                                [self getSubscriptionId:^(NSString* subscriptionId) {
+                                    if (!completionCalled) {
+                                        completionCalled = YES;
+                                        if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
+                                            completion(subscriptionId, nil);
+                                        } else {
+                                            completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
                                         }
                                     }
                                 }];
-
-                                if (subscribedBlock) {
-                                    [self getSubscriptionId:^(NSString* subscriptionId) {
-                                        if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            if (!successBlockCalled) {
-                                                subscribedBlock(subscriptionId);
-                                                successBlockCalled = YES;
-                                            } else {
-                                                [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
-                                            }
-                                        } else {
-                                            [CPLog debug:@"CleverPushInstance: subscribe: There is no subscription for CleverPush SDK."];
-                                        }
-                                    }];
-                                }
-                            } else if (subscribedBlock) {
-                                if (!successBlockCalled) {
-                                    subscribedBlock(subscriptionId);
-                                    successBlockCalled = YES;
-                                } else {
-                                    [CPLog debug:@"CleverPushInstance: subscribe: Subscription callback already invoked."];
-                                }
                             }
-                        } else if (failureBlock) {
-                            failureBlock([NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                        } else if (completion) {
+                            completion(subscriptionId, nil);
                         }
-                    });
-                }];
+                    } else if (completion) {
+                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                    }
+                });
             }];
-
-            [self ensureMainThreadSync:^{
-                [[UIApplication sharedApplication] registerForRemoteNotifications];
-            }];
-        } else {
+        }];
+        
+        [self ensureMainThreadSync:^{
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }];
+    } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-            [self ensureMainThreadSync:^{
-                if (subscriptionId == nil && channelId != nil) {
-                    if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]) {
-                        UIUserNotificationSettings*notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
-                        if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
-                            [self setConfirmAlertShown];
-                        }
-                    } else {
-                        if (![[UIApplication sharedApplication] isRegisteredForRemoteNotifications]) {
-                            [self setConfirmAlertShown];
-                        }
-                    }
+        [self ensureMainThreadSync:^{
+            if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+                Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
+                
+                NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
+                
+                if (@available(iOS 10.0,*)) {
+                    [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
                 }
-
-                if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-                    Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
-
-                    NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
-
-                    if (@available(iOS 10.0,*)) {
-                        [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
-                    }
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
-                } else {
-                    // iOS < 8.0
-                }
-            }];
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+            } else {
+                // iOS < 8.0
+            }
+        }];
 #pragma clang diagnostic pop
-        }
-    };
-
-    if ([CleverPush getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
-        void(^consentBlock)(void) = ^{
-            handleSubscribe();
-        };
-
-        [self waitForSubscribeConsent:consentBlock];
-    } else {
-        handleSubscribe();
     }
 }
 
@@ -1232,6 +1244,7 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
+    isSessionStartCalled = NO;
 }
 
 #pragma mark - unsubscribe
@@ -1547,6 +1560,14 @@ static id isNil(id object) {
                 }
                 pendingSubscriptionListeners = [NSMutableArray new];
 
+                if (!isSessionStartCalled) {
+                    [self trackSessionStart];
+                }
+
+                if (![self isConfirmAlertShown]) {
+                    [self setConfirmAlertShown];
+                }
+
                 static dispatch_once_t onceToken;
                 dispatch_once(&onceToken, ^{
                     if (successBlock) {
@@ -1752,7 +1773,10 @@ static id isNil(id object) {
     if (notification != nil && [notification objectForKey:@"url"] != nil && ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"url"] length] != 0) {
         NSURL*url = [NSURL URLWithString:[notification objectForKey:@"url"]];
         if ([notification objectForKey:@"autoHandleDeepLink"] != nil && ![[notification objectForKey:@"autoHandleDeepLink"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"autoHandleDeepLink"] boolValue]) {
-            [CPUtils tryOpenURL:url];
+            if ([CPUtils isValidURL:url]) {
+                [CPAppBannerModuleInstance updateBannersForDeepLinkWithURL:url];
+                [CPUtils tryOpenURL:url];
+            }
         }
     }
 
@@ -2286,18 +2310,34 @@ static id isNil(id object) {
         NSDictionary*attributes = [CleverPush getSubscriptionAttributes];
 
         if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
-            [self removeSubscriptionTags:subscriptionTags];
+            if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                dispatch_group_t group = dispatch_group_create();
+                for (NSString* tagId in subscriptionTags) {
+                    dispatch_group_enter(group);
+                    [self removeSubscriptionTagFromApi:tagId callback:nil onFailure:nil];
+                    dispatch_group_leave(group);
+                }
+            } else {
+                [self removeSubscriptionTags:subscriptionTags];
+            }
         }
 
         if (attributes != nil && ![attributes isKindOfClass:[NSNull class]] && attributes.count > 0) {
             for (NSString*key in attributes) {
                 id value = [attributes objectForKey:key];
-
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
-                        [CleverPush setSubscriptionAttribute:key value:@""];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key value:@""];
+                        }
                     } else if ([value isKindOfClass:[NSArray class]]) {
-                        [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
+                        }
                     }
                 }
             }
@@ -2362,38 +2402,46 @@ static id isNil(id object) {
 
 - (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
-        [self getSubscriptionId:^(NSString*subscriptionId) {
-            if (subscriptionId == nil) {
-                [CPLog debug:@"CleverPushInstance: setSubscriptionAttribute: There is no subscription for CleverPush SDK."];
-                return;
-            }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
-                NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         channelId, @"channelId",
-                                         attributeId, @"attributeId",
-                                         value, @"value",
-                                         subscriptionId, @"subscriptionId",
-                                         nil];
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback];
+    }];
+}
 
-                NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-                [request setHTTPBody:postData];
-                [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                    if (!subscriptionAttributes) {
-                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
-                    }
-                    [subscriptionAttributes setObject:value forKey:attributeId];
-                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-                    [userDefaults synchronize];
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
+}
 
-                    if (callback) {
-                        callback();
-                    }
-                } onFailure:nil];
-            });
-        }];
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: setSubscriptionAttributeObjectImplementation: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     value, @"value",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                if (!subscriptionAttributes) {
+                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                }
+                [subscriptionAttributes setObject:value forKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback();
+                }
+            } onFailure:nil];
+        });
     }];
 }
 
@@ -2955,7 +3003,6 @@ static id isNil(id object) {
     return [self trackEvent:eventName properties:nil];
 }
 
-
 - (void)trackEvent:(NSString* _Nullable)eventName amount:(NSNumber* _Nullable)amount {
     NSDictionary* properties = [NSDictionary dictionaryWithObjectsAndKeys:
                              isNil(amount), @"amount",
@@ -3256,6 +3303,7 @@ static id isNil(id object) {
             [self getChannelConfig:^(NSDictionary* channelConfig) {
                 bool trackAppStatistics = [channelConfig objectForKey:@"trackAppStatistics"] != nil && ![[channelConfig objectForKey:@"trackAppStatistics"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"trackAppStatistics"] boolValue];
                 if (trackAppStatistics || subscriptionId) {
+                    isSessionStartCalled = YES;
                     sessionVisits = 0;
                     sessionStartedTimestamp = [[NSDate date] timeIntervalSince1970];
 
@@ -3652,6 +3700,10 @@ static id isNil(id object) {
             completionHandler(badgeCount);
         });
     }];
+}
+
+- (BOOL)isConfirmAlertShown {
+    return confirmAlertShown;
 }
 
 #pragma mark - App Banner methods

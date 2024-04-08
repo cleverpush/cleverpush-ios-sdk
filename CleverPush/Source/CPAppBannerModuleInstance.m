@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableArray *bannersForDeepLink;
 NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
 NSMutableArray<CPAppBanner*> *activeBanners;
@@ -94,7 +95,8 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
-        for (CPAppBanner* banner in banners) {
+        NSMutableArray<CPAppBanner *> *bannersCopy = [banners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
             if ([banner.id isEqualToString:bannerId]) {
                 if ([self getBannersDisabled]) {
                     [pendingBanners addObject:banner];
@@ -634,7 +636,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
-    for (NSDictionary* triggeredEvent in events) {
+    NSMutableArray<NSDictionary*> *eventsCopy = [events mutableCopy];
+
+    for (NSDictionary* triggeredEvent in eventsCopy) {
         if (![[triggeredEvent cleverPushStringForKey:@"id"] isEqualToString:condition.event]) {
             continue;
         }
@@ -665,6 +669,22 @@ NSInteger currentScreenIndex = 0;
     return NO;
 }
 
+- (BOOL)checkDeepLinkTriggerCondition:(CPAppBannerTriggerCondition *)condition {
+    NSArray *urls = [CPAppBannerModuleInstance getBannersForDeepLink];
+
+    for (NSString *urlString in urls) {
+        if (![CPUtils isNullOrEmpty:urlString] && ![CPUtils isNullOrEmpty:condition.deepLinkUrl]) {
+            NSString *trimmedUrlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *trimmedDeepLinkUrl = [condition.deepLinkUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+            if ([trimmedUrlString caseInsensitiveCompare:trimmedDeepLinkUrl] == NSOrderedSame) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     NSMutableArray *bannersCopy = [banners mutableCopy];
@@ -692,6 +712,8 @@ NSInteger currentScreenIndex = 0;
                         }
                     } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
                         conditionTrue = [self checkEventTriggerCondition:condition];
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
+                        conditionTrue = [self checkDeepLinkTriggerCondition:condition];
                     } else {
                         conditionTrue = NO;
                     }
@@ -714,7 +736,8 @@ NSInteger currentScreenIndex = 0;
         }
 
         BOOL contains = NO;
-        for (CPAppBanner* tryBanner in [self getActiveBanners]) {
+        NSMutableArray<CPAppBanner*> *bannersCopy = [[self getActiveBanners] mutableCopy];
+        for (CPAppBanner* tryBanner in bannersCopy) {
             if ([tryBanner.id isEqualToString:banner.id]) {
                 contains = YES;
                 break;
@@ -730,7 +753,8 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - manage the schedule to display the banner at a specific time
 - (void)scheduleBanners {
     if ([self getBannersDisabled]) {
-        for (CPAppBanner* banner in activeBanners) {
+        NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
             [pendingBanners addObject:banner];
         }
         [activeBanners removeObjectsInArray:pendingBanners];
@@ -747,7 +771,8 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
-    for (CPAppBanner *banner in activeBanners) {
+    NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+    for (CPAppBanner* banner in bannersCopy) {
         for (CPAppBannerTrigger *trigger in banner.triggers) {
             for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
                 if ([condition.event isEqualToString:eventId]) {
@@ -761,10 +786,11 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)scheduleBannersForNoEventFromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
-    for (CPAppBanner *banner in activeBanners) {
-        NSTimeInterval delay = [self calculateDelayForBanner:banner];
-        [self scheduleBannerDisplay:banner withDelaySeconds:delay];
-    }
+        NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+        for (CPAppBanner* banner in bannersCopy) {
+            NSTimeInterval delay = [self calculateDelayForBanner:banner];
+            [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+        }
 }
 
 - (NSTimeInterval)calculateDelayForBanner:(CPAppBanner *)banner {
@@ -824,63 +850,8 @@ NSInteger currentScreenIndex = 0;
         }
 
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
-            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
-            CPAppBannerButtonBlock *buttons = [[CPAppBannerButtonBlock alloc] init];
-            CPAppBannerImageBlock *images = [[CPAppBannerImageBlock alloc] init];
-            NSMutableArray *buttonBlocks  = [[NSMutableArray alloc] init];
-            NSMutableArray *imageBlocks  = [[NSMutableArray alloc] init];
-            NSString *type;
             NSString *voucherCode;
-
-            if (banner.multipleScreensEnabled && banner.screens.count > 0) {
-                for (CPAppBannerCarouselBlock *screensList in banner.screens) {
-                    if (!screensList.isScreenClicked) {
-                        screen = banner.screens[currentScreenIndex];
-                        break;
-                    }
-                }
-                for (CPAppBannerBlock *bannerBlock in screen.blocks) {
-                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
-                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
-                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    }
-                }
-            } else {
-                for (CPAppBannerBlock *bannerBlock in banner.blocks) {
-                    if (bannerBlock.type == CPAppBannerBlockTypeButton) {
-                        [buttonBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    } else if (bannerBlock.type == CPAppBannerBlockTypeImage) {
-                        [imageBlocks addObject:(CPAppBannerBlock*)bannerBlock];
-                    }
-                }
-            }
-
-            for (CPAppBannerButtonBlock *button in buttonBlocks) {
-                if ([button.id isEqualToString:action.blockId]) {
-                    buttons = (CPAppBannerButtonBlock*)button;
-                    type = @"button";
-                    break;
-                }
-            }
-            for (CPAppBannerImageBlock *image in imageBlocks) {
-                if ([image.id isEqualToString:action.blockId]) {
-                    images = (CPAppBannerImageBlock*)image;
-                    type = @"image";
-                    break;
-                }
-            }
-
-            if ([type isEqualToString:@"button"]) {
-                if (screen != nil && buttons != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:buttons forImageBlock:nil blockType:type];
-                }
-            } else if ([type isEqualToString:@"image"]) {
-                if (screen != nil && images != nil) {
-                    [self sendBannerEvent:@"clicked" forBanner:banner forScreen:screen forButtonBlock:nil forImageBlock:images blockType:type];
-                }
-            }
-
+            
             if (handleBannerOpened && action) {
                 handleBannerOpened(action);
             }
@@ -1054,7 +1025,9 @@ NSInteger currentScreenIndex = 0;
             ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
 
             if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
+                if (screen.id != nil) {
                     screen.isScreenClicked = true;
+                }
             }
         } onFailure:nil withRetry:NO];
     } else {
@@ -1155,6 +1128,39 @@ NSInteger currentScreenIndex = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
+}
+
+#pragma mark - Handle app banners with deep link url
++ (void)setBannersForDeepLink:(NSMutableArray *)appBanner {
+    bannersForDeepLink = appBanner;
+}
+
++  (NSMutableArray*)getBannersForDeepLink {
+    return bannersForDeepLink;
+}
+
++ (void)updateBannersForDeepLinkWithURL:(NSURL*)url {
+    NSMutableArray *existingArray = [[CPAppBannerModuleInstance getBannersForDeepLink] mutableCopy];
+
+    if (!existingArray) {
+        existingArray = [[NSMutableArray alloc] init];
+    }
+
+    NSString *urlString = [NSString stringWithFormat:@"%@",[CPUtils removeQueryParametersFromURL:url]];
+    BOOL urlExists = NO;
+
+    for (NSString *existingURL in existingArray) {
+        if ([existingURL isEqualToString:urlString]) {
+            urlExists = YES;
+            break;
+        }
+    }
+
+    if (!urlExists) {
+        [existingArray addObject:urlString];
+    }
+
+    [CPAppBannerModuleInstance setBannersForDeepLink:existingArray];
 }
 
 #pragma mark - set app banner ids from silent push
@@ -1262,6 +1268,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (NSMutableArray<NSDictionary*>*)getEvents {
+    if (!events) {
+        events = [[NSMutableArray alloc]init];
+    }
     return events;
 }
 

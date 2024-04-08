@@ -46,14 +46,18 @@
     if (self.tblCPBanner.contentSize.height > [CPUtils frameHeightWithoutSafeArea]) {
         self.tblCPBanner.frame = frame;
     } else {
-        if (self.data.type == CPAppBannerTypeFull) {
-            self.tblCPBanner.frame = frame;
-        } else {
+        if (self.data.type != CPAppBannerTypeFull) {
             frame.size = self.tblCPBanner.contentSize;
-            self.tblCPBanner.frame = frame;
         }
     }
+    self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
+    if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
+        self.tblCPBannerHeightConstraint.constant = frame.size.height - 30;
+        if (self.data.closeButtonPositionStaticEnabled) {
+            self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
+        }
+    }
 }
 
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
@@ -79,11 +83,18 @@
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
 
         if (block.imageWidth > 0 && block.imageHeight > 0) {
-            CGFloat aspectRatio = block.imageWidth / block.imageHeight;
+            CGFloat aspectRatio = block.imageWidth / (CGFloat)block.imageHeight;
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
+
+            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat scale = (CGFloat)block.scale / 100.0;
+            CGFloat imageViewWidth = screenWidth * scale;
+            CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+            cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
+            cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
         }
 
         NSString *imageUrl;
@@ -180,7 +191,29 @@
             if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
                 block.action.url = [CPUtils replaceAndEncodeURL:block.action.url withReplacement:self.voucherCode];
             }
-            [self actionCallback:block.action from:YES];
+            BOOL hasActionsArray = block.actions != nil &&
+                                   ![block.actions isKindOfClass:[NSNull class]] &&
+                                   [block.actions isKindOfClass:[NSArray class]] &&
+                                    [(block.actions) count] > 0;
+
+            CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
+
+            if (self.data.multipleScreensEnabled && self.data.screens.count > 0) {
+                for (CPAppBannerCarouselBlock *screensList in self.data.screens) {
+                    if (!screensList.isScreenClicked) {
+                        screen = self.data.screens[self.currentScreenIndex];
+                        break;
+                    }
+                }
+            }
+
+            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:block forImageBlock:nil blockType:@"button"];
+
+            if (hasActionsArray) {
+                [self actionCallback:block.action actions:block.actions from:YES];
+            } else {
+                [self actionCallback:block.action from:YES];
+            }
         }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeText) {
@@ -260,7 +293,28 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeImage) {
         CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.blocks[indexPath.row];
-        [self actionCallback:block.action from:NO];
+        BOOL hasActionsArray = block.actions != nil &&
+                               ![block.actions isKindOfClass:[NSNull class]] &&
+                               [block.actions isKindOfClass:[NSArray class]] &&
+                                [(block.actions) count] > 0;
+
+        CPAppBannerCarouselBlock *screen = [[CPAppBannerCarouselBlock alloc] init];
+
+        if (self.data.multipleScreensEnabled && self.data.screens.count > 0) {
+            for (CPAppBannerCarouselBlock *screensList in self.data.screens) {
+                if (!screensList.isScreenClicked) {
+                    screen = self.data.screens[self.currentScreenIndex];
+                    break;
+                }
+            }
+        }
+        [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:nil forImageBlock:block blockType:@"image"];
+
+        if (hasActionsArray) {
+            [self actionCallback:block.action actions:block.actions from:NO];
+        } else {
+            [self actionCallback:block.action from:NO];
+        }
     }
 }
 
@@ -281,7 +335,7 @@
     }
 }
 
-- (void)actionCallback:(CPAppBannerAction*)action from:(BOOL)buttonBlock {
+- (void)performActionCallback:(CPAppBannerAction *)action {
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
@@ -302,6 +356,17 @@
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
         }
+    }
+}
+
+- (void)actionCallback:(CPAppBannerAction *)action from:(BOOL)buttonBlock {
+    self.actionCallback(action);
+    [self performActionCallback:action];
+}
+
+- (void)actionCallback:(CPAppBannerAction *)action actions:(NSMutableArray<CPAppBannerAction *> *)actions from:(BOOL)buttonBlock {
+    for (CPAppBannerAction *actionItem in actions) {
+        [self performActionCallback:actionItem];
     }
 }
 

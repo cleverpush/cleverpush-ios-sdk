@@ -7,6 +7,7 @@
 
 #pragma mark - Class Variables
 @property (nonatomic, strong) CPAppBannerAction* action;
+@property (nonatomic, strong) NSMutableArray<CPAppBannerAction*>* actions;
 @property (nonatomic, strong) NSString *imageUrl;
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString *darkImageUrl;

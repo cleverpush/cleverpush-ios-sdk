@@ -1,3 +1,25 @@
+## 1.30.11 (05.04.2024)
+* Added a feature in `AppBanner` to support multiple actions on buttons and images.
+* Optimised for app banner image scaling.
+
+## 1.30.10 (02.04.2024)
+* Resolved the issue of app banners still swiping if the carousel is disabled.
+* Resolved the issue of opt-ins are higher than opt-in prompts.
+* Resolved the issue of the track session start maybe not working correctly.
+* Added privacy manifests files.
+* Optimised banner objects prevent crashes.
+* Added support for app banner displaying by deep-link. 
+* Optimised subscribe function for async await-subscribe block called multiple times.
+
+## 1.30.9 (21.03.2024)
+* Optimized banner objects prevent crashes.
+
+## 1.30.8 (14.03.2024)
+* Optimized removing of tags and attributes after revoking tracking consent.
+* Optimized TCF2 API, do not replay queued events after consent is given.
+* Resolved the image resizing issue in the app banner.
+* Optimised the `setNotificationClicked` method for displaying wrong parameter values.
+
 ## 1.30.7 (28.02.2024)
 * Added a feature to support in-app banners for silent push notifications.
 

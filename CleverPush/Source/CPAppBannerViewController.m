@@ -32,6 +32,7 @@
         [self setContentVisibility:false];
         [self setDynamicBannerConstraints:self.data.marginEnabled];
         [self setDynamicCloseButton:NO];
+        [self setCollectionViewSwipeEnabled];
     }
 }
 
@@ -179,12 +180,11 @@
     self.centerYConstraint.active = center;
 }
 
-- (void)setUpPageControl {
+#pragma mark - App banners swipe configuration
+- (void)setCollectionViewSwipeEnabled {
     if (self.data.carouselEnabled == true) {
-        [self.pageControl setNumberOfPages:self.data.screens.count];
         [self.cardCollectionView setScrollEnabled:true];
     } else {
-        [self.pageControl setNumberOfPages:0];
         [self.cardCollectionView setScrollEnabled:false];
     }
 }
@@ -315,6 +315,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
     [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
+    [cell setNeedsLayout];
     [cell layoutIfNeeded];
 }
 
@@ -376,9 +377,16 @@
     CPAppBannerImageBlock *block = (CPAppBannerImageBlock*)self.data.blocks[indexPath.row];
 
     if (block.imageWidth > 0 && block.imageHeight > 0) {
-        CGFloat imageViewWidth = flowLayout.itemSize.width;
-        CGFloat imageViewHeight = imageViewWidth * block.scale / 100;
-        return CGSizeMake(flowLayout.itemSize.width, imageViewHeight);
+        CGFloat aspectRatio = block.imageWidth / (CGFloat)block.imageHeight;
+        if (isnan(aspectRatio) || aspectRatio == 0.0) {
+            aspectRatio = 1.0;
+        }
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat scale = (CGFloat)block.scale / 100.0;
+        CGFloat imageViewWidth = screenWidth * scale;
+        CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+
+        return CGSizeMake(imageViewWidth, imageViewHeight);
     }
     return flowLayout.itemSize;
 }

@@ -8,6 +8,7 @@
 #pragma mark - Class Variables
 @property (nonatomic) CPAppBannerAlignment alignment;
 @property (nonatomic, strong) CPAppBannerAction* action;
+@property (nonatomic, strong) NSMutableArray<CPAppBannerAction*>* actions;
 @property (nonatomic, strong) NSString *text;
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic, strong) NSString *darkColor;

@@ -22,15 +22,15 @@
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
-		NM00SgndSG+d/Q8FrwV9Kg0KZwQ=
+		9NL6CFkDr0kRl3gTHuYLJSZmgwQ=
 		</data>
 		<key>CPHTMLBlockCell.nib</key>
 		<data>
-		n01G0H3ZI/V1NKZYhrep9GhN6SY=
+		zmDn02cbNBeoEP9d5Y5rzl0/oeU=
 		</data>
 		<key>CPImageBlockCell.nib</key>
 		<data>
-		nOHTWsCdkqgqA+PvR2+VqNcFlt0=
+		OvB2sd6skD48eMLhDgejug5x1ro=
 		</data>
 		<key>CPInboxCell.nib</key>
 		<data>
@@ -58,7 +58,7 @@
 		</data>
 		<key>CPTextBlockCell.nib</key>
 		<data>
-		22w0+v6j96/dypgyzYKFestIUvw=
+		bh+wncrUkTW+R7x79GLv3fIZv8g=
 		</data>
 		<key>CPTopicDialogCell.nib</key>
 		<data>
@@ -66,7 +66,11 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		nbWw5wXmB1bMGFFXD6qbwz2slVU=
+		xEkbV40Hi5MFNH4OQACcieTxYVQ=
+		</data>
+		<key>PrivacyInfo.xcprivacy</key>
+		<data>
+		YCnxQe5VWCnwripuT3LoorsTqmQ=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -119,33 +123,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			NM00SgndSG+d/Q8FrwV9Kg0KZwQ=
+			9NL6CFkDr0kRl3gTHuYLJSZmgwQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			uvfSB2MUaQzZtDITZpxMMvX0FWWCN56m+xMI/zUMETw=
+			6hPKc/z9jHb/BccDBWEpP9MhXlLfMNo2gVdM6Q4E8TA=
 			</data>
 		</dict>
 		<key>CPHTMLBlockCell.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			n01G0H3ZI/V1NKZYhrep9GhN6SY=
+			zmDn02cbNBeoEP9d5Y5rzl0/oeU=
 			</data>
 			<key>hash2</key>
 			<data>
-			5IQtIP2O3O8jm7zqJwNIYjhKMtJGW5bg704dge/cFS0=
+			lE49zUZJwyIAnWNFd3YR4fPTkzUJRDLpSUS5eAhm/as=
 			</data>
 		</dict>
 		<key>CPImageBlockCell.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			nOHTWsCdkqgqA+PvR2+VqNcFlt0=
+			OvB2sd6skD48eMLhDgejug5x1ro=
 			</data>
 			<key>hash2</key>
 			<data>
-			97yAYA+fgqOYvSB16kxyFQi4HtKQwKs3pF+Z1soFDwE=
+			AKDyj1sb7aioLmplKsBH88hRMRnrJj5VdBMChf0ZHQ0=
 			</data>
 		</dict>
 		<key>CPInboxCell.nib</key>
@@ -218,11 +222,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			22w0+v6j96/dypgyzYKFestIUvw=
+			bh+wncrUkTW+R7x79GLv3fIZv8g=
 			</data>
 			<key>hash2</key>
 			<data>
-			ipJxIYin22tDxhEVYEoaWvFyGGg1TMEwm4I4QxMBs38=
+			XvZFk2ip3LlCRzs1lbgpcckiebnoVp7blwc1Tg4shD0=
 			</data>
 		</dict>
 		<key>CPTopicDialogCell.nib</key>
@@ -234,6 +238,17 @@
 			<key>hash2</key>
 			<data>
 			5OFFaicjFRwEApqhb2fcFHOj657v75vTft5tyTJrV2I=
+			</data>
+		</dict>
+		<key>PrivacyInfo.xcprivacy</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			YCnxQe5VWCnwripuT3LoorsTqmQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			+Dmha2tfhEl2/9L8+vGC3c80rXENKB3q6ZrUnRviRng=
 			</data>
 		</dict>
 	</dict>

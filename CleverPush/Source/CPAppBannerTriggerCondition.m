@@ -1,4 +1,5 @@
 #import "CPAppBannerTriggerCondition.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerTriggerCondition
 
@@ -20,6 +21,9 @@
             }
             if ([[json objectForKey:@"type"] isEqualToString:@"duration"]) {
                 self.type = CPAppBannerTriggerConditionTypeDuration;
+            }
+            if ([[json objectForKey:@"type"] isEqualToString:@"deepLink"]) {
+                self.type = CPAppBannerTriggerConditionTypeDeepLink;
             }
         }
 
@@ -45,6 +49,15 @@
         if ([json objectForKey:@"seconds"]) {
             self.seconds = [[json objectForKey:@"seconds"] intValue];
         }
+
+        if (![CPUtils isNullOrEmpty:[json objectForKey:@"deepLinkUrl"]]) {
+            self.deepLinkUrl = [json objectForKey:@"deepLinkUrl"];
+        }
+
+        if (![CPUtils isNullOrEmpty:[json objectForKey:@"value"]]) {
+            self.value = [json objectForKey:@"value"];
+        }
+
     }
     return self;
 }

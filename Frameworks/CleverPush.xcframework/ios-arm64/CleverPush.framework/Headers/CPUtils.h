@@ -43,5 +43,6 @@
 + (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary;
 + (void)tryOpenURL:(NSURL *)url;
 + (BOOL)isValidURL:(NSURL *)url;
++ (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
 
 @end
