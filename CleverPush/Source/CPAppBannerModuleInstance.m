@@ -4,6 +4,7 @@
 #import "NSDictionary+SafeExpectations.h"
 #import "NSString+VersionComparator.h"
 #import "CPSQLiteManager.h"
+#import <CleverPushLocation/CleverPushLocation.h>
 
 @interface CPAppBannerModuleInstance()
 
@@ -906,6 +907,14 @@ NSInteger currentScreenIndex = 0;
                 pasteboard.string = action.name;
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
                     pasteboard.string = voucherCode;
+                }
+            }
+
+            if (action && [action.type isEqualToString:@"geoLocation"]) {
+                if ([CleverPushLocation hasLocationPermission]) {
+                    [CleverPushLocation init];
+                } else {
+                    [CleverPushLocation requestLocationPermission];
                 }
             }
         };

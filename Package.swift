@@ -40,7 +40,7 @@ let package = Package(
                 .linkedFramework("SafariServices"),
                 .linkedFramework("ImageIO"),
                 .linkedFramework("MobileCoreServices"),
-
+                .linkedFramework("CoreLocation"),
             ]),
     ]
 )

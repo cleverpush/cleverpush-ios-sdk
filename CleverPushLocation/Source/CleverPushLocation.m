@@ -61,7 +61,7 @@ double geoFenceTimerInterval = 1.0;
 }
 
 #pragma mark - Check the authority of location permission
-- (BOOL)hasLocationPermission {
++ (BOOL)hasLocationPermission {
     CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
     return status == kCLAuthorizationStatusAuthorizedAlways || status == kCLAuthorizationStatusAuthorizedWhenInUse;
 }
