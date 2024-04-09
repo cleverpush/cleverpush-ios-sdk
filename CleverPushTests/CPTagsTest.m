@@ -497,6 +497,55 @@
     }
 }
 
+- (void)testRemoveSubscriptionTagSuccessWithCallback {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSString *tagId = @"tagId";
+    void (^successCallback)(NSString *) = ^(NSString *result) {
+        XCTAssertEqualObjects(result, @"Successfully removed tag");
+    };
+
+    [self.cleverPush removeSubscriptionTagFromApi:tagId callback:successCallback onFailure:[OCMArg any]];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+- (void)testRemoveSubscriptionTagFailureWithCallback {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSString *tagId = @"tagId";
+    void (^failureCallback)(NSError *) = ^(NSError *error) {
+        XCTFail("Unexpected callback invocation in failure case");
+    };
+
+    NSError *testError = [NSError errorWithDomain:@"TestErrorDomain" code:500 userInfo:nil];
+
+    [OCMStub([self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^onFailure)(NSError *);
+        [invocation getArgument:&onFailure atIndex:4];
+        onFailure(testError);
+    }];
+
+    [self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:failureCallback];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    OCMVerify([self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+}
+
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
