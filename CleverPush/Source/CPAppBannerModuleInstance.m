@@ -910,7 +910,15 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"geoLocation"]) {
+                Class cleverPushLocationClass = NSClassFromString(@"CleverPushLocation");
 
+                if (cleverPushLocationClass) {
+                    SEL selector = NSSelectorFromString(@"requestLocationPermission");
+
+                    if ([cleverPushLocationClass respondsToSelector:selector]) {
+                        [cleverPushLocationClass performSelector:selector withObject:nil afterDelay:0];
+                    }
+                }
             }
         };
         [appBannerViewController setActionCallback:callbackBlock];
