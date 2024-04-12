@@ -542,7 +542,6 @@
 		935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSQLiteManager.m; sourceTree = "<group>"; };
 		937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		938FFD052BC4044600EB9782 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk/System/Library/Frameworks/CoreLocation.framework; sourceTree = DEVELOPER_DIR; };
 		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
 		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
@@ -789,7 +788,6 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				938FFD052BC4044600EB9782 /* CoreLocation.framework */,
 				93D458342B3599D9000F4A80 /* MobileCoreServices.framework */,
 				93D458322B3598C4000F4A80 /* ImageIO.framework */,
 				93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */,
