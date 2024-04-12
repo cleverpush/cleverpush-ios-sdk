@@ -5,6 +5,6 @@
 
 + (void)init;
 + (void)requestLocationPermission;
-+ (BOOL)hasLocationPermission;
+- (BOOL)hasLocationPermission;
 
 @end

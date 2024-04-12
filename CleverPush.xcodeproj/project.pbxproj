@@ -228,8 +228,6 @@
 		935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		937390BB2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */; };
 		937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */; };
-		938FFD042BC4042200EB9782 /* CleverPushLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 297C34D023FB710100314A84 /* CleverPushLocation.m */; };
-		938FFD062BC4044600EB9782 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 938FFD052BC4044600EB9782 /* CoreLocation.framework */; };
 		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
 		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
@@ -656,7 +654,6 @@
 			files = (
 				93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */,
 				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
-				938FFD062BC4044600EB9782 /* CoreLocation.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
 				2913D8312514132F002BA52C /* StoreKit.framework in Frameworks */,
 				2913D82F2514132A002BA52C /* UserNotifications.framework in Frameworks */,
@@ -1417,7 +1414,6 @@
 				296A134C25BE128E00A2BEED /* CPNotification.m in Sources */,
 				29660B8E2693A5DD001231C8 /* CPWKWebView.m in Sources */,
 				CB73FFAB272C44660099B648 /* CPAppBannerViewController.m in Sources */,
-				938FFD042BC4042200EB9782 /* CleverPushLocation.m in Sources */,
 				CBA989A72679D62D003DE995 /* CPWidgetsStories.m in Sources */,
 				296A134225BE128700A2BEED /* CPSubscription.m in Sources */,
 				9310FD6A2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
