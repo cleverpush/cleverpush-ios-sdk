@@ -427,19 +427,20 @@
         CGFloat width = frame.size.width;
         CGFloat height = frame.size.height;
         CGFloat topPadding = 0;
+        CGFloat spacing = 10;
 
         if (@available(iOS 11.0, *)) {
             topPadding = window.safeAreaInsets.top;
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, topPadding, 40, 40))];
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
             if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, self.view.safeAreaInsets.top - 40, 40, 40))];
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
             }
         } else {
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, 10, 40, 40))];
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, 10 + spacing, 40, 40))];
             if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, [UIApplication sharedApplication].statusBarFrame.size.height - 40, 40, 40))];
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40 + spacing, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, [UIApplication sharedApplication].statusBarFrame.size.height - 40 - spacing, 40, 40))];
             }
         }
 
@@ -461,7 +462,7 @@
         }
 
         closeButton.alpha = 0.5;
-        closeButton.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
+        closeButton.layer.cornerRadius = CGRectGetWidth(closeButton.frame) / 2;
         [closeButton.layer setMasksToBounds:false];
         [closeButton addTarget:self action:@selector(onDismiss)
               forControlEvents:UIControlEventTouchUpInside];
