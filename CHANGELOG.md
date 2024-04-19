@@ -1,3 +1,8 @@
+## 1.30.12 (19.04.2024)
+* Resolved the issue of the transparent background not working if we use the html block in-app banners.
+* Optimised close button position for HTML Banner.
+* Optimised `setsubscriptionchanged` function for chatview.
+
 ## 1.30.11 (05.04.2024)
 * Added a feature in `AppBanner` to support multiple actions on buttons and images.
 * Optimised for app banner image scaling.
