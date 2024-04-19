@@ -125,14 +125,18 @@
     }
     UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
+    [self.btnClose setBackgroundColor:UIColor.blackColor];
+
     if (@available(iOS 13.0, *)) {
         [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        self.btnClose.tintColor = color;
+        [self.btnClose setTintColor:UIColor.whiteColor];
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
-        [self.btnClose setTitleColor:color forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
 
+    self.btnClose.alpha = 0.5;
+    self.btnClose.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
     [self.btnClose.layer setMasksToBounds:false];
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
@@ -446,14 +450,18 @@
         }
         UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
+        [closeButton setBackgroundColor:UIColor.blackColor];
+
         if (@available(iOS 13.0, *)) {
             [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-            closeButton.tintColor = color;
+            [closeButton setTintColor:UIColor.whiteColor];
         } else {
             [closeButton setTitle:@"X" forState:UIControlStateNormal];
-            [closeButton setTitleColor:color forState:UIControlStateNormal];
+            [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         }
 
+        closeButton.alpha = 0.5;
+        closeButton.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
         [closeButton.layer setMasksToBounds:false];
         [closeButton addTarget:self action:@selector(onDismiss)
               forControlEvents:UIControlEventTouchUpInside];
