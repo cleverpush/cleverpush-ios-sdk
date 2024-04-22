@@ -739,7 +739,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - Callback event for tracking clicks
-+ (void)actionCallback:(CPAppBannerAction*)action{
++ (void)actionCallback:(CPAppBannerAction*)action {
+    static BOOL isProcessingAction = NO;
+    if (isProcessingAction) {
+        return;
+    }
+    isProcessingAction = YES;
     [self actionCallback:action];
 }
 
