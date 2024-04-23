@@ -110,6 +110,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 @end
 
 @implementation CPUtils
+
+static CPAppBannerActionBlock _actionCallback;
+
 #pragma mark - Generate random string for uniquing
 + (NSString*)randomStringWithLength:(int)length {
     NSString* letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -728,7 +731,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             buttonBlockDic = [message.body mutableCopy];
             buttonBlockDic[@"bannerAction"] = @"type";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [self actionCallback:action];
+            [CPUtils performActionCallback:action];
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {
@@ -739,13 +742,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - Callback event for tracking clicks
-+ (void)actionCallback:(CPAppBannerAction*)action {
-    static BOOL isProcessingAction = NO;
-    if (isProcessingAction) {
-        return;
++ (void)setActionCallback:(CPAppBannerActionBlock)callback {
+    _actionCallback = callback;
+}
+
++ (CPAppBannerActionBlock)actionCallback {
+    return _actionCallback;
+}
+
++ (void)performActionCallback:(CPAppBannerAction *)action {
+    if (_actionCallback) {
+        _actionCallback(action);
     }
-    isProcessingAction = YES;
-    [self actionCallback:action];
 }
 
 #pragma mark - Check string is nil, null or empty

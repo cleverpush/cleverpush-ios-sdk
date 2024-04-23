@@ -416,7 +416,8 @@
     self.webView.backgroundColor = [UIColor clearColor];
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     [CPUtils configureWebView:self.webView];
-    
+    [CPUtils setActionCallback:self.actionCallback];
+
     self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     if (self.data.closeButtonEnabled) {

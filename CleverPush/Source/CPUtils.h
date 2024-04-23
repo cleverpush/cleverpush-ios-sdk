@@ -2,6 +2,7 @@
 #import <UIKit/UIKit.h>
 #import <SafariServices/SafariServices.h>
 #import "CleverPush.h"
+#import "CleverPushInstance.h"
 
 @interface CPUtils : NSObject
 
@@ -44,5 +45,7 @@
 + (void)tryOpenURL:(NSURL *)url;
 + (BOOL)isValidURL:(NSURL *)url;
 + (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
++ (void)setActionCallback:(CPAppBannerActionBlock)callback;
++ (void)performActionCallback:(CPAppBannerAction *)action;
 
 @end
