@@ -732,14 +732,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
 
             NSBundle *bundle = [CPUtils getAssetsBundle];
-            CPAppBannerViewController *appBannerViewController;
-            if (bundle) {
-                appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
-            } else {
-                appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:[NSBundle mainBundle]];
+            if (!bundle) {
+                bundle = [NSBundle mainBundle];
             }
 
-            [appBannerViewController actionCallback:action];
+            CPAppBannerViewController *appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+
+            if (appBannerViewController && action) {
+                [appBannerViewController actionCallback:action];
+            }
+
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {

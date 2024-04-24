@@ -2,7 +2,6 @@
 #import <UIKit/UIKit.h>
 #import <SafariServices/SafariServices.h>
 #import "CleverPush.h"
-#import "CleverPushInstance.h"
 
 @interface CPUtils : NSObject
 
