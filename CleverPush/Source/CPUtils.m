@@ -5,6 +5,7 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPAppBannerViewController.h"
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
@@ -728,7 +729,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             buttonBlockDic = [message.body mutableCopy];
             buttonBlockDic[@"bannerAction"] = @"type";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [self actionCallback:action];
+
+            NSBundle *bundle = [CPUtils getAssetsBundle];
+            if (!bundle) {
+                bundle = [NSBundle mainBundle];
+            }
+
+            CPAppBannerViewController *appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+
+            if (appBannerViewController && action) {
+                [appBannerViewController actionCallback:action];
+            }
+
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {
@@ -736,11 +748,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }
         }
     }
-}
-
-#pragma mark - Callback event for tracking clicks
-+ (void)actionCallback:(CPAppBannerAction*)action{
-    [self actionCallback:action];
 }
 
 #pragma mark - Check string is nil, null or empty

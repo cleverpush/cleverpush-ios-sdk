@@ -6,6 +6,8 @@
 
 @implementation CPAppBannerViewController
 
+static CPAppBannerActionBlock appBannerActionCallback;
+
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -416,7 +418,8 @@
     self.webView.backgroundColor = [UIColor clearColor];
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     [CPUtils configureWebView:self.webView];
-    
+    [self setActionCallback:self.actionCallback];
+
     self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     if (self.data.closeButtonEnabled) {
@@ -501,6 +504,14 @@
 #pragma mark - Callback event for tracking clicks
 - (void)actionCallback:(CPAppBannerAction*)action{
     self.actionCallback(action);
+}
+
+- (void)setActionCallback:(CPAppBannerActionBlock)callback {
+    appBannerActionCallback = callback;
+}
+
+- (CPAppBannerActionBlock)actionCallback {
+    return appBannerActionCallback;
 }
 
 #pragma mark - Animations
