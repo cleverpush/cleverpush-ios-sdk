@@ -111,7 +111,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 @end
 
 @implementation CPUtils
-
 #pragma mark - Generate random string for uniquing
 + (NSString*)randomStringWithLength:(int)length {
     NSString* letters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
