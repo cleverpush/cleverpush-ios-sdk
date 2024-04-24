@@ -1,3 +1,6 @@
+## 1.30.13 (24.04.2024)
+* Optimised `CPAppBannerActionBlock` callback function for HTML app banners.
+
 ## 1.30.12 (19.04.2024)
 * Resolved the issue of the transparent background not working if we use the html block in-app banners.
 * Optimised close button position for HTML Banner.
