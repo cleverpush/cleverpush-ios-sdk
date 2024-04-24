@@ -19,10 +19,6 @@
                                       target:self action:@selector(doneButtonPressed)];
     keyboardToolbar.items = @[flexBarButton, doneBarButton];
     self.txtLiveActivityName.inputAccessoryView = keyboardToolbar;
-
-    [CleverPush setAppBannerOpenedCallback:^(CPAppBannerAction * _Nullable action) {
-        NSLog(@"Callback function called");
-    }];
 }
 
 #pragma mark - Button Actions
