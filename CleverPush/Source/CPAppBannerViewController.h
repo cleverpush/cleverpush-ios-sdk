@@ -56,6 +56,7 @@
 - (void)initWithBanner:(CPAppBanner*)banner;
 - (void)initWithHTMLBanner:(CPAppBanner*)banner;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
+- (void)actionCallback:(CPAppBannerAction*)action;
 - (void)onDismiss;
 - (IBAction)tapOutSideBanner:(UIButton *)sender;
 - (IBAction)btnClose:(UIButton *)sender;

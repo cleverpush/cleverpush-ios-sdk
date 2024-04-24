@@ -5,6 +5,7 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPAppBannerViewController.h"
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
@@ -731,28 +732,22 @@ static CPAppBannerActionBlock _actionCallback;
             buttonBlockDic = [message.body mutableCopy];
             buttonBlockDic[@"bannerAction"] = @"type";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [CPUtils performActionCallback:action];
+
+            NSBundle *bundle = [CPUtils getAssetsBundle];
+            CPAppBannerViewController *appBannerViewController;
+            if (bundle) {
+                appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+            } else {
+                appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:[NSBundle mainBundle]];
+            }
+
+            [appBannerViewController actionCallback:action];
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {
                 [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
             }
         }
-    }
-}
-
-#pragma mark - Callback event for tracking clicks
-+ (void)setActionCallback:(CPAppBannerActionBlock)callback {
-    _actionCallback = callback;
-}
-
-+ (CPAppBannerActionBlock)actionCallback {
-    return _actionCallback;
-}
-
-+ (void)performActionCallback:(CPAppBannerAction *)action {
-    if (_actionCallback) {
-        _actionCallback(action);
     }
 }
 

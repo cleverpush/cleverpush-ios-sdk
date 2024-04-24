@@ -45,7 +45,5 @@
 + (void)tryOpenURL:(NSURL *)url;
 + (BOOL)isValidURL:(NSURL *)url;
 + (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
-+ (void)setActionCallback:(CPAppBannerActionBlock)callback;
-+ (void)performActionCallback:(CPAppBannerAction *)action;
 
 @end
