@@ -103,7 +103,6 @@ int localEventTrackingRetentionDays = 90;
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
-static NSString* lastClickedSessionNotificationId;
 static NSString* iabtcfVendorConsents = @"IABTCF_VendorConsents";
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
@@ -586,8 +585,6 @@ static id isNil(id object) {
 - (void)applicationDidEnterBackground API_AVAILABLE(ios(10.0)) {
     [self updateBadge:nil];
     [self trackSessionEnd];
-
-    lastClickedSessionNotificationId = nil;
 }
 
 #pragma mark - Initialised Features.
@@ -1722,7 +1719,12 @@ static id isNil(id object) {
         return;
     }
     lastNotificationOpenedId = notificationId;
-    lastClickedSessionNotificationId = notificationId;
+
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+
+    [userDefaults setObject:notificationId forKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_ID_KEY];
+    [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_TIME_KEY];
+    [userDefaults synchronize];
 
     if (action != nil && ([action isEqualToString:@"__DEFAULT__"] || [action isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"])) {
         action = nil;
@@ -3039,14 +3041,25 @@ static id isNil(id object) {
                         return;
                     }
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
-                    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             channelId, @"channelId",
-                                             eventId, @"eventId",
-                                             subscriptionId, @"subscriptionId",
-                                             isNil(properties), @"properties",
-                                             isNil(lastClickedSessionNotificationId), @"notificationId",
-                                             nil];
-                    
+                    NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                    channelId, @"channelId",
+                                                    eventId, @"eventId",
+                                                    subscriptionId, @"subscriptionId",
+                                                    isNil(properties), @"properties",
+                                                    nil];
+
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+
+                    NSString* lastClickedNotificationId = [userDefaults stringForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_ID_KEY];
+                    NSDate* lastClickedNotificationTimeStamp = [userDefaults objectForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_TIME_KEY];
+
+                    if (![CPUtils isNullOrEmpty:lastClickedNotificationId] && lastClickedNotificationTimeStamp != nil && [lastClickedNotificationTimeStamp isKindOfClass:[NSDate class]]) {
+                        NSTimeInterval secondsSinceLastClick = [[NSDate date] timeIntervalSinceDate:lastClickedNotificationTimeStamp];
+                        if (secondsSinceLastClick <= 60 * 60) {
+                            [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
+                        }
+                    }
+
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
                     
