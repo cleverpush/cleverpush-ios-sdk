@@ -704,7 +704,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             UIViewController *topController = [CleverPush topViewController];
             [topController dismissViewControllerAnimated:YES completion:nil];
         } else if ([message.name isEqualToString:@"subscribe"]) {
-            [CleverPush subscribe];
+            [self handleSubscribeActionWithCallback:^(BOOL success) {
+                if (success) {
+                    [CleverPush subscribe];
+                }
+            }];
         } else if ([message.name isEqualToString:@"unsubscribe"]) {
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"trackEvent"]) {
@@ -748,6 +752,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }
         }
     }
+}
+
+#pragma mark - Notification Settings
++ (void)handleSubscribeActionWithCallback:(void (^)(BOOL))callback {
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *settings) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (settings.authorizationStatus == UNAuthorizationStatusDenied) {
+                NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                }
+                callback(NO);
+            } else {
+                callback(YES);
+            }
+        });
+    }];
 }
 
 #pragma mark - Check string is nil, null or empty

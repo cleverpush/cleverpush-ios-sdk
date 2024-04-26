@@ -866,7 +866,11 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
-                [CleverPush subscribe];
+                [CPUtils handleSubscribeActionWithCallback:^(BOOL success) {
+                    if (success) {
+                        [CleverPush subscribe];
+                    }
+                }];
             }
 
             if (action && [action.type isEqualToString:@"addTags"]) {
