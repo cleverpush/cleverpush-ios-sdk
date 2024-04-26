@@ -704,7 +704,20 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             UIViewController *topController = [CleverPush topViewController];
             [topController dismissViewControllerAnimated:YES completion:nil];
         } else if ([message.name isEqualToString:@"subscribe"]) {
-            [CleverPush subscribe];
+            [CleverPush areNotificationsEnabled:^(BOOL notificationsEnabled) {
+                if (notificationsEnabled) {
+                    [CleverPush subscribe];
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                            [[UIApplication sharedApplication] openURL:url
+                                                               options:@{}
+                                                     completionHandler:nil];
+                        }
+                    });
+                }
+            }];
         } else if ([message.name isEqualToString:@"unsubscribe"]) {
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"trackEvent"]) {

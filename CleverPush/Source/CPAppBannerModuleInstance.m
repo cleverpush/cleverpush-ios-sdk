@@ -866,7 +866,20 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
-                [CleverPush subscribe];
+                [CleverPush areNotificationsEnabled:^(BOOL notificationsEnabled) {
+                    if (notificationsEnabled) {
+                        [CleverPush subscribe];
+                    } else {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                [[UIApplication sharedApplication] openURL:url
+                                                                   options:@{}
+                                                         completionHandler:nil];
+                            }
+                        });
+                    }
+                }];
             }
 
             if (action && [action.type isEqualToString:@"addTags"]) {
