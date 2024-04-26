@@ -866,18 +866,9 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
-                [CleverPush areNotificationsEnabled:^(BOOL notificationsEnabled) {
-                    if (notificationsEnabled) {
+                [CPUtils handleSubscribeActionWithCallback:^(BOOL success) {
+                    if (success) {
                         [CleverPush subscribe];
-                    } else {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-                            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                                [[UIApplication sharedApplication] openURL:url
-                                                                   options:@{}
-                                                         completionHandler:nil];
-                            }
-                        });
                     }
                 }];
             }
