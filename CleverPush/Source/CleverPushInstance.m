@@ -1399,13 +1399,10 @@ static id isNil(id object) {
 
     [self makeSyncSubscriptionRequest:^(NSError* error) {
         [CPLog error:@"syncSubscription error: %@", [error localizedDescription]];
-        [self setSubscriptionInProgress:false];
         if (failureBlock) {
             failureBlock(error);
         }
     } successBlock:^() {
-        [self setSubscriptionInProgress:false];
-
         if (topicsChangedBlock) {
             topicsChangedBlock();
         }
@@ -1509,6 +1506,7 @@ static id isNil(id object) {
         [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
             [self setUnsubscribeStatus:NO];
             [self updateDeselectFlag:NO];
+            [self setSubscriptionInProgress:false];
 
             if ([results objectForKey:@"topics"] != nil) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -1575,6 +1573,8 @@ static id isNil(id object) {
                 });
             }
         } onFailure:^(NSError* error) {
+           [self setSubscriptionInProgress:false];
+            
             if (failureBlock) {
                 failureBlock(error);
             }
