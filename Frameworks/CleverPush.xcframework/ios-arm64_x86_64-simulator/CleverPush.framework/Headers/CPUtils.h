@@ -38,6 +38,7 @@
 + (NSArray<NSString *> *)scriptMessageNames;
 + (void)configureWebView:(WKWebView *)webView;
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
++ (void)handleSubscribeActionWithCallback:(void (^)(BOOL))callback;
 + (BOOL)isNullOrEmpty:(NSString *)string;
 + (NSURL*)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement;
 + (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary;
