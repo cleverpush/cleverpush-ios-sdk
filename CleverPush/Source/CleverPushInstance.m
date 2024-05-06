@@ -792,6 +792,23 @@ static id isNil(id object) {
         nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60]; // 3 days after last sync
     }
     [CPLog info:@"next sync: %@", nextSync];
+
+    // Check if the file exists in the Documents directory
+    NSString *filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"CleverPushMigration.txt"];
+    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:filePath];
+
+    if (!fileExists) {
+        [CPLog info:@"CleverPushMigration file does not exist, creating file and forcing sync"];
+
+        // Create the CleverPushMigration file
+        BOOL success = [[NSFileManager defaultManager] createFileAtPath:filePath contents:nil attributes:nil];
+        if (!success) {
+            [CPLog error:@"Failed to create CleverPushMigration file"];
+        }
+
+        [self syncSubscription]; // call a sync method again if the file is missing
+    }
+
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
 }
 
