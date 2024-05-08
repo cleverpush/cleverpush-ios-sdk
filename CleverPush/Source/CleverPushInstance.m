@@ -104,6 +104,7 @@ static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSString* iabtcfVendorConsents = @"IABTCF_VendorConsents";
+static NSString* syncFile = @"syncFile.txt";
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
 
@@ -793,20 +794,21 @@ static id isNil(id object) {
     }
     [CPLog info:@"next sync: %@", nextSync];
 
-    // Check if the file exists in the Documents directory
-    NSString *filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"CleverPushMigration.txt"];
-    BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:filePath];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:syncFile];
 
-    if (!fileExists) {
-        [CPLog info:@"CleverPushMigration file does not exist, creating file and forcing sync"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSError *error = nil;
+        NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+        BOOL fileWritten = [[NSData data] writeToFile:filePath options:NSDataWritingAtomic error:&error];
+        BOOL success = [fileURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&error];
 
-        // Create the CleverPushMigration file
-        BOOL success = [[NSFileManager defaultManager] createFileAtPath:filePath contents:nil attributes:nil];
-        if (!success) {
-            [CPLog error:@"Failed to create CleverPushMigration file"];
+        if (!fileWritten || !success) {
+            [CPLog debug:@"Failed to write sync file or Error excluding file from backup: %@", error];
         }
 
-        [self syncSubscription]; // call a sync method again if the file is missing
+        return NO;
     }
 
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
@@ -1046,7 +1048,6 @@ static id isNil(id object) {
 }
 
 #pragma mark - channel subscription
-
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         confirmAlertShown = YES;
@@ -1310,7 +1311,6 @@ static id isNil(id object) {
 }
 
 #pragma mark - identify the channels being subscribed or not
-
 - (BOOL)isSubscribed {
     if (subscriptionId) {
         return YES;
@@ -1674,7 +1674,7 @@ static id isNil(id object) {
 #pragma mark - Handle silent notification
 - (BOOL)handleSilentNotificationReceived:(UIApplication* _Nullable)application UserInfo:(NSDictionary* _Nullable)messageDict completionHandler:(void(^ _Nullable)(UIBackgroundFetchResult))completionHandler {
     BOOL startedBackgroundJob = NO;
-    [CPLog debug:@"shandleSilentNotificationReceived"];
+    [CPLog debug:@"handleSilentNotificationReceived"];
 
     if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
         [CleverPush handleNotificationReceived:messageDict isActive:NO];
