@@ -104,7 +104,7 @@ static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSString* iabtcfVendorConsents = @"IABTCF_VendorConsents";
-static NSString* syncFile = @"syncFile.txt";
+static NSString* detectDeviceMigrationFile = @"CleverPush_SHOULD_SYNC_FILE.txt";
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
 
