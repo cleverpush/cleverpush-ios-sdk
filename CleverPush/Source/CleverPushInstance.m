@@ -808,7 +808,13 @@ static id isNil(id object) {
             [CPLog debug:@"Failed to write sync file or Error excluding file from backup: %@", error];
         }
 
-        return NO;
+        [self ensureMainThreadSync:^{
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }];
+
+        return YES;
+    } else {
+        NSLog(@"File exists");
     }
 
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
