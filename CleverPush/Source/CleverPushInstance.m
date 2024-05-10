@@ -104,6 +104,7 @@ static NSString* channelId;
 static NSString* lastNotificationReceivedId;
 static NSString* lastNotificationOpenedId;
 static NSString* iabtcfVendorConsents = @"IABTCF_VendorConsents";
+static NSString* detectDeviceMigrationFile = @"CleverPush_SHOULD_SYNC_FILE.txt";
 static NSDictionary* channelConfig;
 static CleverPushInstance* singleInstance = nil;
 
@@ -792,6 +793,28 @@ static id isNil(id object) {
         nextSync = [lastSync dateByAddingTimeInterval:3*24*60*60]; // 3 days after last sync
     }
     [CPLog info:@"next sync: %@", nextSync];
+
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:detectDeviceMigrationFile];
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+        NSError *error = nil;
+        NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+        BOOL fileWritten = [[NSData data] writeToFile:filePath options:NSDataWritingAtomic error:&error];
+        BOOL success = [fileURL setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&error];
+
+        if (!fileWritten || !success) {
+            [CPLog debug:@"Failed to write sync file or Error excluding file from backup: %@", error];
+        }
+
+        [self ensureMainThreadSync:^{
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }];
+
+        return YES;
+    }
+
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
 }
 
@@ -1029,7 +1052,6 @@ static id isNil(id object) {
 }
 
 #pragma mark - channel subscription
-
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         confirmAlertShown = YES;
@@ -1293,7 +1315,6 @@ static id isNil(id object) {
 }
 
 #pragma mark - identify the channels being subscribed or not
-
 - (BOOL)isSubscribed {
     if (subscriptionId) {
         return YES;
@@ -1657,7 +1678,7 @@ static id isNil(id object) {
 #pragma mark - Handle silent notification
 - (BOOL)handleSilentNotificationReceived:(UIApplication* _Nullable)application UserInfo:(NSDictionary* _Nullable)messageDict completionHandler:(void(^ _Nullable)(UIBackgroundFetchResult))completionHandler {
     BOOL startedBackgroundJob = NO;
-    [CPLog debug:@"shandleSilentNotificationReceived"];
+    [CPLog debug:@"handleSilentNotificationReceived"];
 
     if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
         [CleverPush handleNotificationReceived:messageDict isActive:NO];
