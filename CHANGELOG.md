@@ -1,8 +1,10 @@
+## 1.30.15 (10.05.2024)
+* Optimised `shouldSync` function to fix issues after device migration.
+
 ## 1.30.14 (01.05.2024)
 * Optimised `setSubscriptionInProgress` function.
 * Pass the `lastClickedNotificationId` in `trackEvent` if it was within 60 minutes of the `trackEvent` call.
 * Added a feature in the app banners with subscribe action: if notification permission has been blocked, then notification settings should be redirected.
-
 
 ## 1.30.13 (24.04.2024)
 * Optimised `CPAppBannerActionBlock` callback function for HTML app banners.
