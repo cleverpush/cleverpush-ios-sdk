@@ -813,8 +813,6 @@ static id isNil(id object) {
         }];
 
         return YES;
-    } else {
-        NSLog(@"File exists");
     }
 
     return [nextSync compare:[NSDate date]] == NSOrderedAscending;
