@@ -59,30 +59,40 @@ NSArray* ClassGetSubclasses(Class parentClass) {
         return nil;
     }
 
-    Class *classes = (Class*)malloc(sizeof(Class) * numClasses);
-    if (classes == NULL) {
+    int memSize = sizeof(Class) * numClasses;
+    Class *classes = (__unsafe_unretained Class *)malloc(memSize);
+
+    if (classes == NULL && memSize) {
         return nil;
     }
 
-    objc_getClassList(classes, numClasses);
-    
-    NSMutableArray *result = [NSMutableArray array];
-    
+    numClasses = objc_getClassList(classes, numClasses);
+
+
+    NSMutableArray *indexesToSwizzle = [NSMutableArray new];
     for (NSInteger i = 0; i < numClasses; i++) {
         Class superClass = classes[i];
 
-        if (superClass != nil) {
-            if (superClass && superClass != parentClass) {
-                while(superClass && superClass != parentClass) {
-                    superClass = class_getSuperclass(superClass);
-                }
+        if (superClass == parentClass) {
+            continue;
+        }
 
-                [result addObject:classes[i]];
-            }
+        while (superClass && superClass != parentClass) {
+            superClass = class_getSuperclass(superClass);
+        }
+
+        if (superClass != nil) {
+            [indexesToSwizzle addObject:@(i)];
         }
     }
-    
+
+    NSMutableArray *subclasses = [NSMutableArray new];
+    for (NSNumber *i in indexesToSwizzle) {
+        NSInteger index = [i integerValue];
+        [subclasses addObject:classes[index]];
+    }
+
     free(classes);
-    
-    return result;
+
+    return [NSArray arrayWithArray:subclasses];
 }
