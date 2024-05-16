@@ -742,7 +742,7 @@ static CleverPush* singleInstance = nil;
         return;
     }
 
-    injectToProperClass(@selector(setCleverPushDelegate:), @selector(setDelegate:), @[], [CleverPushAppDelegate class], [UIApplication class]);
+    injectSelector([UIApplication class], @selector(setDelegate:), [CleverPushAppDelegate class], @selector(setCleverPushDelegate:));
 
 #pragma clang diagnostic pop
 

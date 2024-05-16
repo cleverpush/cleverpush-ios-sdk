@@ -24,13 +24,10 @@ __weak static id previousDelegate;
 #pragma mark - Initialise UNUserNotificationCenter
 + (void)injectSelectors {
     if (@available(iOS 10.0, *)) {
-        injectToProperClass(@selector(setCleverPushUNDelegate:), @selector(setDelegate:), @[], [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
-        injectToProperClass(@selector(cleverPushRequestAuthorizationWithOptions:completionHandler:),
-                            @selector(requestAuthorizationWithOptions:completionHandler:), @[],
-                            [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
-        injectToProperClass(@selector(cleverPushGetNotificationSettingsWithCompletionHandler:),
-                            @selector(getNotificationSettingsWithCompletionHandler:), @[],
-                            [CleverPushUNUserNotificationCenter class], [UNUserNotificationCenter class]);
+        injectSelector([UNUserNotificationCenter class], @selector(setDelegate:), [CleverPushUNUserNotificationCenter class], @selector(setCleverPushUNDelegate:));
+        injectSelector([UNUserNotificationCenter class], @selector(requestAuthorizationWithOptions:completionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushRequestAuthorizationWithOptions:completionHandler:));
+        injectSelector([UNUserNotificationCenter class], @selector(getNotificationSettingsWithCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushGetNotificationSettingsWithCompletionHandler:));
+
     }
 }
 
@@ -58,15 +55,11 @@ __weak static id previousDelegate;
     }
 
     previousDelegate = delegate;
+    delegateUNClass = [delegate class];
+    
+    injectSelector(delegateUNClass, @selector(userNotificationCenter:willPresentNotification:withCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:));
+    injectSelector(delegateUNClass, @selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:));
 
-    delegateUNClass = getClassWithProtocolInHierarchy([delegate class], @protocol(UNUserNotificationCenterDelegate));
-    delegateUNSubclasses = ClassGetSubclasses(delegateUNClass);
-
-    injectToProperClass(@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:),
-                        @selector(userNotificationCenter:willPresentNotification:withCompletionHandler:), delegateUNSubclasses, [CleverPushUNUserNotificationCenter class], delegateUNClass);
-
-    injectToProperClass(@selector(cleverPushUserNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:),
-                        @selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:), delegateUNSubclasses, [CleverPushUNUserNotificationCenter class], delegateUNClass);
 
     [self setCleverPushUNDelegate:delegate];
 }
