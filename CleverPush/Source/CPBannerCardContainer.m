@@ -58,6 +58,22 @@
             self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
         }
     }
+    [self updateTableViewContentInset];
+}
+
+- (void)updateTableViewContentInset {
+    if (![self.data.contentType isEqualToString:@"html"]) {
+        CGFloat viewHeight = self.tblCPBanner.frame.size.height;
+        CGFloat tableViewContentHeight = self.tblCPBanner.contentSize.height;
+
+        if (tableViewContentHeight < viewHeight) {
+            CGFloat marginHeight = (viewHeight - tableViewContentHeight) / 2.0;
+            self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, -marginHeight, 0);
+            self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
+        } else {
+            self.tblCPBanner.contentInset = UIEdgeInsetsZero;
+        }
+    }
 }
 
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
