@@ -25,8 +25,6 @@
 
 static Class delegateClass = nil;
 
-static NSArray* delegateSubclasses = nil;
-
 + (Class)delegateClass {
     return delegateClass;
 }
@@ -38,21 +36,15 @@ static NSArray* delegateSubclasses = nil;
     }
     
     Class newClass = [CleverPushAppDelegate class];
-    
-    delegateClass = getClassWithProtocolInHierarchy([delegate class], @protocol(UIApplicationDelegate));
-    delegateSubclasses = ClassGetSubclasses(delegateClass);
-    
-    injectToProperClass(@selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:),
-                        @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:), delegateSubclasses, newClass, delegateClass);
-    
+    delegateClass = [delegate class];
+
+    injectSelector(delegateClass, @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:), newClass, @selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:));
+
     [CleverPushAppDelegate injectPreiOS10MethodsPhase1];
-    
-    injectToProperClass(@selector(cleverPushDidFailRegisterForRemoteNotification:error:),
-                        @selector(application:didFailToRegisterForRemoteNotificationsWithError:), delegateSubclasses, newClass, delegateClass);
-    
-    injectToProperClass(@selector(cleverPushDidRegisterForRemoteNotifications:deviceToken:),
-                        @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:), delegateSubclasses, newClass, delegateClass);
-    
+
+    injectSelector(delegateClass, @selector(application:didFailToRegisterForRemoteNotificationsWithError:), newClass, @selector(cleverPushDidFailRegisterForRemoteNotification:error:));
+    injectSelector(delegateClass, @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:), newClass, @selector(cleverPushDidRegisterForRemoteNotifications:deviceToken:));
+
     [CleverPushAppDelegate injectPreiOS10MethodsPhase2];
     
     [self setCleverPushDelegate:delegate];
@@ -67,9 +59,8 @@ static NSArray* delegateSubclasses = nil;
     if ([self isIOSVersionGreaterOrEqual:10]) {
         return;
     }
-    
-    injectToProperClass(@selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:),
-                        @selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+
+    injectSelector(delegateClass, @selector(application:handleActionWithIdentifier:forLocalNotification:completionHandler:), [CleverPushAppDelegate class], @selector(cleverPushLocalNotificationOpened:handleActionWithIdentifier:forLocalNotification:completionHandler:));
 }
 
 #pragma mark - Initialise and register remote notification before iOS 10
@@ -78,10 +69,9 @@ static NSArray* delegateSubclasses = nil;
         return;
     }
     
-    injectToProperClass(@selector(cleverPushReceivedRemoteNotification:userInfo:),
-                        @selector(application:didReceiveRemoteNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
-    injectToProperClass(@selector(cleverPushLocalNotificationOpened:notification:),
-                        @selector(application:didReceiveLocalNotification:), delegateSubclasses, [CleverPushAppDelegate class], delegateClass);
+    injectSelector(delegateClass, @selector(application:didReceiveRemoteNotification:), [CleverPushAppDelegate class], @selector(cleverPushReceivedRemoteNotification:userInfo:));
+    injectSelector(delegateClass, @selector(application:didReceiveLocalNotification:), [CleverPushAppDelegate class], @selector(cleverPushLocalNotificationOpened:notification:));
+
 }
 
 
@@ -137,7 +127,7 @@ static NSArray* delegateSubclasses = nil;
         && ![[CleverPush valueForKey:@"startFromNotification"] boolValue]) {
         [self cleverPushReceivedRemoteNotification:application userInfo:userInfo];
     }
-    
+
     if (!startedBackgroundJob) {
         completionHandler(UIBackgroundFetchResultNewData);
     }
