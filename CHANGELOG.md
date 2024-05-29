@@ -1,3 +1,7 @@
+## 1.30.16 (29.05.2024)
+* Optimised `ClassGetSubclasses` objects prevent crashes.
+* For NON-HTML Banners the Content needs to be centred vertically.
+
 ## 1.30.15 (10.05.2024)
 * Optimised `shouldSync` function to fix issues after device migration.
 
