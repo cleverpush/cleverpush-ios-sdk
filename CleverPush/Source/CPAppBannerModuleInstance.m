@@ -918,6 +918,8 @@ NSInteger currentScreenIndex = 0;
                     if ([cleverPushLocationClass respondsToSelector:selector]) {
                         [cleverPushLocationClass performSelector:selector withObject:nil afterDelay:0];
                     }
+                } else {
+                    [CPLog error:@"CleverPushLocation framework not found. Please ensure that CleverPushLocation framework is correctly integrated."];
                 }
             }
         };
