@@ -912,6 +912,20 @@ NSInteger currentScreenIndex = 0;
                     pasteboard.string = voucherCode;
                 }
             }
+
+            if (action && [action.type isEqualToString:@"geoLocation"]) {
+                Class cleverPushLocationClass = NSClassFromString(@"CleverPushLocation");
+
+                if (cleverPushLocationClass) {
+                    SEL selector = NSSelectorFromString(@"requestLocationPermission");
+
+                    if ([cleverPushLocationClass respondsToSelector:selector]) {
+                        [cleverPushLocationClass performSelector:selector withObject:nil afterDelay:0];
+                    }
+                } else {
+                    [CPLog error:@"CleverPushLocation framework not found. Please ensure that CleverPushLocation framework is correctly integrated."];
+                }
+            }
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
