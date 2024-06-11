@@ -813,4 +813,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return components.URL;
 }
 
+#pragma mark - Converts UISceneConnectionOptions to launch options.
++ (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions {
+    NSMutableDictionary *launchOptions = [NSMutableDictionary dictionary];
+
+    if (connectionOptions.notificationResponse) {
+        NSDictionary *userInfo = connectionOptions.notificationResponse.notification.request.content.userInfo;
+        [launchOptions setObject:userInfo forKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    }
+
+    return launchOptions;
+}
+
 @end
