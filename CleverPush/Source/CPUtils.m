@@ -814,7 +814,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - Converts UISceneConnectionOptions to launch options.
-+ (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions {
++ (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
     NSMutableDictionary *launchOptions = [NSMutableDictionary dictionary];
 
     if (connectionOptions.notificationResponse) {
