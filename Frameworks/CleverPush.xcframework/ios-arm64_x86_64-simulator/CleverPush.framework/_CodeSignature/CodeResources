@@ -222,7 +222,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		HlD1OvTY6Jcq0Ri1YQnHkO2Otds=
+		SowCZhEwJKAHRLvbrINrXaWwMsE=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -246,7 +246,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
+		o53q+irD3rmtGdycGj0lWmJifUA=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -254,7 +254,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		qL5TxBtuRTHWs/q8PMuYCReoBb4=
+		egWWXe88dADmJnZZ4baRSGTvvG4=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -877,11 +877,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			HlD1OvTY6Jcq0Ri1YQnHkO2Otds=
+			SowCZhEwJKAHRLvbrINrXaWwMsE=
 			</data>
 			<key>hash2</key>
 			<data>
-			UgixYdx2XSlnaJElckfqjkI8qV5DwJsNcw4OJ+LFaHc=
+			McHrYHdRNuPUZIVc4b73hTWCo6Goi7C18X3ypHpTvYM=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
@@ -943,11 +943,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
+			o53q+irD3rmtGdycGj0lWmJifUA=
 			</data>
 			<key>hash2</key>
 			<data>
-			TYhFY5fmXV4Y/MOIWB8xhj9CPW8VP30H0hzFT8LP9EE=
+			Z+DMK/N6C7mKGOn7t787tAR+n1Dqhrrrlp3PSCIUYOE=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -965,11 +965,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			qL5TxBtuRTHWs/q8PMuYCReoBb4=
+			egWWXe88dADmJnZZ4baRSGTvvG4=
 			</data>
 			<key>hash2</key>
 			<data>
-			W/liwsuOnc149jrQFseHkLCsqZu7ldwJHEdSEoBfdJ8=
+			Zjbm0gf6hNqguIa1cuDDy21dJwC5zgvbBLuLr8k+bm4=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

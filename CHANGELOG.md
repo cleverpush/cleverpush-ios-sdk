@@ -1,3 +1,7 @@
+## 1.30.17 (12.06.2024)
+* implemented `initWithConnectionOptions` methods for scene delegate support.
+* Added a feature in `AppBanner` to support the geolocation request.
+
 ## 1.30.16 (29.05.2024)
 * Optimised `ClassGetSubclasses` objects prevent crashes.
 * For NON-HTML Banners the Content needs to be centred vertically.
