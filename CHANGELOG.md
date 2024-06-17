@@ -1,3 +1,6 @@
+## 1.30.18 (17.06.2024)
+* Added storyIconCornerRadius, storyIconSpacing, storyIconShadow, storyIconBorderVisibility customisation options for story view.
+
 ## 1.30.17 (12.06.2024)
 * implemented `initWithConnectionOptions` methods for scene delegate support.
 * Added a feature in `AppBanner` to support the geolocation request.
