@@ -17,9 +17,13 @@ typedef void (^CPStoryViewOpenedBlock)(NSURL* url);
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) NSString *fontStyle;
 @property (nonatomic, assign) BOOL titleVisibility;
+@property (nonatomic, assign) BOOL storyIconBorderVisibility;
+@property (nonatomic, assign) BOOL storyIconShadow;
 @property (nonatomic) int titleTextSize;
 @property (nonatomic) int storyIconHeight;
 @property (nonatomic) int storyIconWidth;
+@property (nonatomic) int storyIconCornerRadius;
+@property (nonatomic) int storyIconSpacing;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id;
@@ -28,6 +32,7 @@ typedef void (^CPStoryViewOpenedBlock)(NSURL* url);
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth;
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id;
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth;
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconShadow:(BOOL)storyIconShadow  widgetId:(NSString *)id ;
 
 + (void)setWidgetId:(NSString*)widgetId;
 
