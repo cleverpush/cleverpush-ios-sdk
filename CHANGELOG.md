@@ -1,3 +1,8 @@
+## 1.30.19 (21.06.2024)
+* Resolved issue of app banner should not be closed if we don't select dismiss on the click checkbox.
+* Resolved issue of track page view assigns all the tags if we pass the blank url.
+* Resolved issue of handleinitialized callback is not working with initwithconnectionoptions
+
 ## 1.30.18 (17.06.2024)
 * Added storyIconCornerRadius, storyIconSpacing, storyIconShadow, storyIconBorderVisibility customisation options for story view.
 
