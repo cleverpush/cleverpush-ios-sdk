@@ -3235,7 +3235,7 @@ static id isNil(id object) {
         }
 
         if ([CPUtils isNullOrEmpty:pathname]) {
-            [CPLog debug:@"autoAssignTagMatches - pathname is nil"];
+            [CPLog debug:@"autoAssignTagMatches - pathname is nil or empty"];
             callback(NO);
             return;
         }
