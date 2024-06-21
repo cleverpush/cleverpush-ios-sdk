@@ -415,7 +415,7 @@ static id isNil(id object) {
                autoRegister:(BOOL)autoRegisterParam
               handleInitialized:(CPInitializedBlock  _Nullable)initializedCallback  API_AVAILABLE(ios(13.0)){
     NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:handleInitialized];
+    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:initializedCallback];
 }
 
 #pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
