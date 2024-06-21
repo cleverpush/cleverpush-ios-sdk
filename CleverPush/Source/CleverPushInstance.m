@@ -3233,7 +3233,18 @@ static id isNil(id object) {
         if ([path isEqualToString:@"[EMPTY]"]) {
             path = @"";
         }
-        if ([pathname rangeOfString:path options:NSRegularExpressionSearch].location != NSNotFound) {
+
+        if ([CPUtils isNullOrEmpty:pathname]) {
+            [CPLog debug:@"autoAssignTagMatches - pathname is nil"];
+            callback(NO);
+            return;
+        }
+
+        NSRange range = [pathname rangeOfString:path options:NSRegularExpressionSearch];
+        if (range.location == NSNotFound) {
+            callback(NO);
+            return;
+        } else {
             callback(YES);
             return;
         }
