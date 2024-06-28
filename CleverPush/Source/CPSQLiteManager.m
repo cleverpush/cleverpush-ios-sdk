@@ -2,7 +2,9 @@
 #import "CleverPush.h"
 #import "CPLog.h"
 
-@implementation CPSQLiteManager
+@implementation CPSQLiteManager {
+    NSRecursiveLock *_databaseLock;
+}
 
 static CPSQLiteManager *sharedInstance = nil;
 NSString *databaseTable = @"cleverpush_tracked_events";
@@ -12,11 +14,20 @@ sqlite3 *database;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
+        [sharedInstance updateDatabaseSchemaIfNeeded];
     });
     return sharedInstance;
 }
 
-#pragma mark - get the database path
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _databaseLock = [[NSRecursiveLock alloc] init];
+    }
+    return self;
+}
+
+#pragma mark - Get the database path
 - (NSString *)databasePath {
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDir = [documentPaths objectAtIndex:0];
@@ -26,68 +37,116 @@ sqlite3 *database;
 
 #pragma mark - to check if the database exists or not
 - (BOOL)databaseExists {
+    [_databaseLock lock];
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager fileExistsAtPath:[self databasePath]];
+    BOOL exists = [fileManager fileExistsAtPath:[self databasePath]];
+    [_databaseLock unlock];
+    return exists;
 }
 
 #pragma mark - to create the database
 - (BOOL)createDatabase {
+    [_databaseLock lock];
+    BOOL success = NO;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         sqlite3_close(database);
-        return YES;
+        success = YES;
     } else {
         [CPLog debug:@"CPSQLiteManager: createDatabase: Error opening or creating the database."];
-        return NO;
     }
+    [_databaseLock unlock];
+    return success;
 }
 
 #pragma mark - to check if the database table exists or not
 - (BOOL)databaseTableExists:(NSString *)tableName {
+    [_databaseLock lock];
+    BOOL tableExists = NO;
+
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT name FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
         sqlite3_stmt *statement;
 
         if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
             if (sqlite3_step(statement) == SQLITE_ROW) {
-                sqlite3_finalize(statement);
-                sqlite3_close(database);
-                return YES;
+                tableExists = YES;
             }
+            sqlite3_finalize(statement);
         }
-        sqlite3_finalize(statement);
         sqlite3_close(database);
     }
-    return NO;
+
+    [_databaseLock unlock];
+    return tableExists;
 }
 
 #pragma mark - to create the database table if needed
 - (BOOL)createTable {
+    [_databaseLock lock];
+    BOOL success = YES;
     if (![self databaseTableExists:databaseTable]) {
         if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
-            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, eventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdDateTime TEXT, updatedDateTime TEXT, fromValue TEXT, toValue TEXT);", databaseTable];
+            NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, eventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdDateTime TEXT, updatedDateTime TEXT, fromValue TEXT, toValue TEXT, eventProperty TEXT, eventValue TEXT, eventRelation TEXT);", databaseTable];
             char *errMsg;
 
             if (sqlite3_exec(database, [createTableSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
                 [CPLog debug:@"CPSQLiteManager: createTable: Error creating table: %s", errMsg];
                 sqlite3_free(errMsg);
-                sqlite3_close(database);
-                return NO;
+                success = NO;
             }
 
             sqlite3_close(database);
-            return YES;
         }
     }
-    return YES;
+    [_databaseLock unlock];
+    return success;
 }
 
-#pragma mark - to insert the record in the database
-- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
+#pragma mark - Update the database schema if needed
+- (void)updateDatabaseSchemaIfNeeded {
+    [_databaseLock lock];
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
+        NSArray *newColumns = @[@"eventProperty", @"eventValue", @"eventRelation"];
+        for (NSString *column in newColumns) {
+            NSString *checkColumnSQL = [NSString stringWithFormat:@"PRAGMA table_info(%@);", databaseTable];
+            sqlite3_stmt *statement;
+            BOOL columnExists = NO;
 
-    if (![self databaseTableExists:databaseTable]) {
-        if (![self createTable]) {
-            return NO;
+            if (sqlite3_prepare_v2(database, [checkColumnSQL UTF8String], -1, &statement, NULL) == SQLITE_OK) {
+                while (sqlite3_step(statement) == SQLITE_ROW) {
+                    NSString *existingColumnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
+                    if ([existingColumnName isEqualToString:column]) {
+                        columnExists = YES;
+                        break;
+                    }
+                }
+            }
+            sqlite3_finalize(statement);
+
+            if (!columnExists) {
+                NSString *addColumnSQL = [NSString stringWithFormat:@"ALTER TABLE %@ ADD COLUMN %@ TEXT;", databaseTable, column];
+                char *errMsg;
+                if (sqlite3_exec(database, [addColumnSQL UTF8String], NULL, NULL, &errMsg) != SQLITE_OK) {
+                    sqlite3_free(errMsg);
+                }
+            }
         }
+        sqlite3_close(database);
+    }
+    [_databaseLock unlock];
+}
+
+#pragma mark - Insert the record in the database
+- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue {
+    return [self insert:bannerId eventId:eventId property:property value:value relation:relation count:count createdDateTime:createdDateTime updatedDateTime:updatedDateTime fromValue:fromValue toValue:toValue eventProperty:@"" eventValue:@"" eventRelation:@""];
+}
+
+- (BOOL)insert:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation count:(NSNumber *)count createdDateTime:(NSString *)createdDateTime updatedDateTime:(NSString *)updatedDateTime fromValue:(NSString *)fromValue toValue:(NSString *)toValue eventProperty:(NSString *)eventProperty eventValue:(NSString *)eventValue eventRelation:(NSString *)eventRelation {
+    [_databaseLock lock];
+    BOOL success = NO;
+    if (![self databaseTableExists:databaseTable]) {
+        [_databaseLock unlock];
+        return NO;
     }
 
     if (!count) {
@@ -102,12 +161,13 @@ sqlite3 *database;
     if (!updatedDateTime) updatedDateTime = @"";
     if (!fromValue) fromValue = @"";
     if (!toValue) toValue = @"";
+    if (!eventProperty) eventProperty = @"";
+    if (!eventValue) eventValue = @"";
+    if (!eventRelation) eventRelation = @"";
 
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
-
         NSString *selectSQL = [NSString stringWithFormat:
-                               @"SELECT count FROM %@ WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ?;",
-                               databaseTable];
+                               @"SELECT 1 FROM %@ WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ? AND eventProperty = ? AND eventValue = ? AND eventRelation = ? LIMIT 1;", databaseTable];
         sqlite3_stmt *selectStatement;
 
         if (sqlite3_prepare_v2(database, [selectSQL UTF8String], -1, &selectStatement, nil) == SQLITE_OK) {
@@ -116,69 +176,93 @@ sqlite3 *database;
             sqlite3_bind_text(selectStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
             sqlite3_bind_text(selectStatement, 5, [relation UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 6, [eventProperty UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 7, [eventValue UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(selectStatement, 8, [eventRelation UTF8String], -1, SQLITE_STATIC);
 
-            if (sqlite3_step(selectStatement) == SQLITE_ROW) {
-                int currentCount = sqlite3_column_int(selectStatement, 0);
-                int updatedCount = currentCount + 1;
-                sqlite3_finalize(selectStatement);
+            BOOL recordExists = sqlite3_step(selectStatement) == SQLITE_ROW;
+            sqlite3_finalize(selectStatement);
 
-                NSString *updateSQL = [NSString stringWithFormat:
-                                       @"UPDATE %@ SET count = ?, updatedDateTime = ? "
-                                       "WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ?;", databaseTable];
-                sqlite3_stmt *updateStatement;
+            if (!recordExists) {
+                NSString *insertSQL = [NSString stringWithFormat:
+                                       @"INSERT INTO %@ (bannerId, eventId, property, value, relation, count, createdDateTime, updatedDateTime, fromValue, toValue, eventProperty, eventValue, eventRelation) "
+                                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", databaseTable];
+                sqlite3_stmt *insertStatement;
 
-                if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
-                    sqlite3_bind_int(updateStatement, 1, updatedCount);
-                    sqlite3_bind_text(updateStatement, 2, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 3, [bannerId UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 4, [eventId UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 5, [property UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 6, [value UTF8String], -1, SQLITE_STATIC);
-                    sqlite3_bind_text(updateStatement, 7, [relation UTF8String], -1, SQLITE_STATIC);
+                if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
+                    sqlite3_bind_text(insertStatement, 1, [bannerId UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 2, [eventId UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 5, [relation UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_int(insertStatement, 6, count.intValue);
+                    sqlite3_bind_text(insertStatement, 7, [createdDateTime UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 9, [fromValue UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 10, [toValue UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 11, [eventProperty UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 12, [eventValue UTF8String], -1, SQLITE_STATIC);
+                    sqlite3_bind_text(insertStatement, 13, [eventRelation UTF8String], -1, SQLITE_STATIC);
 
-                    if (sqlite3_step(updateStatement) == SQLITE_DONE) {
-                        sqlite3_finalize(updateStatement);
-                        sqlite3_close(database);
-                        return YES;
+                    if (sqlite3_step(insertStatement) == SQLITE_DONE) {
+                        success = YES;
+                    } else {
+                        [CPLog debug:@"CPSQLiteManager: insert: Error inserting into the database."];
                     }
+                    sqlite3_finalize(insertStatement);
                 }
-            }
-        }
-
-        NSString *insertSQL = [NSString stringWithFormat:
-                               @"INSERT INTO %@ (bannerId, eventId, property, value, relation, count, createdDateTime, updatedDateTime, fromValue, toValue) "
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", databaseTable];
-        sqlite3_stmt *insertStatement;
-
-        if (sqlite3_prepare_v2(database, [insertSQL UTF8String], -1, &insertStatement, nil) == SQLITE_OK) {
-            sqlite3_bind_text(insertStatement, 1, [bannerId UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 2, [eventId UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 3, [property UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 4, [value UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 5, [relation UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_int(insertStatement, 6, 1);
-            sqlite3_bind_text(insertStatement, 7, [createdDateTime UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 8, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 9, [fromValue UTF8String], -1, SQLITE_STATIC);
-            sqlite3_bind_text(insertStatement, 10, [toValue UTF8String], -1, SQLITE_STATIC);
-
-            if (sqlite3_step(insertStatement) == SQLITE_DONE) {
-                sqlite3_finalize(insertStatement);
-                sqlite3_close(database);
-                return YES;
             }
         }
         sqlite3_close(database);
     }
-    return NO;
+    [_databaseLock unlock];
+    return success;
 }
 
-#pragma mark - to get all the recrods from database
+#pragma mark - Update the record in the database
+- (BOOL)updateCountForEventWithId:(NSString *)eventId eventValue:(NSString *)eventValue eventProperty:(NSString *)eventProperty updatedDateTime:(NSString *)updatedDateTime {
+    [_databaseLock lock];
+    BOOL success = NO;
+    if (![self databaseTableExists:databaseTable]) {
+        [_databaseLock unlock];
+        return NO;
+    }
+
+
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
+        NSString *updateSQL = [NSString stringWithFormat:
+                               @"UPDATE %@ SET count = count + 1, updatedDateTime = ? "
+                               "WHERE eventId = ? AND eventValue = ? AND eventProperty = ?;", databaseTable];
+
+        sqlite3_stmt *updateStatement;
+
+        if (sqlite3_prepare_v2(database, [updateSQL UTF8String], -1, &updateStatement, nil) == SQLITE_OK) {
+            sqlite3_bind_text(updateStatement, 1, [updatedDateTime UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(updateStatement, 2, [eventId UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(updateStatement, 3, [eventValue UTF8String], -1, SQLITE_STATIC);
+            sqlite3_bind_text(updateStatement, 4, [eventProperty UTF8String], -1, SQLITE_STATIC);
+
+            if (sqlite3_step(updateStatement) == SQLITE_DONE) {
+                success = YES;
+            }
+            sqlite3_finalize(updateStatement);
+        }
+        sqlite3_close(database);
+    }
+
+    [_databaseLock unlock];
+    return success;
+}
+
+#pragma mark - to get all the records from database
 - (NSArray<CPAppBannerEventFilters *> *)getAllRecords {
     NSMutableArray<CPAppBannerEventFilters *> *recordArray = [NSMutableArray array];
 
+    [_databaseLock lock];
+
     if (![self databaseTableExists:databaseTable]) {
         [CPLog debug:@"CPSQLiteManager: getAllRecords: Table '%@' does not exist.", databaseTable];
+        [_databaseLock unlock];
         return recordArray;
     }
 
@@ -199,6 +283,67 @@ sqlite3 *database;
                     @"updatedDateTime": (const char *)sqlite3_column_text(statement, 8) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 8)] : @"",
                     @"fromValue": (const char *)sqlite3_column_text(statement, 9) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 9)] : @"",
                     @"toValue": (const char *)sqlite3_column_text(statement, 10) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 10)] : @"",
+                    @"eventProperty": (const char *)sqlite3_column_text(statement, 11) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 11)] : @"",
+                    @"eventValue": (const char *)sqlite3_column_text(statement, 12) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 12)] : @"",
+                    @"eventRelation": (const char *)sqlite3_column_text(statement, 13) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 13)] : @"",
+                };
+                CPAppBannerEventFilters *record = [[CPAppBannerEventFilters alloc] initWithJson:recordDict];
+                [recordArray addObject:record];
+            }
+            sqlite3_finalize(statement);
+        }
+        sqlite3_close(database);
+    }
+    [_databaseLock unlock];
+    return recordArray;
+}
+
+#pragma mark - to get particular the records from database for the particular event
+- (NSArray<CPAppBannerEventFilters *> *)getRecordsForEvent:(NSString *)bannerId eventId:(NSString *)eventId property:(NSString *)property value:(NSString *)value relation:(NSString *)relation fromValue:(NSString *)fromValue toValue:(NSString *)toValue eventProperty:(NSString *)eventProperty
+    eventValue:(NSString *)eventValue eventRelation:(NSString *)eventRelation {
+
+    NSMutableArray<CPAppBannerEventFilters *> *recordArray = [NSMutableArray array];
+
+    [_databaseLock lock];
+
+    if (![self databaseTableExists:databaseTable]) {
+        [CPLog debug:@"CPSQLiteManager: getRecordsForEvent: Table '%@' does not exist.", databaseTable];
+        [_databaseLock unlock];
+        return recordArray;
+    }
+
+    sqlite3 *database;
+    if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@ WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ? AND fromValue = ? AND toValue = ? AND eventProperty = ? AND eventValue = ? AND eventRelation = ?;", databaseTable];
+        sqlite3_stmt *statement;
+
+        if (sqlite3_prepare_v2(database, [query UTF8String], -1, &statement, nil) == SQLITE_OK) {
+            sqlite3_bind_text(statement, 1, [bannerId UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 2, [eventId UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 3, [property UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 4, [value UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 5, [relation UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 6, [fromValue UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 7, [toValue UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 8, [eventProperty UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 9, [eventValue UTF8String], -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(statement, 10, [eventRelation UTF8String], -1, SQLITE_TRANSIENT);
+
+            while (sqlite3_step(statement) == SQLITE_ROW) {
+                NSDictionary *recordDict = @{
+                    @"banner" : (const char *)sqlite3_column_text(statement, 1) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)] : @"",
+                    @"event": (const char *)sqlite3_column_text(statement, 2) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 2)] : @"",
+                    @"property": (const char *)sqlite3_column_text(statement, 3) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 3)] : @"",
+                    @"value": (const char *)sqlite3_column_text(statement, 4) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 4)] : @"",
+                    @"relation": (const char *)sqlite3_column_text(statement, 5) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 5)] : @"",
+                    @"count" : [NSString stringWithFormat:@"%d", sqlite3_column_int(statement, 6)] ?: @"",
+                    @"createdDateTime": (const char *)sqlite3_column_text(statement, 7) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 7)] : @"",
+                    @"updatedDateTime": (const char *)sqlite3_column_text(statement, 8) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 8)] : @"",
+                    @"fromValue": (const char *)sqlite3_column_text(statement, 9) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 9)] : @"",
+                    @"toValue": (const char *)sqlite3_column_text(statement, 10) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 10)] : @"",
+                    @"eventProperty": (const char *)sqlite3_column_text(statement, 11) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 11)] : @"",
+                    @"eventValue": (const char *)sqlite3_column_text(statement, 12) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 12)] : @"",
+                    @"eventRelation": (const char *)sqlite3_column_text(statement, 13) ? [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 13)] : @"",
                 };
                 CPAppBannerEventFilters *record = [[CPAppBannerEventFilters alloc] initWithJson:recordDict];
                 [recordArray addObject:record];
@@ -207,6 +352,9 @@ sqlite3 *database;
         sqlite3_finalize(statement);
         sqlite3_close(database);
     }
+
+    [_databaseLock unlock];
+
     return recordArray;
 }
 
