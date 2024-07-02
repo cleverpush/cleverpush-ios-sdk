@@ -26,7 +26,7 @@
             self.name = [json objectForKey:@"name"];
         }
         
-        self.dismiss = YES;
+        self.dismiss = NO;
         if ([json objectForKey:@"dismiss"]) {
             self.dismiss = [[json objectForKey:@"dismiss"] boolValue];
         }

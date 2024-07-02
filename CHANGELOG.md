@@ -1,3 +1,15 @@
+## 1.30.19 (21.06.2024)
+* Resolved issue of app banner should not be closed if we don't select dismiss on the click checkbox.
+* Resolved issue of track page view assigns all the tags if we pass the blank url.
+* Resolved issue of handleinitialized callback is not working with initwithconnectionoptions
+
+## 1.30.18 (17.06.2024)
+* Added storyIconCornerRadius, storyIconSpacing, storyIconShadow, storyIconBorderVisibility customisation options for story view.
+
+## 1.30.17 (12.06.2024)
+* implemented `initWithConnectionOptions` methods for scene delegate support.
+* Added a feature in `AppBanner` to support the geolocation request.
+
 ## 1.30.16 (29.05.2024)
 * Optimised `ClassGetSubclasses` objects prevent crashes.
 * For NON-HTML Banners the Content needs to be centred vertically.
