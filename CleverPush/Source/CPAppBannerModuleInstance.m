@@ -355,17 +355,17 @@ NSInteger currentScreenIndex = 0;
     if (banner.eventFilters.count > 0) {
         NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
 
-        for (CPAppBannerEventFilters *eventsObj in banner.eventFilters) {
-            if (![self isValidTargetValuesWithEvent:eventsObj.event property:eventsObj.property relation:eventsObj.relation value:eventsObj.value fromValue:eventsObj.fromValue toValue:eventsObj.toValue bannerId:banner.id]) {
+        for (CPAppBannerEventFilters *events in banner.eventFilters) {
+            if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
                 continue;
             }
 
-            if (eventsObj.eventProperties.count > 0) {
-                for (CPAppBannerTriggerConditionEventProperty *eventProperties in eventsObj.eventProperties) {
-                    [sqlManager insert:banner.id eventId:eventsObj.event property:eventsObj.property value:eventsObj.value relation:eventsObj.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:eventsObj.fromValue toValue:eventsObj.toValue eventProperty:eventProperties.property eventValue:eventProperties.value eventRelation:eventProperties.relation];
+            if (events.eventProperties.count > 0) {
+                for (CPAppBannerTriggerConditionEventProperty *eventProperties in events.eventProperties) {
+                    [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue eventProperty:eventProperties.property eventValue:eventProperties.value eventRelation:eventProperties.relation];
                 }
             } else {
-                [sqlManager insert:banner.id eventId:eventsObj.event property:eventsObj.property value:eventsObj.value relation:eventsObj.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:eventsObj.fromValue toValue:eventsObj.toValue eventProperty:@"" eventValue:@"" eventRelation:@""];
+                [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue eventProperty:@"" eventValue:@"" eventRelation:@""];
             }
         }
 
