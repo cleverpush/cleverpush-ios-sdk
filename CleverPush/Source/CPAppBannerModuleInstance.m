@@ -376,7 +376,6 @@ NSInteger currentScreenIndex = 0;
             return allowed;
         }
 
-        NSArray *TT = [sqlManager getAllRecords];
 
         NSMutableArray<CPAppBannerEventFilters *> *eventFilteredRecords = [[NSMutableArray alloc] init];
         for (CPAppBannerEventFilters *eventsObj in banner.eventFilters) {
@@ -394,14 +393,6 @@ NSInteger currentScreenIndex = 0;
         if (eventFilteredRecords.count == 0) {
             allowed = NO;
             return allowed;
-        }
-
-        for (CPAppBannerEventFilters *event in eventFilteredRecords) {
-            allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
-            if (!allowed) {
-                allowed = NO;
-                return allowed;
-            }
         }
 
         for (CPAppBannerEventFilters *eventsObj in banner.eventFilters) {
@@ -449,6 +440,7 @@ NSInteger currentScreenIndex = 0;
             }
         }
     }
+
     return allowed;
 }
 
