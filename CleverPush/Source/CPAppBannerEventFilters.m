@@ -57,6 +57,28 @@
             self.updatedAt = [json objectForKey:@"updatedAt"];
         }
 
+        self.eventProperty = @"";
+        if ([json objectForKey:@"eventProperty"] && [[json objectForKey:@"eventProperty"] isKindOfClass:[NSString class]]) {
+            self.eventProperty = [json objectForKey:@"eventProperty"];
+        }
+
+        self.eventValue = @"";
+        if ([json objectForKey:@"eventValue"] && [[json objectForKey:@"eventValue"] isKindOfClass:[NSString class]]) {
+            self.eventValue = [json objectForKey:@"eventValue"];
+        }
+
+        self.eventRelation = @"";
+        if ([json objectForKey:@"eventRelation"] && [[json objectForKey:@"eventRelation"] isKindOfClass:[NSString class]]) {
+            self.eventRelation = [json objectForKey:@"eventRelation"];
+        }
+
+        self.eventProperties = [NSMutableArray new];
+        if ([json objectForKey:@"eventProperties"] != nil) {
+            for (NSDictionary *eventPropertyJson in [json objectForKey:@"eventProperties"]) {
+                [self.eventProperties addObject:[[CPAppBannerTriggerConditionEventProperty alloc] initWithJson:eventPropertyJson]];
+            }
+        }
+        
     }
     return self;
 }

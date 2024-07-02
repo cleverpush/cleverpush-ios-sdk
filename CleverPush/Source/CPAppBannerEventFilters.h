@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "CPAppBannerBlock.h"
 #import "CPAppBannerBackground.h"
+#import "CPAppBannerTriggerConditionEventProperty.h"
 
 @interface CPAppBannerEventFilters : NSObject
 
@@ -14,6 +15,10 @@
 @property (nonatomic, assign) NSString *count;
 @property (nonatomic, strong) NSString *createdAt;
 @property (nonatomic, strong) NSString *updatedAt;
+@property (nonatomic, strong) NSString *eventProperty;
+@property (nonatomic, strong) NSString *eventValue;
+@property (nonatomic, strong) NSString *eventRelation;
+@property (nonatomic, strong) NSMutableArray<CPAppBannerTriggerConditionEventProperty*> *eventProperties;
 
 - (id)initWithJson:(NSDictionary*)json;
 
