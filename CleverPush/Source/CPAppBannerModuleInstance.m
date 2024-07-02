@@ -401,7 +401,6 @@ NSInteger currentScreenIndex = 0;
                 for (CPAppBannerTriggerConditionEventProperty *propertyDict in eventsObj.eventProperties) {
                     NSString *property = propertyDict.property;
                     NSString *value = propertyDict.value;
-                    NSString *relation = propertyDict.relation;
                     BOOL propertyMatched = NO;
 
                     for (NSDictionary *eventDict in eventsCopy) {
