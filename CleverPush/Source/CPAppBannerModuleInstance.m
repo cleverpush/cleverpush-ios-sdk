@@ -866,7 +866,11 @@ NSInteger currentScreenIndex = 0;
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
-                [CleverPush subscribe];
+                [CPUtils handleSubscribeActionWithCallback:^(BOOL success) {
+                    if (success) {
+                        [CleverPush subscribe];
+                    }
+                }];
             }
 
             if (action && [action.type isEqualToString:@"addTags"]) {
@@ -906,6 +910,20 @@ NSInteger currentScreenIndex = 0;
                 pasteboard.string = action.name;
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
                     pasteboard.string = voucherCode;
+                }
+            }
+
+            if (action && [action.type isEqualToString:@"geoLocation"]) {
+                Class cleverPushLocationClass = NSClassFromString(@"CleverPushLocation");
+
+                if (cleverPushLocationClass) {
+                    SEL selector = NSSelectorFromString(@"requestLocationPermission");
+
+                    if ([cleverPushLocationClass respondsToSelector:selector]) {
+                        [cleverPushLocationClass performSelector:selector withObject:nil afterDelay:0];
+                    }
+                } else {
+                    [CPLog error:@"CleverPushLocation framework not found. Please ensure that CleverPushLocation framework is correctly integrated."];
                 }
             }
         };

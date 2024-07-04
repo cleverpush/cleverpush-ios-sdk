@@ -1,3 +1,35 @@
+## 1.30.19 (21.06.2024)
+* Resolved issue of app banner should not be closed if we don't select dismiss on the click checkbox.
+* Resolved issue of track page view assigns all the tags if we pass the blank url.
+* Resolved issue of handleinitialized callback is not working with initwithconnectionoptions
+
+## 1.30.18 (17.06.2024)
+* Added storyIconCornerRadius, storyIconSpacing, storyIconShadow, storyIconBorderVisibility customisation options for story view.
+
+## 1.30.17 (12.06.2024)
+* implemented `initWithConnectionOptions` methods for scene delegate support.
+* Added a feature in `AppBanner` to support the geolocation request.
+
+## 1.30.16 (29.05.2024)
+* Optimised `ClassGetSubclasses` objects prevent crashes.
+* For NON-HTML Banners the Content needs to be centred vertically.
+
+## 1.30.15 (10.05.2024)
+* Optimised `shouldSync` function to fix issues after device migration.
+
+## 1.30.14 (01.05.2024)
+* Optimised `setSubscriptionInProgress` function.
+* Pass the `lastClickedNotificationId` in `trackEvent` if it was within 60 minutes of the `trackEvent` call.
+* Added a feature in the app banners with subscribe action: if notification permission has been blocked, then notification settings should be redirected.
+
+## 1.30.13 (24.04.2024)
+* Optimised `CPAppBannerActionBlock` callback function for HTML app banners.
+
+## 1.30.12 (19.04.2024)
+* Resolved the issue of the transparent background not working if we use the html block in-app banners.
+* Optimised close button position for HTML Banner.
+* Optimised `setsubscriptionchanged` function for chatview.
+
 ## 1.30.11 (05.04.2024)
 * Added a feature in `AppBanner` to support multiple actions on buttons and images.
 * Optimised for app banner image scaling.

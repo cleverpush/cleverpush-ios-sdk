@@ -7,6 +7,8 @@
 
 #define DEFAULT_TEXT_SIZE 10
 #define DEFAULT_ICON_SIZE 75
+#define DEFAULT_ICON_CORNER_RADIUS 0
+#define DEFAULT_ICON_SPACING 10
 #define TEXT_HEIGHT 30
 
 @implementation CPStoryView
@@ -15,30 +17,34 @@ NSString* storyWidgetId;
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:0 storyIconWidth:0 widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:true titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconShadow:NO widgetId:nil];
 }
 
-- (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconShadow:(BOOL)storyIconShadow widgetId:(NSString *)id {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconShadow:storyIconShadow widgetId:id];
+}
+
+- (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconShadow:(BOOL)storyIconShadow widgetId:(NSString *)id {
     if (self) {
         NSString *customWidgetId = id;
         if (customWidgetId == nil || [customWidgetId isKindOfClass:[NSNull class]] || [customWidgetId isEqualToString:@""]) {
@@ -71,8 +77,8 @@ NSString* storyWidgetId;
                         self.fontStyle = @"AppleSDGothicNeo-Regular";
                     }
 
-                    self.titleVisibility = TRUE;
-                    if (titleVisibility == false) {
+                    self.titleVisibility = YES;
+                    if (titleVisibility == NO) {
                         self.titleVisibility = titleVisibility;
                     }
 
@@ -89,6 +95,26 @@ NSString* storyWidgetId;
                     self.storyIconHeight = DEFAULT_ICON_SIZE;
                     if (storyIconHeight > 0) {
                         self.storyIconHeight = storyIconHeight;
+                    }
+
+                    self.storyIconCornerRadius = DEFAULT_ICON_CORNER_RADIUS;
+                    if (storyIconCornerRadius > 0) {
+                        self.storyIconCornerRadius = storyIconCornerRadius;
+                    }
+
+                    self.storyIconSpacing = DEFAULT_ICON_SPACING;
+                    if (storyIconSpacing > 0) {
+                        self.storyIconSpacing = storyIconSpacing;
+                    }
+
+                    self.storyIconBorderVisibility = YES;
+                    if (storyIconBorderVisibility == NO) {
+                        self.storyIconBorderVisibility = storyIconBorderVisibility;
+                    }
+                    
+                    self.storyIconShadow = NO;
+                    if (storyIconShadow == YES) {
+                        self.storyIconShadow = storyIconShadow;
                     }
 
                     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
@@ -145,10 +171,17 @@ NSString* storyWidgetId;
     if (!cell.image) {
         cell.outerRing = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.storyIconWidth, self.storyIconHeight)];
         [cell addSubview:cell.outerRing];
-        cell.image = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, self.storyIconWidth - 10, self.storyIconHeight - 10)];
+
+        if (self.storyIconBorderVisibility) {
+            cell.image = [[UIImageView alloc] initWithFrame:CGRectMake(5, 5, self.storyIconWidth - 10, self.storyIconHeight - 10)];
+        } else {
+            cell.image = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.storyIconWidth, self.storyIconHeight)];
+        }
         [cell.outerRing addSubview:cell.image];
         cell.name = [[UILabel alloc] initWithFrame:CGRectMake(0, cell.outerRing.frame.size.height, self.storyIconWidth, TEXT_HEIGHT)];
-        [cell addSubview:cell.name];
+        if (self.titleVisibility) {
+            [cell addSubview:cell.name];
+        }
     }
 
     cell.image.contentMode = UIViewContentModeScaleAspectFill;
@@ -172,13 +205,29 @@ NSString* storyWidgetId;
     cell.outerRing.layer.cornerRadius = cell.outerRing.frame.size.height / 2;
     cell.outerRing.backgroundColor = UIColor.whiteColor;
 
-    if ([self.readStories containsObject:self.stories[indexPath.item].id]) {
-        cell.outerRing.layer.borderWidth = 2.0;
-        cell.outerRing.layer.borderColor = [UIColor colorWithRed:198.0/255.0 green:198.0/255.0 blue:198.0/255.0 alpha:1.0].CGColor;
-    } else {
-        cell.outerRing.layer.borderWidth = 2.5;
-        cell.outerRing.layer.borderColor = self.ringBorderColor.CGColor;
+    if (self.storyIconCornerRadius > 0) {
+        cell.image.layer.cornerRadius = self.storyIconCornerRadius;
+        cell.outerRing.layer.cornerRadius = self.storyIconCornerRadius;
     }
+
+    if (self.storyIconBorderVisibility) {
+        if ([self.readStories containsObject:self.stories[indexPath.item].id]) {
+            cell.outerRing.layer.borderWidth = 2.0;
+            cell.outerRing.layer.borderColor = [UIColor colorWithRed:198.0/255.0 green:198.0/255.0 blue:198.0/255.0 alpha:1.0].CGColor;
+        } else {
+            cell.outerRing.layer.borderWidth = 2.5;
+            cell.outerRing.layer.borderColor = self.ringBorderColor.CGColor;
+        }
+    }
+
+    if (self.storyIconShadow) {
+        cell.outerRing.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.3].CGColor;
+        cell.outerRing.layer.shadowOffset = CGSizeMake(0, 3);
+        cell.outerRing.layer.shadowOpacity = 0.6;
+        cell.outerRing.layer.shadowRadius = 1.5;
+        cell.outerRing.layer.masksToBounds = NO;
+    }
+
     return cell;
 }
 
@@ -206,6 +255,10 @@ NSString* storyWidgetId;
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(0, 0, 0, 0);
+}
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
+    return self.storyIconSpacing;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {

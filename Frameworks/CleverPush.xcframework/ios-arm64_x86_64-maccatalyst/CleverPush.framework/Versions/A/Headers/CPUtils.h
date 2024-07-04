@@ -38,11 +38,13 @@
 + (NSArray<NSString *> *)scriptMessageNames;
 + (void)configureWebView:(WKWebView *)webView;
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
++ (void)handleSubscribeActionWithCallback:(void (^)(BOOL))callback;
 + (BOOL)isNullOrEmpty:(NSString *)string;
 + (NSURL*)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement;
 + (NSString *)valueForKey:(NSString *)key inDictionary:(NSDictionary *)dictionary;
 + (void)tryOpenURL:(NSURL *)url;
 + (BOOL)isValidURL:(NSURL *)url;
 + (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
++ (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 
 @end

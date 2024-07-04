@@ -56,6 +56,28 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
    handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister handleInitialized:(CPInitializedBlock _Nullable)initializedCallback;
 + (id _Nullable)initWithLaunchOptions:(NSDictionary* _Nullable)launchOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister;
 
+#pragma mark - Initialise with UISceneConnectionOptions
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+                 handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId
+ handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+                 handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister handleInitialized:(CPInitializedBlock _Nullable)initializedCallback API_AVAILABLE(ios(13.0));
++ (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegister API_AVAILABLE(ios(13.0));
+
 + (void)setTrackingConsentRequired:(BOOL)required;
 + (void)setTrackingConsent:(BOOL)consent;
 + (void)setSubscribeConsentRequired:(BOOL)required;

@@ -5,6 +5,7 @@
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPAppBannerViewController.h"
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
@@ -703,7 +704,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             UIViewController *topController = [CleverPush topViewController];
             [topController dismissViewControllerAnimated:YES completion:nil];
         } else if ([message.name isEqualToString:@"subscribe"]) {
-            [CleverPush subscribe];
+            [self handleSubscribeActionWithCallback:^(BOOL success) {
+                if (success) {
+                    [CleverPush subscribe];
+                }
+            }];
         } else if ([message.name isEqualToString:@"unsubscribe"]) {
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"trackEvent"]) {
@@ -728,7 +733,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             buttonBlockDic = [message.body mutableCopy];
             buttonBlockDic[@"bannerAction"] = @"type";
             action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
-            [self actionCallback:action];
+
+            NSBundle *bundle = [CPUtils getAssetsBundle];
+            if (!bundle) {
+                bundle = [NSBundle mainBundle];
+            }
+
+            CPAppBannerViewController *appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+
+            if (appBannerViewController && action) {
+                [appBannerViewController actionCallback:action];
+            }
+
         } else if ([message.name isEqualToString:@"openWebView"]) {
             NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
             if (webUrl && webUrl.scheme && webUrl.host) {
@@ -738,9 +754,21 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 }
 
-#pragma mark - Callback event for tracking clicks
-+ (void)actionCallback:(CPAppBannerAction*)action{
-    [self actionCallback:action];
+#pragma mark - Notification Settings
++ (void)handleSubscribeActionWithCallback:(void (^)(BOOL))callback {
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *settings) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (settings.authorizationStatus == UNAuthorizationStatusDenied) {
+                NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                }
+                callback(NO);
+            } else {
+                callback(YES);
+            }
+        });
+    }];
 }
 
 #pragma mark - Check string is nil, null or empty
@@ -783,6 +811,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     components.query = nil;
 
     return components.URL;
+}
+
+#pragma mark - Converts UISceneConnectionOptions to launch options.
++ (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
+    NSMutableDictionary *launchOptions = [NSMutableDictionary dictionary];
+
+    if (connectionOptions.notificationResponse) {
+        NSDictionary *userInfo = connectionOptions.notificationResponse.notification.request.content.userInfo;
+        [launchOptions setObject:userInfo forKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    }
+
+    return launchOptions;
 }
 
 @end

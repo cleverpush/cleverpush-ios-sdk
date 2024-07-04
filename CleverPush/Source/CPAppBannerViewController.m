@@ -6,6 +6,8 @@
 
 @implementation CPAppBannerViewController
 
+static CPAppBannerActionBlock appBannerActionCallback;
+
 #pragma mark - Controller Life Cycle
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -125,14 +127,18 @@
     }
     UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
+    [self.btnClose setBackgroundColor:UIColor.blackColor];
+
     if (@available(iOS 13.0, *)) {
         [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        self.btnClose.tintColor = color;
+        [self.btnClose setTintColor:UIColor.whiteColor];
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
-        [self.btnClose setTitleColor:color forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
 
+    self.btnClose.alpha = 0.5;
+    self.btnClose.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
     [self.btnClose.layer setMasksToBounds:false];
     if (closeButtonEnabled) {
         self.btnClose.hidden = NO;
@@ -191,16 +197,20 @@
 
 #pragma mark - Set background color
 - (void)setBackgroundColor {
-    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
-        if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
-            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+    if ([self.data.contentType isEqualToString:@"html"]) {
+        [self.view setBackgroundColor:[UIColor clearColor]];
+    } else {
+        if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
+            if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
+                [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+            } else {
+                [self.view setBackgroundColor:[UIColor whiteColor]];
+            }
         } else {
             [self.view setBackgroundColor:[UIColor whiteColor]];
-        }
-    } else {
-        [self.view setBackgroundColor:[UIColor whiteColor]];
-        if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
-            [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+                [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            }
         }
     }
 }
@@ -408,7 +418,8 @@
     self.webView.backgroundColor = [UIColor clearColor];
     self.webView.translatesAutoresizingMaskIntoConstraints = NO;
     [CPUtils configureWebView:self.webView];
-    
+    [self setActionCallback:self.actionCallback];
+
     self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
 
     if (self.data.closeButtonEnabled) {
@@ -419,19 +430,20 @@
         CGFloat width = frame.size.width;
         CGFloat height = frame.size.height;
         CGFloat topPadding = 0;
+        CGFloat spacing = 10;
 
         if (@available(iOS 11.0, *)) {
             topPadding = window.safeAreaInsets.top;
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, topPadding, 40, 40))];
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
             if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, self.view.safeAreaInsets.top - 40, 40, 40))];
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
             }
         } else {
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, 10, 40, 40))];
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, 10 + spacing, 40, 40))];
             if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40, [UIApplication sharedApplication].statusBarFrame.size.height - 40, 40, 40))];
+                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40 + spacing, width, height) configuration:config];
+                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, [UIApplication sharedApplication].statusBarFrame.size.height - 40 - spacing, 40, 40))];
             }
         }
 
@@ -442,14 +454,18 @@
         }
         UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
+        [closeButton setBackgroundColor:UIColor.blackColor];
+
         if (@available(iOS 13.0, *)) {
             [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-            closeButton.tintColor = color;
+            [closeButton setTintColor:UIColor.whiteColor];
         } else {
             [closeButton setTitle:@"X" forState:UIControlStateNormal];
-            [closeButton setTitleColor:color forState:UIControlStateNormal];
+            [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         }
 
+        closeButton.alpha = 0.5;
+        closeButton.layer.cornerRadius = CGRectGetWidth(closeButton.frame) / 2;
         [closeButton.layer setMasksToBounds:false];
         [closeButton addTarget:self action:@selector(onDismiss)
               forControlEvents:UIControlEventTouchUpInside];
@@ -488,6 +504,14 @@
 #pragma mark - Callback event for tracking clicks
 - (void)actionCallback:(CPAppBannerAction*)action{
     self.actionCallback(action);
+}
+
+- (void)setActionCallback:(CPAppBannerActionBlock)callback {
+    appBannerActionCallback = callback;
+}
+
+- (CPAppBannerActionBlock)actionCallback {
+    return appBannerActionCallback;
 }
 
 #pragma mark - Animations

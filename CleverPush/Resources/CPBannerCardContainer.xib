@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="2304" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,13 +17,13 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dnE-UJ-7yB">
-                        <rect key="frame" x="0.0" y="65" width="280" height="344"/>
+                        <rect key="frame" x="0.0" y="60" width="280" height="354"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ldd-wZ-7My">
-                                <rect key="frame" x="0.0" y="0.0" width="280" height="344"/>
+                                <rect key="frame" x="0.0" y="0.0" width="280" height="354"/>
                             </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="i8s-pt-aNt">
-                                <rect key="frame" x="8" y="54" width="264" height="250"/>
+                                <rect key="frame" x="8" y="64" width="264" height="250"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="250" id="lyd-fW-f5R"/>
@@ -34,7 +34,7 @@
                                 </connections>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="41j-f6-kVw">
-                                <rect key="frame" x="236" y="0.0" width="44" height="44"/>
+                                <rect key="frame" x="226" y="10" width="44" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="Wcc-AT-rWy"/>
                                     <constraint firstAttribute="width" constant="44" id="bcK-by-Qxt"/>
@@ -43,7 +43,7 @@
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                             </button>
                             <pageControl hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="Xx7-kH-pxc">
-                                <rect key="frame" x="82" y="314" width="116.5" height="20"/>
+                                <rect key="frame" x="82" y="324" width="116.5" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="quK-2E-Ecd"/>
                                 </constraints>
@@ -58,8 +58,8 @@
                             <constraint firstItem="Xx7-kH-pxc" firstAttribute="centerX" secondItem="dnE-UJ-7yB" secondAttribute="centerX" id="6mi-Gm-vCp"/>
                             <constraint firstAttribute="trailing" secondItem="ldd-wZ-7My" secondAttribute="trailing" id="AQm-aZ-w6N"/>
                             <constraint firstAttribute="bottom" secondItem="ldd-wZ-7My" secondAttribute="bottom" id="BLO-pc-MDI"/>
-                            <constraint firstItem="41j-f6-kVw" firstAttribute="top" secondItem="dnE-UJ-7yB" secondAttribute="top" id="E6c-Tc-pl3"/>
-                            <constraint firstAttribute="trailing" secondItem="41j-f6-kVw" secondAttribute="trailing" id="Uo8-1I-STK"/>
+                            <constraint firstItem="41j-f6-kVw" firstAttribute="top" secondItem="dnE-UJ-7yB" secondAttribute="top" constant="10" id="E6c-Tc-pl3"/>
+                            <constraint firstAttribute="trailing" secondItem="41j-f6-kVw" secondAttribute="trailing" constant="10" id="Uo8-1I-STK"/>
                             <constraint firstItem="ldd-wZ-7My" firstAttribute="top" secondItem="dnE-UJ-7yB" secondAttribute="top" id="ViT-dZ-GIU"/>
                             <constraint firstItem="i8s-pt-aNt" firstAttribute="leading" secondItem="dnE-UJ-7yB" secondAttribute="leading" constant="8" id="W6F-3d-WL9"/>
                             <constraint firstItem="Xx7-kH-pxc" firstAttribute="top" secondItem="i8s-pt-aNt" secondAttribute="bottom" constant="10" id="Xsl-xG-WiK"/>

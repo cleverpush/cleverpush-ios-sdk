@@ -10,15 +10,15 @@
 		</data>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
-		N8Au2gB2puDErJIYP9dcLkKufvk=
+		vKGFgEJG9wNWznIUeKdHQTN4qe8=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		33hsMmwPCoXxRlBbmnA+O7Rup7U=
+		RvIHLS+QZ1a2isDv8xl8C5c16dQ=
 		</data>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		9is9yB2B0zTbvHt03wNbEFuWuVQ=
+		HxkxWyzwsNlRFMWbCn0lyANUttw=
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
@@ -210,7 +210,7 @@
 		</data>
 		<key>Headers/CPStoryView.h</key>
 		<data>
-		BN9+hKaTAAj26gmFU55cmri5fH0=
+		rc3nxoS4Qh+j3f9SSnBveDs9xTk=
 		</data>
 		<key>Headers/CPStoryWidget.h</key>
 		<data>
@@ -222,7 +222,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		SBGYQ5GV5jfNpkHnOmdcf2atmoM=
+		SowCZhEwJKAHRLvbrINrXaWwMsE=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -246,7 +246,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
+		o53q+irD3rmtGdycGj0lWmJifUA=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -254,11 +254,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		qL5TxBtuRTHWs/q8PMuYCReoBb4=
+		egWWXe88dADmJnZZ4baRSGTvvG4=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		GqzAEfq3gPZsTkcBQiKtYiidlv0=
+		Vym+5ErEH8nyfO64WdUrbEBRVeA=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -266,7 +266,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		xEkbV40Hi5MFNH4OQACcieTxYVQ=
+		LWMAFJgNXftIkTGisn/ZnPvzPPE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -294,33 +294,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			N8Au2gB2puDErJIYP9dcLkKufvk=
+			vKGFgEJG9wNWznIUeKdHQTN4qe8=
 			</data>
 			<key>hash2</key>
 			<data>
-			rBJKWUSTtmg+c5bdrAdLSNN2R/kfa3FLKWo27FNXUQA=
+			WltKaSg2E88vtz/7l1L5QWJar63fwgxzmgeIrLZk91A=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			33hsMmwPCoXxRlBbmnA+O7Rup7U=
+			RvIHLS+QZ1a2isDv8xl8C5c16dQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			FYSZn2jhUyrPrrTHNlmXYBWsAGoo1fvwOjmS07VtJRQ=
+			3Y3EBeRSm4sM0tJAsMRni5eDEdYs0VMwa8R9GiWCBZo=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			9is9yB2B0zTbvHt03wNbEFuWuVQ=
+			HxkxWyzwsNlRFMWbCn0lyANUttw=
 			</data>
 			<key>hash2</key>
 			<data>
-			DEKTNHFDNzDpANQLzH+Mgn4/a8s6hyOAxmwSMQGlc2E=
+			2qIW+YH/SdvFCtdHy3xls7tRLwuq9faQcGFox203kS0=
 			</data>
 		</dict>
 		<key>CPButtonBlockCell.nib</key>
@@ -844,11 +844,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			BN9+hKaTAAj26gmFU55cmri5fH0=
+			rc3nxoS4Qh+j3f9SSnBveDs9xTk=
 			</data>
 			<key>hash2</key>
 			<data>
-			haZjOXWXLM5YMMaVAO83BmnzubPUhOqsrGE39GBRKoU=
+			IMhHCp8nCG/4XEsrg+wqO7YdakPNoeinK8nkKzzzDmw=
 			</data>
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>
@@ -877,11 +877,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			SBGYQ5GV5jfNpkHnOmdcf2atmoM=
+			SowCZhEwJKAHRLvbrINrXaWwMsE=
 			</data>
 			<key>hash2</key>
 			<data>
-			U8UDygasKDpBn9wZ/r8x9tFvvAsIc05LJO+AsSrbYXQ=
+			McHrYHdRNuPUZIVc4b73hTWCo6Goi7C18X3ypHpTvYM=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
@@ -943,11 +943,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			uCDa+B7T1xAxVOFUGQrYK+EJrIQ=
+			o53q+irD3rmtGdycGj0lWmJifUA=
 			</data>
 			<key>hash2</key>
 			<data>
-			TYhFY5fmXV4Y/MOIWB8xhj9CPW8VP30H0hzFT8LP9EE=
+			Z+DMK/N6C7mKGOn7t787tAR+n1Dqhrrrlp3PSCIUYOE=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -965,22 +965,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			qL5TxBtuRTHWs/q8PMuYCReoBb4=
+			egWWXe88dADmJnZZ4baRSGTvvG4=
 			</data>
 			<key>hash2</key>
 			<data>
-			W/liwsuOnc149jrQFseHkLCsqZu7ldwJHEdSEoBfdJ8=
+			Zjbm0gf6hNqguIa1cuDDy21dJwC5zgvbBLuLr8k+bm4=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			GqzAEfq3gPZsTkcBQiKtYiidlv0=
+			Vym+5ErEH8nyfO64WdUrbEBRVeA=
 			</data>
 			<key>hash2</key>
 			<data>
-			LRYSAkzuh09HuzUOeRHQarn5fjFngzmoeQhPiziH1JA=
+			Bjilf8p2XR1/1dmCw0pcoNuKQnOQDWHfpcXyuLnpBZ4=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

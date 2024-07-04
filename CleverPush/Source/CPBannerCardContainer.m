@@ -58,6 +58,22 @@
             self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
         }
     }
+    [self updateTableViewContentInset];
+}
+
+- (void)updateTableViewContentInset {
+    if (![self.data.contentType isEqualToString:@"html"]) {
+        CGFloat viewHeight = self.tblCPBanner.frame.size.height;
+        CGFloat tableViewContentHeight = self.tblCPBanner.contentSize.height;
+
+        if (tableViewContentHeight < viewHeight) {
+            CGFloat marginHeight = (viewHeight - tableViewContentHeight) / 2.0;
+            self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, -marginHeight, 0);
+            self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
+        } else {
+            self.tblCPBanner.contentInset = UIEdgeInsetsZero;
+        }
+    }
 }
 
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
@@ -402,14 +418,18 @@
     }
     UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
+    [self.btnClose setBackgroundColor:UIColor.blackColor];
+
     if (@available(iOS 13.0, *)) {
         [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        self.btnClose.tintColor = color;
+        [self.btnClose setTintColor:UIColor.whiteColor];
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
-        [self.btnClose setTitleColor:color forState:UIControlStateNormal];
+        [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
 
+    self.btnClose.alpha = 0.5;
+    self.btnClose.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
     [self.btnClose.layer setMasksToBounds:false];
     [self.btnClose addTarget:self action:@selector(onDismiss) forControlEvents:UIControlEventTouchUpInside];
     if (closeButtonEnabled) {
@@ -420,7 +440,7 @@
 
     self.tblviewTopBannerConstraint.constant = - 35;
     if (self.data.closeButtonPositionStaticEnabled) {
-        self.tblviewTopBannerConstraint.constant =  0;
+        self.tblviewTopBannerConstraint.constant =  35;
     }
 }
 
