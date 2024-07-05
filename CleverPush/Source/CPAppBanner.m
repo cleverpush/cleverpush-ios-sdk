@@ -210,6 +210,14 @@
         if ([json objectForKey:@"attributes"] && [[json objectForKey:@"attributes"] isKindOfClass:[NSArray class]]) {
             self.attributes = [json objectForKey:@"attributes"];
         }
+
+        if ([json cleverPushStringForKey:@"notificationPermission"] != nil && [[json cleverPushStringForKey:@"notificationPermission"] isEqual:@"withPermission"]) {
+            self.notificationPermission = CPAppBannerNotificationWithPermission;
+        } else if ([json cleverPushStringForKey:@"notificationPermission"] != nil && [[json cleverPushStringForKey:@"notificationPermission"] isEqual:@"withoutPermission"]) {
+            self.notificationPermission = CPAppBannerNotificationWithoutPermission;
+        } else {
+            self.notificationPermission = CPAppBannerNotificationPermissionAll;
+        }
     }
     return self;
 }

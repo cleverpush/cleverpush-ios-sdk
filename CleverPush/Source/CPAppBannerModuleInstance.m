@@ -440,7 +440,7 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - check the banner triggering allowed or not.
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
-    BOOL allowed = YES;
+    __block BOOL allowed = YES;
 
     if (banner.languages.count > 0 && [NSLocale preferredLanguages].count > 0) {
         if (![banner.languages containsObject:[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]]) {
@@ -453,6 +453,10 @@ NSInteger currentScreenIndex = 0;
     }
 
     if (banner.subscribedType == CPAppBannerSubscribedTypeUnsubscribed && [CleverPush isSubscribed]) {
+        allowed = NO;
+    }
+
+    if (![self isNotificationPermissionAllowedForBanner:banner]) {
         allowed = NO;
     }
 
@@ -541,6 +545,26 @@ NSInteger currentScreenIndex = 0;
         allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:TRUE compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     }
     return allowed;
+}
+
+- (BOOL)isNotificationPermissionAllowedForBanner:(CPAppBanner *)banner {
+    __block BOOL isAllowed = YES;
+
+    if (banner.notificationPermission == CPAppBannerNotificationWithPermission || banner.notificationPermission == CPAppBannerNotificationWithoutPermission) {
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        [CleverPush areNotificationsEnabled:^(BOOL isEnabled) {
+            if (banner.notificationPermission == CPAppBannerNotificationWithPermission && !isEnabled) {
+                isAllowed = NO;
+            }
+            if (banner.notificationPermission == CPAppBannerNotificationWithoutPermission && isEnabled) {
+                isAllowed = NO;
+            }
+            dispatch_semaphore_signal(semaphore);
+        }];
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    }
+
+    return isAllowed;
 }
 
 - (BOOL)bannerTimeAllowed:(CPAppBanner*)banner {
