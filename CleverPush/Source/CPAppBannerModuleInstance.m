@@ -440,7 +440,7 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - check the banner triggering allowed or not.
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
-    __block BOOL allowed = YES;
+    BOOL allowed = YES;
 
     if (banner.languages.count > 0 && [NSLocale preferredLanguages].count > 0) {
         if (![banner.languages containsObject:[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]]) {
