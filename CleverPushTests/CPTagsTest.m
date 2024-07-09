@@ -545,6 +545,43 @@
     OCMVerify([self.cleverPush removeSubscriptionTagFromApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
 }
 
+- (void)testGetAvailableTagsSuccess {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Get Available Tags"];
+
+    NSDictionary *tag = @{@"id": @"tagId"};
+
+    OCMStub([self.cleverPush getChannelConfig:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSDictionary *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        NSDictionary *channelConfig = @{@"channelTags": @[tag]};
+        completion(channelConfig);
+    });
+
+    [self.cleverPush getAvailableTags:^(NSArray<CPChannelTag *> * _Nullable tags) {
+        XCTAssertEqual(tags.count, 1);
+        XCTAssertTrue([[tags firstObject].id isEqualToString:@"tagId"]);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
+
+- (void)testGetAvailableTagsFailure {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"Get Available Tags"];
+
+    OCMStub([self.cleverPush getChannelConfig:OCMOCK_ANY]).andDo(^(NSInvocation *invocation) {
+        void (^completion)(NSDictionary *) = nil;
+        [invocation getArgument:&completion atIndex:2];
+        completion(nil);
+    });
+
+    [self.cleverPush getAvailableTags:^(NSArray<CPChannelTag *> * _Nullable tags) {
+        XCTAssertEqual(tags.count, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+}
 
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
