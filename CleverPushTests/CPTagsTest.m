@@ -583,6 +583,67 @@
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 }
 
+- (void)testAddSubscriptionTagsFailureWithoutCallback {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSArray<NSString *> *tagIds = @[@"tagId1", @"tagId2"];
+
+    for (NSString *tagId in tagIds) {
+        OCMStub([self.cleverPush addSubscriptionTagToApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]])
+            .andDo(^(NSInvocation *invocation) {
+                void (^failureHandler)(NSString *);
+                [invocation getArgument:&failureHandler atIndex:4];
+                failureHandler(@"Error adding tag");
+            });
+    }
+
+    [self.cleverPush addSubscriptionTags:tagIds];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+
+    for (NSString *tagId in tagIds) {
+        OCMVerify([self.cleverPush addSubscriptionTagToApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+    }
+}
+
+- (void)testAddSubscriptionTagsSuccessWithoutCallback {
+    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
+    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
+
+    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(void);
+        [invocation getArgument:&handler atIndex:2];
+        handler();
+    }];
+
+    NSArray<NSString *> *tagIds = @[@"tagId1", @"tagId2"];
+
+    for (NSString *tagId in tagIds) {
+        OCMStub([self.cleverPush addSubscriptionTagToApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]])
+            .andDo(^(NSInvocation *invocation) {
+                void (^successHandler)(NSArray<NSString *> *);
+                [invocation getArgument:&successHandler atIndex:3];
+
+                successHandler(@[tagId]);
+            });
+    }
+
+    [self.cleverPush addSubscriptionTags:tagIds];
+
+    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+
+    for (NSString *tagId in tagIds) {
+        OCMVerify([self.cleverPush addSubscriptionTagToApi:tagId callback:[OCMArg any] onFailure:[OCMArg any]]);
+    }
+}
+
 - (void)tearDown {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
