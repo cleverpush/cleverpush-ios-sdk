@@ -125,7 +125,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
     } else {
         backgroundColor = [UIColor colorWithHexString:self.data.background.color];
     }
-    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
     [self.btnClose setBackgroundColor:UIColor.blackColor];
 
@@ -452,7 +451,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
         } else {
             backgroundColor = [UIColor colorWithHexString:self.data.background.color];
         }
-        UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
         [closeButton setBackgroundColor:UIColor.blackColor];
 

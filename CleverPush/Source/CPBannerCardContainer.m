@@ -416,7 +416,6 @@
     } else {
         backgroundColor = [UIColor colorWithHexString:self.data.background.color];
     }
-    UIColor *color = [CPUtils readableForegroundColorForBackgroundColor:backgroundColor];
 
     [self.btnClose setBackgroundColor:UIColor.blackColor];
 
