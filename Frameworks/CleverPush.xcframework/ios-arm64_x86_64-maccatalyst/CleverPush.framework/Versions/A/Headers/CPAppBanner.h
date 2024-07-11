@@ -15,6 +15,7 @@
 #import "CPAppBannerHTMLBlock.h"
 #import "CPFilterRelationType.h"
 #import "CPAppBannerEventFilters.h"
+#import "CPAppBannerNotificationPermission.h"
 #import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
@@ -27,6 +28,7 @@
 @property (nonatomic) CPAppBannerFrequency frequency;
 @property (nonatomic) CPAppBannerTriggerType triggerType;
 @property (nonatomic) CPAppBannerSubscribedType subscribedType;
+@property (nonatomic) CPAppBannerNotificationPermission notificationPermission;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
