@@ -790,8 +790,27 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  URL Handling
 + (void)tryOpenURL:(NSURL *)url {
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    if ([self isValidURL:url]) {
+        NSString *scheme = [url scheme];
+        if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+            [[UIApplication sharedApplication] openURL:url
+                                               options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
+                                     completionHandler:^(BOOL success){
+                if(success) {
+                    NSUserActivity* userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+                    userActivity.webpageURL = url;
+                    [[UIApplication sharedApplication].delegate application:[UIApplication sharedApplication] continueUserActivity:userActivity restorationHandler:nil];
+                } else {
+                    if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+                    }
+                }
+            }];
+        } else {
+            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+            }
+        }
     }
 }
 
