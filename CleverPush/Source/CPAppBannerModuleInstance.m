@@ -305,15 +305,37 @@ NSInteger currentScreenIndex = 0;
     NSMutableArray<CPAppBannerEventFilters *> *filteredResults = [NSMutableArray array];
 
     for (CPAppBannerEventFilters *eventsObject in targetEvents) {
-        for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
-            if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
-                [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
-                [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
-                [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
-                [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
-                [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue]) {
-                [filteredResults addObject:eventsObjectFromDatabase];
-                break;
+        if (eventsObject.eventProperties.count > 0) {
+            for (CPAppBannerTriggerConditionEventProperty *eventsObjectData in eventsObject.eventProperties) {
+                for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
+                    if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
+                        [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
+                        [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
+                        [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
+                        [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
+                        [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue] &&
+                        [eventsObjectFromDatabase.eventValue isEqualToString:eventsObjectData.value] &&
+                        [eventsObjectFromDatabase.eventProperty isEqualToString:eventsObjectData.property] &&
+                        [eventsObjectFromDatabase.eventRelation isEqualToString:eventsObjectData.relation] ) {
+                        [filteredResults addObject:eventsObjectFromDatabase];
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (CPAppBannerEventFilters *eventsObjectFromDatabase in targetEventsFromDatabase) {
+                if ([eventsObject.event isEqualToString:eventsObjectFromDatabase.event] &&
+                    [eventsObject.property isEqualToString:eventsObjectFromDatabase.property] &&
+                    [eventsObject.relation isEqualToString:eventsObjectFromDatabase.relation] &&
+                    [eventsObject.value isEqualToString:eventsObjectFromDatabase.value] &&
+                    [eventsObject.fromValue isEqualToString:eventsObjectFromDatabase.fromValue] &&
+                    [eventsObject.toValue isEqualToString:eventsObjectFromDatabase.toValue] &&
+                    [eventsObjectFromDatabase.eventValue isEqualToString:@""] &&
+                    [eventsObjectFromDatabase.eventProperty isEqualToString:@""] &&
+                    [eventsObjectFromDatabase.eventRelation isEqualToString:@""] ) {
+                    [filteredResults addObject:eventsObjectFromDatabase];
+                    break;
+                }
             }
         }
     }
@@ -328,27 +350,96 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - check the banner triggering allowed as per selected event filters.
 - (BOOL)bannerTargetingWithEventFiltersAllowed:(CPAppBanner*)banner {
     __block BOOL allowed = YES;
+    CPSQLiteManager *sqlManager = [CPSQLiteManager sharedManager];
 
-    if (banner.eventFilters.count > 0 ) {
-        sqlManager = [CPSQLiteManager sharedManager];
+    if (banner.eventFilters.count > 0) {
         NSString *currentTimeStamp = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"];
 
         for (CPAppBannerEventFilters *events in banner.eventFilters) {
             if (![self isValidTargetValuesWithEvent:events.event property:events.property relation:events.relation value:events.value fromValue:events.fromValue toValue:events.toValue bannerId:banner.id]) {
                 continue;
             }
-            [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@1 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue];
+
+            if (events.eventProperties.count > 0) {
+                for (CPAppBannerTriggerConditionEventProperty *eventProperties in events.eventProperties) {
+                    [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue eventProperty:eventProperties.property eventValue:eventProperties.value eventRelation:eventProperties.relation];
+                }
+            } else {
+                [sqlManager insert:banner.id eventId:events.event property:events.property value:events.value relation:events.relation count:@0 createdDateTime:currentTimeStamp updatedDateTime:currentTimeStamp fromValue:events.fromValue toValue:events.toValue eventProperty:@"" eventValue:@"" eventRelation:@""];
+            }
         }
 
-        NSArray<CPAppBannerEventFilters *> *eventRecords = [self compareTargetEvents:banner.eventFilters withDatabaseArray:[sqlManager getAllRecords]];
+        NSMutableArray<NSDictionary *> *eventsCopy = [[NSMutableArray alloc]init];
+        eventsCopy = [events mutableCopy];
+        if (eventsCopy.count == 0) {
+            allowed = NO;
+            return allowed;
+        }
 
-        for (CPAppBannerEventFilters *event in eventRecords) {
-            allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
-            if (allowed) {
-                break;
+
+        NSMutableArray<CPAppBannerEventFilters *> *eventFilteredRecords = [[NSMutableArray alloc] init];
+        for (CPAppBannerEventFilters *eventsObj in banner.eventFilters) {
+            if (eventsObj.eventProperties.count > 0) {
+                for (CPAppBannerTriggerConditionEventProperty *eventProperties in eventsObj.eventProperties) {
+                    NSArray<CPAppBannerEventFilters *> *filteredRecords = [sqlManager getRecordsForEvent:banner.id eventId:eventsObj.event property:eventsObj.property value:eventsObj.value relation:eventsObj.relation fromValue:eventsObj.fromValue toValue:eventsObj.toValue eventProperty:eventProperties.property eventValue:eventProperties.value eventRelation:eventProperties.relation];
+                    [eventFilteredRecords addObjectsFromArray:filteredRecords];
+                }
+            } else {
+                NSArray<CPAppBannerEventFilters *> *filteredRecords = [sqlManager getRecordsForEvent:banner.id eventId:eventsObj.event property:eventsObj.property value:eventsObj.value relation:eventsObj.relation fromValue:eventsObj.fromValue toValue:eventsObj.toValue eventProperty:@"" eventValue:@"" eventRelation:@""];
+                [eventFilteredRecords addObjectsFromArray:filteredRecords];
+            }
+        }
+
+        if (eventFilteredRecords.count == 0) {
+            allowed = NO;
+            return allowed;
+        }
+
+        for (CPAppBannerEventFilters *eventsObj in banner.eventFilters) {
+            if (eventsObj.eventProperties.count > 0) {
+                BOOL allPropertiesMatch = YES;
+                for (CPAppBannerTriggerConditionEventProperty *propertyDict in eventsObj.eventProperties) {
+                    NSString *property = propertyDict.property;
+                    NSString *value = propertyDict.value;
+                    BOOL propertyMatched = NO;
+
+                    for (NSDictionary *eventDict in eventsCopy) {
+                        NSString *eventId = eventDict[@"id"];
+                        NSDictionary *properties = eventDict[@"properties"];
+                        if ([eventId isEqualToString:eventsObj.event]) {
+                            if ([properties[property] isEqualToString:value]) {
+                                propertyMatched = YES;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!propertyMatched) {
+                        allPropertiesMatch = NO;
+                        allowed = NO;
+                        return allowed;
+                    }
+                }
+
+                if (allPropertiesMatch) {
+                    for (CPAppBannerEventFilters *event in eventFilteredRecords) {
+                        allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
+                        if (!allowed) {
+                            return NO;
+                        }
+                    }
+                }
+            } else {
+                for (CPAppBannerEventFilters *event in eventFilteredRecords) {
+                    allowed = [self checkEventFilter:event.value compareWith:event.count compareWithFrom:event.fromValue compareWithTo:event.toValue relation:event.relation isAllowed:YES property:event.property createdAt:event.createdAt];
+                    if (!allowed) {
+                        return NO;
+                    }
+                }
             }
         }
     }
+
     return allowed;
 }
 
@@ -796,15 +887,32 @@ NSInteger currentScreenIndex = 0;
 
 - (void)scheduleBannersForEvent:(NSString *)eventId fromActiveBanners:(NSArray<CPAppBanner *> *)activeBanners {
     NSMutableArray<CPAppBanner*> *bannersCopy = [activeBanners mutableCopy];
+    BOOL shouldDisplayBanner = NO;
     for (CPAppBanner* banner in bannersCopy) {
         for (CPAppBannerTrigger *trigger in banner.triggers) {
             for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
                 if ([condition.event isEqualToString:eventId]) {
-                    NSTimeInterval delay = [self calculateDelayForBanner:banner];
-                    [self scheduleBannerDisplay:banner withDelaySeconds:delay];
+                    shouldDisplayBanner = YES;
                     break;
                 }
             }
+            if (shouldDisplayBanner) {
+                break;
+            }
+        }
+
+        if (!shouldDisplayBanner) {
+            for (CPAppBannerEventFilters *filter in banner.eventFilters) {
+                if ([filter.event isEqualToString:eventId]) {
+                    shouldDisplayBanner = YES;
+                    break;
+                }
+            }
+        }
+
+        if (shouldDisplayBanner) {
+            NSTimeInterval delay = [self calculateDelayForBanner:banner];
+            [self scheduleBannerDisplay:banner withDelaySeconds:delay];
         }
     }
 }
