@@ -240,6 +240,7 @@
 		93DACB222959651900177B08 /* CPTopicDialogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29D3354B26F0C1420058EF16 /* CPTopicDialogCell.xib */; };
 		93DACB232959651900177B08 /* CPInboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB8F47B7275F39A100FC19A7 /* CPInboxCell.xib */; };
 		93E23B182B4BCFB000B43A75 /* CPNotificationsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E23B172B4BCFB000B43A75 /* CPNotificationsTest.m */; };
+		93DBD4192C37C6B6001CB7ED /* CPAppBannerNotificationPermission.h in Headers */ = {isa = PBXBuildFile; fileRef = 93DBD4182C37C65A001CB7ED /* CPAppBannerNotificationPermission.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93E5F0E52ADE6B8D00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
 		93E5F0E62ADE6BBC00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
 		93E5F0E72ADE6BBD00D76057 /* CPAppBannerEventFilters.m in Sources */ = {isa = PBXBuildFile; fileRef = 93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */; };
@@ -548,6 +549,7 @@
 		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
 		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		93E23B172B4BCFB000B43A75 /* CPNotificationsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPNotificationsTest.m; sourceTree = "<group>"; };
+		93DBD4182C37C65A001CB7ED /* CPAppBannerNotificationPermission.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerNotificationPermission.h; sourceTree = "<group>"; };
 		93E5F0E32ADE6B8D00D76057 /* CPAppBannerEventFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerEventFilters.h; sourceTree = "<group>"; };
 		93E5F0E42ADE6B8D00D76057 /* CPAppBannerEventFilters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerEventFilters.m; sourceTree = "<group>"; };
 		93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
@@ -881,6 +883,7 @@
 				298676702572CC400002E9F1 /* CPAppBannerModule.m */,
 				CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */,
 				CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */,
+				93DBD4182C37C65A001CB7ED /* CPAppBannerNotificationPermission.h */,
 				298676E02572D0340002E9F1 /* CPAppBannerStatus.h */,
 				298676E12572D0400002E9F1 /* CPAppBannerStopAtType.h */,
 				29A9E555276FAD8200DD43A4 /* CPAppBannerSubscribedType.h */,
@@ -1151,6 +1154,7 @@
 				29052183276B778D00D81148 /* CleverPushInstance.h in Headers */,
 				29052186276B77A600D81148 /* CPInboxView.h in Headers */,
 				93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
+				93DBD4192C37C6B6001CB7ED /* CPAppBannerNotificationPermission.h in Headers */,
 				2906A15B258557BB0078FD61 /* CPAppBannerBackground.h in Headers */,
 				291FCE64252B5F1F00F5185E /* CPTopicsViewController.h in Headers */,
 				29563FF725881F6F00FE7611 /* CPAppBannerTriggerConditionType.h in Headers */,

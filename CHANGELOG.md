@@ -1,3 +1,8 @@
+## 1.30.20 (11.07.2024)
+* Added a feature to support event property filters for the app banners.
+* Added a feature of app banner trigger has push permission via system ios.
+* Optimised `tryOpenURL` function for universal link.
+
 ## 1.30.19 (21.06.2024)
 * Resolved issue of app banner should not be closed if we don't select dismiss on the click checkbox.
 * Resolved issue of track page view assigns all the tags if we pass the blank url.

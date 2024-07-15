@@ -66,7 +66,7 @@
 		</data>
 		<key>Headers/CPAppBanner.h</key>
 		<data>
-		II7xfBwlEIXPdPhYWAh1DPJVVZE=
+		cRYHiQTKqsHRDS6k3wmpraDBrBI=
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
@@ -102,7 +102,7 @@
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
-		Rbm5iVIsWjWJu+74PpH67KQvy1Y=
+		ftuDLyjRQrALkaRzj0ULQ2Mzi7w=
 		</data>
 		<key>Headers/CPAppBannerFrequency.h</key>
 		<data>
@@ -115,6 +115,10 @@
 		<key>Headers/CPAppBannerImageBlock.h</key>
 		<data>
 		YS9V+eGJvW4R1jUreK/otZUwDE0=
+		</data>
+		<key>Headers/CPAppBannerNotificationPermission.h</key>
+		<data>
+		1fEBbWQVRwbR07gv5xFbI8mURaM=
 		</data>
 		<key>Headers/CPAppBannerStatus.h</key>
 		<data>
@@ -190,7 +194,7 @@
 		</data>
 		<key>Headers/CPSQLiteManager.h</key>
 		<data>
-		sO+eOE3JwBK1uIP0UuuYB1iQQcM=
+		jNGscOM011e98DCawOknbxhU4zs=
 		</data>
 		<key>Headers/CPStory.h</key>
 		<data>
@@ -448,11 +452,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			II7xfBwlEIXPdPhYWAh1DPJVVZE=
+			cRYHiQTKqsHRDS6k3wmpraDBrBI=
 			</data>
 			<key>hash2</key>
 			<data>
-			/U9v/1Sx3Mioni3ESLGbAO0ZIj2wh9WchnK/ForHoss=
+			ewLURKnD8WamylUak00yNBHSINAh52blRyqZr2TYEt4=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
@@ -547,11 +551,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Rbm5iVIsWjWJu+74PpH67KQvy1Y=
+			ftuDLyjRQrALkaRzj0ULQ2Mzi7w=
 			</data>
 			<key>hash2</key>
 			<data>
-			BLqb1BkBGlDT6Ef+42nPm4eHJ5ZyV8f3+gu+GSWRRUk=
+			vLYH4yl9FTVcGfbng397R7Kouj/d+rePqN0Wq2N5PRs=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerFrequency.h</key>
@@ -585,6 +589,17 @@
 			<key>hash2</key>
 			<data>
 			Anb/wd1YJoFOBdyjdhaOLEgM2uBcTcQgaQd/uNGQHmE=
+			</data>
+		</dict>
+		<key>Headers/CPAppBannerNotificationPermission.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			1fEBbWQVRwbR07gv5xFbI8mURaM=
+			</data>
+			<key>hash2</key>
+			<data>
+			awib+zmTiZ7FOrqzPrBf3/X/WxPKmTS0DC/EXmarDY0=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerStatus.h</key>
@@ -789,11 +804,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			sO+eOE3JwBK1uIP0UuuYB1iQQcM=
+			jNGscOM011e98DCawOknbxhU4zs=
 			</data>
 			<key>hash2</key>
 			<data>
-			tyfmkc8STxCxswT8LUTTVR4OPqZfQqb1QKcN0v5L804=
+			Jda0OONZIP+HansUIgXM42mOt7Uagr2xRHjK0UM69XU=
 			</data>
 		</dict>
 		<key>Headers/CPStory.h</key>
