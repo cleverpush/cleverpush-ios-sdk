@@ -4094,7 +4094,7 @@ static id isNil(id object) {
 }
 
 - (BOOL)getHandleUrlFromAppDelegate {
-    return handleUrlFromSceneDelegate;
+    return handleUrlFromAppDelegate;
 }
 
 - (void)setLogListener:(CPLogListener)listener {

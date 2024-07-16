@@ -795,10 +795,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 
     NSString *scheme = [url scheme];
+    UIApplication *application = [UIApplication sharedApplication];
 
     if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        if ([application canOpenURL:url]) {
+            [application openURL:url options:@{} completionHandler:nil];
         }
         return;
     }
@@ -812,17 +813,21 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         userActivity.webpageURL = url;
 
         if (handleUrlFromSceneDelegate) {
-            UIWindowScene *scene = (UIWindowScene *)[UIApplication.sharedApplication.connectedScenes anyObject];
-            [scene.delegate scene:scene continueUserActivity:userActivity];
+            if (@available(iOS 13.0, *)) {
+                UIWindowScene *scene = (UIWindowScene *)[application.connectedScenes anyObject];
+                [scene.delegate scene:scene continueUserActivity:userActivity];
+            }
         } else if (handleUrlFromAppDelegate) {
-            UIApplication *application = [UIApplication sharedApplication];
             [application.delegate application:application continueUserActivity:userActivity restorationHandler:^(NSArray * _Nonnull restorableObjects) {
-                // Restoration handler logic, if needed
             }];
+        } else {
+            if ([application canOpenURL:url]) {
+                [application openURL:url options:@{} completionHandler:nil];
+            }
         }
     } else {
-        if ([[UIApplication sharedApplication] canOpenURL:url]) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        if ([application canOpenURL:url]) {
+            [application openURL:url options:@{} completionHandler:nil];
         }
     }
 }
