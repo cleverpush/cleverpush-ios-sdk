@@ -161,6 +161,9 @@ BOOL hasWebViewOpened = NO;
 BOOL hasTrackingConsentCalled = NO;
 BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
+BOOL handleUrlOnlyInApp = NO;
+BOOL handleUrlFromSceneDelegate = NO;
+BOOL handleUrlFromAppDelegate = NO;
 
 int sessionVisits;
 long sessionStartedTimestamp;
@@ -4067,6 +4070,31 @@ static id isNil(id object) {
     if (handleInitialized) {
         handleInitialized(success, error);
     }
+}
+
+#pragma mark - Handle the universal links from notification tap event
+- (void)setHandleUrlOnlyInApp:(BOOL)handleInApp {
+    handleUrlOnlyInApp = handleInApp;
+}
+
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    handleUrlFromSceneDelegate = handleFromSceneDelegate;
+}
+
+- (void)setHandleUrlFromAppDelegate:(BOOL)handleFromAppDelegate {
+    handleUrlFromAppDelegate = handleFromAppDelegate;
+}
+
+- (BOOL)getHandleUrlOnlyInApp {
+    return handleUrlOnlyInApp;
+}
+
+- (BOOL)getHandleUrlFromSceneDelegate {
+    return handleUrlFromSceneDelegate;
+}
+
+- (BOOL)getHandleUrlFromAppDelegate {
+    return handleUrlFromSceneDelegate;
 }
 
 - (void)setLogListener:(CPLogListener)listener {

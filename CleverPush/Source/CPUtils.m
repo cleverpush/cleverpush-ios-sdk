@@ -803,19 +803,28 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         return;
     }
 
-    [[UIApplication sharedApplication] openURL:url
-                                       options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}
-                             completionHandler:^(BOOL success){
-        if(success) {
-            NSUserActivity* userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
-            userActivity.webpageURL = url;
-            [[UIApplication sharedApplication].delegate application:[UIApplication sharedApplication] continueUserActivity:userActivity restorationHandler:nil];
-        } else {
-            if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-            }
+    BOOL handleUrlOnlyInApp = [CleverPush getHandleUrlOnlyInApp];
+    BOOL handleUrlFromSceneDelegate = [CleverPush getHandleUrlFromSceneDelegate];
+    BOOL handleUrlFromAppDelegate = [CleverPush getHandleUrlFromAppDelegate];
+
+    if (handleUrlOnlyInApp) {
+        NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+        userActivity.webpageURL = url;
+
+        if (handleUrlFromSceneDelegate) {
+            UIWindowScene *scene = (UIWindowScene *)[UIApplication.sharedApplication.connectedScenes anyObject];
+            [scene.delegate scene:scene continueUserActivity:userActivity];
+        } else if (handleUrlFromAppDelegate) {
+            UIApplication *application = [UIApplication sharedApplication];
+            [application.delegate application:application continueUserActivity:userActivity restorationHandler:^(NSArray * _Nonnull restorableObjects) {
+                // Restoration handler logic, if needed
+            }];
         }
-    }];
+    } else {
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        }
+    }
 }
 
 + (BOOL)isValidURL:(NSURL *)url {
