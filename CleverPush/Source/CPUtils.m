@@ -804,10 +804,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         return;
     }
 
-    BOOL handleUrlOnlyInApp = [CleverPush getHandleUniversalLinksInApp];
-    BOOL handleUrlFromSceneDelegate = [CleverPush getHandleUrlFromSceneDelegate];
-
-    if (handleUrlOnlyInApp) {
+    if ([CleverPush getHandleUniversalLinksInApp]) {
         NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
         userActivity.webpageURL = url;
 
