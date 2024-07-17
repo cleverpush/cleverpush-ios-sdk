@@ -805,7 +805,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 
     NSArray<NSString *> *domains = [CleverPush getHandleUniversalLinksInAppForDomains];
-    if ([domains isKindOfClass:[NSArray class]] && domains.count > 0) {
+    if (domains && [domains isKindOfClass:[NSArray class]] && domains.count > 0) {
         if ([self isAssociatedDomainURL:url]) {
             NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
             userActivity.webpageURL = url;
