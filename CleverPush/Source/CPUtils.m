@@ -804,18 +804,25 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         return;
     }
 
-    if ([CleverPush getHandleUniversalLinksInApp]) {
-        NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
-        userActivity.webpageURL = url;
+    NSArray<NSString *> *domains = [CleverPush getHandleUniversalLinksInAppForDomains];
+    if (domains && [domains isKindOfClass:[NSArray class]] && domains.count > 0) {
+        if ([self isAssociatedDomainURL:url]) {
+            NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+            userActivity.webpageURL = url;
 
-        if ([CleverPush getHandleUrlFromSceneDelegate]) {
-            if (@available(iOS 13.0, *)) {
-                UIWindowScene *scene = (UIWindowScene *)[application.connectedScenes anyObject];
-                [scene.delegate scene:scene continueUserActivity:userActivity];
+            if ([CleverPush getHandleUrlFromSceneDelegate]) {
+                if (@available(iOS 13.0, *)) {
+                    UIWindowScene *scene = (UIWindowScene *)[application.connectedScenes anyObject];
+                    [scene.delegate scene:scene continueUserActivity:userActivity];
+                }
+            } else {
+                [application.delegate application:application continueUserActivity:userActivity restorationHandler:^(NSArray<id<UIUserActivityRestoring>> * _Nullable restorableObjects) {
+                }];
             }
         } else {
-            [application.delegate application:application continueUserActivity:userActivity restorationHandler:^(NSArray * _Nonnull restorableObjects) {
-            }];
+            if ([application canOpenURL:url]) {
+                [application openURL:url options:@{} completionHandler:nil];
+            }
         }
     } else {
         if ([application canOpenURL:url]) {
@@ -823,6 +830,42 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         }
     }
 }
+
++ (BOOL)isAssociatedDomainURL:(NSURL *)url {
+    NSArray<NSString *> *associatedDomains = [self fetchAssociatedDomains];
+    NSString *urlString = url.absoluteString;
+
+    for (NSString *domain in associatedDomains) {
+        if ([self doesURL:urlString matchPattern:domain]) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
++ (NSArray<NSString *> *)fetchAssociatedDomains {
+    NSMutableArray<NSString *> *domains = [NSMutableArray array];
+    for (NSString *domain in [CleverPush getHandleUniversalLinksInAppForDomains]) {
+        NSString *trimmedDomain = domain;
+
+        if (![trimmedDomain hasPrefix:@"http://"] && ![trimmedDomain hasPrefix:@"https://"]) {
+            trimmedDomain = [NSString stringWithFormat:@"https://%@", trimmedDomain];
+        }
+
+        [domains addObject:trimmedDomain];
+    }
+
+    return [domains copy];
+}
+
++ (BOOL)doesURL:(NSString *)url matchPattern:(NSString *)pattern {
+    NSString *regexPattern = [pattern stringByReplacingOccurrencesOfString:@"*" withString:@".*"];
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexPattern options:NSRegularExpressionCaseInsensitive error:nil];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:url options:0 range:NSMakeRange(0, [url length])];
+    return numberOfMatches > 0;
+}
+
 
 + (BOOL)isValidURL:(NSURL *)url {
     if (url == nil || [url isKindOfClass:[NSNull class]] || ([[url absoluteString] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) || (url.scheme == nil || [url.scheme isEqualToString:@""])) {

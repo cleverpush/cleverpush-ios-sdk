@@ -117,6 +117,7 @@ NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
+NSArray* handleUniversalLinksInApp;
 
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
@@ -161,7 +162,6 @@ BOOL hasWebViewOpened = NO;
 BOOL hasTrackingConsentCalled = NO;
 BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
-BOOL handleUrlOnlyInApp = NO;
 BOOL handleUrlFromSceneDelegate = NO;
 BOOL handleUrlFromAppDelegate = NO;
 
@@ -4072,12 +4072,12 @@ static id isNil(id object) {
 }
 
 #pragma mark - Handle the universal links from notification tap event
-- (void)setHandleUniversalLinksInApp:(BOOL)handleInApp {
-    handleUrlOnlyInApp = handleInApp;
+- (void)setHandleUniversalLinksInAppForDomains:(NSArray<NSString *> *_Nullable)domains {
+    handleUniversalLinksInApp = domains;
 }
 
-- (BOOL)getHandleUniversalLinksInApp {
-    return handleUrlOnlyInApp;
+- (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains {
+    return handleUniversalLinksInApp;
 }
 
 - (BOOL)getHandleUrlFromSceneDelegate {
