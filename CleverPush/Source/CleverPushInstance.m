@@ -392,7 +392,6 @@ static id isNil(id object) {
    handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback
            handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback
                    autoRegister:(BOOL)autoRegisterParam  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
     return [self initWithConnectionOptionsInternal:connectionOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
 }
 
