@@ -1,3 +1,6 @@
+## 1.30.21 (17.07.2024)
+* Optimised `tryOpenURL` function for universal link.
+
 ## 1.30.20 (11.07.2024)
 * Added a feature to support event property filters for the app banners.
 * Added a feature of app banner trigger has push permission via system ios.
