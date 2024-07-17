@@ -622,16 +622,8 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setUnsubscribeStatus:status];
 }
 
-+ (void)setHandleUrlOnlyInApp:(BOOL)handleInApp {
-    [self.CPSharedInstance setHandleUrlOnlyInApp:handleInApp];
-}
-
-+ (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
-    [self.CPSharedInstance setHandleUrlFromSceneDelegate:handleFromSceneDelegate];
-}
-
-+ (void)setHandleUrlFromAppDelegate:(BOOL)handleFromAppDelegate {
-    [self.CPSharedInstance setHandleUrlFromAppDelegate:handleFromAppDelegate];
++ (void)setHandleUniversalLinksInApp:(BOOL)handleInApp {
+    [self.CPSharedInstance setHandleUniversalLinksInApp:handleInApp];
 }
 
 + (void)setConfirmAlertShown {
@@ -767,16 +759,12 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getUnsubscribeStatus];
 }
 
-+ (BOOL)getHandleUrlOnlyInApp {
-    return [self.CPSharedInstance getHandleUrlOnlyInApp];
++ (BOOL)getHandleUniversalLinksInApp {
+    return [self.CPSharedInstance getHandleUniversalLinksInApp];
 }
 
 + (BOOL)getHandleUrlFromSceneDelegate {
     return [self.CPSharedInstance getHandleUrlFromSceneDelegate];
-}
-
-+ (BOOL)getHandleUrlFromAppDelegate {
-    return [self.CPSharedInstance getHandleUrlFromAppDelegate];
 }
 
 + (void)setLogListener:(CPLogListener _Nullable)listener {

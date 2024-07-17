@@ -804,26 +804,21 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         return;
     }
 
-    BOOL handleUrlOnlyInApp = [CleverPush getHandleUrlOnlyInApp];
+    BOOL handleUrlOnlyInApp = [CleverPush getHandleUniversalLinksInApp];
     BOOL handleUrlFromSceneDelegate = [CleverPush getHandleUrlFromSceneDelegate];
-    BOOL handleUrlFromAppDelegate = [CleverPush getHandleUrlFromAppDelegate];
 
     if (handleUrlOnlyInApp) {
         NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
         userActivity.webpageURL = url;
 
-        if (handleUrlFromSceneDelegate) {
+        if ([CleverPush getHandleUrlFromSceneDelegate]) {
             if (@available(iOS 13.0, *)) {
                 UIWindowScene *scene = (UIWindowScene *)[application.connectedScenes anyObject];
                 [scene.delegate scene:scene continueUserActivity:userActivity];
             }
-        } else if (handleUrlFromAppDelegate) {
+        } else {
             [application.delegate application:application continueUserActivity:userActivity restorationHandler:^(NSArray * _Nonnull restorableObjects) {
             }];
-        } else {
-            if ([application canOpenURL:url]) {
-                [application openURL:url options:@{} completionHandler:nil];
-            }
         }
     } else {
         if ([application canOpenURL:url]) {
