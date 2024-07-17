@@ -181,7 +181,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)updateDeselectFlag:(BOOL)value;
 + (void)setOpenWebViewEnabled:(BOOL)opened;
 + (void)setUnsubscribeStatus:(BOOL)status;
-+ (void)setHandleUniversalLinksInApp:(BOOL)handleInApp;
++ (void)setHandleUniversalLinksInAppForDomains:(NSArray<NSString *> *_Nullable)domains;
 + (UIViewController* _Nullable)topViewController;
 + (BOOL)hasSubscriptionTopic:(NSString* _Nullable)topicId;
 
@@ -194,6 +194,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)removeNotification:(NSString* _Nullable)notificationId;
 
 + (NSArray<NSString*>* _Nullable)getSeenStories;
++ (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains;
 + (NSMutableArray<NSString*>* _Nullable)getSubscriptionTopics;
 + (void)setMaximumNotificationCount:(int)limit;
 
@@ -220,7 +221,6 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (BOOL)hasSubscriptionTag:(NSString* _Nullable)tagId;
 + (BOOL)getDeselectValue;
 + (BOOL)getUnsubscribeStatus;
-+ (BOOL)getHandleUniversalLinksInApp;
 + (BOOL)getHandleUrlFromSceneDelegate;
 + (void)setConfirmAlertShown;
 + (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;

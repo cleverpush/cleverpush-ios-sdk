@@ -1,3 +1,6 @@
+## 1.30.22 (17.07.2024)
+* implemented `sethandleuniversallinksinapp` function for domain list array.
+
 ## 1.30.21 (17.07.2024)
 * Optimised `tryOpenURL` function for universal link.
 
