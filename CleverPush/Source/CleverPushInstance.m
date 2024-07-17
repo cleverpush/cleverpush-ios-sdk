@@ -440,9 +440,6 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
-    if (!handleUrlFromSceneDelegate) {
-        handleUrlFromAppDelegate = YES;
-    }
 
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
@@ -492,6 +489,10 @@ static id isNil(id object) {
 
     if ([self getAutoClearBadge]) {
         [self clearBadge:false];
+    }
+
+    if (!handleUrlFromSceneDelegate) {
+        handleUrlFromAppDelegate = YES;
     }
 
     return self;
