@@ -1365,6 +1365,7 @@ static id isNil(id object) {
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
     isSessionStartCalled = NO;
+    confirmAlertShown = NO;
 }
 
 #pragma mark - unsubscribe
@@ -1681,7 +1682,7 @@ static id isNil(id object) {
                     [self trackSessionStart];
                 }
 
-                if (![self isConfirmAlertShown]) {
+                if (isSubscriptionChanged && ![self isConfirmAlertShown]) {
                     [self setConfirmAlertShown];
                 }
 
