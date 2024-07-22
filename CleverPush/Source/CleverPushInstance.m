@@ -1681,7 +1681,7 @@ static id isNil(id object) {
                     [self trackSessionStart];
                 }
 
-                if (![self isConfirmAlertShown]) {
+                if (isSubscriptionChanged && ![self isConfirmAlertShown]) {
                     [self setConfirmAlertShown];
                 }
 
