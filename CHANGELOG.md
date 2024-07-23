@@ -1,3 +1,6 @@
+## 1.30.23 (23.07.2024)
+* Optimised `setConfirmAlertShown` function.
+
 ## 1.30.22 (17.07.2024)
 * implemented `sethandleuniversallinksinapp` function for domain list array.
 
