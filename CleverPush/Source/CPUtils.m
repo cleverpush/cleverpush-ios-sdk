@@ -897,4 +897,21 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return launchOptions;
 }
 
+#pragma mark - image resizing
++ (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize {
+    if (@available(iOS 13.0, *)) {
+        UIImage *image = [UIImage systemImageNamed:imageName];
+        if (!image) {
+            return nil;
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+        [image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    } 
+    UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return resizedImage;
+}
+
 @end
