@@ -3883,13 +3883,13 @@ static id isNil(id object) {
 }
 
 - (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:true];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES];
 }
 
 - (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
     BOOL fromNotification = notificationId != nil;
     [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:true];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO];
 }
 
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
