@@ -53,9 +53,9 @@
     self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
     if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
-        self.tblCPBannerHeightConstraint.constant = frame.size.height - 30;
+        self.tblCPBannerHeightConstraint.constant = frame.size.height - 20;
         if (self.data.closeButtonPositionStaticEnabled) {
-            self.tblCPBannerHeightConstraint.constant = frame.size.height - 50;
+            self.tblCPBannerHeightConstraint.constant = frame.size.height - 40;
         }
     }
     [self updateTableViewContentInset];
@@ -421,14 +421,15 @@
     [self.btnClose setBackgroundColor:UIColor.blackColor];
 
     if (@available(iOS 13.0, *)) {
-        [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        UIImage *multiplyImage = [CPUtils resizedImageNamed:@"multiply" withSize:CGSizeMake(12,12)];
+        [self.btnClose setImage:multiplyImage forState:UIControlStateNormal];
         [self.btnClose setTintColor:UIColor.whiteColor];
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
         [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
 
-    self.btnClose.alpha = 0.5;
+    self.btnClose.alpha = 0.7;
     self.btnClose.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
     [self.btnClose.layer setMasksToBounds:false];
     [self.btnClose addTarget:self action:@selector(onDismiss) forControlEvents:UIControlEventTouchUpInside];
@@ -438,9 +439,9 @@
         self.btnClose.hidden = YES;
     }
 
-    self.tblviewTopBannerConstraint.constant = - 35;
+    self.tblviewTopBannerConstraint.constant = - 25;
     if (self.data.closeButtonPositionStaticEnabled) {
-        self.tblviewTopBannerConstraint.constant =  35;
+        self.tblviewTopBannerConstraint.constant =  25;
     }
 }
 
