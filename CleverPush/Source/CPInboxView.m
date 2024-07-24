@@ -238,7 +238,7 @@ CPNotificationClickBlock handleClick;
 
 #pragma mark - Show app banner using the bannerId
 - (void)showAppBanner:(NSString *)bannerId notificationId:(NSString*)notificationId {
-    [self showBanner:[CleverPush channelId] bannerId:bannerId notificationId:notificationId force:true];
+    [self showBanner:[CleverPush channelId] bannerId:bannerId notificationId:notificationId force:YES];
 }
 
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
