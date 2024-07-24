@@ -284,7 +284,7 @@ NSInteger currentScreenIndex = 0;
                 NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
 
                 for (NSMutableDictionary *eventsObject in appBanners) {
-                    [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:true];
+                    [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
                     [objectsToRemove addObject:eventsObject];
                 }
 
