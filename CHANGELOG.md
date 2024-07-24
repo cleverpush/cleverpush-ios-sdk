@@ -1,3 +1,9 @@
+## 1.30.24 (24.07.2024)
+* Optimisation of the app banner UI.
+* Optimised `makeSyncSubscriptionRequest` function for `setSubscriptionInProgress`.
+* Resolved the issue of app-banner targeting not working from push notifications.
+* Resolved the issue of app banner filtering and targeting not working if the notification type is silent.
+
 ## 1.30.23 (23.07.2024)
 * Optimised `setConfirmAlertShown` function.
 
