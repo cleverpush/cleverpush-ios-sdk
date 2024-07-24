@@ -1611,6 +1611,7 @@ static id isNil(id object) {
     }
 
     if (!deviceToken && !subscriptionId) {
+        [self setSubscriptionInProgress:false];
         if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"No deviceToken or subscriptionId available"}]);
         }
