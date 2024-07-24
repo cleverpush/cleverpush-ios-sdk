@@ -622,6 +622,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setUnsubscribeStatus:status];
 }
 
++ (void)setHandleUniversalLinksInAppForDomains:(NSArray<NSString *> *)domains {
+    [self.CPSharedInstance setHandleUniversalLinksInAppForDomains:domains];
+}
+
 + (void)setConfirmAlertShown {
     [self.CPSharedInstance setConfirmAlertShown];
 }
@@ -664,6 +668,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSArray* _Nullable)getSeenStories {
     return [self.CPSharedInstance getSeenStories];
+}
+
++ (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains {
+    return [self.CPSharedInstance getHandleUniversalLinksInAppForDomains];
 }
 
 + (NSMutableArray* _Nullable)getSubscriptionTopics {
@@ -710,7 +718,6 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getBrandingColor];
 }
 
-
 + (NSMutableArray* _Nullable)getAvailableAttributes __attribute__((deprecated)) {
     return [self.CPSharedInstance getAvailableAttributes];
 }
@@ -754,6 +761,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)getUnsubscribeStatus {
     return [self.CPSharedInstance getUnsubscribeStatus];
+}
+
++ (BOOL)getHandleUrlFromSceneDelegate {
+    return [self.CPSharedInstance getHandleUrlFromSceneDelegate];
 }
 
 + (void)setLogListener:(CPLogListener _Nullable)listener {

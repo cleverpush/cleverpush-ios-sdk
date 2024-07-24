@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.19";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.24";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -117,6 +117,7 @@ NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
 NSArray* channelTopics;
+NSArray* handleUniversalLinksInApp;
 
 NSMutableArray* pendingChannelConfigListeners;
 NSMutableArray* pendingSubscriptionListeners;
@@ -161,6 +162,8 @@ BOOL hasWebViewOpened = NO;
 BOOL hasTrackingConsentCalled = NO;
 BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
+BOOL handleUrlFromSceneDelegate = NO;
+BOOL handleUrlFromAppDelegate = NO;
 
 int sessionVisits;
 long sessionStartedTimestamp;
@@ -321,80 +324,65 @@ static id isNil(id object) {
 
 #pragma mark - methods to initialize SDK with UISceneConnectionOptions
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback autoRegister:(BOOL)autoRegister  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:autoRegister handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback  autoRegister:(BOOL)autoRegister  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:autoRegister];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:autoRegister handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)channelId
  handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
                  handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:NULL handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:NULL autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:subscribedCallback autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock)subscribedCallback  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:YES handleInitialized:NULL];
 }
 
 - (id _Nullable)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions channelId:(NSString* _Nullable)newChannelId handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback autoRegister:(BOOL)autoRegisterParam  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:newChannelId handleNotificationReceived:NULL handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
 }
 
 - (id)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions
@@ -403,8 +391,7 @@ static id isNil(id object) {
    handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback
            handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback
                    autoRegister:(BOOL)autoRegisterParam  API_AVAILABLE(ios(13.0)){
-    NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:NULL];
 }
 
 - (id)initWithConnectionOptions:(UISceneConnectionOptions* _Nullable)connectionOptions
@@ -414,8 +401,19 @@ static id isNil(id object) {
            handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback
                autoRegister:(BOOL)autoRegisterParam
               handleInitialized:(CPInitializedBlock  _Nullable)initializedCallback  API_AVAILABLE(ios(13.0)){
+    return [self initWithConnectionOptionsInternal:connectionOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:initializedCallback];
+}
+
+- (id _Nullable)initWithConnectionOptionsInternal:(UISceneConnectionOptions* _Nullable)connectionOptions
+                                        channelId:(NSString* _Nullable)channelId
+                       handleNotificationReceived:(CPHandleNotificationReceivedBlock _Nullable)receivedCallback
+                         handleNotificationOpened:(CPHandleNotificationOpenedBlock _Nullable)openedCallback
+                                 handleSubscribed:(CPHandleSubscribedBlock _Nullable)subscribedCallback
+                                     autoRegister:(BOOL)autoRegister
+                                handleInitialized:(CPInitializedBlock _Nullable)initializedCallback API_AVAILABLE(ios(13.0)) {
     NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
-    return [self initWithLaunchOptions:launchOptions channelId:newChannelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegisterParam handleInitialized:initializedCallback];
+    handleUrlFromSceneDelegate = YES;
+    return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegister handleInitialized:initializedCallback];
 }
 
 #pragma mark - Common function to initialize SDK and sync data to NSUserDefaults
@@ -489,6 +487,10 @@ static id isNil(id object) {
 
     if ([self getAutoClearBadge]) {
         [self clearBadge:false];
+    }
+
+    if (!handleUrlFromSceneDelegate) {
+        handleUrlFromAppDelegate = YES;
     }
 
     return self;
@@ -1363,6 +1365,7 @@ static id isNil(id object) {
     [self setHandleSubscribedCalled:NO];
     [self setSubscriptionId:nil];
     isSessionStartCalled = NO;
+    confirmAlertShown = NO;
 }
 
 #pragma mark - unsubscribe
@@ -1608,6 +1611,7 @@ static id isNil(id object) {
     }
 
     if (!deviceToken && !subscriptionId) {
+        [self setSubscriptionInProgress:false];
         if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"No deviceToken or subscriptionId available"}]);
         }
@@ -1679,7 +1683,7 @@ static id isNil(id object) {
                     [self trackSessionStart];
                 }
 
-                if (![self isConfirmAlertShown]) {
+                if (isSubscriptionChanged && ![self isConfirmAlertShown]) {
                     [self setConfirmAlertShown];
                 }
 
@@ -3191,6 +3195,18 @@ static id isNil(id object) {
 
             [CPAppBannerModule setCurrentEventId:eventId];
             [CPAppBannerModule triggerEvent:eventId properties:properties];
+            if ([properties count] > 0) {
+                for (NSString *key in properties) {
+                    id value = [properties objectForKey:key];
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        [databaseManager updateCountForEventWithId:eventId eventValue:value eventProperty:key updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
+                    });
+                }
+            } else {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [databaseManager updateCountForEventWithId:eventId eventValue:@"" eventProperty:@"" updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
+                });
+            }
         }];
     });
 }
@@ -3868,13 +3884,13 @@ static id isNil(id object) {
 }
 
 - (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:true];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES];
 }
 
 - (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
     BOOL fromNotification = notificationId != nil;
     [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:true];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO];
 }
 
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
@@ -4055,6 +4071,19 @@ static id isNil(id object) {
     if (handleInitialized) {
         handleInitialized(success, error);
     }
+}
+
+#pragma mark - Handle the universal links from notification tap event
+- (void)setHandleUniversalLinksInAppForDomains:(NSArray<NSString *> *_Nullable)domains {
+    handleUniversalLinksInApp = domains;
+}
+
+- (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains {
+    return handleUniversalLinksInApp;
+}
+
+- (BOOL)getHandleUrlFromSceneDelegate {
+    return handleUrlFromSceneDelegate;
 }
 
 - (void)setLogListener:(CPLogListener)listener {

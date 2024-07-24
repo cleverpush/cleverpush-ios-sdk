@@ -129,14 +129,15 @@ static CPAppBannerActionBlock appBannerActionCallback;
     [self.btnClose setBackgroundColor:UIColor.blackColor];
 
     if (@available(iOS 13.0, *)) {
-        [self.btnClose setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        UIImage *multiplyImage = [CPUtils resizedImageNamed:@"multiply" withSize:CGSizeMake(12,12)];
+        [self.btnClose setImage:multiplyImage forState:UIControlStateNormal];
         [self.btnClose setTintColor:UIColor.whiteColor];
     } else {
         [self.btnClose setTitle:@"X" forState:UIControlStateNormal];
         [self.btnClose setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     }
 
-    self.btnClose.alpha = 0.5;
+    self.btnClose.alpha = 0.7;
     self.btnClose.layer.cornerRadius = CGRectGetWidth(self.btnClose.frame) / 2;
     [self.btnClose.layer setMasksToBounds:false];
     if (closeButtonEnabled) {
@@ -221,7 +222,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
     } else {
         self.popupHeight.constant = value.height + 20;
         if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
-            self.popupHeight.constant = value.height + 60;
+            self.popupHeight.constant = value.height + 50;
         }
         [self.cardCollectionView layoutIfNeeded];
     }
@@ -462,7 +463,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
             [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         }
 
-        closeButton.alpha = 0.5;
+        closeButton.alpha = 0.7;
         closeButton.layer.cornerRadius = CGRectGetWidth(closeButton.frame) / 2;
         [closeButton.layer setMasksToBounds:false];
         [closeButton addTarget:self action:@selector(onDismiss)
