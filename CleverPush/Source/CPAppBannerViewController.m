@@ -497,7 +497,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
 
     decisionHandler(WKNavigationActionPolicyCancel);
-    [[UIApplication sharedApplication] openURL:navigationAction.request.URL];
+    [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:nil];
 }
 
 #pragma mark - Callback event for tracking clicks

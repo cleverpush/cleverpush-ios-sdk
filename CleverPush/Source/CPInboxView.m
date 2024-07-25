@@ -136,6 +136,11 @@ CPNotificationClickBlock handleClick;
     NSString *thumbnail;
     cell.activityIndicator.color = self.notification_text_color;
     [cell.activityIndicator startAnimating];
+    if (@available(iOS 13.0, *)) {
+        cell.activityIndicator.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleMedium;
+    } else {
+        cell.activityIndicator.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleGray;
+    }
 
     if (self.notifications[indexPath.row].mediaUrl != nil && ![self.notifications[indexPath.row].mediaUrl isKindOfClass:[NSNull class]]) {
         thumbnail = self.notifications[indexPath.row].mediaUrl;
@@ -330,7 +335,7 @@ CPNotificationClickBlock handleClick;
             }
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
-                [[UIApplication sharedApplication] openURL:action.url];
+                [[UIApplication sharedApplication] openURL:action.url options:@{} completionHandler:nil];
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
