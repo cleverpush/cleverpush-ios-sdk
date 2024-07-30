@@ -2881,7 +2881,6 @@ static id isNil(id object) {
         }
 
         [topics addObject:topicId];
-        [self setSubscriptionTopics:topics];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/add"];
@@ -2895,6 +2894,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self setSubscriptionTopics:topics];
                 if (callback) {
                     callback(topicId);
                 }
@@ -2931,7 +2931,6 @@ static id isNil(id object) {
         }
 
         [topics removeObject:topicId];
-        [self setSubscriptionTopics:topics];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/remove"];
@@ -2945,6 +2944,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self setSubscriptionTopics:topics];
                 if (callback) {
                     callback(topicId);
                 }
