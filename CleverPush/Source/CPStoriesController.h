@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray *readStories;
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
+@property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
 
 @end
 NS_ASSUME_NONNULL_END

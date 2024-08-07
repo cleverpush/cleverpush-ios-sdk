@@ -36,6 +36,19 @@
         if ([json objectForKey:@"published"] != nil && ![[json objectForKey:@"published"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"published"] boolValue]) {
             self.published = YES;
         }
+
+        self.pages = [[NSMutableArray alloc] init];
+        if ([json objectForKey:@"pages"] != nil && ![[json objectForKey:@"pages"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"pages"] isKindOfClass:[NSArray class]]) {
+            NSArray *pagesData = [json objectForKey:@"pages"];
+
+            for (NSDictionary *page in pagesData) {
+                NSMutableDictionary *mutablePage = [page mutableCopy];
+                if (![mutablePage objectForKey:@"unread"]) {
+                    [mutablePage setObject:@(YES) forKey:@"unread"];
+                }
+                [self.pages addObject:mutablePage];
+            }
+        }
     }
     return self;
 }
