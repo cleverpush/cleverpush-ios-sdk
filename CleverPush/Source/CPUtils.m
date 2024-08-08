@@ -759,7 +759,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *settings) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (settings.authorizationStatus == UNAuthorizationStatusDenied) {
-                NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                NSString *settingsURLString;
+
+                if (@available(iOS 15.4, *)) {
+                    settingsURLString = UIApplicationOpenNotificationSettingsURLString;
+                } else {
+                    settingsURLString = UIApplicationOpenSettingsURLString;
+                }
+
+                NSURL *url = [NSURL URLWithString:settingsURLString];
+
                 if ([[UIApplication sharedApplication] canOpenURL:url]) {
                     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
                 }
