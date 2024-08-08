@@ -482,10 +482,12 @@
         [self.pageControl setNumberOfPages:self.data.screens.count];
         self.pageControl.hidden = NO;
         self.pageControlHeightConstraint.constant = 30;
+        self.tblviewBottomBannerConstraint.constant = 25;
     } else {
         [self.pageControl setNumberOfPages:0];
         self.pageControl.hidden = YES;
         self.pageControlHeightConstraint.constant = 0;
+        self.tblviewBottomBannerConstraint.constant = 10;
     }
 }
 
