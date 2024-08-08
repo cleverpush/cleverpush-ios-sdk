@@ -439,7 +439,7 @@
         self.btnClose.hidden = YES;
     }
 
-    self.tblviewTopBannerConstraint.constant = -25;
+    self.tblviewTopBannerConstraint.constant = - 25;
     if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
         self.tblviewTopBannerConstraint.constant = - 15;
         if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
