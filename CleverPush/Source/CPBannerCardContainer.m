@@ -440,8 +440,10 @@
     }
 
     self.tblviewTopBannerConstraint.constant = - 25;
-    if (self.data.closeButtonPositionStaticEnabled) {
-        self.tblviewTopBannerConstraint.constant =  25;
+    if (self.data.closeButtonEnabled) {
+        if (self.data.closeButtonPositionStaticEnabled) {
+            self.tblviewTopBannerConstraint.constant =  25;
+        }
     }
 }
 
