@@ -594,8 +594,8 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setCustomTopViewController:viewController];
 }
 
-+ (void)setModalPresentationStyle:(UIModalPresentationStyle)style {
-    [[self CPSharedInstance] setModalPresentationStyle:style];
++ (void)setAppBannerModalPresentationStyle:(UIModalPresentationStyle)style {
+    [[self CPSharedInstance] setAppBannerModalPresentationStyle:style];
 }
 
 + (void)setLocalEventTrackingRetentionDays:(int)days {
@@ -706,8 +706,8 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getCustomTopViewController];
 }
 
-+ (UIModalPresentationStyle)getModalPresentationStyle {
-    return [[self CPSharedInstance] getModalPresentationStyle];
++ (UIModalPresentationStyle)getAppBannerModalPresentationStyle {
+    return [[self CPSharedInstance] getAppBannerModalPresentationStyle];
 }
 
 + (int)getLocalEventTrackingRetentionDays {

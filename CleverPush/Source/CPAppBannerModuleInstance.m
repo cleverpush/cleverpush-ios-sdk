@@ -1091,7 +1091,7 @@ NSInteger currentScreenIndex = 0;
 
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getModalPresentationStyle]];
+    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 

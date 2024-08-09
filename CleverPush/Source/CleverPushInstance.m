@@ -4088,11 +4088,11 @@ static id isNil(id object) {
 }
 
 #pragma mark - Handle the style of the topViewController (the presented app banner controller).
-- (void)setModalPresentationStyle:(UIModalPresentationStyle)style {
+- (void)setAppBannerModalPresentationStyle:(UIModalPresentationStyle)style {
     appBannerModalPresentationStyle = style;
 }
 
-- (UIModalPresentationStyle)getModalPresentationStyle {
+- (UIModalPresentationStyle)getAppBannerModalPresentationStyle {
     return appBannerModalPresentationStyle;
 }
 
