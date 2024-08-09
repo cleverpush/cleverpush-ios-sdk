@@ -57,6 +57,12 @@
         if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
             cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
             [cell.activitydata startAnimating];
+            if (@available(iOS 13.0, *)) {
+                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleMedium;
+            } else {
+                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleGray;
+            }
+
             [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
                 if (callback) {
                     [UIView performWithoutAnimation:^{

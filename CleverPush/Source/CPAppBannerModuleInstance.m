@@ -994,7 +994,7 @@ NSInteger currentScreenIndex = 0;
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
                     action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];
                 }
-                [[UIApplication sharedApplication] openURL:action.url];
+                [[UIApplication sharedApplication] openURL:action.url options:@{} completionHandler:nil];
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
