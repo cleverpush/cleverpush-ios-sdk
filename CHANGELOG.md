@@ -1,3 +1,9 @@
+## 1.30.25 (09.08.2024)
+* Optimisation of the app banner UI.
+* Optimised `handleSubscribeActionWithCallback` function.
+* implemented `setModalPresentationStyle ` and `getModalPresentationStyle ` to display the style of the topViewController (the presented app banner controller).
+* Resolved the issue of `removeSubscriptionTopic` and `addSubscriptionTopic` functions not working properly while the internet connection is not available.
+
 ## 1.30.24 (24.07.2024)
 * Optimisation of the app banner UI.
 * Optimised `makeSyncSubscriptionRequest` function for `setSubscriptionInProgress`.
