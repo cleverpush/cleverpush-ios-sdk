@@ -87,6 +87,7 @@
                 <outlet property="pageControlHeightConstraint" destination="quK-2E-Ecd" id="VcH-RP-era"/>
                 <outlet property="tblCPBanner" destination="i8s-pt-aNt" id="fQC-Xy-akJ"/>
                 <outlet property="tblCPBannerHeightConstraint" destination="lyd-fW-f5R" id="fz8-Cw-FNB"/>
+                <outlet property="tblviewBottomBannerConstraint" destination="4di-n2-JOQ" id="qhi-88-gXN"/>
                 <outlet property="tblviewTopBannerConstraint" destination="5rI-eK-na1" id="4dG-pT-xVx"/>
                 <outlet property="topViewBannerConstraint" destination="E78-F0-kyp" id="vrY-9x-b1c"/>
                 <outlet property="viewBannerCardContainer" destination="dnE-UJ-7yB" id="y6b-6L-Oa2"/>
