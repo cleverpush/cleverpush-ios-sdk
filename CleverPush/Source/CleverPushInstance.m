@@ -4087,7 +4087,7 @@ static id isNil(id object) {
     return handleUrlFromSceneDelegate;
 }
 
-#pragma mark - Handle the appBanner links from notification tap event
+#pragma mark - Handle the style of the topViewController (the presented app banner controller).
 - (void)setModalPresentationStyle:(UIModalPresentationStyle)style {
     appBannerModalPresentationStyle = style;
 }
