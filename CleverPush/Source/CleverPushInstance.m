@@ -131,6 +131,7 @@ UIBackgroundTaskIdentifier mediaBackgroundTask;
 WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* normalTintColor = nil;
+UIModalPresentationStyle appBannerModalPresentationStyle = UIModalPresentationOverCurrentContext;
 
 UIWindow* topicsDialogWindow;
 
@@ -4084,6 +4085,15 @@ static id isNil(id object) {
 
 - (BOOL)getHandleUrlFromSceneDelegate {
     return handleUrlFromSceneDelegate;
+}
+
+#pragma mark - Handle the style of the topViewController (the presented app banner controller).
+- (void)setAppBannerModalPresentationStyle:(UIModalPresentationStyle)style {
+    appBannerModalPresentationStyle = style;
+}
+
+- (UIModalPresentationStyle)getAppBannerModalPresentationStyle {
+    return appBannerModalPresentationStyle;
 }
 
 - (void)setLogListener:(CPLogListener)listener {
