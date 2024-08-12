@@ -138,6 +138,10 @@
     }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
+
+    if (!self.storyWidgetShareButtonVisibility) {
+        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
+    }
     NSString* currentIndex = [NSString stringWithFormat:@"%ld", index];
     CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
 
@@ -305,7 +309,30 @@
         }
     } else if ([message.name isEqualToString:@"storyNavigation"]) {
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
-        
+        [self markStoryAsRead:subStoryIndex];
+    }
+}
+
+- (void)markStoryAsRead:(NSInteger)subStoryIndex {
+    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY] mutableCopy];
+    if (!storyInfo) {
+        storyInfo = [[NSMutableDictionary alloc] init];
+    }
+
+    NSString *storyID = self.stories[self.storyIndex].id;
+    NSMutableArray *unreadPages = [storyInfo[storyID] mutableCopy];
+    if (!unreadPages) {
+        unreadPages = [NSMutableArray array];
+        for (NSInteger i = 0; i < self.stories[self.storyIndex].content.pages.count; i++) {
+            [unreadPages addObject:@(YES)];
+        }
+    }
+
+    if (subStoryIndex < unreadPages.count) {
+        unreadPages[subStoryIndex] = @(NO);
+        storyInfo[storyID] = unreadPages;
+        [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
