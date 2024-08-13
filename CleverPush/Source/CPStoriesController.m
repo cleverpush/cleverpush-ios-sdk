@@ -334,7 +334,6 @@
             [self next];
         }
     } else if ([message.name isEqualToString:@"storyNavigation"]) {
-        NSLog(@"Message body = %@",message.body);
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
         [self markStoryAsRead:subStoryIndex];
     }
