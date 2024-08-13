@@ -122,28 +122,54 @@
     configuration.allowsInlineMediaPlayback = YES;
     [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
 
-    CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
+    UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    containerView.backgroundColor = UIColor.clearColor;
+
+    CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
     webview.allowsBackForwardNavigationGestures = false;
     webview.contentMode = UIViewContentModeScaleToFill;
     webview.scrollView.backgroundColor = UIColor.blackColor;
     webview.scrollView.hidden = YES;
-    webview.backgroundColor = [UIColor clearColor];
-    webview.scrollView.backgroundColor = [UIColor clearColor];
+    webview.backgroundColor = [UIColor whiteColor];
+    webview.scrollView.backgroundColor = [UIColor whiteColor];
     webview.opaque = false;
+    [containerView addSubview:webview];
 
-    if (self.openedCallback != nil) {
-      [webview setUrlOpenedCallback:self.openedCallback];
+    if (@available(iOS 11.0, *)) {
+        webview.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [webview.topAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.topAnchor],
+            [webview.bottomAnchor constraintEqualToAnchor:containerView.bottomAnchor],
+            [webview.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
+            [webview.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor]
+        ]];
+    } else {
+        webview.frame = containerView.bounds;
     }
 
-    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
+    NSString *storyID = self.stories[index].id;
+    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY] mutableCopy];
+    NSArray *unreadPages = [storyInfo[storyID] mutableCopy];
+    NSInteger lastWatchedIndex = 0;
+
+    for (NSInteger i = 0; i < unreadPages.count; i++) {
+        if ([unreadPages[i] boolValue] == NO) {
+            lastWatchedIndex = i;
+            [self markStoryAsRead:lastWatchedIndex];
+        }
+    }
+
+    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&#ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
 
     if (!self.storyWidgetShareButtonVisibility) {
-        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
+        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&#ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
     }
-    NSString* currentIndex = [NSString stringWithFormat:@"%ld", index];
+    NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
     CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
+
+    NSLog(@"Custom URL = %@",customURL);
 
     NSString *content = [NSString stringWithFormat:@"\
                          <!DOCTYPE html>\
@@ -187,7 +213,7 @@
                          </body>\
                          </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex];
 
-    view = webview;
+    view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
             [indicator stopAnimating];
@@ -308,6 +334,7 @@
             [self next];
         }
     } else if ([message.name isEqualToString:@"storyNavigation"]) {
+        NSLog(@"Message body = %@",message.body);
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
         [self markStoryAsRead:subStoryIndex];
     }
@@ -328,12 +355,14 @@
         }
     }
 
-    if (subStoryIndex < unreadPages.count) {
-        unreadPages[subStoryIndex] = @(NO);
-        storyInfo[storyID] = unreadPages;
-        [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+    for (NSInteger i = 0; i <= subStoryIndex; i++) {
+        if (i < unreadPages.count) {
+            unreadPages[i] = @(NO);
+        }
     }
+    storyInfo[storyID] = unreadPages;
+    [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark Device orientation
