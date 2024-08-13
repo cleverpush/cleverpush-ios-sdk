@@ -225,13 +225,14 @@
     }];
 
     UIButton *closeButton = [[UIButton alloc] init];
-    CGFloat buttonWidth = 40.0;
-    CGFloat buttonHeight = 40.0;
+    CGFloat buttonWidth = 30.0;
+    CGFloat buttonHeight = 30.0;
     CGFloat xPosition;
 
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
         CGFloat topPadding = window.safeAreaInsets.top;
+        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10, 40, 40))];
 
         if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
             xPosition = 10.0;
@@ -241,8 +242,9 @@
             xPosition = 10.0;
         }
 
-        closeButton.frame = CGRectMake(xPosition, topPadding + 10.0, buttonWidth, buttonHeight);
+        closeButton.frame = CGRectMake(xPosition, containerView.frame.origin.y + 15, buttonWidth, buttonHeight);
     } else {
+        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
         if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
             xPosition = 10.0;
         } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
@@ -253,7 +255,7 @@
 
         closeButton.frame = CGRectMake(xPosition, 10.0, buttonWidth, buttonHeight);
     }
-    closeButton.layer.cornerRadius = 20.0;
+    closeButton.layer.cornerRadius = 15.0;
     closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
     closeButton.tag = index;
     
