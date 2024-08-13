@@ -157,7 +157,6 @@
     for (NSInteger i = 0; i < unreadPages.count; i++) {
         if ([unreadPages[i] boolValue] == NO) {
             lastWatchedIndex = i;
-            [self markStoryAsRead:lastWatchedIndex];
         }
     }
 
@@ -356,14 +355,12 @@
         }
     }
 
-    for (NSInteger i = 0; i <= subStoryIndex; i++) {
-        if (i < unreadPages.count) {
-            unreadPages[i] = @(NO);
-        }
+    if (subStoryIndex < unreadPages.count) {
+        unreadPages[subStoryIndex] = @(NO);
+        storyInfo[storyID] = unreadPages;
+        [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    storyInfo[storyID] = unreadPages;
-    [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark Device orientation
