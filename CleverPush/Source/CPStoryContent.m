@@ -39,8 +39,7 @@
 
         self.pages = [[NSMutableArray alloc] init];
         if ([json objectForKey:@"pages"] != nil && ![[json objectForKey:@"pages"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"pages"] isKindOfClass:[NSArray class]]) {
-            NSArray *pagesData = [json objectForKey:@"pages"];
-            self.pages = [pagesData mutableCopy];
+            self.pages = [[json objectForKey:@"pages"] mutableCopy];
         }
     }
     return self;
