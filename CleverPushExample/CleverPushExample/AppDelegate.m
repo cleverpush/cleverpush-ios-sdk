@@ -9,13 +9,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [CleverPush enableDevelopmentMode];
-    [CleverPush initWithLaunchOptions:launchOptions
-      channelId:@"YOUR_CHANNEL_ID_HERE"
-      handleNotificationOpened:^(CPNotificationOpenedResult *result) {
+    [CleverPush initWithLaunchOptions:launchOptions channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:^(CPNotificationReceivedResult * _Nullable result) {
+        [CleverPush showAppBanner:[result.notification valueForKey:@"appBanner"]];
+    } handleNotificationOpened:^(CPNotificationOpenedResult * _Nullable result) {
         NSLog(@"Received Notification with URL: %@", [result.notification valueForKey:@"url"]);
-    } handleSubscribed:^(NSString *subscriptionId) {
-        NSLog(@"Subscribed to CleverPush with ID: %@", subscriptionId);
-    } autoRegister:YES];
+    } autoRegister:true];
 
     [CleverPush setAppBannerShownCallback:^(CPAppBanner *appBanner) {
         NSLog(@"APP BANNER SHOWN: %@", appBanner.name);
