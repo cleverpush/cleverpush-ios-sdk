@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="VLv-xN-VC0">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
-        <scene sceneID="UVw-Qg-lxa">
+        <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="VLv-xN-VC0" customClass="ViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Hze-cP-Hvk">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="rwm-gd-xDK">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="04z-BN-vEb">
                                 <rect key="frame" x="30" y="197" width="330" height="450"/>
                                 <subviews>
-                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Live Activity id" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hXw-Mq-fga">
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Live Activity id" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Xbi-Rx-soU">
                                         <rect key="frame" x="0.0" y="0.0" width="330" height="50"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xRd-6h-7aY">
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TtR-Wr-wsJ">
                                         <rect key="frame" x="0.0" y="80" width="330" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="cb0-DC-CEa"/>
+                                            <constraint firstAttribute="height" constant="50" id="KxD-st-wI0"/>
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Start Live Activity"/>
                                         <connections>
-                                            <action selector="btnHandlerStartLiveActivity:" destination="VLv-xN-VC0" eventType="touchUpInside" id="6ng-Jc-aaJ"/>
+                                            <action selector="btnHandlerStartLiveActivity:" destination="BYZ-38-t0r" eventType="touchUpInside" id="UDn-c9-nqd"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vz4-hr-TuZ">
+                                    <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1vf-Iu-g0i">
                                         <rect key="frame" x="0.0" y="160" width="330" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="D8N-U3-fav"/>
+                                            <constraint firstAttribute="height" constant="50" id="QDy-8d-R1q"/>
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Subscribe"/>
                                         <connections>
-                                            <action selector="btnHandlerSubscriptionOn:" destination="VLv-xN-VC0" eventType="touchUpInside" id="mRs-1S-Cha"/>
+                                            <action selector="btnHandlerSubscriptionOn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="TiR-9k-Dgu"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VBD-xl-69p">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZG8-xW-Oie">
                                         <rect key="frame" x="0.0" y="240" width="330" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="ncG-I1-tLr"/>
+                                            <constraint firstAttribute="height" constant="50" id="k5z-e4-qSV"/>
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Unsubscribe"/>
                                         <connections>
-                                            <action selector="btnHandlerSubscribeOff:" destination="VLv-xN-VC0" eventType="touchUpInside" id="KvH-YF-Q0h"/>
+                                            <action selector="btnHandlerSubscribeOff:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Wiz-S2-XYw"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v1q-AT-OVU">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hGq-4z-aWT">
                                         <rect key="frame" x="0.0" y="320" width="330" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="7zG-JF-MIX"/>
+                                            <constraint firstAttribute="height" constant="50" id="Wbb-Eu-9Vk"/>
                                         </constraints>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Get Subscription id"/>
                                         <connections>
-                                            <action selector="btnHandlergetSubscriptionID:" destination="VLv-xN-VC0" eventType="touchUpInside" id="t29-xo-xFN"/>
+                                            <action selector="btnHandlergetSubscriptionID:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vSU-sH-Vba"/>
                                         </connections>
                                     </button>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ozz-q0-DDs">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BpV-A9-5EC">
                                         <rect key="frame" x="0.0" y="400" width="330" height="50"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <nil key="textColor"/>
@@ -90,20 +90,20 @@
                                 </subviews>
                             </stackView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="RiA-oB-sEv"/>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="rwm-gd-xDK" firstAttribute="centerY" secondItem="Hze-cP-Hvk" secondAttribute="centerY" id="3Bz-oU-7Ge"/>
-                            <constraint firstItem="RiA-oB-sEv" firstAttribute="trailing" secondItem="rwm-gd-xDK" secondAttribute="trailing" constant="30" id="7gp-SK-aNY"/>
-                            <constraint firstItem="rwm-gd-xDK" firstAttribute="leading" secondItem="RiA-oB-sEv" secondAttribute="leading" constant="30" id="jTs-0g-beX"/>
+                            <constraint firstItem="04z-BN-vEb" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="30" id="Wcl-iw-1TG"/>
+                            <constraint firstItem="04z-BN-vEb" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="eXD-eE-axs"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="04z-BN-vEb" secondAttribute="trailing" constant="30" id="yod-Je-2SY"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="lblStatusDisplay" destination="Ozz-q0-DDs" id="T2S-DY-50w"/>
-                        <outlet property="txtLiveActivityName" destination="hXw-Mq-fga" id="da0-hS-bLJ"/>
+                        <outlet property="lblStatusDisplay" destination="BpV-A9-5EC" id="KaW-iK-eM9"/>
+                        <outlet property="txtLiveActivityName" destination="Xbi-Rx-soU" id="cec-MH-dWV"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="qVb-DD-8fl" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="132" y="-28"/>
         </scene>
