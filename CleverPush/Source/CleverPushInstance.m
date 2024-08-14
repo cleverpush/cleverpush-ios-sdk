@@ -2151,10 +2151,16 @@ static id isNil(id object) {
 
 #pragma mark - Generalised Api call.
 - (void)enqueueFailedRequest:(NSURLRequest* _Nullable)request withRetryCount:(NSInteger)retryCount onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
-    NSURLSession*session = [NSURLSession sharedSession];
-    NSURLSessionDataTask*task = [session dataTaskWithRequest:request completionHandler:^(NSData*data, NSURLResponse*response, NSError*error) {
-        if (successBlock != nil && error == nil) {
-            [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+
+        if (error == nil && httpResponse.statusCode == 200) {
+            if (data.length == 0 && successBlock != nil) {
+                successBlock(nil);
+            } else {
+                [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
+            }
         } else {
             if (retryCount < httpRequestRetryCount) {
                 NSTimeInterval httpRequestRetryBackoffSeconds = pow(httpRequestRetryBackoffMultiplier, retryCount);
