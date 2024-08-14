@@ -158,12 +158,13 @@
 
     if (storyInfo != nil && [storyInfo objectForKey:storyID] != nil) {
         lastWatchedIndex = [storyInfo[storyID] integerValue];
+        lastWatchedIndex = lastWatchedIndex + 1;
     }
 
-    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&#ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
+    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
 
     if (!self.storyWidgetShareButtonVisibility) {
-        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&#ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
+        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
     }
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
     CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
