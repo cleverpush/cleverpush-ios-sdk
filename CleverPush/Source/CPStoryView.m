@@ -178,6 +178,34 @@ NSString* storyWidgetId;
                     [self addSubview:self.storyCollection];
                     self.widget = Widget.widgets;
                     self.stories = Widget.stories;
+
+                    NSArray<CPStory *> *firstThreeStories = [self.stories subarrayWithRange:NSMakeRange(0, 3)];
+                    self.stories = [firstThreeStories mutableCopy];
+
+                    for (CPStory *story in self.stories) {
+                        NSArray *pages = story.content.pages;
+                        if (pages != nil) {
+                            [story setSubStoryCount:[pages count]];
+                        }
+                    }
+
+                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                    NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+
+                    for (CPStory *story in self.stories) {
+                        if (story.content.pages != nil) {
+                            story.subStoryCount = story.content.pages.count;
+                        }
+
+                        NSString *storyId = story.id;
+                        if (existingMap != nil && [existingMap objectForKey:storyId] != nil) {
+                            NSInteger unreadCount = [existingMap[storyId] integerValue];
+                            story.unreadCount = unreadCount;
+                        } else {
+                            story.unreadCount = story.content.pages.count;
+                        }
+                    }
+                    
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
                 });
@@ -262,7 +290,7 @@ NSString* storyWidgetId;
             cell.outerRing.frame = CGRectMake(0, 5, width, height - TEXT_HEIGHT);
             cell.image.frame = CGRectMake(imagePadding, imagePadding, width - 2 * imagePadding, cell.outerRing.frame.size.height);
             cell.name.frame = CGRectMake(0, CGRectGetMaxY(cell.outerRing.frame), width, TEXT_HEIGHT);
-            cell.name.text = self.stories[indexPath.item].id;
+            cell.name.text = self.stories[indexPath.item].title;
             cell.name.textColor = self.textColor;
             cell.name.font = [self fontForTitleTextSize];
         } else {
@@ -273,10 +301,10 @@ NSString* storyWidgetId;
 
             if (self.textPosition == CPStoryWidgetTextPositionInsideTop) {
                 cell.image.frame = CGRectMake(0, 0, width, imageHeight);
-                cell.name.frame = CGRectMake(0, 0, width, textAreaHeight);
+                cell.name.frame = CGRectMake(5, 0, width - 10, textAreaHeight);
             } else if (self.textPosition == CPStoryWidgetTextPositionInsideBottom) {
                 cell.image.frame = CGRectMake(0, 0, width, imageHeight);
-                cell.name.frame = CGRectMake(0, imageHeight - textHeight, width, textHeight);
+                cell.name.frame = CGRectMake(5, imageHeight - textHeight, width - 10, textHeight);
             }
             cell.name.text = self.stories[indexPath.item].title;
             cell.name.textColor = self.textColor;
@@ -326,7 +354,7 @@ NSString* storyWidgetId;
             [cell addSubview:cell.name];
         }
         cell.name.frame = CGRectMake(0, CGRectGetMaxY(cell.outerRing.frame), self.storyIconWidth, TEXT_HEIGHT);
-        cell.name.text = self.stories[indexPath.item].id;
+        cell.name.text = self.stories[indexPath.item].title;
         cell.name.textColor = self.textColor;
         cell.name.textAlignment = NSTextAlignmentCenter;
         cell.name.numberOfLines = 0;
@@ -374,12 +402,11 @@ NSString* storyWidgetId;
         cell.unReadCount.backgroundColor = self.unreadStoryCountBackgroundColor;
         cell.unReadCount.textColor = self.unreadStoryCountTextColor;
 
-        NSInteger unreadCount = [self getUnreadCountForStory:self.stories[indexPath.item].id indexPath:indexPath];
-        if (unreadCount > 0) {
-            [cell addSubview:cell.unReadCount];
-            cell.unReadCount.text = [NSString stringWithFormat:@"%ld", unreadCount];
-        } else {
+        if ([self.readStories containsObject:self.stories[indexPath.item].id] && self.stories[indexPath.item].unreadCount <= 0) {
             [cell.unReadCount removeFromSuperview];
+        } else {
+            [cell addSubview:cell.unReadCount];
+            cell.unReadCount.text = [NSString stringWithFormat:@"%ld", self.stories[indexPath.item].unreadCount];
         }
     }
 
@@ -418,6 +445,7 @@ NSString* storyWidgetId;
     storiesController.openedCallback = self.openedCallback;
     storiesController.closeButtonPosition = self.closeButtonPosition;
     storiesController.storyWidgetShareButtonVisibility = self.storyWidgetShareButtonVisibility;
+    storiesController.widget = self.widget;
     [topController presentViewController:storiesController animated:YES completion:nil];
 }
 
