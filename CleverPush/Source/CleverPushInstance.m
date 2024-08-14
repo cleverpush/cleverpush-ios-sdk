@@ -2219,10 +2219,10 @@ static id isNil(id object) {
         if (successBlock != nil && error == nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         } else {
-            if (retryOnFailure) {
+            if (retryOnFailure && error != nil) {
                 [self enqueueFailedRequest:request withRetryCount:0 onSuccess:successBlock onFailure:failureBlock];
             } else {
-                if (failureBlock) {
+                if (failureBlock && error != nil) {
                     failureBlock(error);
                 }
             }
