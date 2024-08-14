@@ -239,27 +239,16 @@ NSString* storyWidgetId;
     CGFloat cellWidth = CGRectGetWidth(cell.frame);
     CGFloat cellHeight = CGRectGetHeight(cell.frame);
 
-    if (self.adjustToCollectionViewFrame) {
-        [self configureCellForAdjustedFrame:cell withWidth:cellWidth height:cellHeight atIndexPath:indexPath];
-    } else {
-        [self configureCellForDefaultFrame:cell withWidth:cellWidth height:cellHeight atIndexPath:indexPath];
-    }
+    [self configureCell:cell withWidth:cellWidth height:cellHeight atIndexPath:indexPath];
 
     return cell;
 }
 
-- (void)configureCellForAdjustedFrame:(CPStoryCell *)cell withWidth:(CGFloat)width height:(CGFloat)height atIndexPath:(NSIndexPath *)indexPath {
-    CGFloat borderMargin = MAX(self.storyIconBorderMargin, 0);
-    CGFloat imagePadding = borderMargin;
-
+- (void)configureCell:(CPStoryCell *)cell withWidth:(CGFloat)width height:(CGFloat)height atIndexPath:(NSIndexPath *)indexPath {
     if (!cell.outerRing) {
         cell.outerRing = [[UIView alloc] init];
         [cell addSubview:cell.outerRing];
     }
-    cell.outerRing.frame = CGRectMake(0, 5, width, height - 5);
-    cell.outerRing.backgroundColor = UIColor.whiteColor;
-    cell.outerRing.layer.cornerRadius = self.storyIconCornerRadius;
-    cell.outerRing.clipsToBounds = YES;
 
     if (!cell.image) {
         cell.image = [[UIImageView alloc] init];
@@ -275,90 +264,63 @@ NSString* storyWidgetId;
         [cell addSubview:cell.name];
     }
 
-    if (self.titleVisibility) {
-        if (self.textPosition == CPStoryWidgetTextPositionDefault) {
+    [self configureCellFrame:cell withWidth:width height:height];
+    [self configureCellContent:cell atIndexPath:indexPath];
+    [self configureCellAppearance:cell forIndexPath:indexPath];
+}
+
+- (void)configureCellFrame:(CPStoryCell *)cell withWidth:(CGFloat)width height:(CGFloat)height {
+    CGFloat borderMargin = MAX(self.storyIconBorderMargin, 0);
+    CGFloat imagePadding = borderMargin;
+
+    if (self.adjustToCollectionViewFrame) {
+        CGFloat outerRingHeight = height - 5;
+        cell.outerRing.frame = CGRectMake(0, 5, width, outerRingHeight);
+        cell.outerRing.layer.cornerRadius = self.storyIconCornerRadius;
+
+        if (self.titleVisibility && self.textPosition == CPStoryWidgetTextPositionDefault) {
             cell.outerRing.frame = CGRectMake(0, 5, width, height - TEXT_HEIGHT);
             cell.image.frame = CGRectMake(imagePadding, imagePadding, width - 2 * imagePadding, cell.outerRing.frame.size.height);
             cell.name.frame = CGRectMake(0, CGRectGetMaxY(cell.outerRing.frame), width, TEXT_HEIGHT);
-            cell.name.text = self.stories[indexPath.item].title;
-            cell.name.textColor = self.textColor;
-            cell.name.font = [self fontForTitleTextSize];
-        } else {
-            CGFloat imageHeight = height - 5;
-            CGFloat textHeight = TEXT_HEIGHT;
-            CGFloat textAreaHeight = imageHeight / 2;
-            cell.outerRing.frame = CGRectMake(0, 5, width, imageHeight);
+        } else if (self.titleVisibility && (self.textPosition == CPStoryWidgetTextPositionInsideTop || self.textPosition == CPStoryWidgetTextPositionInsideBottom)) {
+            cell.outerRing.frame = CGRectMake(0, 5, width, outerRingHeight);
+            cell.image.frame = CGRectMake(0, 0, width, outerRingHeight);
 
             if (self.textPosition == CPStoryWidgetTextPositionInsideTop) {
-                cell.image.frame = CGRectMake(0, 0, width, imageHeight);
-                cell.name.frame = CGRectMake(5, 0, width - 10, textAreaHeight);
+                cell.name.frame = CGRectMake(5, 0, width - 10, outerRingHeight / 2);
             } else if (self.textPosition == CPStoryWidgetTextPositionInsideBottom) {
-                cell.image.frame = CGRectMake(0, 0, width, imageHeight);
-                cell.name.frame = CGRectMake(5, imageHeight - textHeight, width - 10, textHeight);
+                cell.name.frame = CGRectMake(5, outerRingHeight - TEXT_HEIGHT, width - 10, TEXT_HEIGHT);
             }
-            cell.name.text = self.stories[indexPath.item].title;
-            cell.name.textColor = self.textColor;
-            cell.name.font = [self fontForTitleTextSize];
+        } else {
+            cell.image.frame = CGRectMake(0, 0, width, outerRingHeight);
+        }
+    } else {
+        CGFloat storyIconHeight = self.storyIconHeight;
+        CGFloat storyIconWidth = self.storyIconWidth;
+        CGFloat outerRingY = 10;
+        CGFloat cornerRadius = self.storyIconCornerRadius > 0 ? self.storyIconCornerRadius : storyIconHeight / 2;
+
+        cell.outerRing.frame = CGRectMake(0, outerRingY, storyIconWidth, storyIconHeight);
+        cell.outerRing.layer.cornerRadius = cornerRadius;
+
+        CGRect imageFrame = self.storyIconBorderVisibility ? CGRectMake(5, 5, storyIconWidth - 10, storyIconHeight - 10) : CGRectMake(0, 0, storyIconWidth, storyIconHeight);
+        cell.image.frame = imageFrame;
+
+        if (self.titleVisibility) {
+            cell.name.frame = CGRectMake(0, CGRectGetMaxY(cell.outerRing.frame), storyIconWidth, TEXT_HEIGHT);
         }
     }
-
-    NSURL *imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.posterPortraitSrc];
-    [cell.image setImageWithURL:imageURL];
-
-    [self configureCellAppearance:cell forIndexPath:indexPath];
 }
 
-- (void)configureCellForDefaultFrame:(CPStoryCell *)cell withWidth:(CGFloat)width height:(CGFloat)height atIndexPath:(NSIndexPath *)indexPath {
-    if (!cell.outerRing) {
-        cell.outerRing = [[UIView alloc] init];
-        [cell addSubview:cell.outerRing];
-    }
-    cell.outerRing.frame = CGRectMake(0, 10, self.storyIconWidth, self.storyIconHeight);
-    cell.outerRing.backgroundColor = UIColor.whiteColor;
-    CGFloat cornerRadius = self.storyIconCornerRadius > 0
-        ? self.storyIconCornerRadius
-        : self.storyIconHeight / 2;
-    cell.outerRing.layer.cornerRadius = cornerRadius;
-    cell.outerRing.clipsToBounds = YES;
-
-    if (!cell.image) {
-        cell.image = [[UIImageView alloc] init];
-        [cell.outerRing addSubview:cell.image];
-    }
-    CGRect imageFrame;
-    if (self.storyIconBorderVisibility) {
-        imageFrame = CGRectMake(5, 5, self.storyIconWidth - 10, self.storyIconHeight - 10);
-    } else {
-        imageFrame = CGRectMake(0, 0, self.storyIconWidth, self.storyIconHeight);
-    }
-    cell.image.frame = imageFrame;
-    cell.image.contentMode = UIViewContentModeScaleAspectFill;
-    cell.image.clipsToBounds = YES;
-
+- (void)configureCellContent:(CPStoryCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     NSURL *imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.posterPortraitSrc];
     [cell.image setImageWithURL:imageURL];
 
     if (self.titleVisibility) {
-        if (!cell.name) {
-            cell.name = [[UILabel alloc] init];
-            [cell addSubview:cell.name];
-        }
-        cell.name.frame = CGRectMake(0, CGRectGetMaxY(cell.outerRing.frame), self.storyIconWidth, TEXT_HEIGHT);
         cell.name.text = self.stories[indexPath.item].title;
         cell.name.textColor = self.textColor;
-        cell.name.textAlignment = NSTextAlignmentCenter;
-        cell.name.numberOfLines = 0;
         cell.name.font = [self fontForTitleTextSize];
     }
-
-    [self configureCellAppearance:cell forIndexPath:indexPath];
-}
-
-- (UIFont *)fontForTitleTextSize {
-    if (self.fontStyle && [self.fontStyle length] > 0 && [CPUtils fontFamilyExists:self.fontStyle]) {
-        return [UIFont fontWithName:self.fontStyle size:(CGFloat)(self.titleTextSize)];
-    }
-    return [UIFont systemFontOfSize:(CGFloat)(self.titleTextSize) weight:UIFontWeightSemibold];
 }
 
 - (void)configureCellAppearance:(CPStoryCell *)cell forIndexPath:(NSIndexPath *)indexPath {
@@ -400,7 +362,14 @@ NSString* storyWidgetId;
         }
     }
 
-    cell.outerRing.clipsToBounds = TRUE;
+    cell.outerRing.clipsToBounds = YES;
+}
+
+- (UIFont *)fontForTitleTextSize {
+    if (self.fontStyle && [self.fontStyle length] > 0 && [CPUtils fontFamilyExists:self.fontStyle]) {
+        return [UIFont fontWithName:self.fontStyle size:(CGFloat)(self.titleTextSize)];
+    }
+    return [UIFont systemFontOfSize:(CGFloat)(self.titleTextSize) weight:UIFontWeightSemibold];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
