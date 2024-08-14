@@ -105,6 +105,9 @@
 }
 
 - (UIView *)carousel:(CleverPushiCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
+    [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    view = nil;
+
     UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhiteLarge];
     indicator.color = UIColor.redColor;
     [indicator hidesWhenStopped];
@@ -150,14 +153,11 @@
     }
 
     NSString *storyID = self.stories[index].id;
-    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY] mutableCopy];
-    NSArray *unreadPages = [storyInfo[storyID] mutableCopy];
+    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
     NSInteger lastWatchedIndex = 0;
 
-    for (NSInteger i = 0; i < unreadPages.count; i++) {
-        if ([unreadPages[i] boolValue] == NO) {
-            lastWatchedIndex = i;
-        }
+    if (storyInfo != nil && [storyInfo objectForKey:storyID] != nil) {
+        lastWatchedIndex = [storyInfo[storyID] integerValue];
     }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&#ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
@@ -167,8 +167,6 @@
     }
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
     CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
-
-    NSLog(@"Custom URL = %@",customURL);
 
     NSString *content = [NSString stringWithFormat:@"\
                          <!DOCTYPE html>\
@@ -204,13 +202,14 @@
                              console.log('storyNavigation event triggered');\
                              var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
                              window.webkit.messageHandlers.storyNavigation.postMessage({\
+                                position: %ld,\
                                  subStoryIndex: subStoryIndex\
                              });\
                          });\
                          player.go(%@);\
                          </script>\
                          </body>\
-                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex];
+                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, (long)self.storyIndex,currentIndex];
 
     view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
@@ -268,7 +267,7 @@
     [closeButton addTarget:self action:@selector(closeTapped:)
           forControlEvents:UIControlEventTouchUpInside];
     [webview addSubview:closeButton];
-    indicator.center = webview.center;
+    indicator.center = containerView.center;
     [webview addSubview:indicator];
     
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
@@ -323,8 +322,8 @@
 
 #pragma mark Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+    NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
     if ([message.name isEqualToString:@"previous"] || [message.name isEqualToString:@"next"]) {
-        NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
         NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
         if (![currentIndex isEqualToString:scriptMessageIndex]) {
             return;
@@ -335,32 +334,46 @@
             [self next];
         }
     } else if ([message.name isEqualToString:@"storyNavigation"]) {
+        NSInteger position = [message.body[@"position"] integerValue];
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
-        [self markStoryAsRead:subStoryIndex];
+        if (position == [currentIndex integerValue]) {
+            [self onStoryNavigation:position subStoryPosition:subStoryIndex];
+        }
     }
 }
 
-- (void)markStoryAsRead:(NSInteger)subStoryIndex {
-    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY] mutableCopy];
-    if (!storyInfo) {
-        storyInfo = [[NSMutableDictionary alloc] init];
-    }
+- (void)onStoryNavigation:(NSInteger)position subStoryPosition:(NSInteger)subStoryPosition {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    NSString *storyID = self.stories[self.storyIndex].id;
-    NSMutableArray *unreadPages = [storyInfo[storyID] mutableCopy];
-    if (!unreadPages) {
-        unreadPages = [NSMutableArray array];
-        for (NSInteger i = 0; i < self.stories[self.storyIndex].content.pages.count; i++) {
-            [unreadPages addObject:@(YES)];
+    NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+    NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+
+    NSMutableDictionary *updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy] ?: [NSMutableDictionary dictionary];
+    NSMutableDictionary *updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy] ?: [NSMutableDictionary dictionary];
+
+    NSString *storyId = self.stories[position].id;
+    NSInteger subStoryCount = self.stories[position].content.pages.count;
+    NSInteger unreadCount = subStoryCount - (subStoryPosition + 1);
+
+    NSNumber *existingUnreadCount = updatedStoryUnreadCountDict[storyId];
+    NSNumber *existingSubStoryPosition = updatedSubStoryPositionDict[storyId];
+
+    if (!existingUnreadCount || !existingSubStoryPosition) {
+        updatedStoryUnreadCountDict[storyId] = @(unreadCount);
+        updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
+        self.stories[position].unreadCount = unreadCount;
+    } else {
+        NSInteger preferencesSubStoryPosition = [existingSubStoryPosition integerValue];
+        if (subStoryPosition > preferencesSubStoryPosition) {
+            updatedStoryUnreadCountDict[storyId] = @(unreadCount);
+            updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
+            self.stories[position].unreadCount = unreadCount;
         }
     }
 
-    if (subStoryIndex < unreadPages.count) {
-        unreadPages[subStoryIndex] = @(NO);
-        storyInfo[storyID] = unreadPages;
-        [[NSUserDefaults standardUserDefaults] setObject:storyInfo forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+    [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+    [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+    [defaults synchronize];
 }
 
 #pragma mark Device orientation

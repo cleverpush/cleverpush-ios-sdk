@@ -179,16 +179,6 @@ NSString* storyWidgetId;
                     self.widget = Widget.widgets;
                     self.stories = Widget.stories;
 
-                    NSArray<CPStory *> *firstThreeStories = [self.stories subarrayWithRange:NSMakeRange(0, 3)];
-                    self.stories = [firstThreeStories mutableCopy];
-
-                    for (CPStory *story in self.stories) {
-                        NSArray *pages = story.content.pages;
-                        if (pages != nil) {
-                            [story setSubStoryCount:[pages count]];
-                        }
-                    }
-
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
                     NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
 
@@ -492,26 +482,6 @@ NSString* storyWidgetId;
     } else {
         [self.storyCollection reloadData];
     }
-}
-
-- (NSInteger)getUnreadCountForStory:(NSString *)storyID indexPath:(NSIndexPath *)indexPath {
-    NSDictionary *storyInfo = [[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-    if (!storyInfo) {
-        return self.stories[indexPath.item].content.pages.count;
-    }
-
-    NSArray *unreadPages = storyInfo[storyID];
-    if (!unreadPages) {
-        return self.stories[indexPath.item].content.pages.count;
-    }
-
-    NSInteger unreadCount = 0;
-    for (NSNumber *isUnread in unreadPages) {
-        if ([isUnread boolValue]) {
-            unreadCount++;
-        }
-    }
-    return unreadCount;
 }
 
 @end

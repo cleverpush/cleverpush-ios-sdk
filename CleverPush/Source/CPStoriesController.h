@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
 @property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
+@property (nonatomic, strong) CPStoryWidget *widget;
 
 @end
 NS_ASSUME_NONNULL_END
