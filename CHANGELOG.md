@@ -1,3 +1,6 @@
+## 1.30.26 (19.08.2024)
+* Optimised `enqueueFailedRequest` function for the failure case.
+
 ## 1.30.25 (09.08.2024)
 * Optimisation of the app banner UI.
 * Optimised `handleSubscribeActionWithCallback` function.
