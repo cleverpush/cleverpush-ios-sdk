@@ -157,8 +157,7 @@
     NSInteger lastWatchedIndex = 0;
 
     if (storyInfo != nil && [storyInfo objectForKey:storyID] != nil) {
-        lastWatchedIndex = [storyInfo[storyID] integerValue];
-        lastWatchedIndex = lastWatchedIndex + 1;
+        lastWatchedIndex = [storyInfo[storyID] integerValue] + 1;
     }
 
     NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
@@ -349,8 +348,16 @@
     NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
     NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
 
-    NSMutableDictionary *updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy] ?: [NSMutableDictionary dictionary];
-    NSMutableDictionary *updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy] ?: [NSMutableDictionary dictionary];
+    NSMutableDictionary *updatedStoryUnreadCountDict = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *updatedSubStoryPositionDict = [[NSMutableDictionary alloc] init];
+
+    if (storyUnreadCountDict) {
+        updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy];
+    }
+
+    if (subStoryPositionDict) {
+        updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy];
+    } 
 
     NSString *storyId = self.stories[position].id;
     NSInteger subStoryCount = self.stories[position].content.pages.count;
