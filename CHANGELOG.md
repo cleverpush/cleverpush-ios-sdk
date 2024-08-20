@@ -1,3 +1,6 @@
+## 1.31.0 (20.08.2024)
+* More customization options for `CPStoryView` with unread story count
+
 ## 1.30.26 (19.08.2024)
 * Optimised `enqueueFailedRequest` function for the failure case.
 

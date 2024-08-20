@@ -198,11 +198,11 @@
 		</data>
 		<key>Headers/CPStory.h</key>
 		<data>
-		XX6P5tDQbAcRlbAX5kzPv9oosQc=
+		IR5JuSuBbc817oCasXUgRZM3edA=
 		</data>
 		<key>Headers/CPStoryContent.h</key>
 		<data>
-		avldC5rFqDNJN4A2IYCKnKOqYis=
+		JVMq+2hgdO0PHa2TqqFFeuSMU5o=
 		</data>
 		<key>Headers/CPStoryContentMeta.h</key>
 		<data>
@@ -214,11 +214,19 @@
 		</data>
 		<key>Headers/CPStoryView.h</key>
 		<data>
-		rc3nxoS4Qh+j3f9SSnBveDs9xTk=
+		XDoZg0+Zcgh8jVUZqeo1X2Ng0e4=
 		</data>
 		<key>Headers/CPStoryWidget.h</key>
 		<data>
 		JknvTiPPBbYYBXjzJdhHlvwnvuQ=
+		</data>
+		<key>Headers/CPStoryWidgetCloseButtonPosition.h</key>
+		<data>
+		QvhnGUppHrpEi4S60vrhbVvPMmQ=
+		</data>
+		<key>Headers/CPStoryWidgetTextPosition.h</key>
+		<data>
+		jcbPVgyQlHFM94Z6POyrC+Hy6I8=
 		</data>
 		<key>Headers/CPSubscription.h</key>
 		<data>
@@ -262,7 +270,7 @@
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		Vym+5ErEH8nyfO64WdUrbEBRVeA=
+		j5opaxHR4jS5XgfVjaWmvTfddhA=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -270,7 +278,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		LWMAFJgNXftIkTGisn/ZnPvzPPE=
+		rDa+XEv8tIOqiOMvGWPHylr5cj0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -815,22 +823,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			XX6P5tDQbAcRlbAX5kzPv9oosQc=
+			IR5JuSuBbc817oCasXUgRZM3edA=
 			</data>
 			<key>hash2</key>
 			<data>
-			vPIp7YOxuob2YZMKwu3OvGWNnYfhchxp6wG0Ajd5V7c=
+			C4RGHyKZLctlP1abmvIhfOn9fubihawNZ2deI6Wn3g8=
 			</data>
 		</dict>
 		<key>Headers/CPStoryContent.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			avldC5rFqDNJN4A2IYCKnKOqYis=
+			JVMq+2hgdO0PHa2TqqFFeuSMU5o=
 			</data>
 			<key>hash2</key>
 			<data>
-			Ma6/+AzaIC7R4ggRRkWoyaWx/RrvUv+sLT9QJavyCEo=
+			DMQ+/oo0oYc8fcixWhjSHb0FMN5Z+ftlJQuzJCLpaUg=
 			</data>
 		</dict>
 		<key>Headers/CPStoryContentMeta.h</key>
@@ -859,11 +867,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			rc3nxoS4Qh+j3f9SSnBveDs9xTk=
+			XDoZg0+Zcgh8jVUZqeo1X2Ng0e4=
 			</data>
 			<key>hash2</key>
 			<data>
-			IMhHCp8nCG/4XEsrg+wqO7YdakPNoeinK8nkKzzzDmw=
+			KdiQBHLEf5dxEqj+OytYpGl+JyVGJE1LOoONgRw1an0=
 			</data>
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>
@@ -875,6 +883,28 @@
 			<key>hash2</key>
 			<data>
 			TUh3PbcmZJzyZEfmJ9SyUP+Uln0l7tqg1SnSWY/EUiA=
+			</data>
+		</dict>
+		<key>Headers/CPStoryWidgetCloseButtonPosition.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			QvhnGUppHrpEi4S60vrhbVvPMmQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			vD7oRiNY1qL2CmMPkrvdZlIYeaP1Zgn815jmJLE/MOA=
+			</data>
+		</dict>
+		<key>Headers/CPStoryWidgetTextPosition.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			jcbPVgyQlHFM94Z6POyrC+Hy6I8=
+			</data>
+			<key>hash2</key>
+			<data>
+			UrAWWw4J17HYSeGP22eWFrUNajzMXmdrUTEe3StDGiY=
 			</data>
 		</dict>
 		<key>Headers/CPSubscription.h</key>
@@ -991,11 +1021,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Vym+5ErEH8nyfO64WdUrbEBRVeA=
+			j5opaxHR4jS5XgfVjaWmvTfddhA=
 			</data>
 			<key>hash2</key>
 			<data>
-			Bjilf8p2XR1/1dmCw0pcoNuKQnOQDWHfpcXyuLnpBZ4=
+			lZEoticpsq2s7qZB1pJwcikj3T2lFtT+GfGqbSgqCP0=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>
