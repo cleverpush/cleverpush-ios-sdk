@@ -16,8 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger storyIndex;
 @property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) NSMutableArray *readStories;
+@property (nonatomic, assign) BOOL storyWidgetShareButtonVisibility;
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
+@property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
+@property (nonatomic, strong) CPStoryWidget *widget;
 
 @end
 NS_ASSUME_NONNULL_END

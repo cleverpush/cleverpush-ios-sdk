@@ -95,7 +95,7 @@
     self.carousel.pagingEnabled = YES;
     self.carousel.bounces = NO;
     self.carousel.currentItemIndex = self.storyIndex;
-    self.carousel.backgroundColor = [UIColor whiteColor];
+    self.carousel.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.carousel];
 }
 
@@ -105,6 +105,9 @@
 }
 
 - (UIView *)carousel:(CleverPushiCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
+    [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    view = nil;
+
     UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhiteLarge];
     indicator.color = UIColor.redColor;
     [indicator hidesWhenStopped];
@@ -114,57 +117,101 @@
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController removeScriptMessageHandlerForName:@"previous"];
     [userController removeScriptMessageHandlerForName:@"next"];
+    [userController removeScriptMessageHandlerForName:@"storyNavigation"];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
+    [userController addScriptMessageHandler:self name:@"storyNavigation"];
     configuration.userContentController = userController;
     configuration.allowsInlineMediaPlayback = YES;
     [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
 
-    CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) configuration:configuration];
+    UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    containerView.backgroundColor = UIColor.clearColor;
+
+    CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
     webview.scrollView.scrollEnabled = true;
     webview.scrollView.bounces = false;
     webview.allowsBackForwardNavigationGestures = false;
     webview.contentMode = UIViewContentModeScaleToFill;
     webview.scrollView.backgroundColor = UIColor.blackColor;
     webview.scrollView.hidden = YES;
-    webview.backgroundColor = [UIColor clearColor];
-    webview.scrollView.backgroundColor = [UIColor clearColor];
+    webview.backgroundColor = [UIColor whiteColor];
+    webview.scrollView.backgroundColor = [UIColor whiteColor];
     webview.opaque = false;
+    [containerView addSubview:webview];
 
-    if (self.openedCallback != nil) {
-      [webview setUrlOpenedCallback:self.openedCallback];
+    if (@available(iOS 11.0, *)) {
+        webview.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [webview.topAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.topAnchor],
+            [webview.bottomAnchor constraintEqualToAnchor:containerView.bottomAnchor],
+            [webview.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
+            [webview.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor]
+        ]];
+    } else {
+        webview.frame = containerView.bounds;
     }
 
-    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#ignoreLocalStorageHistory=true", self.stories[index].channel, self.stories[index].id];
-    NSString* currentIndex = [NSString stringWithFormat:@"%ld",index];
-    CGFloat frameHeight;
-    frameHeight = [CPUtils frameHeightWithoutSafeArea];
+    NSString *storyID = self.stories[index].id;
+    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
+    NSInteger lastWatchedIndex = 0;
+
+    if (storyInfo != nil && [storyInfo objectForKey:storyID] != nil) {
+        lastWatchedIndex = [storyInfo[storyID] integerValue] + 1;
+    }
+
+    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
+
+    if (!self.storyWidgetShareButtonVisibility) {
+        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
+    }
+    NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
+    CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
 
     NSString *content = [NSString stringWithFormat:@"\
-                        <!DOCTYPE html>\
-                        <html>\
-                        <head>\
-                        <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\">\
-                        </script>\
-                        <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
-                        </script>\
-                        </head>\
-                        <body>\
-                        <amp-story-player style=\"width: %f; height: %f;\">\
-                        <a href=\"%@\">\"%@\"\
-                        </a>\
-                        </amp-story-player>\
-                        <script>\
-                        var playerEl = document.querySelector('amp-story-player');\
-                        var player = new AmpStoryPlayer(window, playerEl);\
-                        playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
-                        playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
-                        player.go(%@);\
-                        </script>\
-                        </body>\
-                        </html>",UIScreen.mainScreen.bounds.size.width, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex];
+                         <!DOCTYPE html>\
+                         <html>\
+                         <head>\
+                         <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\"></script>\
+                         <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
+                         <style>\
+                         body {\
+                             margin: 0;\
+                             padding: 0;\
+                         }\
+                         amp-story-player {\
+                             display: block;\
+                             margin: 0;\
+                             padding: 0;\
+                             width: 100%%;\
+                             height: %f;\
+                         }\
+                         </style>\
+                         </head>\
+                         <body>\
+                         <amp-story-player style=\"width: 100%%; height: %f;\">\
+                         <a href=\"%@\">\"%@\"\
+                         </a>\
+                         </amp-story-player>\
+                         <script>\
+                         var playerEl = document.querySelector('amp-story-player');\
+                         var player = new AmpStoryPlayer(window, playerEl);\
+                         playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
+                         playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
+                         player.addEventListener('storyNavigation', function(event) {\
+                             console.log('storyNavigation event triggered');\
+                             var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
+                             window.webkit.messageHandlers.storyNavigation.postMessage({\
+                                position: %ld,\
+                                 subStoryIndex: subStoryIndex\
+                             });\
+                         });\
+                         player.go(%@);\
+                         </script>\
+                         </body>\
+                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, (long)self.storyIndex,currentIndex];
 
-    view = webview;
+    view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
             [indicator stopAnimating];
@@ -174,16 +221,39 @@
             webview.scrollView.hidden = NO;
         }
     }];
-    
-    UIButton *closeButton = [[UIButton alloc]init];
+
+    UIButton *closeButton = [[UIButton alloc] init];
+    CGFloat buttonWidth = 30.0;
+    CGFloat buttonHeight = 30.0;
+    CGFloat xPosition;
+
     if (@available(iOS 11.0, *)) {
         UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
         CGFloat topPadding = window.safeAreaInsets.top;
         closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10, 40, 40))];
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
+            xPosition = 10.0;
+        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            xPosition = window.frame.size.width - buttonWidth - 10.0;
+        } else {
+            xPosition = 10.0;
+        }
+
+        closeButton.frame = CGRectMake(xPosition, containerView.frame.origin.y + 15, buttonWidth, buttonHeight);
     } else {
         closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
+            xPosition = 10.0;
+        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            xPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - buttonWidth - 10.0;
+        } else {
+            xPosition = 10.0;
+        }
+
+        closeButton.frame = CGRectMake(xPosition, 10.0, buttonWidth, buttonHeight);
     }
-    closeButton.layer.cornerRadius = 20.0;
+    closeButton.layer.cornerRadius = 15.0;
     closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
     closeButton.tag = index;
     
@@ -197,7 +267,7 @@
     [closeButton addTarget:self action:@selector(closeTapped:)
           forControlEvents:UIControlEventTouchUpInside];
     [webview addSubview:closeButton];
-    indicator.center = webview.center;
+    indicator.center = containerView.center;
     [webview addSubview:indicator];
     
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
@@ -251,17 +321,67 @@
 }
 
 #pragma mark Synced JS with Native bridge.
-- (void)userContentController:(WKUserContentController*)userContentController didReceiveScriptMessage:(WKScriptMessage*)message {
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
-    NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
-    if (![currentIndex isEqualToString:scriptMessageIndex]) {
-      return;
+    if ([message.name isEqualToString:@"previous"] || [message.name isEqualToString:@"next"]) {
+        NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
+        if (![currentIndex isEqualToString:scriptMessageIndex]) {
+            return;
+        }
+        if ([message.name isEqualToString:@"previous"]) {
+            [self previous];
+        } else {
+            [self next];
+        }
+    } else if ([message.name isEqualToString:@"storyNavigation"]) {
+        NSInteger position = [message.body[@"position"] integerValue];
+        NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
+        if (position == [currentIndex integerValue]) {
+            [self onStoryNavigation:position subStoryPosition:subStoryIndex];
+        }
     }
-    if ([message.name isEqualToString:@"previous"]) {
-        [self previous];
+}
+
+- (void)onStoryNavigation:(NSInteger)position subStoryPosition:(NSInteger)subStoryPosition {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+    NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+
+    NSMutableDictionary *updatedStoryUnreadCountDict = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *updatedSubStoryPositionDict = [[NSMutableDictionary alloc] init];
+
+    if (storyUnreadCountDict) {
+        updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy];
+    }
+
+    if (subStoryPositionDict) {
+        updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy];
+    } 
+
+    NSString *storyId = self.stories[position].id;
+    NSInteger subStoryCount = self.stories[position].content.pages.count;
+    NSInteger unreadCount = subStoryCount - (subStoryPosition + 1);
+
+    NSNumber *existingUnreadCount = updatedStoryUnreadCountDict[storyId];
+    NSNumber *existingSubStoryPosition = updatedSubStoryPositionDict[storyId];
+
+    if (!existingUnreadCount || !existingSubStoryPosition) {
+        updatedStoryUnreadCountDict[storyId] = @(unreadCount);
+        updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
+        self.stories[position].unreadCount = unreadCount;
     } else {
-        [self next];
+        NSInteger preferencesSubStoryPosition = [existingSubStoryPosition integerValue];
+        if (subStoryPosition > preferencesSubStoryPosition) {
+            updatedStoryUnreadCountDict[storyId] = @(unreadCount);
+            updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
+            self.stories[position].unreadCount = unreadCount;
+        }
     }
+
+    [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+    [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+    [defaults synchronize];
 }
 
 #pragma mark Device orientation

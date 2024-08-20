@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray<NSString*> *redirectUrls;
 @property (nonatomic, strong) NSMutableArray<NSString*> *fontFamilies;
 @property (nonatomic, strong) NSMutableArray<NSString*> *keywords;
+@property (nonatomic) NSInteger subStoryCount;
+@property (nonatomic) NSInteger unreadCount;
 
 - (id)initWithJson:(NSDictionary*)json;
 

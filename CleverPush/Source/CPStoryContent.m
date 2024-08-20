@@ -36,6 +36,11 @@
         if ([json objectForKey:@"published"] != nil && ![[json objectForKey:@"published"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"published"] boolValue]) {
             self.published = YES;
         }
+
+        self.pages = [[NSMutableArray alloc] init];
+        if ([json objectForKey:@"pages"] != nil && ![[json objectForKey:@"pages"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"pages"] isKindOfClass:[NSArray class]]) {
+            self.pages = [[json objectForKey:@"pages"] mutableCopy];
+        }
     }
     return self;
 }
