@@ -151,8 +151,8 @@ NSString* storyWidgetId;
                         self.storyWidgetShareButtonVisibility = storyWidgetShareButtonVisibility;
                     }
 
-                    self.sortToLastIndex = YES;
-                    if (sortToLastIndex == NO) {
+                    self.sortToLastIndex = NO;
+                    if (sortToLastIndex == YES) {
                         self.sortToLastIndex = sortToLastIndex;
                     }
 
