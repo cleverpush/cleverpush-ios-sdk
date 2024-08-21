@@ -1,3 +1,6 @@
+## 1.31.1 (21.08.2024)
+* More customization options for `CPStoryView` with sorting order for displaying stories.
+
 ## 1.31.0 (20.08.2024)
 * More customization options for `CPStoryView` with unread story count
 
