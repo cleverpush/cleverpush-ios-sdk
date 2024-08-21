@@ -202,14 +202,14 @@
                              console.log('storyNavigation event triggered');\
                              var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
                              window.webkit.messageHandlers.storyNavigation.postMessage({\
-                                position: %ld,\
+                                position: %@,\
                                  subStoryIndex: subStoryIndex\
                              });\
                          });\
                          player.go(%@);\
                          </script>\
                          </body>\
-                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, (long)self.storyIndex,currentIndex];
+                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex,currentIndex];
 
     view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
@@ -280,6 +280,7 @@
 - (void)carouselCurrentItemIndexDidChange:(CleverPushiCarousel *)carousel {
     if (![self.readStories containsObject:self.stories[carousel.currentItemIndex].id]) {
         [self.readStories addObject:self.stories[carousel.currentItemIndex].id];
+        self.stories[carousel.currentItemIndex].opened = YES;
     }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
@@ -348,40 +349,44 @@
     NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
     NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
 
-    NSMutableDictionary *updatedStoryUnreadCountDict = [[NSMutableDictionary alloc] init];
-    NSMutableDictionary *updatedSubStoryPositionDict = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy] ?: [NSMutableDictionary dictionary];
+    NSMutableDictionary *updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy] ?: [NSMutableDictionary dictionary];
 
-    if (storyUnreadCountDict) {
-        updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy];
+    if (position < 0 || position >= self.stories.count) {
+        return;
     }
 
-    if (subStoryPositionDict) {
-        updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy];
-    } 
-
-    NSString *storyId = self.stories[position].id;
-    NSInteger subStoryCount = self.stories[position].content.pages.count;
+    CPStory *story = self.stories[position];
+    NSString *storyId = story.id;
+    NSInteger subStoryCount = story.content.pages.count;
     NSInteger unreadCount = subStoryCount - (subStoryPosition + 1);
-
     NSNumber *existingUnreadCount = updatedStoryUnreadCountDict[storyId];
     NSNumber *existingSubStoryPosition = updatedSubStoryPositionDict[storyId];
+
+    BOOL shouldUpdate = NO;
 
     if (!existingUnreadCount || !existingSubStoryPosition) {
         updatedStoryUnreadCountDict[storyId] = @(unreadCount);
         updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
-        self.stories[position].unreadCount = unreadCount;
+        story.unreadCount = unreadCount;
+        story.opened = YES;
+        shouldUpdate = YES;
     } else {
         NSInteger preferencesSubStoryPosition = [existingSubStoryPosition integerValue];
         if (subStoryPosition > preferencesSubStoryPosition) {
             updatedStoryUnreadCountDict[storyId] = @(unreadCount);
             updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
-            self.stories[position].unreadCount = unreadCount;
+            story.unreadCount = unreadCount;
+            story.opened = YES;
+            shouldUpdate = YES;
         }
     }
 
-    [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-    [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
-    [defaults synchronize];
+    if (shouldUpdate) {
+        [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+        [defaults synchronize];
+    }
 }
 
 #pragma mark Device orientation

@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
 @property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
 @property (nonatomic, strong) CPStoryWidget *widget;
+@property (nonatomic, assign) BOOL sortToLastIndex;
 
 @end
 NS_ASSUME_NONNULL_END
