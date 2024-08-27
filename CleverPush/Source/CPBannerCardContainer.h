@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topViewBannerConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *centerViewBannerConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *tblviewTopBannerConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *tblviewBottomBannerConstraint;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControlHeightConstraint;
 @property (weak, nonatomic) IBOutlet UIImageView *imgviewBackground;

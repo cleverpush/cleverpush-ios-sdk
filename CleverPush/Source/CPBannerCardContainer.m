@@ -445,8 +445,11 @@
     }
 
     self.tblviewTopBannerConstraint.constant = - 25;
-    if (self.data.closeButtonPositionStaticEnabled) {
-        self.tblviewTopBannerConstraint.constant =  25;
+    if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
+        self.tblviewTopBannerConstraint.constant = - 15;
+        if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
+            self.tblviewTopBannerConstraint.constant = 25;
+        }
     }
 }
 
@@ -485,10 +488,12 @@
         [self.pageControl setNumberOfPages:self.data.screens.count];
         self.pageControl.hidden = NO;
         self.pageControlHeightConstraint.constant = 30;
+        self.tblviewBottomBannerConstraint.constant = 25;
     } else {
         [self.pageControl setNumberOfPages:0];
         self.pageControl.hidden = YES;
         self.pageControlHeightConstraint.constant = 0;
+        self.tblviewBottomBannerConstraint.constant = 10;
     }
 }
 

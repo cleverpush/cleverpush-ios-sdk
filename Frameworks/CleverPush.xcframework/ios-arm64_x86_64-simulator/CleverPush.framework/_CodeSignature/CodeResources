@@ -10,15 +10,15 @@
 		</data>
 		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
 		<data>
-		Ao2zkIr4aGflQp2qsqbj5gyYkic=
+		+dS9y8x81MJC6MePCxUjA+Bi55c=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		Ovg9iH21pInMPVh5PtRX0FxyAbY=
+		HAeN37rF/oq96Bnw0xnoRRFdD4g=
 		</data>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		zgwD4nCAbIQ37LvU9y5LHU12kDc=
+		gWG/UJBCJKXeQGkGsfz9Md3ER0o=
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
@@ -198,11 +198,11 @@
 		</data>
 		<key>Headers/CPStory.h</key>
 		<data>
-		XX6P5tDQbAcRlbAX5kzPv9oosQc=
+		GL9128yF/Zw/e4pS8CeLffY2IWM=
 		</data>
 		<key>Headers/CPStoryContent.h</key>
 		<data>
-		avldC5rFqDNJN4A2IYCKnKOqYis=
+		JVMq+2hgdO0PHa2TqqFFeuSMU5o=
 		</data>
 		<key>Headers/CPStoryContentMeta.h</key>
 		<data>
@@ -214,11 +214,19 @@
 		</data>
 		<key>Headers/CPStoryView.h</key>
 		<data>
-		rc3nxoS4Qh+j3f9SSnBveDs9xTk=
+		tIx+rLC+K86+lzVuR66ChNhYAv0=
 		</data>
 		<key>Headers/CPStoryWidget.h</key>
 		<data>
 		JknvTiPPBbYYBXjzJdhHlvwnvuQ=
+		</data>
+		<key>Headers/CPStoryWidgetCloseButtonPosition.h</key>
+		<data>
+		QvhnGUppHrpEi4S60vrhbVvPMmQ=
+		</data>
+		<key>Headers/CPStoryWidgetTextPosition.h</key>
+		<data>
+		jcbPVgyQlHFM94Z6POyrC+Hy6I8=
 		</data>
 		<key>Headers/CPSubscription.h</key>
 		<data>
@@ -250,7 +258,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		frE0w3Y8Sa7FpQfa7TwmMD5bcuQ=
+		PVJ6Br3pAfD8rjfsmR3Q/7P1Tvk=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -258,11 +266,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		d15R8AHtoZyHhSZUxb5VA+gyDX4=
+		O9lZyrn4V9llehwP8JI9wHAb7WU=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		Vym+5ErEH8nyfO64WdUrbEBRVeA=
+		j5opaxHR4jS5XgfVjaWmvTfddhA=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -270,7 +278,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		LWMAFJgNXftIkTGisn/ZnPvzPPE=
+		rDa+XEv8tIOqiOMvGWPHylr5cj0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -298,33 +306,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Ao2zkIr4aGflQp2qsqbj5gyYkic=
+			+dS9y8x81MJC6MePCxUjA+Bi55c=
 			</data>
 			<key>hash2</key>
 			<data>
-			oX4j9XfOCqfY0MlEqo3bLZMlp4c1qdIB8WpUChW4oXQ=
+			Vf+m7NSqAjfbbUbn17hvLm/N8po5TMN3U7NTEcWXQ+I=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Ovg9iH21pInMPVh5PtRX0FxyAbY=
+			HAeN37rF/oq96Bnw0xnoRRFdD4g=
 			</data>
 			<key>hash2</key>
 			<data>
-			cFt6iQkYRCmdNnHZzi2eC8aYYXYnWMRLaMvJiTXulpc=
+			gkoaon431B2NHrwMMiSAnAwYZNhI049pd6s4ewwc4BM=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			zgwD4nCAbIQ37LvU9y5LHU12kDc=
+			gWG/UJBCJKXeQGkGsfz9Md3ER0o=
 			</data>
 			<key>hash2</key>
 			<data>
-			wTJDTx2rOwbm+B5athWTW7oGcxz/zijoC24PIkNrZ30=
+			GoaQKK0Clx5aDKwYWKScEGs+Vbz/6NH3KsVqmB8hES8=
 			</data>
 		</dict>
 		<key>CPButtonBlockCell.nib</key>
@@ -815,22 +823,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			XX6P5tDQbAcRlbAX5kzPv9oosQc=
+			GL9128yF/Zw/e4pS8CeLffY2IWM=
 			</data>
 			<key>hash2</key>
 			<data>
-			vPIp7YOxuob2YZMKwu3OvGWNnYfhchxp6wG0Ajd5V7c=
+			+SBn95SGL+SznOPrhU0PrLiqB4OakMsIuzUhWlCbgFE=
 			</data>
 		</dict>
 		<key>Headers/CPStoryContent.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			avldC5rFqDNJN4A2IYCKnKOqYis=
+			JVMq+2hgdO0PHa2TqqFFeuSMU5o=
 			</data>
 			<key>hash2</key>
 			<data>
-			Ma6/+AzaIC7R4ggRRkWoyaWx/RrvUv+sLT9QJavyCEo=
+			DMQ+/oo0oYc8fcixWhjSHb0FMN5Z+ftlJQuzJCLpaUg=
 			</data>
 		</dict>
 		<key>Headers/CPStoryContentMeta.h</key>
@@ -859,11 +867,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			rc3nxoS4Qh+j3f9SSnBveDs9xTk=
+			tIx+rLC+K86+lzVuR66ChNhYAv0=
 			</data>
 			<key>hash2</key>
 			<data>
-			IMhHCp8nCG/4XEsrg+wqO7YdakPNoeinK8nkKzzzDmw=
+			T4Em/0BFXSKTKFur6I9ndHyc8H8+BsQuJSlDXFbjTwQ=
 			</data>
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>
@@ -875,6 +883,28 @@
 			<key>hash2</key>
 			<data>
 			TUh3PbcmZJzyZEfmJ9SyUP+Uln0l7tqg1SnSWY/EUiA=
+			</data>
+		</dict>
+		<key>Headers/CPStoryWidgetCloseButtonPosition.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			QvhnGUppHrpEi4S60vrhbVvPMmQ=
+			</data>
+			<key>hash2</key>
+			<data>
+			vD7oRiNY1qL2CmMPkrvdZlIYeaP1Zgn815jmJLE/MOA=
+			</data>
+		</dict>
+		<key>Headers/CPStoryWidgetTextPosition.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			jcbPVgyQlHFM94Z6POyrC+Hy6I8=
+			</data>
+			<key>hash2</key>
+			<data>
+			UrAWWw4J17HYSeGP22eWFrUNajzMXmdrUTEe3StDGiY=
 			</data>
 		</dict>
 		<key>Headers/CPSubscription.h</key>
@@ -958,11 +988,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			frE0w3Y8Sa7FpQfa7TwmMD5bcuQ=
+			PVJ6Br3pAfD8rjfsmR3Q/7P1Tvk=
 			</data>
 			<key>hash2</key>
 			<data>
-			xxP7BQYdocie5ZfWZvqucT/Ee5LECn3Dg6LMgpslI7s=
+			B8jHoPahxMyPmhHHZdQS3bIZ7HAkssaKVWNUXGMiJEc=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -980,22 +1010,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			d15R8AHtoZyHhSZUxb5VA+gyDX4=
+			O9lZyrn4V9llehwP8JI9wHAb7WU=
 			</data>
 			<key>hash2</key>
 			<data>
-			AjCMaMocoDeIwj6wx2KJ87aR0cfKRht0/NS2QDw/YeY=
+			TUWmuPp7Pj6jl4WTp2WVzgDIyUToYhhK247C3KFFa6A=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			Vym+5ErEH8nyfO64WdUrbEBRVeA=
+			j5opaxHR4jS5XgfVjaWmvTfddhA=
 			</data>
 			<key>hash2</key>
 			<data>
-			Bjilf8p2XR1/1dmCw0pcoNuKQnOQDWHfpcXyuLnpBZ4=
+			lZEoticpsq2s7qZB1pJwcikj3T2lFtT+GfGqbSgqCP0=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.30.24";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.1";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -131,6 +131,7 @@ UIBackgroundTaskIdentifier mediaBackgroundTask;
 WKWebView* currentAppBannerWebView;
 UIColor* brandingColor;
 UIColor* normalTintColor = nil;
+UIModalPresentationStyle appBannerModalPresentationStyle = UIModalPresentationOverCurrentContext;
 
 UIWindow* topicsDialogWindow;
 
@@ -2212,10 +2213,10 @@ static id isNil(id object) {
         if (successBlock != nil && error == nil) {
             [self handleJSONNSURLResponse:response data:data error:error onSuccess:successBlock onFailure:failureBlock];
         } else {
-            if (retryOnFailure) {
+            if (retryOnFailure && error != nil) {
                 [self enqueueFailedRequest:request withRetryCount:0 onSuccess:successBlock onFailure:failureBlock];
             } else {
-                if (failureBlock) {
+                if (failureBlock && error != nil) {
                     failureBlock(error);
                 }
             }
@@ -2881,7 +2882,6 @@ static id isNil(id object) {
         }
 
         [topics addObject:topicId];
-        [self setSubscriptionTopics:topics];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/add"];
@@ -2895,6 +2895,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self setSubscriptionTopics:topics];
                 if (callback) {
                     callback(topicId);
                 }
@@ -2931,7 +2932,6 @@ static id isNil(id object) {
         }
 
         [topics removeObject:topicId];
-        [self setSubscriptionTopics:topics];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/remove"];
@@ -2945,6 +2945,7 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [self setSubscriptionTopics:topics];
                 if (callback) {
                     callback(topicId);
                 }
@@ -4084,6 +4085,15 @@ static id isNil(id object) {
 
 - (BOOL)getHandleUrlFromSceneDelegate {
     return handleUrlFromSceneDelegate;
+}
+
+#pragma mark - Handle the style of the topViewController (the presented app banner controller).
+- (void)setAppBannerModalPresentationStyle:(UIModalPresentationStyle)style {
+    appBannerModalPresentationStyle = style;
+}
+
+- (UIModalPresentationStyle)getAppBannerModalPresentationStyle {
+    return appBannerModalPresentationStyle;
 }
 
 - (void)setLogListener:(CPLogListener)listener {

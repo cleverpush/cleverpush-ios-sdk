@@ -1,3 +1,18 @@
+## 1.31.1 (21.08.2024)
+* More customization options for `CPStoryView` with sorting order for displaying stories.
+
+## 1.31.0 (20.08.2024)
+* More customization options for `CPStoryView` with unread story count
+
+## 1.30.26 (19.08.2024)
+* Optimised `enqueueFailedRequest` function for the failure case.
+
+## 1.30.25 (09.08.2024)
+* Optimisation of the app banner UI.
+* Optimised `handleSubscribeActionWithCallback` function.
+* implemented `setModalPresentationStyle ` and `getModalPresentationStyle ` to display the style of the topViewController (the presented app banner controller).
+* Resolved the issue of `removeSubscriptionTopic` and `addSubscriptionTopic` functions not working properly while the internet connection is not available.
+
 ## 1.30.24 (24.07.2024)
 * Optimisation of the app banner UI.
 * Optimised `makeSyncSubscriptionRequest` function for `setSubscriptionInProgress`.
