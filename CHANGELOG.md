@@ -1,3 +1,6 @@
+## 1.31.3 (29.08.2024)
+* Fixed latest release for deployment target 
+
 ## 1.31.2 (29.08.2024)
 * Added the functionality of `trackEvent` in the app banner action.
 * Optimised Xcode deployment target warnings
