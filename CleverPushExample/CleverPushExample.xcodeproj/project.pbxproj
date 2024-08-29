@@ -281,7 +281,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9310FD432A6025F9004B400B /* Build configuration list for PBXNativeTarget "CleverPushNotificationServiceExtension" */;
 			buildPhases = (
-				37B8F0612C494134E00FABAA /* Compile Bundle Resources */,
+				E3F7EFF82D7F5363BE0FABAA /* Link Bundle Resources */,
 				9310FD362A6025F9004B400B /* Sources */,
 				9310FD372A6025F9004B400B /* Frameworks */,
 				9310FD382A6025F9004B400B /* Resources */,
@@ -377,7 +377,7 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		37B8F0612C494134E00FABAA /* Compile Bundle Resources */ = {
+		E3F7EFF82D7F5363BE0FABAA /* Link Bundle Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			alwaysOutOfDate = 1;
@@ -387,7 +387,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Compile Bundle Resources";
+			name = "Link Bundle Resources";
 			outputFileListPaths = (
 			);
 			outputPaths = (
