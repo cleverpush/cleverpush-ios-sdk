@@ -1,3 +1,7 @@
+## 1.31.2 (29.08.2024)
+* Added the functionality of `trackEvent` in the app banner action.
+* Optimised Xcode deployment target warnings
+
 ## 1.31.1 (21.08.2024)
 * More customization options for `CPStoryView` with sorting order for displaying stories.
 

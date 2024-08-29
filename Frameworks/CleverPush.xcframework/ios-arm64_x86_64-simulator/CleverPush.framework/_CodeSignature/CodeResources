@@ -6,11 +6,7 @@
 	<dict>
 		<key>CPAppBannerViewController.nib</key>
 		<data>
-		T/CCLLg1BTase1KYJadr4undgK4=
-		</data>
-		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
-		<data>
-		+dS9y8x81MJC6MePCxUjA+Bi55c=
+		BA5kARiYa30QRVDEyksktYw+97M=
 		</data>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
@@ -18,11 +14,11 @@
 		</data>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		gWG/UJBCJKXeQGkGsfz9Md3ER0o=
+		+dS9y8x81MJC6MePCxUjA+Bi55c=
 		</data>
 		<key>CPButtonBlockCell.nib</key>
 		<data>
-		9NL6CFkDr0kRl3gTHuYLJSZmgwQ=
+		yH4jcbXfoD6BRsN9miC3qhClgU4=
 		</data>
 		<key>CPHTMLBlockCell.nib</key>
 		<data>
@@ -30,15 +26,11 @@
 		</data>
 		<key>CPImageBlockCell.nib</key>
 		<data>
-		OvB2sd6skD48eMLhDgejug5x1ro=
+		VnU219PgGsXdY3nU34G98Xa6AXg=
 		</data>
 		<key>CPInboxCell.nib</key>
 		<data>
-		eyxJnlnWjsqUPMDihEUiPcQSZ1k=
-		</data>
-		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
-		<data>
-		8HmlIUB5hyBYcQLbhv3FKgueY+4=
+		acOCi14h/xTFODJOCBfINU9RM+s=
 		</data>
 		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<data>
@@ -46,7 +38,7 @@
 		</data>
 		<key>CPInboxDetailContainer.nib/runtime.nib</key>
 		<data>
-		rKMy5UrFb/mmh3krxc3KZzEHbkc=
+		8HmlIUB5hyBYcQLbhv3FKgueY+4=
 		</data>
 		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<data>
@@ -58,7 +50,7 @@
 		</data>
 		<key>CPTextBlockCell.nib</key>
 		<data>
-		bh+wncrUkTW+R7x79GLv3fIZv8g=
+		Ju2vHcS/le0vMlzqJJ7zARBF/j0=
 		</data>
 		<key>CPTopicDialogCell.nib</key>
 		<data>
@@ -70,7 +62,7 @@
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
-		7yZI01geudViJZTJOc+f58zxBgI=
+		e4gT0Npg1RcaupWYlCBSMgRUiSo=
 		</data>
 		<key>Headers/CPAppBannerAlignment.h</key>
 		<data>
@@ -278,7 +270,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		rDa+XEv8tIOqiOMvGWPHylr5cj0=
+		+vqWFQjy/q8B7f3fNvCKH+aopJE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -293,32 +285,13 @@
 	<dict>
 		<key>CPAppBannerViewController.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			T/CCLLg1BTase1KYJadr4undgK4=
-			</data>
 			<key>hash2</key>
 			<data>
-			KRWCGBAPoRKNhThXBkKugH8HCxP6aIMZdFWlVBxA4rg=
-			</data>
-		</dict>
-		<key>CPBannerCardContainer.nib/objects-11.0+.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			+dS9y8x81MJC6MePCxUjA+Bi55c=
-			</data>
-			<key>hash2</key>
-			<data>
-			Vf+m7NSqAjfbbUbn17hvLm/N8po5TMN3U7NTEcWXQ+I=
+			OI3wzIeTm1VCuWWBMQVJ4OnwtFMxR493yyNjfIoxW4A=
 			</data>
 		</dict>
 		<key>CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			HAeN37rF/oq96Bnw0xnoRRFdD4g=
-			</data>
 			<key>hash2</key>
 			<data>
 			gkoaon431B2NHrwMMiSAnAwYZNhI049pd6s4ewwc4BM=
@@ -326,32 +299,20 @@
 		</dict>
 		<key>CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			gWG/UJBCJKXeQGkGsfz9Md3ER0o=
-			</data>
 			<key>hash2</key>
 			<data>
-			GoaQKK0Clx5aDKwYWKScEGs+Vbz/6NH3KsVqmB8hES8=
+			Vf+m7NSqAjfbbUbn17hvLm/N8po5TMN3U7NTEcWXQ+I=
 			</data>
 		</dict>
 		<key>CPButtonBlockCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			9NL6CFkDr0kRl3gTHuYLJSZmgwQ=
-			</data>
 			<key>hash2</key>
 			<data>
-			6hPKc/z9jHb/BccDBWEpP9MhXlLfMNo2gVdM6Q4E8TA=
+			PC/krN/GdF+WK4mLXjZ4piRKu2riBUqEcsxO9VNUKx4=
 			</data>
 		</dict>
 		<key>CPHTMLBlockCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			zmDn02cbNBeoEP9d5Y5rzl0/oeU=
-			</data>
 			<key>hash2</key>
 			<data>
 			lE49zUZJwyIAnWNFd3YR4fPTkzUJRDLpSUS5eAhm/as=
@@ -359,43 +320,20 @@
 		</dict>
 		<key>CPImageBlockCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			OvB2sd6skD48eMLhDgejug5x1ro=
-			</data>
 			<key>hash2</key>
 			<data>
-			AKDyj1sb7aioLmplKsBH88hRMRnrJj5VdBMChf0ZHQ0=
+			EgeMaDF6FrwHTLf6M5SsU0zeK5gNM085HJw7PQUx8MY=
 			</data>
 		</dict>
 		<key>CPInboxCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			eyxJnlnWjsqUPMDihEUiPcQSZ1k=
-			</data>
 			<key>hash2</key>
 			<data>
-			2mpi4a+5+juV234aUFAqxbI+Cy9m3eOdegjNoaPTygU=
-			</data>
-		</dict>
-		<key>CPInboxDetailContainer.nib/objects-11.0+.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			8HmlIUB5hyBYcQLbhv3FKgueY+4=
-			</data>
-			<key>hash2</key>
-			<data>
-			0wwPFmlMET8vmDgA6x7g2HxuN2VkUNvhQrQedCQibl4=
+			78dgDkfmRZZBQp4w1X5rku9YpRWVWXcDqGdGhb7pkQ0=
 			</data>
 		</dict>
 		<key>CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			d91jNxzL5+EL7rFr0qbf8n2Jyrc=
-			</data>
 			<key>hash2</key>
 			<data>
 			nqCCTJnnaIo8Eyp8q5EPHAJ96XAlZJ2lpq0OEjvyQgA=
@@ -403,21 +341,13 @@
 		</dict>
 		<key>CPInboxDetailContainer.nib/runtime.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			rKMy5UrFb/mmh3krxc3KZzEHbkc=
-			</data>
 			<key>hash2</key>
 			<data>
-			Y7U/renQ3Y/0UD1Oo48OHd0tEWQIJycC302rh2VDj8M=
+			0wwPFmlMET8vmDgA6x7g2HxuN2VkUNvhQrQedCQibl4=
 			</data>
 		</dict>
 		<key>CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			EDbCGDk775X2aD/iN67DxgLaliw=
-			</data>
 			<key>hash2</key>
 			<data>
 			S1dYxJ8Yi+vehOFQ+NmgY8765e+KlsObw2O/+2LWoic=
@@ -425,10 +355,6 @@
 		</dict>
 		<key>CPInboxDetailView.nib/runtime.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			at08rQmBbxQy0WNibULzXG8APqY=
-			</data>
 			<key>hash2</key>
 			<data>
 			8R5D1vYRil5QByJQiH3wf7l/Ptp3IekB8R6+uHp5SNA=
@@ -436,21 +362,13 @@
 		</dict>
 		<key>CPTextBlockCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			bh+wncrUkTW+R7x79GLv3fIZv8g=
-			</data>
 			<key>hash2</key>
 			<data>
-			XvZFk2ip3LlCRzs1lbgpcckiebnoVp7blwc1Tg4shD0=
+			/cMczPVsb9eP4jIOrt+lgNo2mQfn5+B0kNvYJ1qj/kU=
 			</data>
 		</dict>
 		<key>CPTopicDialogCell.nib</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			hRBiE1Wsv7i4+c1cqmW7igN248E=
-			</data>
 			<key>hash2</key>
 			<data>
 			5OFFaicjFRwEApqhb2fcFHOj657v75vTft5tyTJrV2I=
@@ -458,10 +376,6 @@
 		</dict>
 		<key>Headers/CPAppBanner.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			cRYHiQTKqsHRDS6k3wmpraDBrBI=
-			</data>
 			<key>hash2</key>
 			<data>
 			ewLURKnD8WamylUak00yNBHSINAh52blRyqZr2TYEt4=
@@ -469,21 +383,13 @@
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			7yZI01geudViJZTJOc+f58zxBgI=
-			</data>
 			<key>hash2</key>
 			<data>
-			cqVVkWrwc3g5pbO7QpJvyH45YeF+3JFF58wxzEWSFbM=
+			lTE/kS68EBIvr7srTwe/mVc4i9IuJNXKyIllyL+lLUo=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAlignment.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			cPipFuqMByvcu9e0ssABNgbpLeg=
-			</data>
 			<key>hash2</key>
 			<data>
 			KaTECQlEzGFProETQg0v4EILm09t0XeIRuLDV9YLyx4=
@@ -491,10 +397,6 @@
 		</dict>
 		<key>Headers/CPAppBannerBackground.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			YX79NS9jRqCjuPELJq2O2BD2i5M=
-			</data>
 			<key>hash2</key>
 			<data>
 			D2D6aMrgaqiyYIJ3pie41hNqhdH3wyrl5c5vuSQfJDI=
@@ -502,10 +404,6 @@
 		</dict>
 		<key>Headers/CPAppBannerBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			SINSSGSne95ReGgfRHMp7TaQ644=
-			</data>
 			<key>hash2</key>
 			<data>
 			CuKhuRwMGFfODBriZ6mYVipm9N1BY6czxHGizThEK7M=
@@ -513,10 +411,6 @@
 		</dict>
 		<key>Headers/CPAppBannerBlockType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			tN738yT9/1uXDLRhdp4rWttR6IE=
-			</data>
 			<key>hash2</key>
 			<data>
 			lehPa5UJ7bm9WLdUqhxN76SoHWCpotc536pma2GY0jE=
@@ -524,10 +418,6 @@
 		</dict>
 		<key>Headers/CPAppBannerButtonBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			DrGO84urOWRckr2InJGvwiA+Lq8=
-			</data>
 			<key>hash2</key>
 			<data>
 			AgwAw6N4mnbks0y7SIU+V+lD/TxXKcPL1p3pd/B0H4s=
@@ -535,10 +425,6 @@
 		</dict>
 		<key>Headers/CPAppBannerCarouselBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			LWtKiF4um3dKWSjw8QEvpGU5k1c=
-			</data>
 			<key>hash2</key>
 			<data>
 			/yHvx/WPBvr9kX76e6WYYmPQ5g4k0kzGB+/aKfawvXg=
@@ -546,10 +432,6 @@
 		</dict>
 		<key>Headers/CPAppBannerDismissType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			HJIOUYzsCu9CPtcU0/s7Qygo18w=
-			</data>
 			<key>hash2</key>
 			<data>
 			7JNeFneunsV2tTCVPX4JNzIQJdNiQmJhXZ+KPAwXBP4=
@@ -557,10 +439,6 @@
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			ftuDLyjRQrALkaRzj0ULQ2Mzi7w=
-			</data>
 			<key>hash2</key>
 			<data>
 			vLYH4yl9FTVcGfbng397R7Kouj/d+rePqN0Wq2N5PRs=
@@ -568,10 +446,6 @@
 		</dict>
 		<key>Headers/CPAppBannerFrequency.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			NXiHAFhbr0nQSaIVQnLne0xcujs=
-			</data>
 			<key>hash2</key>
 			<data>
 			gX2UTcP1JKf9CrL0563cKtZp0a6m8QWDYLZxOKYVE5I=
@@ -579,10 +453,6 @@
 		</dict>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			AW+JnsIkpC/o6+sPd5pPSxoSfPI=
-			</data>
 			<key>hash2</key>
 			<data>
 			ShUJDSD1q81MImQcarwS19MpoU06ITPquJyaXfWrMPQ=
@@ -590,10 +460,6 @@
 		</dict>
 		<key>Headers/CPAppBannerImageBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			YS9V+eGJvW4R1jUreK/otZUwDE0=
-			</data>
 			<key>hash2</key>
 			<data>
 			Anb/wd1YJoFOBdyjdhaOLEgM2uBcTcQgaQd/uNGQHmE=
@@ -601,10 +467,6 @@
 		</dict>
 		<key>Headers/CPAppBannerNotificationPermission.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			1fEBbWQVRwbR07gv5xFbI8mURaM=
-			</data>
 			<key>hash2</key>
 			<data>
 			awib+zmTiZ7FOrqzPrBf3/X/WxPKmTS0DC/EXmarDY0=
@@ -612,10 +474,6 @@
 		</dict>
 		<key>Headers/CPAppBannerStatus.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Wt2ivxLuvWMnbMUO+DCpE8QL4+8=
-			</data>
 			<key>hash2</key>
 			<data>
 			YEoLn3ttsiVZ2WALK0hkfrqMQrMLEvQtZNZ7+kIQfUo=
@@ -623,10 +481,6 @@
 		</dict>
 		<key>Headers/CPAppBannerStopAtType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Gbd3qSp3YZ2dtotsz3NxikkfXx8=
-			</data>
 			<key>hash2</key>
 			<data>
 			0El7EiqMd2MllnhlR/ESkRH8AQORvozEfc+ZW3mZMpg=
@@ -634,10 +488,6 @@
 		</dict>
 		<key>Headers/CPAppBannerSubscribedType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			GQ0t8LyEjPwFyXlD2pT9IBLuEgs=
-			</data>
 			<key>hash2</key>
 			<data>
 			HgIaUY8ODbbwxktmTMoc5Sy6RLay14Qo5wyTW4cm3+c=
@@ -645,10 +495,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTextBlock.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			9dXWu0oy5T08/3M2pMjxxlM545E=
-			</data>
 			<key>hash2</key>
 			<data>
 			/JVLZRWxIw+/4Z2aVthKJMB3mfl8P5cqw/zt5eD8wrU=
@@ -656,10 +502,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTrigger.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			8butvsIHNpZjHCoH46N9fTlGCyw=
-			</data>
 			<key>hash2</key>
 			<data>
 			Y2aZWbH+7vFaFj3/gXRs5Wl6MD2Eaf36eFl9gdmnbo4=
@@ -667,10 +509,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTriggerCondition.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			QytS3KBA2HbVY0U7U+tn8IPVD4c=
-			</data>
 			<key>hash2</key>
 			<data>
 			n9T7EaIiZCM+/0eiUFUYRmpXVgyRtp32P/WGui3uu/k=
@@ -678,10 +516,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTriggerConditionEventProperty.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			bHBecYSDxloS5TfPzjz7WZ+/eeM=
-			</data>
 			<key>hash2</key>
 			<data>
 			coBUj7UWo024XqjYzOH/7majClRLx2gO2wesFfk21lw=
@@ -689,10 +523,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTriggerConditionType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			114tl++c511ELOqx/CAT34bP4uE=
-			</data>
 			<key>hash2</key>
 			<data>
 			iEw9XibakZHVXU7fp6/BA0eTF6J1Z03Xk/qKOMiNwpk=
@@ -700,10 +530,6 @@
 		</dict>
 		<key>Headers/CPAppBannerTriggerType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			iWlYZoC8kwxf/KGjPWSPMinp1+s=
-			</data>
 			<key>hash2</key>
 			<data>
 			m9B3C2fDNgo1J9dBJ1JT+WRb+BVZdFXZ23ZcNtUzBw4=
@@ -711,10 +537,6 @@
 		</dict>
 		<key>Headers/CPAppBannerType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Ls1+ksyL4/3xsMoEVl61ea2yWyw=
-			</data>
 			<key>hash2</key>
 			<data>
 			+5bEohJkGmLtENASYOdzDJGQCo8t/lEXEmBaweO/1+I=
@@ -722,10 +544,6 @@
 		</dict>
 		<key>Headers/CPChannelTag.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			WjTUN86ttvpx9qFEcXse0vqMR6k=
-			</data>
 			<key>hash2</key>
 			<data>
 			3b/eAJc8p6l3gUP8gZH+poVndqc0AsVoMF7jlCjgaf4=
@@ -733,10 +551,6 @@
 		</dict>
 		<key>Headers/CPChannelTopic.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			4jG5UkFyWKCTkO7/QitEg9zDayM=
-			</data>
 			<key>hash2</key>
 			<data>
 			zR2XcZUQDPMZjPfLhFpy4eqjnZXZzyeeWtobk8lnvC4=
@@ -744,10 +558,6 @@
 		</dict>
 		<key>Headers/CPChatView.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			gdhl3JeVivg/47wO+ZufzI51RVw=
-			</data>
 			<key>hash2</key>
 			<data>
 			AP20pl/JZZ8Ecljwgz0tXXRYeI9di1aQQAqXfa3DxKQ=
@@ -755,10 +565,6 @@
 		</dict>
 		<key>Headers/CPFilterRelationType.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			5V8JW6L+IGt7d6yzoDTXMklZIaU=
-			</data>
 			<key>hash2</key>
 			<data>
 			n944nk2fXgQMjySz3KtzCcGhWZQR+TVRR0QUfGKug64=
@@ -766,10 +572,6 @@
 		</dict>
 		<key>Headers/CPIabTcfMode.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			JPqi4iGSM+8nfnQHTGhQkOwYkXI=
-			</data>
 			<key>hash2</key>
 			<data>
 			5BlP7T3QO4O/suuybltyzsL+lCOFSDvQlPBGllklzeg=
@@ -777,10 +579,6 @@
 		</dict>
 		<key>Headers/CPInboxView.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			0Cp3XhB12x6K8+vqqMOYOm8BI6M=
-			</data>
 			<key>hash2</key>
 			<data>
 			1CGLJRHHxJDn8Zt1+DT++pyhEZL7VJDdXXuMqEG0Q8w=
@@ -788,10 +586,6 @@
 		</dict>
 		<key>Headers/CPNotification.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			HaD/rdOM4s8qYk7RGcYYquukNzo=
-			</data>
 			<key>hash2</key>
 			<data>
 			/DW7hC7uSyz0N/5dMqwOkpELh2MDcM1ZQY+vcyHHozs=
@@ -799,10 +593,6 @@
 		</dict>
 		<key>Headers/CPNotificationViewController.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			P3NUXwVgmOIFNcY7GhtTjmUKl1U=
-			</data>
 			<key>hash2</key>
 			<data>
 			AaIr5Dzdn9/KwrlurFPq74gIWyrIWz4ki8BlFEmRA8M=
@@ -810,10 +600,6 @@
 		</dict>
 		<key>Headers/CPSQLiteManager.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			jNGscOM011e98DCawOknbxhU4zs=
-			</data>
 			<key>hash2</key>
 			<data>
 			Jda0OONZIP+HansUIgXM42mOt7Uagr2xRHjK0UM69XU=
@@ -821,10 +607,6 @@
 		</dict>
 		<key>Headers/CPStory.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			GL9128yF/Zw/e4pS8CeLffY2IWM=
-			</data>
 			<key>hash2</key>
 			<data>
 			+SBn95SGL+SznOPrhU0PrLiqB4OakMsIuzUhWlCbgFE=
@@ -832,10 +614,6 @@
 		</dict>
 		<key>Headers/CPStoryContent.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			JVMq+2hgdO0PHa2TqqFFeuSMU5o=
-			</data>
 			<key>hash2</key>
 			<data>
 			DMQ+/oo0oYc8fcixWhjSHb0FMN5Z+ftlJQuzJCLpaUg=
@@ -843,10 +621,6 @@
 		</dict>
 		<key>Headers/CPStoryContentMeta.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			AdOYcmKcHF3W6p0sPNL6cnwMewA=
-			</data>
 			<key>hash2</key>
 			<data>
 			yfscsTKUQE3vHZ3a1L3+5keyzrltob/twojaxZl1WXk=
@@ -854,10 +628,6 @@
 		</dict>
 		<key>Headers/CPStoryContentPreview.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			5gR5EoDuystxwJdPmK+ujIr6ncY=
-			</data>
 			<key>hash2</key>
 			<data>
 			48mTe/jNV3Eue04cH5XxrK08vpnkchftelbNHHKkH+c=
@@ -865,10 +635,6 @@
 		</dict>
 		<key>Headers/CPStoryView.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			tIx+rLC+K86+lzVuR66ChNhYAv0=
-			</data>
 			<key>hash2</key>
 			<data>
 			T4Em/0BFXSKTKFur6I9ndHyc8H8+BsQuJSlDXFbjTwQ=
@@ -876,10 +642,6 @@
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			JknvTiPPBbYYBXjzJdhHlvwnvuQ=
-			</data>
 			<key>hash2</key>
 			<data>
 			TUh3PbcmZJzyZEfmJ9SyUP+Uln0l7tqg1SnSWY/EUiA=
@@ -887,10 +649,6 @@
 		</dict>
 		<key>Headers/CPStoryWidgetCloseButtonPosition.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			QvhnGUppHrpEi4S60vrhbVvPMmQ=
-			</data>
 			<key>hash2</key>
 			<data>
 			vD7oRiNY1qL2CmMPkrvdZlIYeaP1Zgn815jmJLE/MOA=
@@ -898,10 +656,6 @@
 		</dict>
 		<key>Headers/CPStoryWidgetTextPosition.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			jcbPVgyQlHFM94Z6POyrC+Hy6I8=
-			</data>
 			<key>hash2</key>
 			<data>
 			UrAWWw4J17HYSeGP22eWFrUNajzMXmdrUTEe3StDGiY=
@@ -909,10 +663,6 @@
 		</dict>
 		<key>Headers/CPSubscription.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			8uhFU35tQm6J1YT5ysMWMMTNciw=
-			</data>
 			<key>hash2</key>
 			<data>
 			uY+9ce2FxbmmbyRQpvEiDvxR7emlYNBbkPLN4Y8Fjds=
@@ -920,10 +670,6 @@
 		</dict>
 		<key>Headers/CPUtils.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			RKBkmU4a94XP2tHAQi9krxY1b+U=
-			</data>
 			<key>hash2</key>
 			<data>
 			AKsdWWDd2Ieh96/h5GXw1U2ebKQYacUdYkgXRKj9RpY=
@@ -931,10 +677,6 @@
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			dY+77JRBNZ8+9eFtxr7zHSI2ZWY=
-			</data>
 			<key>hash2</key>
 			<data>
 			ZYyG33CiRiFs5ZfSbCHQtlduW7ZD5D4wdMN0T06afiA=
@@ -942,10 +684,6 @@
 		</dict>
 		<key>Headers/CPWidgetDisplay.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			M+7o46Dn2Is4Qskjt+uIoy6eZU4=
-			</data>
 			<key>hash2</key>
 			<data>
 			CZ0ZJj4wiKvJPhgT5glQXWsHSXJ/t5QXRG2YT6UqwLc=
@@ -953,10 +691,6 @@
 		</dict>
 		<key>Headers/CPWidgetPosition.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			py5gxgAas7X1kYBw9ZMTJMTBKr8=
-			</data>
 			<key>hash2</key>
 			<data>
 			udsHAiQt8yU/OpzCLezlbDbIURS6TvSpsQxSLCSLGpQ=
@@ -964,10 +698,6 @@
 		</dict>
 		<key>Headers/CPWidgetVariant.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			V8j8amsZaZm/PK8LqH5AD4ju304=
-			</data>
 			<key>hash2</key>
 			<data>
 			GVklj5ASMKLYWpBm+KSubUXHqBRg5jQB5JK0Fgiir5c=
@@ -975,10 +705,6 @@
 		</dict>
 		<key>Headers/CPiCarousel.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			AV1XihSPZ+kVKpzV4DWyCRD3UJo=
-			</data>
 			<key>hash2</key>
 			<data>
 			riaJQUfV21AeVhB00T0XzxFWR2a5P4iBvRPUQtMoip4=
@@ -986,10 +712,6 @@
 		</dict>
 		<key>Headers/CleverPush.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			PVJ6Br3pAfD8rjfsmR3Q/7P1Tvk=
-			</data>
 			<key>hash2</key>
 			<data>
 			B8jHoPahxMyPmhHHZdQS3bIZ7HAkssaKVWNUXGMiJEc=
@@ -997,10 +719,6 @@
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			jAAu61P1MwEs6e+rchB9D4mn+zY=
-			</data>
 			<key>hash2</key>
 			<data>
 			ZObgTx1fHLUkzOtMDDKJGJiuZtfA2qlbARBtI1tqEb8=
@@ -1008,10 +726,6 @@
 		</dict>
 		<key>Headers/CleverPushInstance.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			O9lZyrn4V9llehwP8JI9wHAb7WU=
-			</data>
 			<key>hash2</key>
 			<data>
 			TUWmuPp7Pj6jl4WTp2WVzgDIyUToYhhK247C3KFFa6A=
@@ -1019,10 +733,6 @@
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			j5opaxHR4jS5XgfVjaWmvTfddhA=
-			</data>
 			<key>hash2</key>
 			<data>
 			lZEoticpsq2s7qZB1pJwcikj3T2lFtT+GfGqbSgqCP0=
@@ -1030,10 +740,6 @@
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			BZUoUuMZYVt/lO7tfTW3AnsjFv4=
-			</data>
 			<key>hash2</key>
 			<data>
 			SHv2uGodVwNw6o5H2HAgZ07wdym0mlJNhDrvBPYRr0U=
@@ -1041,10 +747,6 @@
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			JgjZqu1M0u8nf2O3Q3jo9O+GI7k=
-			</data>
 			<key>hash2</key>
 			<data>
 			liBf0LHpG8Xnh4NONKK5P/xgDz42LSd86F737NM+6KY=
@@ -1052,10 +754,6 @@
 		</dict>
 		<key>PrivacyInfo.xcprivacy</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			YCnxQe5VWCnwripuT3LoorsTqmQ=
-			</data>
 			<key>hash2</key>
 			<data>
 			+Dmha2tfhEl2/9L8+vGC3c80rXENKB3q6ZrUnRviRng=

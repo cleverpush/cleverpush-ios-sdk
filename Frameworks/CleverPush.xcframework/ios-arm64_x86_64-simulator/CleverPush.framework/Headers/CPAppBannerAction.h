@@ -13,6 +13,8 @@
 @property (nonatomic, strong) NSString *attributeId;
 @property (nonatomic, strong) NSString *attributeValue;
 @property (nonatomic, strong) NSDictionary *customData;
+@property (nonatomic, strong) NSMutableDictionary *eventData;
+@property (nonatomic, strong) NSMutableArray<NSDictionary*> *eventProperties;
 @property (nonatomic) BOOL dismiss;
 @property (nonatomic) BOOL openInWebview;
 @property (nonatomic) BOOL openBySystem;
