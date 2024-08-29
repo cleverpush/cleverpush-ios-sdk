@@ -61,6 +61,18 @@
         if ([json objectForKey:@"blockId"] && [[json objectForKey:@"blockId"] isKindOfClass:[NSString class]]) {
             self.blockId = [json objectForKey:@"blockId"];
         }
+
+        self.eventData = [[NSMutableDictionary alloc] init];
+        if ([json objectForKey:@"event"] != nil && ![[json objectForKey:@"event"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"event"] isKindOfClass:[NSDictionary class]]) {
+            self.eventData = [[json objectForKey:@"event"] mutableCopy];
+        }
+
+        self.eventProperties = [NSMutableArray new];
+        if ([json objectForKey:@"eventProperties"] != nil) {
+            for (NSDictionary *eventPropertyJson in [json objectForKey:@"eventProperties"]) {
+                [self.eventProperties addObject:eventPropertyJson];
+            }
+        }
     }
     return self;
 }

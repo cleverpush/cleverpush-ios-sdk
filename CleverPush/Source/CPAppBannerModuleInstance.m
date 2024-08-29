@@ -1058,6 +1058,26 @@ NSInteger currentScreenIndex = 0;
                     [CPLog error:@"CleverPushLocation framework not found. Please ensure that CleverPushLocation framework is correctly integrated."];
                 }
             }
+
+            if (action && [action.type isEqualToString:@"trackEvent"]) {
+                if (action.eventData.count > 0) {
+                    if (action.eventProperties.count > 0) {
+                        NSMutableDictionary *propertiesDict = [NSMutableDictionary dictionary];
+                        for (NSDictionary *obj in action.eventProperties) {
+                            NSString *key = [obj objectForKey:@"property"];
+                            id value = [obj objectForKey:@"value"];
+                            if (key && value) {
+                                [propertiesDict setObject:value forKey:key];
+                            }
+                        }
+                        [CleverPush trackEvent:[action.eventData objectForKey:@"name"] properties:propertiesDict];
+                    } else {
+                        if (![CPUtils isNullOrEmpty:[action.eventData objectForKey:@"name"]]) {
+                            [CleverPush trackEvent:[action.eventData objectForKey:@"name"]];
+                        }
+                    }
+                }
+            }
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
