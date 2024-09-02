@@ -138,7 +138,6 @@ NSString* storyWidgetId;
                     self.isFixedCellLayout = NO;
                     if (isFixedCellLayout == YES) {
                         self.isFixedCellLayout = isFixedCellLayout;
-                        self.storyIconSpacing = 10;
                     }
 
                     self.unreadStoryCountVisibility = NO;
@@ -390,7 +389,7 @@ NSString* storyWidgetId;
         CGFloat collectionViewWidth = CGRectGetWidth(collectionView.frame);
         CGFloat collectionViewHeight = CGRectGetHeight(collectionView.frame);
         NSInteger numberOfCellsInRow = 3;
-        CGFloat totalPadding = self.storyIconSpacing * numberOfCellsInRow;
+        CGFloat totalPadding = (numberOfCellsInRow - 1) * self.storyIconSpacing;
         CGFloat availableWidth = collectionViewWidth - totalPadding;
         CGFloat cellWidth = availableWidth / numberOfCellsInRow;
         CGFloat cellHeight = collectionViewHeight;
@@ -423,7 +422,16 @@ NSString* storyWidgetId;
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(0, 0, 0, 0);
+    if (self.isFixedCellLayout) {
+        CGFloat collectionViewWidth = CGRectGetWidth(collectionView.frame);
+        NSInteger numberOfCellsInRow = 3;
+        CGFloat cellWidth = (collectionViewWidth - (numberOfCellsInRow - 1) * self.storyIconSpacing) / numberOfCellsInRow;
+        CGFloat totalCellWidth = cellWidth * numberOfCellsInRow + (numberOfCellsInRow - 1) * self.storyIconSpacing;
+        CGFloat horizontalInset = (collectionViewWidth - totalCellWidth) / 2;
+        return UIEdgeInsetsMake(0, horizontalInset, 0, horizontalInset);
+    } else {
+        return UIEdgeInsetsMake(0, 0, 0, 0);
+    }
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
