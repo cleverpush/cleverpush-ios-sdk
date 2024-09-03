@@ -1,5 +1,6 @@
 #import "CPStoriesController.h"
 #import "CPLog.h"
+#import "CPWidgetModule.h"
 
 @interface CPStoriesController ()
 @end
@@ -17,6 +18,12 @@
     }
     [self ConfigureCPCarousel];
     [self initialisePanGesture];
+
+    if (self.readStories.count > 0) {
+        [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
+            [CPLog error:@"Failed to open widgets stories: %@", error];
+        }];
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -217,6 +224,12 @@
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         } else {
+            if (self.readStories.count > 0) {
+                [CPWidgetModule trackWidgetShown:self.widget.id withStories:@[storyID] onSuccess:nil onFailure:^(NSError * _Nullable error) {
+                    [CPLog error:@"Failed to render story: %@ %@", storyID, error];
+                }];
+            }
+
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         }
@@ -329,6 +342,13 @@
         if (![currentIndex isEqualToString:scriptMessageIndex]) {
             return;
         }
+
+        if (self.readStories.count > 0) {
+            [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
+                [CPLog error:@"Failed to open widgets stories: %@", error];
+            }];
+        }
+
         if ([message.name isEqualToString:@"previous"]) {
             [self previous];
         } else {
