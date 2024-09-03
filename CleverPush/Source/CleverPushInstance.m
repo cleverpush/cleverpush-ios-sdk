@@ -3520,13 +3520,17 @@ static id isNil(id object) {
                     long sessionEndedTimestamp = [[NSDate date] timeIntervalSince1970];
                     long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
 
+                    if (channelId == nil || subscriptionId == nil || deviceToken == nil || sessionVisits < 0 || sessionDuration < 0) {
+                        return;
+                    }
+
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/end"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                              channelId, @"channelId",
                                              subscriptionId, @"subscriptionId",
                                              deviceToken, @"apnsToken",
-                                             sessionVisits, @"visits",
-                                             sessionDuration, @"duration",
+                                             @(sessionVisits), @"visits",
+                                             @(sessionDuration), @"duration",
                                              nil];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
