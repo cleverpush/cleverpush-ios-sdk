@@ -37,7 +37,7 @@
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        if (results != nil) {
+        if (successBlock) {
             successBlock(results);
         }
     } onFailure:^(NSError* error) {
@@ -56,7 +56,7 @@
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* results) {
-        if (results != nil) {
+        if (successBlock) {
             successBlock(results);
         }
     } onFailure:^(NSError* error) {
