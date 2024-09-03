@@ -224,12 +224,10 @@
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         } else {
-            if (self.readStories.count > 0) {
-                [CPWidgetModule trackWidgetShown:self.widget.id withStories:@[storyID] onSuccess:nil onFailure:^(NSError * _Nullable error) {
-                    [CPLog error:@"Failed to render story: %@ %@", storyID, error];
-                }];
-            }
-
+            [CPWidgetModule trackWidgetShown:self.widget.id withStories:@[storyID] onSuccess:nil onFailure:^(NSError * _Nullable error) {
+                [CPLog error:@"Failed to render story: %@ %@", storyID, error];
+            }];
+            
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         }
