@@ -2437,11 +2437,15 @@ static id isNil(id object) {
         NSDictionary*attributes = [CleverPush getSubscriptionAttributes];
 
         if (subscriptionTags != nil && ![subscriptionTags isKindOfClass:[NSNull class]] && subscriptionTags.count > 0) {
-            dispatch_group_t group = dispatch_group_create();
-            for (NSString* tagId in subscriptionTags) {
-                dispatch_group_enter(group);
-                [self removeSubscriptionTagFromApi:tagId callback:nil onFailure:nil];
-                dispatch_group_leave(group);
+            if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                dispatch_group_t group = dispatch_group_create();
+                for (NSString* tagId in subscriptionTags) {
+                    dispatch_group_enter(group);
+                    [self removeSubscriptionTagFromApi:tagId callback:nil onFailure:nil];
+                    dispatch_group_leave(group);
+                }
+            } else {
+                [self removeSubscriptionTags:subscriptionTags];
             }
         }
 
@@ -2450,9 +2454,17 @@ static id isNil(id object) {
                 id value = [attributes objectForKey:key];
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
-                        [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key value:@""];
+                        }
                     } else if ([value isKindOfClass:[NSArray class]]) {
-                        [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
+                        if ([CleverPush getIabTcfMode] != CPIabTcfModeDisabled) {
+                            [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
+                        } else {
+                            [CleverPush setSubscriptionAttribute:key arrayValue:@[]];
+                        }
                     }
                 }
             }
