@@ -16,14 +16,16 @@
     if (self.stories == nil) {
         return;
     }
+
+    self.storyStatusMap = [[NSMutableDictionary alloc] init];
+    for (NSInteger i = 0; i < [self.stories count]; i++) {
+        [self.storyStatusMap setObject:@(NO) forKey:@(i)];
+    }
+
     [self ConfigureCPCarousel];
     [self initialisePanGesture];
+    [self trackStoryOpened];
 
-    if (self.readStories.count > 0) {
-        [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
-            [CPLog error:@"Failed to open widgets stories: %@", error];
-        }];
-    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -104,6 +106,20 @@
     self.carousel.currentItemIndex = self.storyIndex;
     self.carousel.backgroundColor = [UIColor clearColor];
     [self.view addSubview:self.carousel];
+}
+
+#pragma mark - Tracking when story widget has been opened
+- (void)trackStoryOpened {
+    [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
+        [CPLog error:@"Failed to open widgets stories: %@", error];
+    }];
+}
+
+#pragma mark - Tracking when story widget has been rendered
+- (void)trackStoriesShown {
+    [CPWidgetModule trackWidgetShown:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
+        [CPLog error:@"Failed to render story: %@ %@", self.widget.id, error];
+    }];
 }
 
 #pragma mark CleverPushiCarousel methods
@@ -224,10 +240,12 @@
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         } else {
-            [CPWidgetModule trackWidgetShown:self.widget.id withStories:@[storyID] onSuccess:nil onFailure:^(NSError * _Nullable error) {
-                [CPLog error:@"Failed to render story: %@ %@", storyID, error];
-            }];
-            
+            NSNumber *currentValue = [self.storyStatusMap objectForKey:@(index)];
+            if (self.storyIndex == index && [currentValue boolValue] == NO) {
+                [self.storyStatusMap setObject:@(YES) forKey:@(index)];
+                [self trackStoriesShown];
+            }
+
             [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         }
@@ -296,6 +314,8 @@
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     self.storyIndex = carousel.currentItemIndex;
+    [self.storyStatusMap setObject:@(NO) forKey:@(self.storyIndex)];
+    [self trackStoryOpened];
     [self.carousel reloadItemAtIndex:carousel.currentItemIndex animated:NO];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.carousel scrollToItemAtIndex:carousel.currentItemIndex animated:YES];
@@ -339,12 +359,6 @@
         NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
         if (![currentIndex isEqualToString:scriptMessageIndex]) {
             return;
-        }
-
-        if (self.readStories.count > 0) {
-            [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
-                [CPLog error:@"Failed to open widgets stories: %@", error];
-            }];
         }
 
         if ([message.name isEqualToString:@"previous"]) {
