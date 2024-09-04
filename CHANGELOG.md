@@ -1,3 +1,8 @@
+## 1.31.5 (04.09.2024)
+* Resolved issue of when setTrackingConsent(false) is not removing attributes and tags.
+* Resolved issue of story view `setOpenedCallback` function is not working
+* implemented API `track-opened` and `track-shown` for the story widget.
+
 ## 1.31.4 (30.08.2024)
 * Fixed latest release for deployment target
 
