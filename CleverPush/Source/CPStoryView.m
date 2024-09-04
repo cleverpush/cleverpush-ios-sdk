@@ -15,6 +15,8 @@
 #define DEFAULT_BORDER_WIDTH 2.5
 #define TEXT_HEIGHT 30
 
+CPStoryViewOpenedBlock openedCallback;
+
 @implementation CPStoryView
 
 NSString* storyWidgetId;
@@ -414,7 +416,7 @@ NSString* storyWidgetId;
     UIViewController* topController = [CleverPush topViewController];
     storiesController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     storiesController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
-    storiesController.openedCallback = self.openedCallback;
+    storiesController.openedCallback = openedCallback;
     storiesController.closeButtonPosition = self.closeButtonPosition;
     storiesController.storyWidgetShareButtonVisibility = self.storyWidgetShareButtonVisibility;
     storiesController.widget = self.widget;
@@ -502,6 +504,11 @@ NSString* storyWidgetId;
             [self.storyCollection reloadData];
         });
     }
+}
+
+#pragma mark - Callback function while storyview has been open-up url successfully
+- (void)setOpenedCallback:(__strong CPStoryViewOpenedBlock)callback {
+    openedCallback = callback;
 }
 
 @end

@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>
 
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> *storyStatusMap;
 @property (nonatomic, assign) NSInteger storyIndex;
 @property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) NSMutableArray *readStories;
