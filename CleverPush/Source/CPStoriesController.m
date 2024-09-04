@@ -274,6 +274,9 @@
     swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
     [webview addGestureRecognizer:swipeDown];
     
+    if (self.openedCallback) {
+        [webview setUrlOpenedCallback:self.openedCallback];
+    }
     return view;
 }
 
