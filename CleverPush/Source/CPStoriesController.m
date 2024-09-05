@@ -167,7 +167,7 @@
         webview.translatesAutoresizingMaskIntoConstraints = NO;
         [NSLayoutConstraint activateConstraints:@[
             [webview.topAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.topAnchor],
-            [webview.bottomAnchor constraintEqualToAnchor:containerView.bottomAnchor],
+            [webview.bottomAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.bottomAnchor],
             [webview.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
             [webview.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor]
         ]];
@@ -189,7 +189,7 @@
         customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
     }
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
-    CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
+    CGFloat frameHeight = [CPUtils frameHeightWithoutSafeArea];
 
     NSString *content = [NSString stringWithFormat:@"\
                          <!DOCTYPE html>\

@@ -284,6 +284,7 @@ NSString* storyWidgetId;
 
     if (self.isFixedCellLayout) {
         CGFloat outerRingHeight = height - 5;
+        width = width - 5;
         cell.outerRing.frame = CGRectMake(0, 5, width, outerRingHeight);
         cell.outerRing.layer.cornerRadius = self.storyIconCornerRadius;
 
@@ -364,7 +365,7 @@ NSString* storyWidgetId;
             cell.unReadCount.layer.cornerRadius = 10;
             cell.unReadCount.clipsToBounds = YES;
         }
-        cell.unReadCount.frame = CGRectMake(CGRectGetWidth(cell.frame) - 15, 0, 20, 20);
+        cell.unReadCount.frame = CGRectMake(CGRectGetWidth(cell.outerRing.frame) - 15, 0, 20, 20);
         cell.unReadCount.backgroundColor = self.unreadStoryCountBackgroundColor;
         cell.unReadCount.textColor = self.unreadStoryCountTextColor;
 
