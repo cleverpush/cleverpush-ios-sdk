@@ -22,6 +22,7 @@
         [self.storyStatusMap setObject:@(NO) forKey:@(i)];
     }
 
+    [self configureCloseButton];
     [self ConfigureCPCarousel];
     [self initialisePanGesture];
     [self trackStoryOpened];
@@ -96,7 +97,7 @@
 
 #pragma mark - Configure Stories Carousel
 - (void)ConfigureCPCarousel {
-    self.carousel = [[CleverPushiCarousel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    self.carousel = [[CleverPushiCarousel alloc] initWithFrame:self.view.bounds];
     self.carousel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.carousel.type = iCarouselTypeLinear;
     self.carousel.delegate = self;
@@ -247,55 +248,11 @@
             }
 
             [indicator stopAnimating];
+            [self.carousel addSubview:self.closeButton];
             webview.scrollView.hidden = NO;
         }
     }];
 
-    UIButton *closeButton = [[UIButton alloc] init];
-    CGFloat buttonWidth = 30.0;
-    CGFloat buttonHeight = 30.0;
-    CGFloat xPosition;
-
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-        CGFloat topPadding = window.safeAreaInsets.top;
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10, 40, 40))];
-
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
-            xPosition = 10.0;
-        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            xPosition = window.frame.size.width - buttonWidth - 10.0;
-        } else {
-            xPosition = 10.0;
-        }
-
-        closeButton.frame = CGRectMake(xPosition, containerView.frame.origin.y + 15, buttonWidth, buttonHeight);
-    } else {
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
-            xPosition = 10.0;
-        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            xPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - buttonWidth - 10.0;
-        } else {
-            xPosition = 10.0;
-        }
-
-        closeButton.frame = CGRectMake(xPosition, 10.0, buttonWidth, buttonHeight);
-    }
-    closeButton.layer.cornerRadius = 15.0;
-    closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
-    closeButton.tag = index;
-    
-    if (@available(iOS 13.0, *)) {
-        [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        closeButton.tintColor = UIColor.whiteColor;
-    } else {
-        [closeButton setTitle:@"X" forState:UIControlStateNormal];
-        [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
-    }
-    [closeButton addTarget:self action:@selector(closeTapped:)
-          forControlEvents:UIControlEventTouchUpInside];
-    [webview addSubview:closeButton];
     indicator.center = containerView.center;
     [webview addSubview:indicator];
     
@@ -453,6 +410,72 @@
 #pragma mark - Dismiss by tapping on the X button.
 - (void)closeTapped:(UIButton *)button {
     [self onDismiss];
+}
+
+#pragma mark - Configure close buttton
+- (void)configureCloseButton {
+    self.buttonWidth = 30.0;
+    self.buttonHeight = 30.0;
+    self.buttonXPosition = 10.0;
+
+    if (@available(iOS 11.0, *)) {
+        self.window = UIApplication.sharedApplication.windows.firstObject;
+        self.topPadding = self.window.safeAreaInsets.top;
+        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, self.topPadding + 10, 40, 40))];
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = self.window.frame.size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, self.topPadding + 15, self.buttonWidth, self.buttonHeight);
+    } else {
+        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+    }
+    self.closeButton.layer.cornerRadius = 15.0;
+    self.closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
+
+    if (@available(iOS 13.0, *)) {
+        [self.closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        self.closeButton.tintColor = UIColor.whiteColor;
+    } else {
+        [self.closeButton setTitle:@"X" forState:UIControlStateNormal];
+        [self.closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    }
+    [self.closeButton addTarget:self action:@selector(closeTapped:)
+               forControlEvents:UIControlEventTouchUpInside];
+
+}
+
+- (void)updateCloseButtonPositionForSize:(CGSize)size {
+    if (@available(iOS 11.0, *)) {
+        CGFloat topPadding = self.window.safeAreaInsets.top;
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, topPadding + 15, self.buttonWidth, self.buttonHeight);
+    } else {
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+    }
 }
 
 @end
