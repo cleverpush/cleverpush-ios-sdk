@@ -1,3 +1,6 @@
+## 1.31.6 (10.09.2024)
+* Optimised `trackSessionEnd` to prevent crash.
+
 ## 1.31.5 (04.09.2024)
 * Resolved issue of when setTrackingConsent(false) is not removing attributes and tags.
 * Resolved issue of story view `setOpenedCallback` function is not working
