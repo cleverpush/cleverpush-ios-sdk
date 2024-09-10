@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.5";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.6";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -3507,14 +3507,19 @@ static id isNil(id object) {
 
                     long sessionEndedTimestamp = [[NSDate date] timeIntervalSince1970];
                     long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
+                    long visits = MAX(sessionVisits, 0);
+
+                    if (channelId == nil || subscriptionId == nil || deviceToken == nil || sessionDuration < 0) {
+                        return;
+                    }
 
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/end"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                              channelId, @"channelId",
                                              subscriptionId, @"subscriptionId",
                                              deviceToken, @"apnsToken",
-                                             sessionVisits, @"visits",
-                                             sessionDuration, @"duration",
+                                             @(visits), @"visits",
+                                             @(sessionDuration), @"duration",
                                              nil];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
