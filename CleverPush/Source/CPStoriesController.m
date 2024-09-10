@@ -383,11 +383,41 @@
 
 #pragma mark Device orientation
 - (BOOL) shouldAutorotate {
-    return NO;
+    return self.allowAutoRotation;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return (UIInterfaceOrientationPortrait | UIInterfaceOrientationPortraitUpsideDown);
+    if (self.allowAutoRotation) {
+        return UIInterfaceOrientationMaskAll;
+    } else {
+        return (UIInterfaceOrientationPortrait | UIInterfaceOrientationPortraitUpsideDown);
+    }
+
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    if (self.allowAutoRotation) {
+        [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+        UIView *overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
+        overlayView.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:overlayView];
+
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            overlayView.frame = self.view.bounds;
+
+            [self updateCloseButtonPositionForSize:size];
+            self.carousel.frame = CGRectMake(0, 0, size.width, size.height);
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            [UIView animateWithDuration:0.1 animations:^{
+                overlayView.alpha = 0.0;
+            } completion:^(BOOL finished) {
+                [overlayView removeFromSuperview];
+            }];
+
+            [self.carousel reloadData];
+        }];
+    }
 }
 
 #pragma mark - Animations
@@ -397,6 +427,7 @@
     }
 }
 
+#pragma mark - Dismiss by tapping on the X button.
 - (void)onDismiss {
     self.carousel = self.carousel;
     self.carousel.delegate = nil;
@@ -407,7 +438,7 @@
     });
 }
 
-#pragma mark - Dismiss by tapping on the X button.
+#pragma mark - Close Button Handling
 - (void)closeTapped:(UIButton *)button {
     [self onDismiss];
 }
