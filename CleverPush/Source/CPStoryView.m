@@ -338,6 +338,9 @@ NSString* storyWidgetId;
 
 - (void)configureCellContent:(CPStoryCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     NSURL *imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.posterPortraitSrc];
+    if (![CPUtils isNullOrEmpty:self.stories[indexPath.item].content.preview.widgetSrc]) {
+        imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.widgetSrc];
+    }
     [cell.image setImageWithURL:imageURL];
 
     if (self.titleVisibility) {

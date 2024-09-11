@@ -132,11 +132,6 @@
     [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     view = nil;
 
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhiteLarge];
-    indicator.color = UIColor.redColor;
-    [indicator hidesWhenStopped];
-    [indicator startAnimating];
-
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController removeScriptMessageHandlerForName:@"previous"];
@@ -238,7 +233,6 @@
     view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
-            [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         } else {
             NSNumber *currentValue = [self.storyStatusMap objectForKey:@(index)];
@@ -247,15 +241,11 @@
                 [self trackStoriesShown];
             }
 
-            [indicator stopAnimating];
             [self.carousel addSubview:self.closeButton];
             webview.scrollView.hidden = NO;
         }
     }];
 
-    indicator.center = containerView.center;
-    [webview addSubview:indicator];
-    
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
     swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
     [webview addGestureRecognizer:swipeDown];
