@@ -217,7 +217,7 @@
                          var player = new AmpStoryPlayer(window, playerEl);\
                          playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
                          playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
-                         player.addEventListener('storyNavigation', function(event) {\
+                         playerEl.addEventListener('storyNavigation', function(event) {\
                              console.log('storyNavigation event triggered');\
                              var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
                              window.webkit.messageHandlers.storyNavigation.postMessage({\
