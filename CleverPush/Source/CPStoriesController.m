@@ -22,6 +22,7 @@
         [self.storyStatusMap setObject:@(NO) forKey:@(i)];
     }
 
+    [self configureCloseButton];
     [self ConfigureCPCarousel];
     [self initialisePanGesture];
     [self trackStoryOpened];
@@ -96,7 +97,7 @@
 
 #pragma mark - Configure Stories Carousel
 - (void)ConfigureCPCarousel {
-    self.carousel = [[CleverPushiCarousel alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+    self.carousel = [[CleverPushiCarousel alloc] initWithFrame:self.view.bounds];
     self.carousel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.carousel.type = iCarouselTypeLinear;
     self.carousel.delegate = self;
@@ -131,11 +132,6 @@
     [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     view = nil;
 
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhiteLarge];
-    indicator.color = UIColor.redColor;
-    [indicator hidesWhenStopped];
-    [indicator startAnimating];
-
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     WKUserContentController* userController = [[WKUserContentController alloc]init];
     [userController removeScriptMessageHandlerForName:@"previous"];
@@ -167,7 +163,7 @@
         webview.translatesAutoresizingMaskIntoConstraints = NO;
         [NSLayoutConstraint activateConstraints:@[
             [webview.topAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.topAnchor],
-            [webview.bottomAnchor constraintEqualToAnchor:containerView.bottomAnchor],
+            [webview.bottomAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.bottomAnchor],
             [webview.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
             [webview.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor]
         ]];
@@ -189,7 +185,7 @@
         customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
     }
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
-    CGFloat frameHeight = UIApplication.sharedApplication.windows.firstObject.frame.size.height;
+    CGFloat frameHeight = [CPUtils frameHeightWithoutSafeArea];
 
     NSString *content = [NSString stringWithFormat:@"\
                          <!DOCTYPE html>\
@@ -221,7 +217,7 @@
                          var player = new AmpStoryPlayer(window, playerEl);\
                          playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
                          playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
-                         player.addEventListener('storyNavigation', function(event) {\
+                         playerEl.addEventListener('storyNavigation', function(event) {\
                              console.log('storyNavigation event triggered');\
                              var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
                              window.webkit.messageHandlers.storyNavigation.postMessage({\
@@ -237,7 +233,6 @@
     view = containerView;
     [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
         if (error) {
-            [indicator stopAnimating];
             webview.scrollView.hidden = NO;
         } else {
             NSNumber *currentValue = [self.storyStatusMap objectForKey:@(index)];
@@ -246,59 +241,11 @@
                 [self trackStoriesShown];
             }
 
-            [indicator stopAnimating];
+            [self.carousel addSubview:self.closeButton];
             webview.scrollView.hidden = NO;
         }
     }];
 
-    UIButton *closeButton = [[UIButton alloc] init];
-    CGFloat buttonWidth = 30.0;
-    CGFloat buttonHeight = 30.0;
-    CGFloat xPosition;
-
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-        CGFloat topPadding = window.safeAreaInsets.top;
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, topPadding + 10, 40, 40))];
-
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
-            xPosition = 10.0;
-        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            xPosition = window.frame.size.width - buttonWidth - 10.0;
-        } else {
-            xPosition = 10.0;
-        }
-
-        closeButton.frame = CGRectMake(xPosition, containerView.frame.origin.y + 15, buttonWidth, buttonHeight);
-    } else {
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionLeftSide) {
-            xPosition = 10.0;
-        } else if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            xPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - buttonWidth - 10.0;
-        } else {
-            xPosition = 10.0;
-        }
-
-        closeButton.frame = CGRectMake(xPosition, 10.0, buttonWidth, buttonHeight);
-    }
-    closeButton.layer.cornerRadius = 15.0;
-    closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
-    closeButton.tag = index;
-    
-    if (@available(iOS 13.0, *)) {
-        [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-        closeButton.tintColor = UIColor.whiteColor;
-    } else {
-        [closeButton setTitle:@"X" forState:UIControlStateNormal];
-        [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
-    }
-    [closeButton addTarget:self action:@selector(closeTapped:)
-          forControlEvents:UIControlEventTouchUpInside];
-    [webview addSubview:closeButton];
-    indicator.center = containerView.center;
-    [webview addSubview:indicator];
-    
     UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
     swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
     [webview addGestureRecognizer:swipeDown];
@@ -426,11 +373,41 @@
 
 #pragma mark Device orientation
 - (BOOL) shouldAutorotate {
-    return NO;
+    return self.allowAutoRotation;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return (UIInterfaceOrientationPortrait | UIInterfaceOrientationPortraitUpsideDown);
+    if (self.allowAutoRotation) {
+        return UIInterfaceOrientationMaskAll;
+    } else {
+        return (UIInterfaceOrientationPortrait | UIInterfaceOrientationPortraitUpsideDown);
+    }
+
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    if (self.allowAutoRotation) {
+        [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+        UIView *overlayView = [[UIView alloc] initWithFrame:self.view.bounds];
+        overlayView.backgroundColor = [UIColor whiteColor];
+        [self.view addSubview:overlayView];
+
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            overlayView.frame = self.view.bounds;
+
+            [self updateCloseButtonPositionForSize:size];
+            self.carousel.frame = CGRectMake(0, 0, size.width, size.height);
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            [UIView animateWithDuration:0.1 animations:^{
+                overlayView.alpha = 0.0;
+            } completion:^(BOOL finished) {
+                [overlayView removeFromSuperview];
+            }];
+
+            [self.carousel reloadData];
+        }];
+    }
 }
 
 #pragma mark - Animations
@@ -440,6 +417,7 @@
     }
 }
 
+#pragma mark - Dismiss by tapping on the X button.
 - (void)onDismiss {
     self.carousel = self.carousel;
     self.carousel.delegate = nil;
@@ -450,9 +428,75 @@
     });
 }
 
-#pragma mark - Dismiss by tapping on the X button.
+#pragma mark - Close Button Handling
 - (void)closeTapped:(UIButton *)button {
     [self onDismiss];
+}
+
+#pragma mark - Configure close buttton
+- (void)configureCloseButton {
+    self.buttonWidth = 30.0;
+    self.buttonHeight = 30.0;
+    self.buttonXPosition = 10.0;
+
+    if (@available(iOS 11.0, *)) {
+        self.window = UIApplication.sharedApplication.windows.firstObject;
+        self.topPadding = self.window.safeAreaInsets.top;
+        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, self.topPadding + 10, 40, 40))];
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = self.window.frame.size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, self.topPadding + 15, self.buttonWidth, self.buttonHeight);
+    } else {
+        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+    }
+    self.closeButton.layer.cornerRadius = 15.0;
+    self.closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
+
+    if (@available(iOS 13.0, *)) {
+        [self.closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+        self.closeButton.tintColor = UIColor.whiteColor;
+    } else {
+        [self.closeButton setTitle:@"X" forState:UIControlStateNormal];
+        [self.closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    }
+    [self.closeButton addTarget:self action:@selector(closeTapped:)
+               forControlEvents:UIControlEventTouchUpInside];
+
+}
+
+- (void)updateCloseButtonPositionForSize:(CGSize)size {
+    if (@available(iOS 11.0, *)) {
+        CGFloat topPadding = self.window.safeAreaInsets.top;
+
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, topPadding + 15, self.buttonWidth, self.buttonHeight);
+    } else {
+        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
+        } else {
+            self.buttonXPosition = 10.0;
+        }
+
+        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+    }
 }
 
 @end

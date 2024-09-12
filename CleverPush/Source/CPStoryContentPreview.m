@@ -27,6 +27,9 @@
         if ([json objectForKey:@"posterSquareSrc"] != nil && ![[json objectForKey:@"posterSquareSrc"] isKindOfClass:[NSNull class]]) {
             self.posterSquareSrc = [json objectForKey:@"posterSquareSrc"];
         }
+        if ([json objectForKey:@"widgetSrc"] != nil && ![[json objectForKey:@"widgetSrc"] isKindOfClass:[NSNull class]]) {
+            self.widgetSrc = [json objectForKey:@"widgetSrc"];
+        }
     }
     return self;
 }
