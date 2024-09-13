@@ -137,9 +137,11 @@
     [userController removeScriptMessageHandlerForName:@"previous"];
     [userController removeScriptMessageHandlerForName:@"next"];
     [userController removeScriptMessageHandlerForName:@"storyNavigation"];
+    [userController removeScriptMessageHandlerForName:@"storyButtonCallbackUrl"];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
     [userController addScriptMessageHandler:self name:@"storyNavigation"];
+    [userController addScriptMessageHandler:self name:@"storyButtonCallbackUrl"];
     configuration.userContentController = userController;
     configuration.allowsInlineMediaPlayback = YES;
     [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
@@ -225,6 +227,17 @@
                                  subStoryIndex: subStoryIndex\
                              });\
                          });\
+                         window.addEventListener('message', function (event) {\
+                            try {\
+                            var data = JSON.parse(event.data);\
+                         if (data.type === 'storyButtonCallback') {\
+                            console.log('Story button callback received:', data);\
+                                window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);\
+                        }\
+                        } catch (error) {\
+                            console.error('Error processing message:', error.message);\
+                         }\
+                        });\
                          player.go(%@);\
                          </script>\
                          </body>\
@@ -322,6 +335,23 @@
         if (position == [currentIndex integerValue]) {
             [self onStoryNavigation:position subStoryPosition:subStoryIndex];
         }
+    } else if ([message.name isEqualToString:@"storyButtonCallbackUrl"]) {
+        if (message.body != nil && ![message.body isKindOfClass:[NSNull class]] && [message.body isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *bodyDict = (NSDictionary *)message.body;
+            if (bodyDict && bodyDict.count > 0) {
+                NSString *callbackURLString = bodyDict[@"callbackUrl"];
+                if (![CPUtils isNullOrEmpty:callbackURLString]) {
+                    NSURL *storyElementURL = [NSURL URLWithString:callbackURLString];
+                    if ([CPUtils isValidURL:storyElementURL]) {
+                        if (self.openedCallback) {
+                            self.openedCallback(storyElementURL);
+                        } else {
+                            [CPUtils openSafari:storyElementURL];
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -382,7 +412,6 @@
     } else {
         return (UIInterfaceOrientationPortrait | UIInterfaceOrientationPortraitUpsideDown);
     }
-
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
