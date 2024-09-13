@@ -1,3 +1,6 @@
+## 1.31.7 (13.09.2024)
+* More customization options for `CPStoryView`.
+
 ## 1.31.6 (10.09.2024)
 * Optimised `trackSessionEnd` to prevent crash.
 
