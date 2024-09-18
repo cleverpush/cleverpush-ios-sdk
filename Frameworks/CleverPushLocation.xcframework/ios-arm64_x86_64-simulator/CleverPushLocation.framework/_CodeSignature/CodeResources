@@ -6,7 +6,7 @@
 	<dict>
 		<key>Frameworks/CleverPush.framework/CPAppBannerViewController.nib</key>
 		<data>
-		BA5kARiYa30QRVDEyksktYw+97M=
+		ob8wCRI4Hy8ATgJDs3XqU4RHl4E=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
-		zmDn02cbNBeoEP9d5Y5rzl0/oeU=
+		+DVdB7RLGyep4eIHyOempyd8sms=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
 		<data>
@@ -30,7 +30,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxCell.nib</key>
 		<data>
-		acOCi14h/xTFODJOCBfINU9RM+s=
+		0nO0akZFnRgIEx9vjSDJdOfKX+k=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-12.3+.nib</key>
 		<data>
@@ -42,11 +42,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<data>
-		EDbCGDk775X2aD/iN67DxgLaliw=
+		+WN3vtheypkN40gd6eWFy0ivWpw=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<data>
-		at08rQmBbxQy0WNibULzXG8APqY=
+		Fk7Kr6noiTLoOFy5349MCIpYwOs=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<data>
@@ -54,15 +54,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPTopicDialogCell.nib</key>
 		<data>
-		hRBiE1Wsv7i4+c1cqmW7igN248E=
+		187orZieRHtkfGBcdjvzUQpztF4=
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		+C/2wVlB2+vqPlgrJvrjrtQBRno=
+		smU4LoXqjWLmmwSMMBNsqducwz0=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		+vqWFQjy/q8B7f3fNvCKH+aopJE=
+		CDOiWQHJt4xGfXxf0jY+8LKwkvg=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		RxzZq0oyS200OZXkOQT98XltblY=
+		p4u6c+J1gMq2dzlJS5JSYbd6PS8=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		je/DkF92Qa6oZIoCURUp7AwJy9Y=
+		E/B/D0Rzoj+28i2sObD9x+s6ZCY=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -123,7 +123,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			OI3wzIeTm1VCuWWBMQVJ4OnwtFMxR493yyNjfIoxW4A=
+			G8cuFk6+UXq5STfI4d6PZNvBG4f6JH5skJQ1y/GF4Lc=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
@@ -151,7 +151,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			lE49zUZJwyIAnWNFd3YR4fPTkzUJRDLpSUS5eAhm/as=
+			TLZsTcvDLNlfE2H1shiWA+JqfjDn4nDNLy916bFxfdU=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
@@ -165,7 +165,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			78dgDkfmRZZBQp4w1X5rku9YpRWVWXcDqGdGhb7pkQ0=
+			/QAumYA8vI8AdwYKMFd8KcDVhJgUSuA/xJdw4w+IP+8=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailContainer.nib/objects-12.3+.nib</key>
@@ -186,14 +186,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			S1dYxJ8Yi+vehOFQ+NmgY8765e+KlsObw2O/+2LWoic=
+			gMz4Czwb7eoE6We0hTxqHI+ovSkFwExRHzTmwfAlEpo=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8R5D1vYRil5QByJQiH3wf7l/Ptp3IekB8R6+uHp5SNA=
+			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
@@ -207,21 +207,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			5OFFaicjFRwEApqhb2fcFHOj657v75vTft5tyTJrV2I=
+			VPCAFYDc95SiWse0rZJEJ46dPDiaflK3zE8mR3EDUwI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			w+dKV/N02jbHdTKyuia2eGu/UNq4kFxWwidmVQd8JKg=
+			iVZbmLUj/CixrR3ttrKJe4yEokaPOR+jD1HFVgqhjmQ=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			FrpJA7bteZWM/kBO76dKNx8A0n+ziWWPrzeVdp6c6aI=
+			/564XRCItBUn7XHp4QDjiJrkwZ77OHtRD66aHcZJA4M=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -235,7 +235,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			00IzgNhh8yBdgStQaCrNnHLnQ128P5zLCKOsfFB/I8I=
+			MfKCcmSfCXP3MkC5RQ0l7DwElPQw7YMKaGvMESlSQb4=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
