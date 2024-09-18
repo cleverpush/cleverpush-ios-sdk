@@ -42,13 +42,12 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     CGRect frame = self.tblCPBanner.frame;
-    frame.size.height = [CPUtils frameHeightWithoutSafeArea] - 50;
-    if (self.tblCPBanner.contentSize.height > [CPUtils frameHeightWithoutSafeArea]) {
-        self.tblCPBanner.frame = frame;
+    CGFloat maxHeight = [CPUtils frameHeightWithoutSafeArea] - 50;
+    CGFloat contentHeight = self.tblCPBanner.contentSize.height;
+    if (contentHeight > maxHeight) {
+        frame.size.height = maxHeight - 40;
     } else {
-        if (self.data.type != CPAppBannerTypeFull) {
-            frame.size = self.tblCPBanner.contentSize;
-        }
+        frame.size.height = contentHeight;
     }
     self.tblCPBanner.frame = frame;
     self.tblCPBannerHeightConstraint.constant = frame.size.height;
