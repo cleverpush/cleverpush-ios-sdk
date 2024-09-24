@@ -64,6 +64,11 @@ NS_ASSUME_NONNULL_BEGIN
                [self.selectedStories addObject:story];
             }
         }
+
+        self.groupStoryCategories = NO;
+        if ([json objectForKey:@"groupStoryCategories"] != nil && ![[json objectForKey:@"groupStoryCategories"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"groupStoryCategories"] boolValue]) {
+            self.groupStoryCategories = YES;
+        }
     }
     return self;
 }
