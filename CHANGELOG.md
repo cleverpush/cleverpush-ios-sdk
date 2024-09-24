@@ -1,3 +1,6 @@
+## 1.31.9 (24.09.2024) 
+* Added more customization options, including support for group story categories for `CPStoryView`.
+
 ## 1.31.8 (18.09.2024) 
 * Optimisation of the app banner UI for not displaying close button in iPad.
 
