@@ -199,22 +199,57 @@ NSString* storyWidgetId;
                     self.stories = Widget.stories;
 
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                    NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
 
-                    for (CPStory *story in self.stories) {
-                        if (story.content.pages != nil) {
-                            story.subStoryCount = story.content.pages.count;
+                    if (self.widget != nil && self.widget.groupStoryCategories) {
+                        for (CPStory *story in self.stories) {
+                            NSString *storyIdString = story.id;
+                            if (storyIdString != nil) {
+                                NSArray *storyIdArray = [storyIdString componentsSeparatedByString:@","];
+                                NSInteger subStoryCount = storyIdArray.count;
+                                story.subStoryCount = subStoryCount;
+
+                                NSString *storyUnreadCountString = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+                                NSArray *readStoryIdArray = @[];
+                                if (storyUnreadCountString != nil) {
+                                    readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+                                }
+                                NSInteger readCount = 0;
+
+                                for (NSString *subStoryID in storyIdArray) {
+                                    if ([readStoryIdArray containsObject:subStoryID]) {
+                                        readCount++;
+                                        story.opened = YES;
+                                    }
+                                }
+
+                                NSInteger unreadCount = subStoryCount - readCount;
+                                story.unreadCount = unreadCount;
+                            }
                         }
+                    } else {
+                        NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+                        for (CPStory *story in self.stories) {
+                            if (story.content != nil && story.content.pages != nil) {
+                                story.subStoryCount = story.content.pages.count;
+                            }
 
-                        NSString *storyId = story.id;
-                        if (existingMap != nil && [existingMap objectForKey:storyId] != nil) {
-                            NSInteger unreadCount = [existingMap[storyId] integerValue];
-                            story.unreadCount = unreadCount;
-                        } else {
-                            story.unreadCount = story.content.pages.count;
+                            NSString *storyId = story.id;
+                            if (storyId != nil) {
+                                if (existingMap != nil && [existingMap objectForKey:storyId] != nil) {
+                                    NSInteger unreadCount = [existingMap[storyId] integerValue];
+                                    story.unreadCount = unreadCount;
+                                } else {
+                                    if (story.content != nil && story.content.pages != nil) {
+                                        story.unreadCount = story.content.pages.count;
+                                    } else {
+                                        story.unreadCount = 0;
+                                    }
+                                }
+                            }
                         }
                     }
-                    
+
+
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
                 });
@@ -376,7 +411,11 @@ NSString* storyWidgetId;
     [cell.image setImageWithURL:imageURL];
 
     if (self.titleVisibility) {
-        cell.name.text = self.stories[indexPath.item].title;
+        if (self.widget.groupStoryCategories) {
+            cell.name.text = self.stories[indexPath.item].content.subtitle;
+        } else {
+            cell.name.text = self.stories[indexPath.item].title;
+        }
         cell.name.textColor = self.textColor;
         cell.name.font = [self fontForTitleTextSize];
     }
@@ -413,7 +452,7 @@ NSString* storyWidgetId;
         cell.unReadCount.backgroundColor = self.unreadStoryCountBackgroundColor;
         cell.unReadCount.textColor = self.unreadStoryCountTextColor;
 
-        if (([self.readStories containsObject:self.stories[indexPath.item].id] || self.stories[indexPath.item].opened == YES) && self.stories[indexPath.item].unreadCount <= 0) {
+        if (self.stories[indexPath.item].unreadCount <= 0) {
             [cell.unReadCount removeFromSuperview];
         } else {
             [cell addSubview:cell.unReadCount];
@@ -512,8 +551,12 @@ NSString* storyWidgetId;
                 for (CPStory *story in self.stories) {
                     if ([readStoriesSet containsObject:story.id]) {
                         [seenArray addObject:story];
+                        story.opened = YES;
+                        story.unreadCount = 0;
                     } else {
                         [unSeenArray addObject:story];
+                        story.unreadCount = story.content.pages.count;
+                        story.opened = NO;
                     }
                 }
 
@@ -527,22 +570,66 @@ NSString* storyWidgetId;
         }
     } else {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        if (self.widget.groupStoryCategories) {
+            for (CPStory *story in self.stories) {
+                NSString *storyIdString = story.id;
+                if (storyIdString != nil) {
+                    NSArray *storyIdArray = [storyIdString componentsSeparatedByString:@","];
+                    NSInteger subStoryCount = storyIdArray.count;
+                    story.subStoryCount = subStoryCount;
 
-        for (CPStory *story in self.stories) {
-            BOOL isRead = [self.readStories containsObject:story.id];
-            if (isRead) {
-                NSNumber *unreadCountNumber = existingMap[story.id];
-                if (unreadCountNumber != nil) {
-                    story.unreadCount = [unreadCountNumber integerValue];
-                    story.opened = YES;
+                    NSString *storyUnreadCountString = [defaults stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+                    NSArray *readStoryIdArray = @[];
+                    if (storyUnreadCountString != nil) {
+                        readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+                    }
+                    NSInteger readCount = 0;
+
+                    for (NSString *subStoryID in storyIdArray) {
+                        if ([readStoryIdArray containsObject:subStoryID]) {
+                            readCount++;
+                            story.opened = YES;
+                        }
+                    }
+
+                    NSInteger unreadCount = subStoryCount - readCount;
+                    story.unreadCount = unreadCount;
+                }
+            }
+        } else {
+            NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+            for (CPStory *story in self.stories) {
+                BOOL isRead = [self.readStories containsObject:story.id];
+                if (isRead) {
+                    if (existingMap != nil) {
+                        NSNumber *unreadCountNumber = existingMap[story.id];
+                        if (unreadCountNumber != nil) {
+                            story.unreadCount = [unreadCountNumber integerValue];
+                            story.opened = YES;
+                        } else {
+                            if (story.content != nil && story.content.pages != nil) {
+                                story.unreadCount = story.content.pages.count;
+                            } else {
+                                story.unreadCount = 0;
+                            }
+                            story.opened = NO;
+                        }
+                    } else {
+                        if (story.content != nil && story.content.pages != nil) {
+                            story.unreadCount = story.content.pages.count;
+                        } else {
+                            story.unreadCount = 0;
+                        }
+                        story.opened = NO;
+                    }
                 } else {
-                    story.unreadCount = story.content.pages.count;
+                    if (story.content != nil && story.content.pages != nil) {
+                        story.unreadCount = story.content.pages.count;
+                    } else {
+                        story.unreadCount = 0;
+                    }
                     story.opened = NO;
                 }
-            } else {
-                story.unreadCount = story.content.pages.count;
-                story.opened = NO;
             }
         }
 

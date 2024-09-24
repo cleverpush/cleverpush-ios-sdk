@@ -173,21 +173,51 @@
         webview.frame = containerView.bounds;
     }
 
-    NSString *storyID = self.stories[index].id;
-    NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
-    NSInteger lastWatchedIndex = 0;
-
-    if (storyInfo != nil && [storyInfo objectForKey:storyID] != nil) {
-        lastWatchedIndex = [storyInfo[storyID] integerValue] + 1;
-    }
-
-    NSString* customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
-
-    if (!self.storyWidgetShareButtonVisibility) {
-        customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=true&#page=page-%ld&ignoreLocalStorageHistory=true", self.stories[index].channel, storyID, (long)lastWatchedIndex];
-    }
+    NSString *customURL;
     NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
     CGFloat frameHeight = [CPUtils frameHeightWithoutSafeArea];
+
+    NSString *channelID = self.stories[index].channel;
+    NSString *storyIDString = self.stories[index].id;
+    BOOL hideShareButton = !self.storyWidgetShareButtonVisibility;
+
+    NSString *baseURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", channelID, storyIDString];
+    NSString *ignoreLocalStorage = @"&ignoreLocalStorageHistory=true";
+    NSString *pageParam;
+
+    if (self.widget.groupStoryCategories) {
+        NSArray *storyIdArray = [storyIDString componentsSeparatedByString:@","];
+        NSString *storyUnreadCountString = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        NSArray *readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+
+        NSInteger subStoryIndex = 0;
+        for (NSString *subStoryID in storyIdArray) {
+            if ([readStoryIdArray containsObject:subStoryID]) {
+                subStoryIndex++;
+            }
+        }
+
+        if (storyIdArray.count == subStoryIndex) {
+            subStoryIndex = 0;
+        }
+
+        pageParam = [NSString stringWithFormat:@"#page=page-%ld", (long)subStoryIndex];
+    } else {
+        NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
+        NSInteger lastWatchedIndex = 0;
+
+        if (storyInfo != nil && storyInfo[storyIDString] != nil) {
+            lastWatchedIndex = [storyInfo[storyIDString] integerValue] + 1;
+        }
+
+        pageParam = [NSString stringWithFormat:@"#page=page-%ld", (long)lastWatchedIndex];
+    }
+
+    if (hideShareButton) {
+        customURL = [NSString stringWithFormat:@"%@?hideStoryShareButton=true%@%@", baseURL, pageParam, ignoreLocalStorage];
+    } else {
+        customURL = [NSString stringWithFormat:@"%@%@%@", baseURL, pageParam, ignoreLocalStorage];
+    }
 
     NSString *content = [NSString stringWithFormat:@"\
                          <!DOCTYPE html>\
@@ -358,46 +388,82 @@
 - (void)onStoryNavigation:(NSInteger)position subStoryPosition:(NSInteger)subStoryPosition {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
-    NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-    NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+    if (self.widget.groupStoryCategories) {
+        NSMutableArray *storyIdArray = [self.stories[position].id componentsSeparatedByString:@","].mutableCopy;
 
-    NSMutableDictionary *updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy] ?: [NSMutableDictionary dictionary];
-    NSMutableDictionary *updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy] ?: [NSMutableDictionary dictionary];
+        NSString *storyUnreadCountString = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        NSArray *readStoryIdArray = storyUnreadCountString.length > 0 ? [storyUnreadCountString componentsSeparatedByString:@","] : @[];
 
-    if (position < 0 || position >= self.stories.count) {
-        return;
-    }
+        NSString *subStoryId = @"";
+        if (subStoryPosition >= 0 && subStoryPosition < storyIdArray.count) {
+            subStoryId = storyIdArray[subStoryPosition];
+        }
 
-    CPStory *story = self.stories[position];
-    NSString *storyId = story.id;
-    NSInteger subStoryCount = story.content.pages.count;
-    NSInteger unreadCount = subStoryCount - (subStoryPosition + 1);
-    NSNumber *existingUnreadCount = updatedStoryUnreadCountDict[storyId];
-    NSNumber *existingSubStoryPosition = updatedSubStoryPositionDict[storyId];
+        if (storyUnreadCountString.length == 0) {
+            storyUnreadCountString = subStoryId;
+        } else {
+            storyUnreadCountString = [storyUnreadCountString stringByAppendingFormat:@",%@", subStoryId];
+        }
 
-    BOOL shouldUpdate = NO;
+        readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+        NSInteger readCount = 0;
 
-    if (!existingUnreadCount || !existingSubStoryPosition) {
-        updatedStoryUnreadCountDict[storyId] = @(unreadCount);
-        updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
-        story.unreadCount = unreadCount;
-        story.opened = YES;
-        shouldUpdate = YES;
+        for (NSString *idString in storyIdArray) {
+            if ([readStoryIdArray containsObject:idString]) {
+                readCount++;
+            }
+        }
+
+        NSInteger unreadCount = storyIdArray.count - readCount;
+
+        self.stories[position].unreadCount = unreadCount;
+        self.stories[position].opened = YES;
+
+        [defaults setObject:storyUnreadCountString forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        [defaults synchronize];
+
     } else {
-        NSInteger preferencesSubStoryPosition = [existingSubStoryPosition integerValue];
-        if (subStoryPosition > preferencesSubStoryPosition) {
+        NSDictionary *storyUnreadCountDict = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        NSDictionary *subStoryPositionDict = [defaults objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+
+        NSMutableDictionary *updatedStoryUnreadCountDict = [storyUnreadCountDict mutableCopy] ?: [NSMutableDictionary dictionary];
+        NSMutableDictionary *updatedSubStoryPositionDict = [subStoryPositionDict mutableCopy] ?: [NSMutableDictionary dictionary];
+
+        if (position < 0 || position >= self.stories.count) {
+            return;
+        }
+
+        CPStory *story = self.stories[position];
+        NSString *storyId = story.id;
+        NSInteger subStoryCount = story.content.pages.count;
+        NSInteger unreadCount = subStoryCount - (subStoryPosition + 1);
+        NSNumber *existingUnreadCount = updatedStoryUnreadCountDict[storyId];
+        NSNumber *existingSubStoryPosition = updatedSubStoryPositionDict[storyId];
+
+        BOOL shouldUpdate = NO;
+
+        if (!existingUnreadCount || !existingSubStoryPosition) {
             updatedStoryUnreadCountDict[storyId] = @(unreadCount);
             updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
             story.unreadCount = unreadCount;
             story.opened = YES;
             shouldUpdate = YES;
+        } else {
+            NSInteger preferencesSubStoryPosition = [existingSubStoryPosition integerValue];
+            if (subStoryPosition > preferencesSubStoryPosition) {
+                updatedStoryUnreadCountDict[storyId] = @(unreadCount);
+                updatedSubStoryPositionDict[storyId] = @(subStoryPosition);
+                story.unreadCount = unreadCount;
+                story.opened = YES;
+                shouldUpdate = YES;
+            }
         }
-    }
 
-    if (shouldUpdate) {
-        [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
-        [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
-        [defaults synchronize];
+        if (shouldUpdate) {
+            [defaults setObject:updatedStoryUnreadCountDict forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+            [defaults setObject:updatedSubStoryPositionDict forKey:CLEVERPUSH_SUB_STORY_POSITION_KEY];
+            [defaults synchronize];
+        }
     }
 }
 

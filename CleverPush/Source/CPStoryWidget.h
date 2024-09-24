@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *margin;
 @property (nonatomic, strong) NSDate *createdAt;
 @property (nonatomic, strong) NSMutableArray *selectedStories;
+@property (nonatomic, readwrite) BOOL groupStoryCategories;
 
 - (id)initWithJson:(NSDictionary*)json;
 
