@@ -1282,6 +1282,10 @@ static id isNil(id object) {
                     } else if (completion) {
                         completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
                     }
+
+                    if (!granted && !ignoreDisabledNotificationPermission) {
+                        [self setConfirmAlertShown];
+                    }
                 });
             }];
         }];
