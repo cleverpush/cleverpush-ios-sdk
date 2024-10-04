@@ -22,20 +22,10 @@
         [self.storyStatusMap setObject:@(NO) forKey:@(i)];
     }
 
+    [self configureStoryView];
     [self configureCloseButton];
-    [self ConfigureCPCarousel];
     [self initialisePanGesture];
     [self trackStoryOpened];
-
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    self.carousel = self.carousel;
-}
-
-- (void)dealloc {
-    self.carousel.delegate = nil;
-    self.carousel.dataSource = nil;
 }
 
 #pragma mark - Initialise Pan Gesture for dismiss with animation
@@ -95,18 +85,143 @@
     self.view.frame = CGRectMake(screenBound.origin.x, screenBound.origin.y, screenBound.size.width, screenBound.size.height);
 }
 
-#pragma mark - Configure Stories Carousel
-- (void)ConfigureCPCarousel {
-    self.carousel = [[CleverPushiCarousel alloc] initWithFrame:self.view.bounds];
-    self.carousel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.carousel.type = iCarouselTypeLinear;
-    self.carousel.delegate = self;
-    self.carousel.dataSource = self;
-    self.carousel.pagingEnabled = YES;
-    self.carousel.bounces = NO;
-    self.carousel.currentItemIndex = self.storyIndex;
-    self.carousel.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:self.carousel];
+#pragma mark - Configure the story view
+- (void) configureStoryView {
+    WKUserContentController* userController = [[WKUserContentController alloc] init];
+    [userController removeScriptMessageHandlerForName:@"previous"];
+    [userController removeScriptMessageHandlerForName:@"next"];
+    [userController removeScriptMessageHandlerForName:@"navigation"];
+    [userController removeScriptMessageHandlerForName:@"storyNavigation"];
+    [userController removeScriptMessageHandlerForName:@"storyButtonCallbackUrl"];
+    [userController addScriptMessageHandler:self name:@"previous"];
+    [userController addScriptMessageHandler:self name:@"next"];
+    [userController addScriptMessageHandler:self name:@"navigation"];
+    [userController addScriptMessageHandler:self name:@"storyNavigation"];
+    [userController addScriptMessageHandler:self name:@"storyButtonCallbackUrl"];
+
+    WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+    configuration.userContentController = userController;
+    configuration.allowsInlineMediaPlayback = YES;
+    [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
+    [configuration setValue:@YES forKey:@"allowUniversalAccessFromFileURLs"];
+    configuration.userContentController = userController;
+    configuration.allowsInlineMediaPlayback = YES;
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = YES;
+
+    self.webview = [[CPWKWebView alloc] initWithFrame:self.view.frame configuration:configuration];
+    self.webview.scrollView.scrollEnabled = YES;
+    self.webview.scrollView.bounces = NO;
+    self.webview.allowsBackForwardNavigationGestures = NO;
+    self.webview.contentMode = UIViewContentModeScaleToFill;
+    self.webview.scrollView.backgroundColor = UIColor.blackColor;
+    self.webview.backgroundColor = [UIColor whiteColor];
+    self.webview.scrollView.backgroundColor = [UIColor whiteColor];
+    self.webview.scrollView.hidden = NO;
+    self.webview.backgroundColor = [UIColor whiteColor];
+    self.webview.opaque = NO;
+    self.webview.navigationDelegate = self;
+
+    NSMutableString *anchorTags = [NSMutableString string];
+    BOOL hideShareButton = !self.storyWidgetShareButtonVisibility;
+
+    for (NSInteger i = 0; i < self.stories.count; i++) {
+        NSString *storyId = self.stories[i].id;
+        NSString *customURL = @"";
+        NSInteger subStoryIndex = [self getSubStoryPosition:i];
+        NSString *hideShareButtonValue = @"false";
+        if (hideShareButton) {
+            hideShareButtonValue = @"true";
+        }
+
+        if (self.stories[i].content.pages != nil && self.stories[i].content.pages.count > 1) {
+            customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=%@&widgetId=%@&#page=page-%ld",
+                         self.stories[i].channel, storyId, hideShareButtonValue, self.widget.id, (long)subStoryIndex];
+        } else {
+            customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=%@&widgetId=%@",
+                         self.stories[i].channel, storyId, hideShareButtonValue, self.widget.id];
+        }
+
+        [anchorTags appendFormat:@"    <a href=\"%@\">\"Story Title %ld \"</a>\n", customURL, (long)(i + 1)];
+    }
+
+    NSString *html = [NSString stringWithFormat:@"\
+                                <!DOCTYPE html>\
+                                <html>\
+                                <head>\
+                                <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\"></script>\
+                                <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
+                                <style>\
+                                body {\
+                                        margin: 0;\
+                                        padding: 0;\
+                                }\
+                                amp-story-player {\
+                                        display: none;\
+                                        margin: 0;\
+                                        padding: 0;\
+                                        width: 100%%;\
+                                        height: %@;\
+                                }\
+                                </style>\
+                                </head>\
+                                <body>\
+                                <amp-story-player width=\"100%%\" height=\"%@\">\
+                                    %@\
+                                </amp-story-player>\
+                                <script>\
+                                var playerEl = document.querySelector('amp-story-player');\
+                                var player = new AmpStoryPlayer(window, playerEl);\
+                                window.player = player;\
+                                playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
+                                playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
+                                playerEl.addEventListener('storyNavigation', function (event) {\
+                                    var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
+                                    window.webkit.messageHandlers.storyNavigation.postMessage({selectedPosition: %@, subStoryIndex: subStoryIndex});\
+                                });\
+                                playerEl.addEventListener('ready', function (event) {\
+                                       player.go(%@);\
+                                    playerEl.style.display = 'block';\
+                                });\
+                                playerEl.addEventListener('navigation', function (event) {\
+                                    window.webkit.messageHandlers.navigation.postMessage({index: event.detail.index});\
+                                });\
+                                window.addEventListener('message', function (event) {\
+                                    try {\
+                                        var data = JSON.parse(event.data);\
+                                        if (data.type === 'storyButtonCallback') {\
+                                            window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);\
+                                        }\
+                                    } catch (error) {\
+                                            console.error(error);\
+                                        }\
+                                    });\
+                                </script>\
+                                </body>\
+                                </html>",[NSString stringWithFormat:@"%fpx",[CPUtils frameHeightWithoutSafeArea]],[NSString stringWithFormat:@"%fpx",[CPUtils frameHeightWithoutSafeArea]],anchorTags,@(self.storyIndex),@(self.storyIndex),@(self.storyIndex),@(self.storyIndex)];
+
+    if (@available(iOS 16.4, *)) {
+        [self.webview setInspectable:YES];
+    }
+
+    [self.webview loadHTML:html withCompletionHandler:^(WKWebView *webView, NSError *error) {
+        if (error) {
+            self.webview.scrollView.hidden = NO;
+        } else {
+            [self trackStoriesShown];
+            [self.webview addSubview:self.closeButton];
+            self.webview.scrollView.hidden = NO;
+        }
+    }];
+
+    UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
+    swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
+    [self.webview addGestureRecognizer:swipeDown];
+
+    if (self.openedCallback) {
+        [self.webview setUrlOpenedCallback:self.openedCallback];
+    }
+
+    [self.view addSubview:self.webview];
 }
 
 #pragma mark - Tracking when story widget has been opened
@@ -123,248 +238,14 @@
     }];
 }
 
-#pragma mark CleverPushiCarousel methods
-- (NSInteger)numberOfItemsInCarousel:(CleverPushiCarousel *)carousel {
-    return [self.stories count];
-}
-
-- (UIView *)carousel:(CleverPushiCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view {
-    [view.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    view = nil;
-
-    WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-    WKUserContentController* userController = [[WKUserContentController alloc]init];
-    [userController removeScriptMessageHandlerForName:@"previous"];
-    [userController removeScriptMessageHandlerForName:@"next"];
-    [userController removeScriptMessageHandlerForName:@"storyNavigation"];
-    [userController removeScriptMessageHandlerForName:@"storyButtonCallbackUrl"];
-    [userController addScriptMessageHandler:self name:@"previous"];
-    [userController addScriptMessageHandler:self name:@"next"];
-    [userController addScriptMessageHandler:self name:@"storyNavigation"];
-    [userController addScriptMessageHandler:self name:@"storyButtonCallbackUrl"];
-    configuration.userContentController = userController;
-    configuration.allowsInlineMediaPlayback = YES;
-    [configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
-
-    UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-    containerView.backgroundColor = UIColor.clearColor;
-
-    CPWKWebView *webview = [[CPWKWebView alloc] initWithFrame:CGRectZero configuration:configuration];
-    webview.scrollView.scrollEnabled = true;
-    webview.scrollView.bounces = false;
-    webview.allowsBackForwardNavigationGestures = false;
-    webview.contentMode = UIViewContentModeScaleToFill;
-    webview.scrollView.backgroundColor = UIColor.blackColor;
-    webview.scrollView.hidden = YES;
-    webview.backgroundColor = [UIColor whiteColor];
-    webview.scrollView.backgroundColor = [UIColor whiteColor];
-    webview.opaque = false;
-    [containerView addSubview:webview];
-
-    if (@available(iOS 11.0, *)) {
-        webview.translatesAutoresizingMaskIntoConstraints = NO;
-        [NSLayoutConstraint activateConstraints:@[
-            [webview.topAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.topAnchor],
-            [webview.bottomAnchor constraintEqualToAnchor:containerView.safeAreaLayoutGuide.bottomAnchor],
-            [webview.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor],
-            [webview.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor]
-        ]];
-    } else {
-        webview.frame = containerView.bounds;
-    }
-
-    NSString *customURL;
-    NSString *currentIndex = [NSString stringWithFormat:@"%ld", (long)index];
-    CGFloat frameHeight = [CPUtils frameHeightWithoutSafeArea];
-
-    NSString *channelID = self.stories[index].channel;
-    NSString *storyIDString = self.stories[index].id;
-    BOOL hideShareButton = !self.storyWidgetShareButtonVisibility;
-
-    NSString *baseURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html", channelID, storyIDString];
-    NSString *ignoreLocalStorage = @"&ignoreLocalStorageHistory=true";
-    NSString *pageParam;
-
-    if (self.widget.groupStoryCategories) {
-        NSArray *storyIdArray = [storyIDString componentsSeparatedByString:@","];
-        NSString *storyUnreadCountString = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
-        NSArray *readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
-
-        NSInteger subStoryIndex = 0;
-        for (NSString *subStoryID in storyIdArray) {
-            if ([readStoryIdArray containsObject:subStoryID]) {
-                subStoryIndex++;
-            }
-        }
-
-        if (storyIdArray.count == subStoryIndex) {
-            subStoryIndex = 0;
-        }
-
-        pageParam = [NSString stringWithFormat:@"#page=page-%ld", (long)subStoryIndex];
-    } else {
-        NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
-        NSInteger lastWatchedIndex = 0;
-
-        if (storyInfo != nil && storyInfo[storyIDString] != nil) {
-            lastWatchedIndex = [storyInfo[storyIDString] integerValue] + 1;
-        }
-
-        pageParam = [NSString stringWithFormat:@"#page=page-%ld", (long)lastWatchedIndex];
-    }
-
-    if (hideShareButton) {
-        customURL = [NSString stringWithFormat:@"%@?hideStoryShareButton=true%@%@", baseURL, pageParam, ignoreLocalStorage];
-    } else {
-        customURL = [NSString stringWithFormat:@"%@%@%@", baseURL, pageParam, ignoreLocalStorage];
-    }
-
-    NSString *content = [NSString stringWithFormat:@"\
-                         <!DOCTYPE html>\
-                         <html>\
-                         <head>\
-                         <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\"></script>\
-                         <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
-                         <style>\
-                         body {\
-                             margin: 0;\
-                             padding: 0;\
-                         }\
-                         amp-story-player {\
-                             display: block;\
-                             margin: 0;\
-                             padding: 0;\
-                             width: 100%%;\
-                             height: %f;\
-                         }\
-                         </style>\
-                         </head>\
-                         <body>\
-                         <amp-story-player style=\"width: 100%%; height: %f;\">\
-                         <a href=\"%@\">\"%@\"\
-                         </a>\
-                         </amp-story-player>\
-                         <script>\
-                         var playerEl = document.querySelector('amp-story-player');\
-                         var player = new AmpStoryPlayer(window, playerEl);\
-                         playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
-                         playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
-                         playerEl.addEventListener('storyNavigation', function(event) {\
-                             console.log('storyNavigation event triggered');\
-                             var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
-                             window.webkit.messageHandlers.storyNavigation.postMessage({\
-                                position: %@,\
-                                 subStoryIndex: subStoryIndex\
-                             });\
-                         });\
-                         window.addEventListener('message', function (event) {\
-                            try {\
-                            var data = JSON.parse(event.data);\
-                         if (data.type === 'storyButtonCallback') {\
-                            console.log('Story button callback received:', data);\
-                                window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);\
-                        }\
-                        } catch (error) {\
-                            console.error('Error processing message:', error.message);\
-                         }\
-                        });\
-                         player.go(%@);\
-                         </script>\
-                         </body>\
-                         </html>", frameHeight, frameHeight, customURL, self.stories[index].title, currentIndex, currentIndex, currentIndex,currentIndex];
-
-    view = containerView;
-    [webview loadHTML:content withCompletionHandler:^(WKWebView *webView, NSError *error) {
-        if (error) {
-            webview.scrollView.hidden = NO;
-        } else {
-            NSNumber *currentValue = [self.storyStatusMap objectForKey:@(index)];
-            if (self.storyIndex == index && [currentValue boolValue] == NO) {
-                [self.storyStatusMap setObject:@(YES) forKey:@(index)];
-                [self trackStoriesShown];
-            }
-
-            [self.carousel addSubview:self.closeButton];
-            webview.scrollView.hidden = NO;
-        }
-    }];
-
-    UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
-    swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
-    [webview addGestureRecognizer:swipeDown];
-    
-    if (self.openedCallback) {
-        [webview setUrlOpenedCallback:self.openedCallback];
-    }
-    return view;
-}
-
-- (void)carouselCurrentItemIndexDidChange:(CleverPushiCarousel *)carousel {
-    if (![self.readStories containsObject:self.stories[carousel.currentItemIndex].id]) {
-        [self.readStories addObject:self.stories[carousel.currentItemIndex].id];
-        self.stories[carousel.currentItemIndex].opened = YES;
-    }
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
-    self.storyIndex = carousel.currentItemIndex;
-    [self.storyStatusMap setObject:@(NO) forKey:@(self.storyIndex)];
-    [self trackStoryOpened];
-    [self.carousel reloadItemAtIndex:carousel.currentItemIndex animated:NO];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.carousel scrollToItemAtIndex:carousel.currentItemIndex animated:YES];
-    });
-}
-
-- (CGFloat)carousel:(CleverPushiCarousel *)carousel valueForOption:(iCarouselOption)option withDefault:(CGFloat)value {
-    if (option == iCarouselOptionSpacing)
-    {
-        return value * 1.0;
-    }
-    return value;
-}
-
-- (void)next {
-    if (self.storyIndex == self.stories.count - 1) {
-        [self onDismiss];
-    } else if (self.storyIndex >= 0) {
-        [self.carousel reloadItemAtIndex:self.storyIndex + 1 animated:NO];
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.carousel scrollToItemAtIndex:self.storyIndex + 1 animated:YES];
-        });
-    }
-}
-
-- (void)previous {
-    if (self.storyIndex == 0)  {
-        self.carousel.currentItemIndex = 0;
-    } else if (self.storyIndex >= 0) {
-        [self.carousel reloadItemAtIndex:self.storyIndex - 1 animated:NO];
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.carousel scrollToItemAtIndex:self.storyIndex - 1 animated:YES];
-        });
-    }
-}
-
-#pragma mark Synced JS with Native bridge.
+#pragma mark - Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
-    NSString *currentIndex = [NSString stringWithFormat:@"%ld", self.storyIndex];
-    if ([message.name isEqualToString:@"previous"] || [message.name isEqualToString:@"next"]) {
-        NSString *scriptMessageIndex = [NSString stringWithFormat:@"%@", message.body];
-        if (![currentIndex isEqualToString:scriptMessageIndex]) {
-            return;
-        }
-
-        if ([message.name isEqualToString:@"previous"]) {
-            [self previous];
-        } else {
-            [self next];
-        }
+    if ([message.name isEqualToString:@"navigation"]) {
+        self.storyIndex = [message.body[@"index"] integerValue];
+        [self currentItemIndexDidChange:self.storyIndex];
     } else if ([message.name isEqualToString:@"storyNavigation"]) {
-        NSInteger position = [message.body[@"position"] integerValue];
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
-        if (position == [currentIndex integerValue]) {
-            [self onStoryNavigation:position subStoryPosition:subStoryIndex];
-        }
+        [self onStoryNavigation:self.storyIndex subStoryPosition:subStoryIndex];
     } else if ([message.name isEqualToString:@"storyButtonCallbackUrl"]) {
         if (message.body != nil && ![message.body isKindOfClass:[NSNull class]] && [message.body isKindOfClass:[NSDictionary class]]) {
             NSDictionary *bodyDict = (NSDictionary *)message.body;
@@ -382,9 +263,16 @@
                 }
             }
         }
+    } else if ([message.name isEqualToString:@"next"]) {
+        [self onDismiss];
     }
 }
 
+- (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
+    [self.webview evaluateJavaScript:@"document.querySelector('amp-story-player > div').shadowRoot.querySelector('iframe[i-amphtml-iframe-position=\"0\"').contentWindow.postMessage(JSON.stringify({ type: 'triggerStoryFocusEvent' }), '*');" completionHandler:nil];
+}
+
+#pragma mark - Unread count story navigation methods.
 - (void)onStoryNavigation:(NSInteger)position subStoryPosition:(NSInteger)subStoryPosition {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
@@ -467,7 +355,50 @@
     }
 }
 
-#pragma mark Device orientation
+- (NSInteger)getSubStoryPosition:(NSInteger)selectedPosition {
+    NSInteger subStoryIndex = 0;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+    if (self.widget != nil && self.widget.groupStoryCategories) {
+        NSArray *storyIdArray = [self.stories[selectedPosition].id componentsSeparatedByString:@","];
+        NSString *storyUnreadCountString = [defaults stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        NSArray *readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+
+        for (NSString *subStoryID in storyIdArray) {
+            if ([readStoryIdArray containsObject:subStoryID]) {
+                subStoryIndex++;
+            } else {
+                break;
+            }
+        }
+
+        if (storyIdArray.count == subStoryIndex) {
+            subStoryIndex = 0;
+        }
+    } else {
+        NSMutableDictionary *storyInfo = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUB_STORY_POSITION_KEY] mutableCopy];
+
+        if (storyInfo != nil && storyInfo[self.stories[selectedPosition].id] != nil) {
+            subStoryIndex = [storyInfo[self.stories[selectedPosition].id] integerValue] + 1;
+        }
+    }
+
+    return subStoryIndex;
+}
+
+- (void)currentItemIndexDidChange:(NSInteger)index {
+    if (![self.readStories containsObject:self.stories[index].id]) {
+        [self.readStories addObject:self.stories[index].id];
+        self.stories[index].opened = YES;
+    }
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
+    [self.storyStatusMap setObject:@(NO) forKey:@(self.storyIndex)];
+    [self trackStoryOpened];
+    [self trackStoriesShown];
+}
+
+#pragma mark - Device orientation
 - (BOOL) shouldAutorotate {
     return self.allowAutoRotation;
 }
@@ -490,17 +421,15 @@
 
         [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
             overlayView.frame = self.view.bounds;
-
             [self updateCloseButtonPositionForSize:size];
-            self.carousel.frame = CGRectMake(0, 0, size.width, size.height);
-        } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+            self.webview.frame = self.view.bounds;
+            [self.webview layoutIfNeeded];
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
             [UIView animateWithDuration:0.1 animations:^{
                 overlayView.alpha = 0.0;
             } completion:^(BOOL finished) {
                 [overlayView removeFromSuperview];
             }];
-
-            [self.carousel reloadData];
         }];
     }
 }
@@ -514,9 +443,6 @@
 
 #pragma mark - Dismiss by tapping on the X button.
 - (void)onDismiss {
-    self.carousel = self.carousel;
-    self.carousel.delegate = nil;
-    self.carousel.dataSource = nil;
     [delegate reloadReadStories:self.readStories];
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self dismissViewControllerAnimated:YES completion:nil];
