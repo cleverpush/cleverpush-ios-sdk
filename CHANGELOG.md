@@ -1,3 +1,6 @@
+## 1.31.10 (26.09.2024) 
+* Track confirm-alerts also on denied notification permissions.
+
 ## 1.31.9 (24.09.2024) 
 * Added more customization options, including support for group story categories for `CPStoryView`.
 

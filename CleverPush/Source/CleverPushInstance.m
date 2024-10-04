@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.9";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.10";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -936,19 +936,28 @@ static id isNil(id object) {
 
 #pragma mark - API call and get the data of the specific Channel.
 - (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
-    if (channelConfig) {
-        callback(channelConfig);
-        return;
+    @synchronized(self) {
+        if (channelConfig) {
+            if (callback) {
+                callback(channelConfig);
+            }
+            return;
+        }
+
+        if (!pendingChannelConfigListeners) {
+            pendingChannelConfigListeners = [NSMutableArray new];
+        }
+        
+        [pendingChannelConfigListeners addObject:callback];
+        if (pendingChannelConfigRequest) {
+            return;
+        }
+        pendingChannelConfigRequest = YES;
     }
 
-    [pendingChannelConfigListeners addObject:callback];
-    if (pendingChannelConfigRequest) {
-        return;
-    }
-    pendingChannelConfigRequest = YES;
-
-    NSString*configPath = @"";
-    if ([self channelId] != NULL) {
+    NSString *configPath = @"";
+    NSString *channelId = [self channelId];
+    if (channelId != NULL) {
         configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", channelId];
         if ([self isDevelopmentModeEnabled]) {
             configPath = [NSString stringWithFormat:@"%@&t=%f", configPath, NSDate.date.timeIntervalSince1970];
@@ -959,6 +968,7 @@ static id isNil(id object) {
         [self getChannelConfigFromBundleId:configPath];
     }
 }
+
 - (NSString* _Nullable)getBundleName {
     return [[NSBundle mainBundle] bundleIdentifier];
 }
@@ -1281,6 +1291,10 @@ static id isNil(id object) {
                         }
                     } else if (completion) {
                         completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                    }
+
+                    if (!granted && !ignoreDisabledNotificationPermission) {
+                        [self setConfirmAlertShown];
                     }
                 });
             }];
