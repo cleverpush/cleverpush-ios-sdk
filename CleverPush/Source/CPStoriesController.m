@@ -269,7 +269,7 @@
 }
 
 - (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
-    [self.webview evaluateJavaScript:@"document.querySelector('amp-story-player > div').shadowRoot.querySelector('iframe').contentWindow.postMessage(JSON.stringify({ type: 'triggerStoryFocusEvent' }), '*');" completionHandler:nil];
+    [self.webview evaluateJavaScript:@"document.querySelector('amp-story-player > div').shadowRoot.querySelector('iframe[i-amphtml-iframe-position=\"0\"').contentWindow.postMessage(JSON.stringify({ type: 'triggerStoryFocusEvent' }), '*');" completionHandler:nil];
 }
 
 #pragma mark - Unread count story navigation methods.
