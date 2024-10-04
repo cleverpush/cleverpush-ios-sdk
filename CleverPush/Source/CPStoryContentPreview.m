@@ -31,7 +31,7 @@
             self.widgetSrc = [json objectForKey:@"widgetSrc"];
         }
         if ([json objectForKey:@"widgetDarkSrc"] != nil && ![[json objectForKey:@"widgetDarkSrc"] isKindOfClass:[NSNull class]]) {
-            self.widgetSrc = [json objectForKey:@"widgetDarkSrc"];
+            self.widgetDarkSrc = [json objectForKey:@"widgetDarkSrc"];
         }
 
     }
