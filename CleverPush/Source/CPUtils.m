@@ -250,6 +250,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if ([self isValidURL:URL]) {
         if ([SFSafariViewController class] != nil) {
             SFSafariViewController *safariController = [[SFSafariViewController alloc] initWithURL:URL];
+            safariController.delegate = (id<SFSafariViewControllerDelegate>)CleverPush.topViewController;
             safariController.modalPresentationStyle = UIModalPresentationPageSheet;
             [CleverPush.topViewController presentViewController:safariController animated:YES completion:nil];
         }

@@ -9,7 +9,7 @@
 
 #pragma mark - Get the Widgets & Stories details by api call and load the Widgets & Stories data in to class variables
 + (void)getWidgetsStories:(NSString*)widgetId completion:(void(^)(CPWidgetsStories *))callback {
-    NSString* widgetsPath = [NSString stringWithFormat:@"story-widget/%@/config", widgetId];
+    NSString* widgetsPath = [NSString stringWithFormat:@"story-widget/%@/config?platform=app", widgetId];
     if ([CleverPush isDevelopmentModeEnabled]) {
         widgetsPath = [NSString stringWithFormat:@"%@?t=%f", widgetsPath, NSDate.date.timeIntervalSince1970];
     }
