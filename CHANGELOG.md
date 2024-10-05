@@ -1,3 +1,6 @@
+## 1.31.12 (05.10.2024) 
+* Optimized `CPStoryView` to make resuming work better after opening a URL inside a story
+
 ## 1.31.11 (04.10.2024) 
 * Added more customization options to `CPStoryView` to support dark mode UI.
 * Optimised `getChannelConfig`.
