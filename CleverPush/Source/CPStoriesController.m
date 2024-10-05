@@ -51,7 +51,7 @@
     } else if (panGesture.state == UIGestureRecognizerStateEnded) {
         CGPoint velocity = [panGesture velocityInView:panGesture.view];
         
-        if (velocity.y >= [[UIScreen mainScreen] bounds].size.height * 60 / 100 ) {
+        if (velocity.y >= [[UIScreen mainScreen] bounds].size.height * 60 / 100) {
             [self dismissWithAnimation];
         } else {
             [UIView animateWithDuration:0.2 animations:^{
@@ -141,7 +141,7 @@
                          self.stories[i].channel, storyId, hideShareButtonValue, self.widget.id];
         }
 
-        [anchorTags appendFormat:@"    <a href=\"%@\">\"Story Title %ld \"</a>\n", customURL, (long)(i + 1)];
+        [anchorTags appendFormat:@"<a href=\"%@\">Story %ld</a>\n", customURL, (long)(i + 1)];
     }
 
     NSString *html = [NSString stringWithFormat:@"\
@@ -165,25 +165,29 @@
                                 </style>\
                                 </head>\
                                 <body>\
-                                <amp-story-player width=\"100%%\" height=\"%@\">\
+                                <amp-story-player>\
                                     %@\
                                 </amp-story-player>\
                                 <script>\
                                 var playerEl = document.querySelector('amp-story-player');\
                                 var player = new AmpStoryPlayer(window, playerEl);\
                                 window.player = player;\
-                                playerEl.addEventListener('noPreviousStory', function (event) {window.webkit.messageHandlers.previous.postMessage(%@);});\
-                                playerEl.addEventListener('noNextStory', function (event) {window.webkit.messageHandlers.next.postMessage(%@);});\
+                                playerEl.addEventListener('noPreviousStory', function (event) {\
+								    window.webkit.messageHandlers.previous.postMessage(%@);\
+								});\
+                                playerEl.addEventListener('noNextStory', function (event) {\
+								    window.webkit.messageHandlers.next.postMessage(%@);\
+								});\
                                 playerEl.addEventListener('storyNavigation', function (event) {\
-                                    var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 111);\
-                                    window.webkit.messageHandlers.storyNavigation.postMessage({selectedPosition: %@, subStoryIndex: subStoryIndex});\
+                                    var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 0);\
+                                    window.webkit.messageHandlers.storyNavigation.postMessage({ selectedPosition: %@, subStoryIndex: subStoryIndex });\
                                 });\
                                 playerEl.addEventListener('ready', function (event) {\
-                                       player.go(%@);\
+									player.go(%@);\
                                     playerEl.style.display = 'block';\
                                 });\
                                 playerEl.addEventListener('navigation', function (event) {\
-                                    window.webkit.messageHandlers.navigation.postMessage({index: event.detail.index});\
+                                    window.webkit.messageHandlers.navigation.postMessage({ index: event.detail.index });\
                                 });\
                                 window.addEventListener('message', function (event) {\
                                     try {\
@@ -191,13 +195,18 @@
                                         if (data.type === 'storyButtonCallback') {\
                                             window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);\
                                         }\
-                                    } catch (error) {\
-                                            console.error(error);\
-                                        }\
-                                    });\
+                                    } catch (ignored) {}\
+								});\
                                 </script>\
                                 </body>\
-                                </html>",[NSString stringWithFormat:@"%fpx",[CPUtils frameHeightWithoutSafeArea]],[NSString stringWithFormat:@"%fpx",[CPUtils frameHeightWithoutSafeArea]],anchorTags,@(self.storyIndex),@(self.storyIndex),@(self.storyIndex),@(self.storyIndex)];
+                                </html>",
+					  [NSString stringWithFormat:@"%fpx", [CPUtils frameHeightWithoutSafeArea]],
+					  anchorTags,
+					  @(self.storyIndex),
+					  @(self.storyIndex),
+					  @(self.storyIndex),
+					  @(self.storyIndex)
+	];
 
     if (@available(iOS 16.4, *)) {
         [self.webview setInspectable:YES];
@@ -247,6 +256,7 @@
         NSInteger subStoryIndex = [message.body[@"subStoryIndex"] integerValue];
         [self onStoryNavigation:self.storyIndex subStoryPosition:subStoryIndex];
     } else if ([message.name isEqualToString:@"storyButtonCallbackUrl"]) {
+		[self.webview evaluateJavaScript:@"player.pause();" completionHandler:nil];
         if (message.body != nil && ![message.body isKindOfClass:[NSNull class]] && [message.body isKindOfClass:[NSDictionary class]]) {
             NSDictionary *bodyDict = (NSDictionary *)message.body;
             if (bodyDict && bodyDict.count > 0) {
@@ -269,7 +279,7 @@
 }
 
 - (void)safariViewControllerDidFinish:(SFSafariViewController *)controller {
-    [self.webview evaluateJavaScript:@"document.querySelector('amp-story-player > div').shadowRoot.querySelector('iframe[i-amphtml-iframe-position=\"0\"').contentWindow.postMessage(JSON.stringify({ type: 'triggerStoryFocusEvent' }), '*');" completionHandler:nil];
+    [self.webview evaluateJavaScript:@"player.play();" completionHandler:nil];
 }
 
 #pragma mark - Unread count story navigation methods.
