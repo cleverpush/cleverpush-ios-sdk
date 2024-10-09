@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL allowAutoRotation;
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
+@property (atomic, strong) CPStoryViewFinishedBlock finishedCallback;
 @property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
 @property (nonatomic, strong) CPStoryWidget *widget;
 @property (nonatomic, assign) UIWindow* window;

@@ -44,7 +44,7 @@ CPStoryViewOpenedBlock urlOpenedListener;
         if (navigationAction.request.URL) {
             if ([[UIApplication sharedApplication] canOpenURL:navigationAction.request.URL]) {
                 if (urlOpenedListener != nil) {
-                    urlOpenedListener(navigationAction.request.URL);
+                    urlOpenedListener(navigationAction.request.URL,nil);
                 } else {
                     [CPUtils openSafari:navigationAction.request.URL];
                 }
