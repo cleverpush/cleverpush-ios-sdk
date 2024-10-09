@@ -264,8 +264,12 @@
                 if (![CPUtils isNullOrEmpty:callbackURLString]) {
                     NSURL *storyElementURL = [NSURL URLWithString:callbackURLString];
                     if ([CPUtils isValidURL:storyElementURL]) {
+                        __weak typeof(self) weakSelf = self;
                         if (self.openedCallback) {
-                            self.openedCallback(storyElementURL);
+                            self.finishedCallback = ^() {
+                                [weakSelf.webview evaluateJavaScript:@"player.play();" completionHandler:nil];
+                            };
+                            self.openedCallback(storyElementURL, self.finishedCallback);
                         } else {
                             [CPUtils openSafari:storyElementURL];
                         }
