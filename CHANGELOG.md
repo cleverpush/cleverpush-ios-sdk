@@ -1,3 +1,6 @@
+## 1.31.13 (09.10.2024) 
+* Optimized `CPStoryView` URL opened listener and provide a finished callback block.
+
 ## 1.31.12 (05.10.2024) 
 * Optimized `CPStoryView` to make resuming work better after opening a URL inside a story
 
