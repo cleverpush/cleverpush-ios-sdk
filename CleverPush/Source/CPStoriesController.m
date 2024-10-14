@@ -216,7 +216,6 @@
         if (error) {
             self.webview.scrollView.hidden = NO;
         } else {
-            [self trackStoriesShown];
             [self.webview addSubview:self.closeButton];
             self.webview.scrollView.hidden = NO;
         }
@@ -240,13 +239,6 @@
     }];
 }
 
-#pragma mark - Tracking when story widget has been rendered
-- (void)trackStoriesShown {
-    [CPWidgetModule trackWidgetShown:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
-        [CPLog error:@"Failed to render story: %@ %@", self.widget.id, error];
-    }];
-}
-
 #pragma mark - Synced JS with Native bridge.
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
     if ([message.name isEqualToString:@"navigation"]) {
@@ -262,16 +254,24 @@
             if (bodyDict && bodyDict.count > 0) {
                 NSString *callbackURLString = bodyDict[@"callbackUrl"];
                 if (![CPUtils isNullOrEmpty:callbackURLString]) {
-                    NSURL *storyElementURL = [NSURL URLWithString:callbackURLString];
-                    if ([CPUtils isValidURL:storyElementURL]) {
+                    NSURL *storyElementCallBackURL = [NSURL URLWithString:callbackURLString];
+                    if ([CPUtils isValidURL:storyElementCallBackURL]) {
                         __weak typeof(self) weakSelf = self;
                         if (self.openedCallback) {
                             self.finishedCallback = ^() {
                                 [weakSelf.webview evaluateJavaScript:@"player.play();" completionHandler:nil];
                             };
-                            self.openedCallback(storyElementURL, self.finishedCallback);
+                            self.openedCallback(storyElementCallBackURL, self.finishedCallback);
                         } else {
-                            [CPUtils openSafari:storyElementURL];
+                            [CPUtils openSafari:storyElementCallBackURL];
+                        }
+
+                        NSString *requestURLString = bodyDict[@"url"];
+                        if (![CPUtils isNullOrEmpty:requestURLString]) {
+                            if ([CPUtils isValidURL:[NSURL URLWithString:requestURLString]]) {
+                                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:requestURLString];
+                                [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
+                            }
                         }
                     }
                 }
@@ -409,7 +409,6 @@
     [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     [self.storyStatusMap setObject:@(NO) forKey:@(self.storyIndex)];
     [self trackStoryOpened];
-    [self trackStoriesShown];
 }
 
 #pragma mark - Device orientation
