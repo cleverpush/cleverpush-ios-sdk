@@ -292,9 +292,7 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
                     [CleverPush addStoryView:self];
 
                     if (self.widget != nil && self.stories != nil && self.stories.count > 0) {
-                        for (NSInteger index = 0; index < self.stories.count; index++) {
-                            [self trackStoriesShownAtIndex:index];
-                        }
+						[self trackStoriesShown];
                     }
                 });
             }];
@@ -764,18 +762,27 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 }
 
 #pragma mark - Tracking when story widget has been rendered
-- (void)trackStoriesShownAtIndex:(NSInteger)index {
-    if (self.widget != nil && index < self.stories.count) {
-        CPStory *story = self.stories[index];
-        if (story != nil) {
-            NSString *storyIdString = story.id;
-            if (![CPUtils isNullOrEmpty:storyIdString]) {
-                NSArray<NSString *> *storyArray = @[storyIdString];
-    [CPWidgetModule trackWidgetShown:self.widget.id withStories:storyArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
-                    [CPLog error:@"Failed to render story: %@ %@", self.widget.id, error];
-                }];
-            }
-        }
+- (void)trackStoriesShown {
+    if (self.widget != nil) {
+		NSMutableArray <NSString*>* storyIdArray = [NSMutableArray new];
+		for (CPStory *story in self.stories) {
+			NSString *storyIdString = story.id;
+			if (storyIdString != nil) {
+				if (self.widget.groupStoryCategories) {
+					NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
+					for (NSString *storyId in currentStoryIds) {
+						[storyIdArray addObject:storyId];
+					}
+				} else {
+
+					[storyIdArray addObject:storyIdString];
+				}
+			}
+		}
+
+		[CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+			[CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
+		}];
     }
 }
 

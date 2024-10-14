@@ -53,6 +53,8 @@
         NSDictionary* dataDic = @{
         @"stories": stories
     };
+
+	[CPLog info:@"story-widget track-shown data:%@", dataDic];
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* results) {
