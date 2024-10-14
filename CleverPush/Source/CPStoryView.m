@@ -290,6 +290,12 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
+
+                    if (self.widget != nil && self.stories != nil && self.stories.count > 0) {
+                        for (NSInteger index = 0; index < self.stories.count; index++) {
+                            [self trackStoriesShownAtIndex:index];
+                        }
+                    }
                 });
             }];
         } else {
@@ -755,6 +761,22 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:CPAppearanceModeChangedNotification object:nil];
+}
+
+#pragma mark - Tracking when story widget has been rendered
+- (void)trackStoriesShownAtIndex:(NSInteger)index {
+    if (self.widget != nil && index < self.stories.count) {
+        CPStory *story = self.stories[index];
+        if (story != nil) {
+            NSString *storyIdString = story.id;
+            if (![CPUtils isNullOrEmpty:storyIdString]) {
+                NSArray<NSString *> *storyArray = @[storyIdString];
+    [CPWidgetModule trackWidgetShown:self.widget.id withStories:storyArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+                    [CPLog error:@"Failed to render story: %@ %@", self.widget.id, error];
+                }];
+            }
+        }
+    }
 }
 
 @end
