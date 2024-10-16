@@ -2464,7 +2464,7 @@ static id isNil(id object) {
                 id value = [attributes objectForKey:key];
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
-                        [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil onSuccess:nil onFailure:nil];
                     } else if ([value isKindOfClass:[NSArray class]]) {
                         [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
                     }
@@ -2531,18 +2531,35 @@ static id isNil(id object) {
 
 - (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
-        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback];
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback onSuccess:nil onFailure:nil];
     }];
 }
 
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
-    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:nil onFailure:nil];
 }
 
-- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
-    [self getSubscriptionId:^(NSString*subscriptionId) {
+- (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttribute:attributeId objectValue:value onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self waitForTrackingConsent:^{
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:successBlock onFailure:failureBlock];
+    }];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)(void))callback onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self getSubscriptionId:^(NSString *subscriptionId) {
         if (subscriptionId == nil) {
             [CPLog debug:@"CleverPushInstance: setSubscriptionAttributeObjectImplementation: There is no subscription for CleverPush SDK."];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+            }
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2566,20 +2583,30 @@ static id isNil(id object) {
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
 
+                if (successBlock) {
+                    successBlock(results);
+                }
                 if (callback) {
                     callback();
                 }
-            } onFailure:nil];
+            } onFailure:^(NSError *error) {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
         });
     }];
 }
 
 #pragma mark - Push subscription array attribute value.
-- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString*subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pushSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+                if (failureBlock) {
+                    failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                }
                 return;
             }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -2616,18 +2643,33 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
-                } onFailure:nil];
+                    if (successBlock) {
+                        successBlock(results);
+                    }
+                } onFailure:^(NSError *error) {
+                    [CPLog debug:@"Failed to push attribute value: %@", error];
+                    if (failureBlock) {
+                        failureBlock(error);
+                    }
+                }];
             });
         }];
     }];
 }
 
+- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    [self pushSubscriptionAttributeValue:attributeId value:value onSuccess:nil onFailure:nil];
+}
+
 #pragma mark - Pull subscription array attribute value.
-- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString*subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pullSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+                if (failureBlock) {
+                    failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                }
                 return;
             }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -2661,11 +2703,23 @@ static id isNil(id object) {
                 [request setHTTPBody:postData];
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                    [CPLog debug:@"Attribute value pulled successfully: %@ %@", attributeId, value];
-                } onFailure:nil];
+                    [CPLog debug:@"Attribute value pull successfully: %@ %@", attributeId, value];
+                    if (successBlock) {
+                        successBlock(results);
+                    }
+                } onFailure:^(NSError *error) {
+                    [CPLog debug:@"Failed to pull attribute value: %@", error];
+                    if (failureBlock) {
+                        failureBlock(error);
+                    }
+                }];
             });
         }];
     }];
+}
+
+- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    [self pullSubscriptionAttributeValue:attributeId value:value onSuccess:nil onFailure:nil];
 }
 
 #pragma mark - Check if subscription array attribute has a value.
@@ -2962,6 +3016,28 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
+- (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure {
+    if (topics == nil || topics.count == 0) {
+        if (failure) {
+            failure([NSError errorWithDomain:@"com.cleverPush" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Subscription Topics cannot be nil or empty."}]);
+        }
+        return;
+    }
+
+    [self setDefaultCheckedTopics:topics];
+    [self ensureMainThreadSync:^{
+        [self makeSyncSubscriptionRequest:^(NSError *error) {
+            if (failure) {
+                failure(error);
+            }
+        } successBlock:^{
+            if (successBlock) {
+                successBlock();
+            }
+        }];
+    }];
+}
+
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics {
     [self setDefaultCheckedTopics:topics];
     [self ensureMainThreadSync:^{
