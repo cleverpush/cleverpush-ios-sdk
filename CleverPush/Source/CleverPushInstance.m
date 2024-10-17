@@ -1254,7 +1254,7 @@ static id isNil(id object) {
                         if (subscriptionId == nil) {
                             [CPLog debug:@"syncSubscription called from subscribe"];
                             if (failureBlock) {
-                                [self performSelector:@selector(syncSubscription) withObject:failureBlock];
+                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                             } else {
                                 [self performSelector:@selector(syncSubscription) withObject:nil];
                             }
