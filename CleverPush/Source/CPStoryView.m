@@ -774,7 +774,6 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 						[storyIdArray addObject:storyId];
 					}
 				} else {
-
 					[storyIdArray addObject:storyIdString];
 				}
 			}

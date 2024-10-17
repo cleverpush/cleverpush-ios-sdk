@@ -234,9 +234,25 @@
 
 #pragma mark - Tracking when story widget has been opened
 - (void)trackStoryOpened {
-    [CPWidgetModule trackWidgetOpened:self.widget.id withStories:self.readStories onSuccess:nil onFailure:^(NSError * _Nullable error) {
-        [CPLog error:@"Failed to open widgets stories: %@", error];
-    }];
+    if (self.widget != nil) {
+        NSMutableArray<NSString *> *readStoryIdArray = [NSMutableArray new];
+        for (NSString *storyId in self.readStories) {
+            if (![CPUtils isNullOrEmpty:storyId]) {
+                if (self.widget.groupStoryCategories) {
+                    NSArray *currentStoryIds = [storyId componentsSeparatedByString:@","];
+                    for (NSString *storyId in currentStoryIds) {
+                        [readStoryIdArray addObject:storyId];
+                    }
+                } else {
+                    [readStoryIdArray addObject:storyId];
+                }
+            }
+        }
+
+        [CPWidgetModule trackWidgetOpened:self.widget.id withStories:readStoryIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+            [CPLog error:@"Failed to open widgets stories: %@ %@", self.widget.id, error];
+        }];
+    }
 }
 
 #pragma mark - Synced JS with Native bridge.
