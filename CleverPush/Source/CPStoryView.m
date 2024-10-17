@@ -290,6 +290,10 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
+
+                    if (self.widget != nil && self.stories != nil && self.stories.count > 0) {
+						[self trackStoriesShown];
+                    }
                 });
             }];
         } else {
@@ -755,6 +759,31 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:CPAppearanceModeChangedNotification object:nil];
+}
+
+#pragma mark - Tracking when story widget has been rendered
+- (void)trackStoriesShown {
+    if (self.widget != nil) {
+		NSMutableArray <NSString*>* storyIdArray = [NSMutableArray new];
+		for (CPStory *story in self.stories) {
+			NSString *storyIdString = story.id;
+			if (storyIdString != nil) {
+				if (self.widget.groupStoryCategories) {
+					NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
+					for (NSString *storyId in currentStoryIds) {
+						[storyIdArray addObject:storyId];
+					}
+				} else {
+
+					[storyIdArray addObject:storyIdString];
+				}
+			}
+		}
+
+		[CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+			[CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
+		}];
+    }
 }
 
 @end

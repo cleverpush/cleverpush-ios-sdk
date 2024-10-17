@@ -1,3 +1,6 @@
+## 1.31.14 (14.10.2024) 
+* Optimized `CPStoryView` statistic tracking.
+
 ## 1.31.13 (09.10.2024) 
 * Optimized `CPStoryView` URL opened listener and provide a finished callback block.
 
