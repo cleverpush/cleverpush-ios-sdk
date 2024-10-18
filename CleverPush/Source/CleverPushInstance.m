@@ -1273,9 +1273,9 @@ static id isNil(id object) {
                                     }
                                 }
                             }];
-                            
-                            if (completion) {
-                                [self getSubscriptionId:^(NSString* subscriptionId) {
+
+                            if (completion && !completionCalled) {
+                                [self getSubscriptionId:^(NSString *subscriptionId) {
                                     if (!completionCalled) {
                                         completionCalled = YES;
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
@@ -1286,15 +1286,13 @@ static id isNil(id object) {
                                     }
                                 }];
                             }
-                        } else if (completion) {
+                        } else if (completion && !completionCalled) {
+                            completionCalled = YES;
                             completion(subscriptionId, nil);
                         }
-                    } else if (completion) {
-                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
-                    }
-
-                    if (!granted && !ignoreDisabledNotificationPermission) {
-                        [self setConfirmAlertShown];
+                    } else if (completion && !completionCalled) {
+                        completionCalled = YES;
+                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
                     }
                 });
             }];
