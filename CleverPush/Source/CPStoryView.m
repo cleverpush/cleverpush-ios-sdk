@@ -263,6 +263,8 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
                                 story.unreadCount = unreadCount;
                             }
                         }
+
+                        [self syncUnreadStoryIds];
                     } else {
                         NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
                         for (CPStory *story in self.stories) {
@@ -782,6 +784,35 @@ NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNo
 		[CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
 			[CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
 		}];
+    }
+}
+
+#pragma mark - Unread Story ID Synchronization
+- (void)syncUnreadStoryIds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *storyUnreadCountString = [userDefaults stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+
+    if (storyUnreadCountString != nil && storyUnreadCountString.length > 0) {
+        NSMutableSet *readStoryIds = [NSMutableSet setWithArray:[storyUnreadCountString componentsSeparatedByString:@","]];
+        NSMutableString *updatedUnreadStoryIds = [NSMutableString string];
+
+        for (CPStory *story in self.stories) {
+            NSArray *storyIdArray = [story.id componentsSeparatedByString:@","];
+
+            for (NSString *subStoryID in storyIdArray) {
+                if ([readStoryIds containsObject:subStoryID]) {
+                    if (updatedUnreadStoryIds.length == 0) {
+                        [updatedUnreadStoryIds appendString:subStoryID];
+                    } else {
+                        [updatedUnreadStoryIds appendFormat:@",%@", subStoryID];
+                    }
+                }
+            }
+        }
+
+        [userDefaults removeObjectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        [userDefaults setObject:updatedUnreadStoryIds forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        [userDefaults synchronize];
     }
 }
 
