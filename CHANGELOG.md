@@ -1,3 +1,6 @@
+## 1.31.15 (21.10.2024) 
+* Optimised `trackStoryOpened` function for passing parameters in API.
+
 ## 1.31.14 (14.10.2024) 
 * Optimized `CPStoryView` statistic tracking.
 
