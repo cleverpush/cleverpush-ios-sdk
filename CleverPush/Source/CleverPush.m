@@ -374,12 +374,24 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value callback:callback];
 }
 
++ (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance pushSubscriptionAttributeValue:attributeId value:value];
 }
 
++ (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance pushSubscriptionAttributeValue:attributeId value:value onSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance pullSubscriptionAttributeValue:attributeId value:value];
+}
+
++ (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance pullSubscriptionAttributeValue:attributeId value:value onSuccess:successBlock onFailure:failureBlock];
 }
 
 + (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
@@ -422,6 +434,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)setSubscriptionTopics:(NSMutableArray* _Nullable)topics {
     [self.CPSharedInstance setSubscriptionTopics:topics];
+}
+
++ (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure {
+    [self.CPSharedInstance setSubscriptionTopics:topics onSuccess:successBlock onFailure:failure];
 }
 
 + (void)setBrandingColor:(UIColor* _Nullable)color {
