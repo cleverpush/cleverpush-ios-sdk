@@ -1,3 +1,7 @@
+## 1.31.16 (23.10.2024) 
+* Optimised SDK functions for performance improvements.
+* Added optional successBlock and failureBlock callbacks for `setSubscriptionTopics`, `setSubscriptionAttribute` (Array), `pushSubscriptionAttributeValue` and `pullSubscriptionAttributeValue`
+
 ## 1.31.15 (21.10.2024) 
 * Optimised `trackStoryOpened` function for passing parameters in API.
 

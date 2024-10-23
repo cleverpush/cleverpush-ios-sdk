@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.15";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.16";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1293,6 +1293,10 @@ static id isNil(id object) {
                     } else if (completion && !completionCalled) {
                         completionCalled = YES;
                         completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
+                    }
+
+                    if (!granted && !ignoreDisabledNotificationPermission) {
+                        [self setConfirmAlertShown];
                     }
                 });
             }];
