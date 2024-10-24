@@ -538,7 +538,7 @@ static id isNil(id object) {
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
+    [self ensureMainThreadSync:^{
         if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
@@ -547,7 +547,7 @@ static id isNil(id object) {
         } else {
             registeredWithApple = deviceToken != nil;
         }
-    });
+    }];
 
     [self incrementAppOpens];
 
@@ -2128,13 +2128,13 @@ static id isNil(id object) {
 - (BOOL)clearBadge:(BOOL)fromNotificationOpened {
     __block BOOL wasSet;
 
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    [self ensureMainThreadSync:^{
         wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
         if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
         }
-    });
+    }];
 
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
