@@ -169,7 +169,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)setTopicsDialogWindow:(UIWindow* _Nullable)window;
 - (void)setTopicsChangedListener:(CPTopicsChangedBlock _Nullable)changedBlock;
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics;
-- (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure;
+- (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure;
 - (void)setBrandingColor:(UIColor* _Nullable)color;
 - (void)setNormalTintColor:(UIColor* _Nullable)color;
 - (UIColor* _Nullable)getNormalTintColor;

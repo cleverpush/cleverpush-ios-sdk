@@ -1,3 +1,7 @@
+## 1.31.17 (25.10.2024) 
+* Optimised SDK functions for performance improvements.
+* Resolved issue of `setSubscriptionTopics` function for callback was not working. 
+
 ## 1.31.16 (23.10.2024) 
 * Optimised SDK functions for performance improvements.
 * Added optional successBlock and failureBlock callbacks for `setSubscriptionTopics`, `setSubscriptionAttribute` (Array), `pushSubscriptionAttributeValue` and `pullSubscriptionAttributeValue`
