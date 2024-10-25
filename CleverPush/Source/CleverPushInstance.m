@@ -1707,14 +1707,11 @@ static id isNil(id object) {
                     [self setConfirmAlertShown];
                 }
 
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    if (successBlock) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            successBlock();
-                        });
-                    }
-                });
+                if (successBlock) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        successBlock();
+                    });
+                }
             }
         } onFailure:^(NSError* error) {
            [self setSubscriptionInProgress:false];
@@ -3024,7 +3021,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure {
+- (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
     if (topics == nil || topics.count == 0) {
         if (failure) {
             failure([NSError errorWithDomain:@"com.cleverPush" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Subscription Topics cannot be nil or empty."}]);
