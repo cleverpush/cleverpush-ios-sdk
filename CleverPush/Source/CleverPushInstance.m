@@ -539,8 +539,8 @@ static id isNil(id object) {
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
 
-    [self ensureMainThreadSync:^{
-        if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
             registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
@@ -548,7 +548,7 @@ static id isNil(id object) {
         } else {
             registeredWithApple = deviceToken != nil;
         }
-    }];
+    });
 
     [self incrementAppOpens];
 
@@ -2124,21 +2124,22 @@ static id isNil(id object) {
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
 - (BOOL)clearBadge:(BOOL)fromNotificationOpened {
-    __block BOOL wasSet;
+    __block BOOL wasSet = NO;
 
-    [self ensureMainThreadSync:^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
+
         if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-        }
-    }];
 
-    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-    if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
-        [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
-        [userDefaults synchronize];
-    }
+            NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+            if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
+                [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
+                [userDefaults synchronize];
+            }
+        }
+    });
 
     return wasSet;
 }
