@@ -436,7 +436,7 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionTopics:topics];
 }
 
-+ (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure {
++ (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
     [self.CPSharedInstance setSubscriptionTopics:topics onSuccess:successBlock onFailure:failure];
 }
 

@@ -91,6 +91,7 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
 static BOOL confirmAlertShown = NO;
+static BOOL hasInitialized = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -537,14 +538,17 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
-    if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-        registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
+            registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
 #pragma clang diagnostic pop
-    } else {
-        registeredWithApple = deviceToken != nil;
-    }
+        } else {
+            registeredWithApple = deviceToken != nil;
+        }
+    });
 
     [self incrementAppOpens];
 
@@ -605,7 +609,7 @@ static id isNil(id object) {
             }
         }];
     } else {
-        [CPLog debug:@"There is no subscription for CleverPush SDK."];
+        [CPLog debug:@"There is no subscription for CleverPush SDK."];
     }
 
     [self initFeatures];
@@ -1704,14 +1708,11 @@ static id isNil(id object) {
                     [self setConfirmAlertShown];
                 }
 
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    if (successBlock) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            successBlock();
-                        });
-                    }
-                });
+                if (successBlock) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        successBlock();
+                    });
+                }
             }
         } onFailure:^(NSError* error) {
            [self setSubscriptionInProgress:false];
@@ -2123,21 +2124,25 @@ static id isNil(id object) {
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
 - (BOOL)clearBadge:(BOOL)fromNotificationOpened {
-    bool wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
-    if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    __block BOOL wasSet = NO;
 
-        NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-        if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
-            [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
-            [userDefaults synchronize];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
+
+        if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+
+            NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+            if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
+                [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
+                [userDefaults synchronize];
+            }
         }
+    });
 
-    }
     return wasSet;
 }
-
 #pragma mark - Removed space from 32bytes and convert token in to string.
 - (NSString*)stringFromDeviceToken:(NSData*)deviceToken {
     // deviceToken = <4618be8f 70f2a10f ce0e7435 5528fac9 86221163 94b282b1 553afc3c e31ec99c>
@@ -3018,7 +3023,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
-- (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics onSuccess:(void(^ _Nullable)())successBlock onFailure:(CPFailureBlock _Nullable)failure {
+- (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
     if (topics == nil || topics.count == 0) {
         if (failure) {
             failure([NSError errorWithDomain:@"com.cleverPush" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Subscription Topics cannot be nil or empty."}]);
@@ -4113,8 +4118,11 @@ static id isNil(id object) {
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
         [CPLog error:@"%@", failureMessage];
-        [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
+        if (!hasInitialized) {
+            hasInitialized = YES;
+            [self handleInitialization:NO error:failureMessage];
+            [self fireChannelConfigListeners];
+        }
     }];
 }
 
