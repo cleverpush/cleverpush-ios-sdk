@@ -91,6 +91,7 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
 static BOOL confirmAlertShown = NO;
+static BOOL hasInitialized = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -4116,8 +4117,11 @@ static id isNil(id object) {
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
         [CPLog error:@"%@", failureMessage];
-        [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
+        if (!hasInitialized) {
+            hasInitialized = YES;
+            [self handleInitialization:NO error:failureMessage];
+            [self fireChannelConfigListeners];
+        }
     }];
 }
 
