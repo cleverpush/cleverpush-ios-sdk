@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) CPStoryWidget *widget;
 @property (nonatomic, assign) UIWindow* window;
 @property (nonatomic, strong) CPWKWebView *webview;
+@property (nonatomic, copy) void (^contentLoadedCompletion)(void);
+
+- (void)loadContentWithCompletion:(void (^)(void))completion;
 
 @end
 NS_ASSUME_NONNULL_END

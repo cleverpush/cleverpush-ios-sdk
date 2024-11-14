@@ -22,7 +22,6 @@
         [self.storyStatusMap setObject:@(NO) forKey:@(i)];
     }
 
-    [self configureStoryView];
     [self configureCloseButton];
     [self initialisePanGesture];
     [self trackStoryOpened];
@@ -86,18 +85,20 @@
 }
 
 #pragma mark - Configure the story view
-- (void) configureStoryView {
+- (void)loadContentWithCompletion:(void (^)(void))completion {
     WKUserContentController* userController = [[WKUserContentController alloc] init];
     [userController removeScriptMessageHandlerForName:@"previous"];
     [userController removeScriptMessageHandlerForName:@"next"];
     [userController removeScriptMessageHandlerForName:@"navigation"];
     [userController removeScriptMessageHandlerForName:@"storyNavigation"];
     [userController removeScriptMessageHandlerForName:@"storyButtonCallbackUrl"];
+    [userController removeScriptMessageHandlerForName:@"storyReady"];
     [userController addScriptMessageHandler:self name:@"previous"];
     [userController addScriptMessageHandler:self name:@"next"];
     [userController addScriptMessageHandler:self name:@"navigation"];
     [userController addScriptMessageHandler:self name:@"storyNavigation"];
     [userController addScriptMessageHandler:self name:@"storyButtonCallbackUrl"];
+    [userController addScriptMessageHandler:self name:@"storyReady"];
 
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.userContentController = userController;
@@ -121,7 +122,9 @@
     self.webview.opaque = NO;
     self.webview.navigationDelegate = self;
 
-    NSMutableString *anchorTags = [NSMutableString string];
+    self.contentLoadedCompletion = completion;
+
+    NSMutableString *anchorTags = [NSMutableString stringWithString:@"[\n"];
     BOOL hideShareButton = !self.storyWidgetShareButtonVisibility;
 
     for (NSInteger i = 0; i < self.stories.count; i++) {
@@ -141,8 +144,18 @@
                          self.stories[i].channel, storyId, hideShareButtonValue, self.widget.id];
         }
 
-        [anchorTags appendFormat:@"<a href=\"%@\">Story %ld</a>\n", customURL, (long)(i + 1)];
+        [anchorTags appendFormat:@"    {\n"];
+        [anchorTags appendFormat:@"        href: '%@'\n", customURL];
+        [anchorTags appendFormat:@"    }"];
+
+        if (i < self.stories.count - 1) {
+            [anchorTags appendString:@",\n"];
+        } else {
+            [anchorTags appendString:@"\n"];
+        }
     }
+
+    [anchorTags appendString:@"]"];
 
     NSString *html = [NSString stringWithFormat:@"\
                                 <!DOCTYPE html>\
@@ -166,7 +179,6 @@
                                 </head>\
                                 <body>\
                                 <amp-story-player>\
-                                    %@\
                                 </amp-story-player>\
                                 <script>\
                                 var playerEl = document.querySelector('amp-story-player');\
@@ -183,8 +195,10 @@
                                     window.webkit.messageHandlers.storyNavigation.postMessage({ selectedPosition: %@, subStoryIndex: subStoryIndex });\
                                 });\
                                 playerEl.addEventListener('ready', function (event) {\
-									player.go(%@);\
+                                    player.add(%@);\
+                                    player.go(%@);\
                                     playerEl.style.display = 'block';\
+                                    window.webkit.messageHandlers.storyReady.postMessage({});\
                                 });\
                                 playerEl.addEventListener('navigation', function (event) {\
                                     window.webkit.messageHandlers.navigation.postMessage({ index: event.detail.index });\
@@ -201,10 +215,10 @@
                                 </body>\
                                 </html>",
 					  [NSString stringWithFormat:@"%fpx", [CPUtils frameHeightWithoutSafeArea]],
-					  anchorTags,
+                      @(self.storyIndex),
 					  @(self.storyIndex),
 					  @(self.storyIndex),
-					  @(self.storyIndex),
+                      anchorTags,
 					  @(self.storyIndex)
 	];
 
@@ -295,6 +309,10 @@
         }
     } else if ([message.name isEqualToString:@"next"]) {
         [self onDismiss];
+    } else if ([message.name isEqualToString:@"storyReady"]) {
+        if (self.contentLoadedCompletion) {
+            self.contentLoadedCompletion();
+        }
     }
 }
 
