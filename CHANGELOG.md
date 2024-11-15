@@ -1,4 +1,8 @@
-## 1.31.17 (25.10.2024) 
+## 1.31.18 (15.11.2024)
+* Add story loading animation in widget (border_color_loading, border_color_loading_dark_mode).
+* To remove white load html content, click on the widget once it is loaded, then display the detail screen.
+    
+## 1.31.17 (25.10.2024)
 * Optimised SDK functions for performance improvements.
 * Resolved issue of `setSubscriptionTopics` function for callback was not working. 
 
