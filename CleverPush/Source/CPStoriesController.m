@@ -114,7 +114,6 @@
     self.webview.scrollView.bounces = NO;
     self.webview.allowsBackForwardNavigationGestures = NO;
     self.webview.contentMode = UIViewContentModeScaleToFill;
-    self.webview.scrollView.backgroundColor = UIColor.blackColor;
     self.webview.backgroundColor = [UIColor whiteColor];
     self.webview.scrollView.backgroundColor = [UIColor whiteColor];
     self.webview.scrollView.hidden = NO;
@@ -141,112 +140,45 @@
     }
 
     NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:storyURLs options:0 error:&error];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:storyURLs options:0 error:nil];
     NSString *storyURLsJsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"storyPlayerContent" ofType:@"html"];
+    NSString *htmlTemplate = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
 
-    NSString *html = [NSString stringWithFormat:
-                              @"<!DOCTYPE html>\
-                              <html>\
-                              <head>\
-                                <style>\
-                                  body { margin: 0; padding: 0; }\
-                                  amp-story-player { display: block; margin: 0; padding: 0; width: 100%%; height: %@; }\
-                                </style>\
-                                <script src=\"https://cdn.ampproject.org/amp-story-player-v0.js\"></script>\
-                                <link rel=\"stylesheet\" href=\"https://cdn.ampproject.org/amp-story-player-v0.css\">\
-                              </head>\
-                              <body>\
-                                <script>\
-                                  function loadAmpResources(callback) {\
-                                    if (window.ampStoryPlayerLoaded) {\
-                                      callback();\
-                                      return;\
-                                    }\
-                                    window.ampStoryPlayerLoaded = true;\
-                                    const script = document.createElement('script');\
-                                    const link = document.createElement('link');\
-                                    script.src = 'https://cdn.ampproject.org/amp-story-player-v0.js';\
-                                    script.async = true;\
-                                    script.onload = function() {\
-                                      callback();\
-                                    };\
-                                    link.href = 'https://cdn.ampproject.org/amp-story-player-v0.css';\
-                                    link.rel = 'stylesheet';\
-                                    document.head.append(script, link);\
-                                  }\
-                                  function onPlayerReady(player) {\
-                                    player.go(%@);\
-                                    window.webkit.messageHandlers.storyReady.postMessage({});\
-                                  }\
-                                  loadAmpResources(function() {\
-                                    var playerEl = document.createElement('amp-story-player');\
-                                    var storyURLs = %@;\
-                                    storyURLs.forEach(function(storyURL) {\
-                                      var anker = document.createElement('a');\
-                                      anker.setAttribute('href', storyURL);\
-                                      playerEl.appendChild(anker);\
-                                    });\
-                                    var player = new AmpStoryPlayer(window, playerEl);\
-                                    document.body.appendChild(playerEl);\
-                                    player.load();\
-                                    window.player = player;\
-                                    if(player.isReady) {\
-                                      onPlayerReady(player);\
-                                    } else {\
-                                      player.addEventListener('ready', function(event) {\
-                                        onPlayerReady(player);\
-                                      });\
-                                    }\
-                                    playerEl.addEventListener('noNextStory', function(event) {\
-                                      window.webkit.messageHandlers.next.postMessage({});\
-                                    });\
-                                    playerEl.addEventListener('storyNavigation', function(event) {\
-                                      var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 0);\
-                                      window.webkit.messageHandlers.storyNavigation.postMessage({ selectedPosition: %@, subStoryIndex: subStoryIndex });\
-                                    });\
-                                    playerEl.addEventListener('navigation', function(event) {\
-                                      window.webkit.messageHandlers.navigation.postMessage({ index: event.detail.index });\
-                                    });\
-                                    window.addEventListener('message', function (event) {\
-                                      try {\
-                                        var data = JSON.parse(event.data);\
-                                        if (data.type === 'storyButtonCallback') {\
-                                          window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);\
-                                        }\
-                                      } catch (ignored) {}\
-                                    });\
-                                  });\
-                                </script>\
-                              </body>\
-                              </html>",
-                      [NSString stringWithFormat:@"%fpx", [CPUtils frameHeightWithoutSafeArea]],
-                      @(self.storyIndex),
-                      storyURLsJsonString,
-                      @(self.storyIndex)
-    ];
-
-    if (@available(iOS 16.4, *)) {
-        [self.webview setInspectable:YES];
-    }
-
-    [self.webview loadHTML:html withCompletionHandler:^(WKWebView *webView, NSError *error) {
-        if (error) {
-            self.webview.scrollView.hidden = NO;
-        } else {
-            [self.webview addSubview:self.closeButton];
-            self.webview.scrollView.hidden = NO;
+    if (error) {
+        [CPLog debug:@"Error loading HTML file: %@", error.localizedDescription];
+        if (self.contentLoadedCompletion) {
+            self.contentLoadedCompletion();
         }
-    }];
+    } else {
+        NSString *frameHeightString = [NSString stringWithFormat:@"%fpx", [CPUtils frameHeightWithoutSafeArea]];
+        NSString *html = [htmlTemplate stringByReplacingOccurrencesOfString:@"{{frameHeight}}" withString:frameHeightString];
+        html = [html stringByReplacingOccurrencesOfString:@"{{storyIndex}}" withString:[@(self.storyIndex) stringValue]];
+        html = [html stringByReplacingOccurrencesOfString:@"{{storyURLs}}" withString:storyURLsJsonString];
 
-    UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
-    swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
-    [self.webview addGestureRecognizer:swipeDown];
+        if (@available(iOS 16.4, *)) {
+            [self.webview setInspectable:YES];
+        }
 
-    if (self.openedCallback) {
-        [self.webview setUrlOpenedCallback:self.openedCallback];
+        [self.webview loadHTML:html withCompletionHandler:^(WKWebView *webView, NSError *error) {
+            if (error) {
+                self.webview.scrollView.hidden = NO;
+            } else {
+                [self.webview addSubview:self.closeButton];
+                self.webview.scrollView.hidden = NO;
+            }
+        }];
+
+        UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(didSwipe:)];
+        swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
+        [self.webview addGestureRecognizer:swipeDown];
+
+        if (self.openedCallback) {
+            [self.webview setUrlOpenedCallback:self.openedCallback];
+        }
+
+        [self.view addSubview:self.webview];
     }
-
-    [self.view addSubview:self.webview];
 }
 
 #pragma mark - Tracking when story widget has been opened
