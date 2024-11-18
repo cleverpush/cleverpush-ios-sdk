@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Lints CocoaPods
-    runs-on: macos-12
+    runs-on: macos-14
 
     steps:
       - name: Checkout SDK
