@@ -444,12 +444,13 @@ static id isNil(id object) {
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
-        if (pendingOpenedResult && handleNotificationOpened) {
-            handleNotificationOpened(pendingOpenedResult);
-        }
-        if (pendingDeliveryResult && handleNotificationReceived) {
-            handleNotificationReceived(pendingDeliveryResult);
-        }
+    }
+
+    if (pendingOpenedResult && handleNotificationOpened) {
+        handleNotificationOpened(pendingOpenedResult);
+    }
+    if (pendingDeliveryResult && handleNotificationReceived) {
+        handleNotificationReceived(pendingDeliveryResult);
     }
 
     if (self) {
@@ -3894,6 +3895,10 @@ static id isNil(id object) {
 
 - (void)setApiEndpoint:(NSString* _Nullable)endpoint {
     apiEndpoint = endpoint;
+}
+
+- (void)setChannelId:(NSString* _Nullable)newChannelId {
+    channelId = newChannelId;
 }
 
 - (void)setAppGroupIdentifierSuffix:(NSString* _Nullable)suffix {
