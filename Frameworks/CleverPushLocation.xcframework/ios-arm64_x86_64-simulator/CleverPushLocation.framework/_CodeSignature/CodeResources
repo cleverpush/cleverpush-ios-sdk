@@ -20,6 +20,10 @@
 		<data>
 		yH4jcbXfoD6BRsN9miC3qhClgU4=
 		</data>
+		<key>Frameworks/CleverPush.framework/CPChatViewHtmlContent.html</key>
+		<data>
+		atV/xqxDt4NotqNxoqlPt/qjBG8=
+		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
 		+DVdB7RLGyep4eIHyOempyd8sms=
@@ -48,6 +52,10 @@
 		<data>
 		Fk7Kr6noiTLoOFy5349MCIpYwOs=
 		</data>
+		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
+		<data>
+		uOnnRoNCpvGYT5hWEvJs7Boqxj4=
+		</data>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<data>
 		Ju2vHcS/le0vMlzqJJ7zARBF/j0=
@@ -58,7 +66,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		LW5z3TNfLlBmuVrZIQNCO9VazvE=
+		8C/BBXi7RlWRsRDwQEC0fWcT6jE=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
@@ -70,7 +78,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		rc9fyYfdCc0q3ZmAaLFchDO4L4U=
+		7x6W2en6Z27SROnaZkdvkc/tRF4=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -147,6 +155,13 @@
 			PC/krN/GdF+WK4mLXjZ4piRKu2riBUqEcsxO9VNUKx4=
 			</data>
 		</dict>
+		<key>Frameworks/CleverPush.framework/CPChatViewHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			E31Olc2zpQFCVmDXRecIvVDwxx/Q0QWN1liX1Jae5tU=
+			</data>
+		</dict>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<dict>
 			<key>hash2</key>
@@ -196,6 +211,13 @@
 			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
 			</data>
 		</dict>
+		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y+/DhN9VSJ0zB2/KlThomzkcPOmdLr0qHRR+Vu/6JFU=
+			</data>
+		</dict>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<dict>
 			<key>hash2</key>
@@ -214,7 +236,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			EWupebk4tEbOkm4gh19UNofZp4k3C53HsLVN48cyUic=
+			9sAPXvsSoi0golmP1htLnY5WU+XTZB4OFsVMBcdztQc=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
@@ -235,7 +257,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			t/hNCP3jC676QDsLhutBEHMqBKZUt3tK5FKUkjZk+ko=
+			msot+ySR9HBGnqft/rtEYeGWSNlwf+qu+AdMKw3ABnE=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
