@@ -142,7 +142,7 @@
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:storyURLs options:0 error:nil];
     NSString *storyURLsJsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"storyPlayerContent" ofType:@"html"];
+    NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"CPStoryPlayerHtmlContent" ofType:@"html"];
     NSString *htmlTemplate = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
 
     if (error) {

@@ -163,76 +163,28 @@ UIColor* chatReceiverBubbleTextColor;
             headerCodes = @"";
         }
 
-        content = [NSString stringWithFormat:@"\
-                   <!DOCTYPE html>\
-                   <html>\
-                   <head>\
-                   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>\
-                   <style>\
-                   html, body { margin: 0; padding: 0; height: 100%%; -webkit-tap-highlight-color: rgba(0,0,0,0); } \
-                   </style>\
-                   %@\
-                   </head>\
-                   <body>\
-                   <div class='cleverpush-chat-target' style='height: 100%%;  -webkit-overflow-scrolling: touch;'></div>\
-                   <script>document.documentElement.style.webkitUserSelect='none'; document.documentElement.style.webkitTouchCallout='none';</script>\
-                   <script>window.cleverpushHandleSubscribe = function() { window.webkit.messageHandlers.chat.postMessage(\"subscribe\") }</script>\
-                   <script>var cleverpushConfig = %@; cleverpushConfig.chatStylingOptions = {}; var cleverpushSubscriptionId = '%@';\
-                   (cleverpushConfig || {}).nativeApp = true;\
-                   (cleverpushConfig || {}).brandingColor = '%@';\
-                   (cleverpushConfig || {}).chatBackgroundColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.inputContainer = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.dateColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '%@';\
-                   (cleverpushConfig || {}).chatStylingOptions.chatSenderBubbleBackgroundColor = '%@';</script>\
-                   <script>\
-                   function showErrorView() {\
-                   document.body.innerHTML = `\
-                   <style>\
-                   .cleverpush-chat-error {\
-                   color: #555;\
-                   text-align: center;\
-                   font-family: sans-serif;\
-                   padding: center;\
-                   height: 100%%;\
-                   display: flex;\
-                   align-items: center;\
-                   justify-content: center;\
-                   flex-direction: column;\
-                   }\
-                   .cleverpush-chat-error h1 {\
-                   font-size: 24px;\
-                   font-weight: normal;\
-                   margin-bottom: 25px;\
-                   }\
-                   .cleverpush-chat-error button {\
-                   background-color: #555;\
-                   color: #fff;\
-                   border: none;\
-                   font-weight: bold;\
-                   display: block;\
-                   font-size: 16px;\
-                   border-radius: 200px;\
-                   padding: 7.5px 15px;\
-                   cursor: pointer;\
-                   font-family: sans-serif;\
-                   }\
-                   </style>\
-                   <div class='cleverpush-chat-error'>\
-                   <h1>Laden fehlgeschlagen</h1>\
-                   <button onclick='window.webkit.messageHandlers.chat.postMessage(\"reload\")' type='button'>Erneut versuchen</button>\
-                   </div>`;\
-                   }\
-                   if (!cleverpushConfig) { showErrorView() }\
-                   </script>\
-                   <script onerror='showErrorView()' src='https://static.cleverpush.com/sdk/cleverpush-chat.js'></script>\
-                   </body>\
-                   </html>", headerCodes, jsonConfig, subscriptionId, brandingColor, backgroundColor, chatSenderBubbleTextColor, chatSendButtonBackgroundColor, chatInputBackgroundColor, chatInputTextColor, chatReceiverBubbleBackgroundColor, chatInputContainerBackgroundColor, chatTimestampTextColor, chatReceiverBubbleTextColor, chatSenderBubbleBackgroundColor];
+        NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"CPChatViewHtmlContent" ofType:@"html"];
+        NSString *htmlTemplate = [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:&error];
+
+        if (error) {
+            [CPLog debug:@"Error loading HTML file: %@", error.localizedDescription];
+            return;
+        }
+
+        content = [htmlTemplate stringByReplacingOccurrencesOfString:@"{{headerCodes}}" withString:headerCodes];
+        content = [content stringByReplacingOccurrencesOfString:@"{{jsonConfig}}" withString:jsonConfig];
+        content = [content stringByReplacingOccurrencesOfString:@"{{subscriptionId}}" withString:subscriptionId];
+        content = [content stringByReplacingOccurrencesOfString:@"{{brandingColor}}" withString:brandingColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{backgroundColor}}" withString:backgroundColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatSenderBubbleTextColor}}" withString:chatSenderBubbleTextColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatSendButtonBackgroundColor}}" withString:chatSendButtonBackgroundColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatInputBackgroundColor}}" withString:chatInputBackgroundColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatInputTextColor}}" withString:chatInputTextColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatReceiverBubbleBackgroundColor}}" withString:chatReceiverBubbleBackgroundColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatInputContainerBackgroundColor}}" withString:chatInputContainerBackgroundColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatTimestampTextColor}}" withString:chatTimestampTextColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatReceiverBubbleTextColor}}" withString:chatReceiverBubbleTextColor];
+        content = [content stringByReplacingOccurrencesOfString:@"{{chatSenderBubbleBackgroundColor}}" withString:chatSenderBubbleBackgroundColor];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.webView loadHTMLString:content baseURL:[[NSBundle mainBundle] resourceURL]];

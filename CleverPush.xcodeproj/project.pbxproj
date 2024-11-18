@@ -230,7 +230,8 @@
 		935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */; };
 		937390BB2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */; };
 		937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */; };
-		939E9C702CE76E5500DE7293 /* storyPlayerContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 939E9C6F2CE76E5500DE7293 /* storyPlayerContent.html */; };
+		939046D02CEB0AD700182AC3 /* CPChatViewHtmlContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 939046CF2CEB0AD700182AC3 /* CPChatViewHtmlContent.html */; };
+		939E9C702CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 939E9C6F2CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html */; };
 		93C8FA3E2C5B924F00300B69 /* CPStoryWidgetCloseButtonPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 93C8FA3D2C5B921D00300B69 /* CPStoryWidgetCloseButtonPosition.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
 		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
@@ -548,7 +549,8 @@
 		935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPSQLiteManager.m; sourceTree = "<group>"; };
 		937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		939E9C6F2CE76E5500DE7293 /* storyPlayerContent.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = storyPlayerContent.html; sourceTree = "<group>"; };
+		939046CF2CEB0AD700182AC3 /* CPChatViewHtmlContent.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = CPChatViewHtmlContent.html; sourceTree = "<group>"; };
+		939E9C6F2CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = CPStoryPlayerHtmlContent.html; sourceTree = "<group>"; };
 		93C8FA3D2C5B921D00300B69 /* CPStoryWidgetCloseButtonPosition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryWidgetCloseButtonPosition.h; sourceTree = "<group>"; };
 		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
 		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
@@ -998,7 +1000,8 @@
 				935A5F162AE64FB7007A3F7F /* CPSQLiteManager.m */,
 				93F417DD2B19C03900B908DB /* CPIabTcfMode.h */,
 				937390BA2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy */,
-				939E9C6F2CE76E5500DE7293 /* storyPlayerContent.html */,
+				939E9C6F2CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html */,
+				939046CF2CEB0AD700182AC3 /* CPChatViewHtmlContent.html */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -1363,8 +1366,9 @@
 				93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */,
 				937390BB2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy in Resources */,
 				93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */,
-				939E9C702CE76E5500DE7293 /* storyPlayerContent.html in Resources */,
+				939E9C702CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html in Resources */,
 				93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */,
+				939046D02CEB0AD700182AC3 /* CPChatViewHtmlContent.html in Resources */,
 				93DACB1F2959651900177B08 /* CPHTMLBlockCell.xib in Resources */,
 				93DACB202959651900177B08 /* CPButtonBlockCell.xib in Resources */,
 				9310FD702A602D2A004B400B /* CPInboxDetailView.xib in Resources */,
