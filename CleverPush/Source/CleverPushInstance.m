@@ -441,6 +441,20 @@ static id isNil(id object) {
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
 
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+
+    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
+        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+            [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        } else {
+            [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        }
+
+        [userDefaults synchronize];
+    }
+
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
@@ -1687,6 +1701,11 @@ static id isNil(id object) {
                 [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
                 [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
                 [userDefaults synchronize];
+
+                if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] != nil) {
+                    NSLog(@"CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEYDate = %@", [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY]);
+                }
+
 
                 if (handleSubscribed && ![self getHandleSubscribedCalled]) {
                     handleSubscribed(subscriptionId);
