@@ -3897,10 +3897,6 @@ static id isNil(id object) {
     apiEndpoint = endpoint;
 }
 
-- (void)setChannelId:(NSString* _Nullable)newChannelId {
-    channelId = newChannelId;
-}
-
 - (void)setAppGroupIdentifierSuffix:(NSString* _Nullable)suffix {
     appGroupIdentifier = suffix;
 }
