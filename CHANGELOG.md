@@ -1,3 +1,7 @@
+## 1.31.20 (22.11.2024)
+* Optimised `getChannelConfigFromChannelId` for preventing crash.
+* Call trackStoryShown() when widget is visible.
+
 ## 1.31.19 (18.11.2024)
 * Fixed `notificationOpened` callback for notification action buttons when `initWithLaunchOptions` has been called delayed (e.g. not in `AppDelegate`)
 
