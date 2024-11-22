@@ -1,3 +1,6 @@
+## 1.31.21 (22.11.2024)
+* Added `copyToClipboard` method to HTML app banners
+
 ## 1.31.20 (22.11.2024)
 * Optimised `getChannelConfigFromChannelId` for preventing crash.
 * Call trackStoryShown() when widget is visible.
