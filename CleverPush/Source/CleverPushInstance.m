@@ -440,6 +440,7 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
+    hasInitialized = NO;
 
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
@@ -4072,12 +4073,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
         [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
     }];
 }
 
@@ -4104,7 +4103,6 @@ static id isNil(id object) {
                 }
 
                 [self handleInitialization:YES error:Nil];
-                [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
                 NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
                 [CPLog error:@"%@", failureMessage];
@@ -4115,15 +4113,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
         [CPLog error:@"%@", failureMessage];
-        if (!hasInitialized) {
-            hasInitialized = YES;
-            [self handleInitialization:NO error:failureMessage];
-            [self fireChannelConfigListeners];
-        }
+        [self handleInitialization:NO error:failureMessage];
     }];
 }
 
@@ -4163,9 +4156,14 @@ static id isNil(id object) {
 }
 
 - (void)handleInitialization:(BOOL)success error:(NSString* _Nullable)error {
+    if (hasInitialized) {
+        return;
+    }
+    hasInitialized = YES;
     if (handleInitialized) {
         handleInitialized(success, error);
     }
+    [self fireChannelConfigListeners];
 }
 
 #pragma mark - Handle the universal links from notification tap event
