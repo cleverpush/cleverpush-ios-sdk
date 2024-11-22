@@ -306,9 +306,6 @@ CPStoryCell *previousAnimatedCell;
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
 
-                    if (self.widget != nil && self.stories != nil && self.stories.count > 0) {
-						[self trackStoriesShown];
-                    }
                 });
             }];
         } else {
@@ -351,6 +348,44 @@ CPStoryCell *previousAnimatedCell;
                 [self.storyCollection reloadData];
             } completion:nil];
         }];
+    }
+}
+
+- (void)didMoveToSuperview {
+    [super didMoveToSuperview];
+
+    UIView *currentView = self;
+    while (currentView.superview) {
+        if ([currentView.superview isKindOfClass:[UIScrollView class]]) {
+            UIScrollView *scrollView = (UIScrollView *)currentView.superview;
+
+            [scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
+            break;
+        }
+        currentView = currentView.superview;
+    }
+}
+
+- (BOOL)isPartiallyVisible:(UIView *)view inScrollView:(UIScrollView *)scrollView {
+    CGRect viewFrameInScrollView = [view convertRect:view.bounds toView:scrollView];
+    CGRect visibleBounds = scrollView.bounds;
+    return CGRectIntersectsRect(visibleBounds, viewFrameInScrollView);
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"contentOffset"] && [object isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)object;
+
+        if ([self isPartiallyVisible:self inScrollView:scrollView]) {
+            [self trackStoriesShownIfNeeded];
+        }
+    }
+}
+
+- (void)trackStoriesShownIfNeeded {
+    if (!self.hasTrackedStoriesShown) {
+        [self trackStoriesShown];
+        self.hasTrackedStoriesShown = YES;
     }
 }
 
