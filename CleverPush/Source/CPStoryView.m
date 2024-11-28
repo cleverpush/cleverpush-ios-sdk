@@ -334,8 +334,20 @@ CPStoryCell *previousAnimatedCell;
             self.storyCollection.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height + TEXT_HEIGHT);
         }
 
-        [self.storyCollection.collectionViewLayout invalidateLayout];
-        [self.storyCollection reloadData];
+        [self checkVisibilityAndTrack];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.storyCollection.collectionViewLayout invalidateLayout];
+            [self.storyCollection reloadData];
+        });
+    }
+}
+
+- (void)checkVisibilityAndTrack {
+    if (self.superview) {
+        CGRect visibleRect = self.superview.bounds;
+        if (CGRectIntersectsRect(self.frame, visibleRect)) {
+            [self trackStoriesShownIfNeeded];
+        }
     }
 }
 
@@ -351,41 +363,12 @@ CPStoryCell *previousAnimatedCell;
     }
 }
 
-- (void)didMoveToSuperview {
-    [super didMoveToSuperview];
-
-    UIView *currentView = self;
-    while (currentView.superview) {
-        if ([currentView.superview isKindOfClass:[UIScrollView class]]) {
-            UIScrollView *scrollView = (UIScrollView *)currentView.superview;
-
-            [scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
-            break;
-        }
-        currentView = currentView.superview;
-    }
-}
-
-- (BOOL)isPartiallyVisible:(UIView *)view inScrollView:(UIScrollView *)scrollView {
-    CGRect viewFrameInScrollView = [view convertRect:view.bounds toView:scrollView];
-    CGRect visibleBounds = scrollView.bounds;
-    return CGRectIntersectsRect(visibleBounds, viewFrameInScrollView);
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"contentOffset"] && [object isKindOfClass:[UIScrollView class]]) {
-        UIScrollView *scrollView = (UIScrollView *)object;
-
-        if ([self isPartiallyVisible:self inScrollView:scrollView]) {
-            [self trackStoriesShownIfNeeded];
-        }
-    }
-}
-
 - (void)trackStoriesShownIfNeeded {
     if (!self.hasTrackedStoriesShown) {
-        [self trackStoriesShown];
-        self.hasTrackedStoriesShown = YES;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self trackStoriesShown];
+            self.hasTrackedStoriesShown = YES;
+        });
     }
 }
 
