@@ -3026,13 +3026,6 @@ static id isNil(id object) {
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
-    if (topics == nil || topics.count == 0) {
-        if (failure) {
-            failure([NSError errorWithDomain:@"com.cleverPush" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Subscription Topics cannot be nil or empty."}]);
-        }
-        return;
-    }
-
     [self setDefaultCheckedTopics:topics];
     [self ensureMainThreadSync:^{
         [self makeSyncSubscriptionRequest:^(NSError *error) {
