@@ -190,8 +190,8 @@
             if (![CPUtils isNullOrEmpty:storyId]) {
                 if (self.widget.groupStoryCategories) {
                     NSArray *currentStoryIds = [storyId componentsSeparatedByString:@","];
-                    for (NSString *id in currentStoryIds) {
-                        [readStoryIdArray addObject:id];
+                    for (NSString *storyId in currentStoryIds) {
+                        [readStoryIdArray addObject:storyId];
                     }
                 } else {
                     [readStoryIdArray addObject:storyId];
