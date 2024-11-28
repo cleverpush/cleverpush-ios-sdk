@@ -201,9 +201,7 @@
             [CPWidgetModule trackWidgetOpened:self.widget.id withStories:readStoryIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
                 [CPLog error:@"Failed to open widget stories: %@ %@", self.widget.id, error];
             }];
-        } else {
-            [CPLog error:@"Invalid story index: %ld", (long)self.storyIndex];
-        }
+        } 
     }
 }
 
