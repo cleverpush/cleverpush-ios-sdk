@@ -1,3 +1,8 @@
+## 1.31.22 (28.11.2024)
+* Fixed crash for `StoryView`
+* Improved opened tracking for `StoryView`
+* Allow passing of empty array to `setSubscriptionTopics`
+
 ## 1.31.21 (22.11.2024)
 * Added `copyToClipboard` method to HTML app banners
 
