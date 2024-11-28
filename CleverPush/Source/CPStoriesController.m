@@ -24,7 +24,6 @@
 
     [self configureCloseButton];
     [self initialisePanGesture];
-    [self trackStoryOpened];
 }
 
 #pragma mark - Initialise Pan Gesture for dismiss with animation
@@ -185,22 +184,26 @@
 - (void)trackStoryOpened {
     if (self.widget != nil) {
         NSMutableArray<NSString *> *readStoryIdArray = [NSMutableArray new];
-        for (NSString *storyId in self.readStories) {
+        if (self.storyIndex >= 0 && self.storyIndex < [self.stories count]) {
+            CPStory *story = self.stories[self.storyIndex];
+            NSString *storyId = story.id;
             if (![CPUtils isNullOrEmpty:storyId]) {
                 if (self.widget.groupStoryCategories) {
                     NSArray *currentStoryIds = [storyId componentsSeparatedByString:@","];
-                    for (NSString *storyId in currentStoryIds) {
-                        [readStoryIdArray addObject:storyId];
+                    for (NSString *id in currentStoryIds) {
+                        [readStoryIdArray addObject:id];
                     }
                 } else {
                     [readStoryIdArray addObject:storyId];
                 }
             }
-        }
 
-        [CPWidgetModule trackWidgetOpened:self.widget.id withStories:readStoryIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
-            [CPLog error:@"Failed to open widgets stories: %@ %@", self.widget.id, error];
-        }];
+            [CPWidgetModule trackWidgetOpened:self.widget.id withStories:readStoryIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+                [CPLog error:@"Failed to open widget stories: %@ %@", self.widget.id, error];
+            }];
+        } else {
+            [CPLog error:@"Invalid story index: %ld", (long)self.storyIndex];
+        }
     }
 }
 
@@ -246,6 +249,7 @@
         [self onDismiss];
     } else if ([message.name isEqualToString:@"storyReady"]) {
         if (self.contentLoadedCompletion) {
+            [self trackStoryOpened];
             self.contentLoadedCompletion();
         }
     }
@@ -377,7 +381,6 @@
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:self.readStories forKey:CLEVERPUSH_SEEN_STORIES_KEY];
     [self.storyStatusMap setObject:@(NO) forKey:@(self.storyIndex)];
-    [self trackStoryOpened];
 }
 
 #pragma mark - Device orientation
