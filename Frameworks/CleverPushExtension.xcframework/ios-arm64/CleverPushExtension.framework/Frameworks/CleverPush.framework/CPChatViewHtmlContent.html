@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <title>CleverPush Chat</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+    </style>
+    {{headerCodes}}
+</head>
+<body>
+    <div class="cleverpush-chat-target" style="height: 100%; -webkit-overflow-scrolling: touch;"></div>
+
+    <script>
+        document.documentElement.style.webkitUserSelect = 'none';
+        document.documentElement.style.webkitTouchCallout = 'none';
+    </script>
+
+    <script>
+        window.cleverpushHandleSubscribe = function () {
+            window.webkit.messageHandlers.chat.postMessage("subscribe");
+        };
+    </script>
+
+    <script>
+        var cleverpushConfig = {{jsonConfig}};
+        cleverpushConfig.chatStylingOptions = {};
+        var cleverpushSubscriptionId = '{{subscriptionId}}';
+
+        (cleverpushConfig || {}).nativeApp = true;
+        (cleverpushConfig || {}).brandingColor = '{{brandingColor}}';
+        (cleverpushConfig || {}).chatBackgroundColor = '{{backgroundColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.widgetTextColor = '{{chatSenderBubbleTextColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.chatButtonColor = '{{chatSendButtonBackgroundColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.widgetInputBoxColor = '{{chatInputBackgroundColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.widgetInputTextColor = '{{chatInputTextColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.receiverBubbleColor = '{{chatReceiverBubbleBackgroundColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.inputContainer = '{{chatInputContainerBackgroundColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.dateColor = '{{chatTimestampTextColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.receiverTextColor = '{{chatReceiverBubbleTextColor}}';
+        (cleverpushConfig || {}).chatStylingOptions.chatSenderBubbleBackgroundColor = '{{chatSenderBubbleBackgroundColor}}';
+    </script>
+
+    <script>
+        function showErrorView() {
+            document.body.innerHTML = `
+                <style>
+                    .cleverpush-chat-error {
+                        color: #555;
+                        text-align: center;
+                        font-family: sans-serif;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-direction: column;
+                    }
+                    .cleverpush-chat-error h1 {
+                        font-size: 24px;
+                        font-weight: normal;
+                        margin-bottom: 25px;
+                    }
+                    .cleverpush-chat-error button {
+                        background-color: #555;
+                        color: #fff;
+                        border: none;
+                        font-weight: bold;
+                        font-size: 16px;
+                        border-radius: 200px;
+                        padding: 7.5px 15px;
+                        cursor: pointer;
+                        font-family: sans-serif;
+                    }
+                </style>
+                <div class='cleverpush-chat-error'>
+                    <h1>Laden fehlgeschlagen</h1>
+                    <button onclick='window.webkit.messageHandlers.chat.postMessage("reload")' type='button'>Erneut versuchen</button>
+                </div>`;
+        }
+
+        if (!cleverpushConfig) {
+            showErrorView();
+        }
+    </script>
+
+    <script onerror="showErrorView()" src="https://static.cleverpush.com/sdk/cleverpush-chat.js"></script>
+</body>
+</html>
