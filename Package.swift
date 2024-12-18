@@ -47,6 +47,7 @@ let package = Package(
         ),
         .target(
             name: "CleverPushExtension",
+            dependencies: ["CleverPush"],
             path: "CleverPushExtension",
             publicHeadersPath: "."
         )
