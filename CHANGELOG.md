@@ -1,3 +1,6 @@
+## 1.32.0 (19.12.2024)
+* Optimised notification service extension service methods by creating separate sub-pods to prevent crashes.
+
 ## 1.31.22 (28.11.2024)
 * Fixed crash for `StoryView`
 * Improved opened tracking for `StoryView`
