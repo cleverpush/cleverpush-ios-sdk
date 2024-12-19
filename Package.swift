@@ -1,18 +1,21 @@
-// swift-tools-version: 5.6
-// The swift-tools-version declares the minimum version of Swift required to build this package.
-
+// swift-tools-version:5.6
 import PackageDescription
 
 let package = Package(
     name: "CleverPush",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v9)
+        .iOS(.v11)
     ],
     products: [
         .library(
             name: "CleverPush",
-            targets: ["CleverPush"]),
+            targets: ["CleverPush"]
+        ),
+        .library(
+            name: "CleverPushExtension",
+            targets: ["CleverPushExtension"]
+        )
     ],
     dependencies: [],
     targets: [
@@ -40,7 +43,13 @@ let package = Package(
                 .linkedFramework("SafariServices"),
                 .linkedFramework("ImageIO"),
                 .linkedFramework("MobileCoreServices"),
-
-            ]),
+            ]
+        ),
+        .target(
+            name: "CleverPushExtension",
+            dependencies: ["CleverPush"],
+            path: "CleverPushExtension",
+            publicHeadersPath: "."
+        )
     ]
 )
