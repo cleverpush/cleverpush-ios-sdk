@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.18";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -440,6 +440,7 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
+    hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
@@ -458,12 +459,13 @@ static id isNil(id object) {
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
-        if (pendingOpenedResult && handleNotificationOpened) {
-            handleNotificationOpened(pendingOpenedResult);
-        }
-        if (pendingDeliveryResult && handleNotificationReceived) {
-            handleNotificationReceived(pendingDeliveryResult);
-        }
+    }
+
+    if (pendingOpenedResult && handleNotificationOpened) {
+        handleNotificationOpened(pendingOpenedResult);
+    }
+    if (pendingDeliveryResult && handleNotificationReceived) {
+        handleNotificationReceived(pendingDeliveryResult);
     }
 
     if (self) {
@@ -3043,13 +3045,6 @@ static id isNil(id object) {
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
-    if (topics == nil || topics.count == 0) {
-        if (failure) {
-            failure([NSError errorWithDomain:@"com.cleverPush" code:400 userInfo:@{NSLocalizedDescriptionKey: @"Subscription Topics cannot be nil or empty."}]);
-        }
-        return;
-    }
-
     [self setDefaultCheckedTopics:topics];
     [self ensureMainThreadSync:^{
         [self makeSyncSubscriptionRequest:^(NSError *error) {
@@ -4090,12 +4085,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
         [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
     }];
 }
 
@@ -4122,7 +4115,6 @@ static id isNil(id object) {
                 }
 
                 [self handleInitialization:YES error:Nil];
-                [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
                 NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
                 [CPLog error:@"%@", failureMessage];
@@ -4133,15 +4125,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
         [CPLog error:@"%@", failureMessage];
-        if (!hasInitialized) {
-            hasInitialized = YES;
-            [self handleInitialization:NO error:failureMessage];
-            [self fireChannelConfigListeners];
-        }
+        [self handleInitialization:NO error:failureMessage];
     }];
 }
 
@@ -4181,9 +4168,14 @@ static id isNil(id object) {
 }
 
 - (void)handleInitialization:(BOOL)success error:(NSString* _Nullable)error {
+    if (hasInitialized) {
+        return;
+    }
+    hasInitialized = YES;
     if (handleInitialized) {
         handleInitialized(success, error);
     }
+    [self fireChannelConfigListeners];
 }
 
 #pragma mark - Handle the universal links from notification tap event

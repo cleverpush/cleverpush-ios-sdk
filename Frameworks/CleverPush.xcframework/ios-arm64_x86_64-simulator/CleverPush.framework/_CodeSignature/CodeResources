@@ -20,6 +20,10 @@
 		<data>
 		yH4jcbXfoD6BRsN9miC3qhClgU4=
 		</data>
+		<key>CPChatViewHtmlContent.html</key>
+		<data>
+		atV/xqxDt4NotqNxoqlPt/qjBG8=
+		</data>
 		<key>CPHTMLBlockCell.nib</key>
 		<data>
 		+DVdB7RLGyep4eIHyOempyd8sms=
@@ -47,6 +51,10 @@
 		<key>CPInboxDetailView.nib/runtime.nib</key>
 		<data>
 		Fk7Kr6noiTLoOFy5349MCIpYwOs=
+		</data>
+		<key>CPStoryPlayerHtmlContent.html</key>
+		<data>
+		uOnnRoNCpvGYT5hWEvJs7Boqxj4=
 		</data>
 		<key>CPTextBlockCell.nib</key>
 		<data>
@@ -206,7 +214,7 @@
 		</data>
 		<key>Headers/CPStoryView.h</key>
 		<data>
-		MRqOAPhlbcXljzAgY2n9Z36ByRM=
+		Kcn12XHll9+Dyyk540YuLtalx/8=
 		</data>
 		<key>Headers/CPStoryWidget.h</key>
 		<data>
@@ -270,7 +278,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		gmHd3fycElCntiq7Tyzq7TMu7Q8=
+		fP0Crci9+MA4D78yRVZxmDCAR7U=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -309,6 +317,13 @@
 			<key>hash2</key>
 			<data>
 			PC/krN/GdF+WK4mLXjZ4piRKu2riBUqEcsxO9VNUKx4=
+			</data>
+		</dict>
+		<key>CPChatViewHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			E31Olc2zpQFCVmDXRecIvVDwxx/Q0QWN1liX1Jae5tU=
 			</data>
 		</dict>
 		<key>CPHTMLBlockCell.nib</key>
@@ -358,6 +373,13 @@
 			<key>hash2</key>
 			<data>
 			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
+			</data>
+		</dict>
+		<key>CPStoryPlayerHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y+/DhN9VSJ0zB2/KlThomzkcPOmdLr0qHRR+Vu/6JFU=
 			</data>
 		</dict>
 		<key>CPTextBlockCell.nib</key>
@@ -637,7 +659,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Z6LxOHc8avx/IOSN/eeJrKVbRzKWBmHHi56WY/XR5QI=
+			zueePZ4wuOpF7rXsqD4DBH+vIL8woOgo9ELVIJXQN/g=
 			</data>
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>

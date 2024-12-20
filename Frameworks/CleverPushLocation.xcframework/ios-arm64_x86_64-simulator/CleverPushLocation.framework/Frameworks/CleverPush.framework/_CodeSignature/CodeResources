@@ -20,6 +20,10 @@
 		<data>
 		yH4jcbXfoD6BRsN9miC3qhClgU4=
 		</data>
+		<key>CPChatViewHtmlContent.html</key>
+		<data>
+		atV/xqxDt4NotqNxoqlPt/qjBG8=
+		</data>
 		<key>CPHTMLBlockCell.nib</key>
 		<data>
 		+DVdB7RLGyep4eIHyOempyd8sms=
@@ -48,6 +52,10 @@
 		<data>
 		Fk7Kr6noiTLoOFy5349MCIpYwOs=
 		</data>
+		<key>CPStoryPlayerHtmlContent.html</key>
+		<data>
+		uOnnRoNCpvGYT5hWEvJs7Boqxj4=
+		</data>
 		<key>CPTextBlockCell.nib</key>
 		<data>
 		Ju2vHcS/le0vMlzqJJ7zARBF/j0=
@@ -58,7 +66,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		gmHd3fycElCntiq7Tyzq7TMu7Q8=
+		fP0Crci9+MA4D78yRVZxmDCAR7U=
 		</data>
 		<key>PrivacyInfo.xcprivacy</key>
 		<data>
@@ -93,6 +101,13 @@
 			<key>hash2</key>
 			<data>
 			PC/krN/GdF+WK4mLXjZ4piRKu2riBUqEcsxO9VNUKx4=
+			</data>
+		</dict>
+		<key>CPChatViewHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			E31Olc2zpQFCVmDXRecIvVDwxx/Q0QWN1liX1Jae5tU=
 			</data>
 		</dict>
 		<key>CPHTMLBlockCell.nib</key>
@@ -142,6 +157,13 @@
 			<key>hash2</key>
 			<data>
 			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
+			</data>
+		</dict>
+		<key>CPStoryPlayerHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y+/DhN9VSJ0zB2/KlThomzkcPOmdLr0qHRR+Vu/6JFU=
 			</data>
 		</dict>
 		<key>CPTextBlockCell.nib</key>

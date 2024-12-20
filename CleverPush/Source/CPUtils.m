@@ -661,6 +661,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.trackClick = function trackClick(ID, properties) {\
                window.webkit.messageHandlers.trackClick.postMessage({ buttonId: ID, properties: properties });\
            };\
+           window.CleverPush.copyToClipboard = function copyToClipboard(text) {\
+               window.webkit.messageHandlers.copyToClipboard.postMessage(text);\
+           };\
        </script>";
 }
 
@@ -688,7 +691,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
              @"setSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
-             @"showTopicsDialog", @"trackClick", @"openWebView"];
+             @"showTopicsDialog", @"trackClick", @"openWebView", @"copyToClipboard"];
 }
 
 + (void)configureWebView:(WKWebView *)webView {
@@ -750,6 +753,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             if (webUrl && webUrl.scheme && webUrl.host) {
                 [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
             }
+        } else if ([message.name isEqualToString:@"copyToClipboard"]) {
+            [UIPasteboard generalPasteboard].string = [NSString stringWithFormat:@"%@", message.body];
         }
     }
 }

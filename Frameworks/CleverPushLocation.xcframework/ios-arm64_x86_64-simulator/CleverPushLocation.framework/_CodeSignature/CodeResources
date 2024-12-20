@@ -20,6 +20,10 @@
 		<data>
 		yH4jcbXfoD6BRsN9miC3qhClgU4=
 		</data>
+		<key>Frameworks/CleverPush.framework/CPChatViewHtmlContent.html</key>
+		<data>
+		atV/xqxDt4NotqNxoqlPt/qjBG8=
+		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
 		+DVdB7RLGyep4eIHyOempyd8sms=
@@ -48,6 +52,10 @@
 		<data>
 		Fk7Kr6noiTLoOFy5349MCIpYwOs=
 		</data>
+		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
+		<data>
+		uOnnRoNCpvGYT5hWEvJs7Boqxj4=
+		</data>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<data>
 		Ju2vHcS/le0vMlzqJJ7zARBF/j0=
@@ -58,11 +66,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		LW5z3TNfLlBmuVrZIQNCO9VazvE=
+		onKPB8d7dqWawgEd20h7C1GBVqg=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		gmHd3fycElCntiq7Tyzq7TMu7Q8=
+		fP0Crci9+MA4D78yRVZxmDCAR7U=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -70,7 +78,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		rc9fyYfdCc0q3ZmAaLFchDO4L4U=
+		m+SYs/9LfRP3T+370HyoSh4zM9E=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -106,7 +114,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		Mq8s15xs+z+pb8MLgwbub7ZoeFo=
+		V44rBnNqay/ecx6hjLTLAeETLUg=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -145,6 +153,13 @@
 			<key>hash2</key>
 			<data>
 			PC/krN/GdF+WK4mLXjZ4piRKu2riBUqEcsxO9VNUKx4=
+			</data>
+		</dict>
+		<key>Frameworks/CleverPush.framework/CPChatViewHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			E31Olc2zpQFCVmDXRecIvVDwxx/Q0QWN1liX1Jae5tU=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
@@ -196,6 +211,13 @@
 			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
 			</data>
 		</dict>
+		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y+/DhN9VSJ0zB2/KlThomzkcPOmdLr0qHRR+Vu/6JFU=
+			</data>
+		</dict>
 		<key>Frameworks/CleverPush.framework/CPTextBlockCell.nib</key>
 		<dict>
 			<key>hash2</key>
@@ -214,14 +236,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			EWupebk4tEbOkm4gh19UNofZp4k3C53HsLVN48cyUic=
+			4WdNA3y+6TC/stBpOuXRWPRVxlB6Ss71glJQXP9EFro=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Nw604t7xp5P8OMLvofui0UmMBVkuyy8m1lKJmS9alis=
+			sUBnt73ajBlhr3FBXgz7VA6VuRy3+itLIEZCEeAzTXs=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -235,7 +257,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			t/hNCP3jC676QDsLhutBEHMqBKZUt3tK5FKUkjZk+ko=
+			DFAkPT7aDwx1aBO4JnY/liI6cNh8h0X7mDTh1p0BN7o=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
