@@ -1242,93 +1242,95 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     __block BOOL completionCalled = NO;
     hasCalledSubscribe = YES;
-    
-    if (@available(iOS 10.0,*)) {
-        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
 
-            UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
-            [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (error) {
-                        [CPLog error:@"requestAuthorizationWithOptions error: %@", error];
-                    } else if (!granted) {
-                        [CPLog info:@"requestAuthorizationWithOptions not granted"];
-                    }
-                    
-                    if (granted || ignoreDisabledNotificationPermission) {
-                        if (subscriptionId == nil) {
-                            [CPLog debug:@"syncSubscription called from subscribe"];
-                            if (failureBlock) {
-                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
-                            } else {
-                                [self performSelector:@selector(syncSubscription) withObject:nil];
-                            }
-                            
-                            [self getChannelConfig:^(NSDictionary* channelConfig) {
-                                if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                                    if (![self isSubscribed]) {
-                                        [self initTopicsDialogData:channelConfig syncToBackend:YES];
-                                    }
-                                    
-                                    if (!skipTopicsDialog) {
-                                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                                        [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
-                                        [userDefaults synchronize];
-                                        [self showPendingTopicsDialog];
-                                    }
+    if (autoRequestNotificationPermission) {
+        if (@available(iOS 10.0,*)) {
+            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+            [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
+
+                UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
+                [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (error) {
+                            [CPLog error:@"requestAuthorizationWithOptions error: %@", error];
+                        } else if (!granted) {
+                            [CPLog info:@"requestAuthorizationWithOptions not granted"];
+                        }
+
+                        if (granted || ignoreDisabledNotificationPermission) {
+                            if (subscriptionId == nil) {
+                                [CPLog debug:@"syncSubscription called from subscribe"];
+                                if (failureBlock) {
+                                    [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+                                } else {
+                                    [self performSelector:@selector(syncSubscription) withObject:nil];
                                 }
-                            }];
 
-                            if (completion && !completionCalled) {
-                                [self getSubscriptionId:^(NSString *subscriptionId) {
-                                    if (!completionCalled) {
-                                        completionCalled = YES;
-                                        if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                                            completion(subscriptionId, nil);
-                                        } else {
-                                            completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                                [self getChannelConfig:^(NSDictionary* channelConfig) {
+                                    if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+                                        if (![self isSubscribed]) {
+                                            [self initTopicsDialogData:channelConfig syncToBackend:YES];
+                                        }
+
+                                        if (!skipTopicsDialog) {
+                                            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                                            [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
+                                            [userDefaults synchronize];
+                                            [self showPendingTopicsDialog];
                                         }
                                     }
                                 }];
+
+                                if (completion && !completionCalled) {
+                                    [self getSubscriptionId:^(NSString *subscriptionId) {
+                                        if (!completionCalled) {
+                                            completionCalled = YES;
+                                            if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
+                                                completion(subscriptionId, nil);
+                                            } else {
+                                                completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                                            }
+                                        }
+                                    }];
+                                }
+                            } else if (completion && !completionCalled) {
+                                completionCalled = YES;
+                                completion(subscriptionId, nil);
                             }
                         } else if (completion && !completionCalled) {
                             completionCalled = YES;
-                            completion(subscriptionId, nil);
+                            completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
                         }
-                    } else if (completion && !completionCalled) {
-                        completionCalled = YES;
-                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
-                    }
 
-                    if (!granted && !ignoreDisabledNotificationPermission) {
-                        [self setConfirmAlertShown];
-                    }
-                });
+                        if (!granted && !ignoreDisabledNotificationPermission) {
+                            [self setConfirmAlertShown];
+                        }
+                    });
+                }];
             }];
-        }];
-        
-        [self ensureMainThreadSync:^{
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        }];
-    } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-        [self ensureMainThreadSync:^{
-            if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
-                Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
-                
-                NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
-                
-                if (@available(iOS 10.0,*)) {
-                    [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
-                }
+
+            [self ensureMainThreadSync:^{
                 [[UIApplication sharedApplication] registerForRemoteNotifications];
-            } else {
-                // iOS < 8.0
-            }
-        }];
-#pragma clang diagnostic pop
+            }];
+        } else {
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated"
+            [self ensureMainThreadSync:^{
+                if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+                    Class uiUserNotificationSettings = NSClassFromString(@"UIUserNotificationSettings");
+
+                    NSSet* categories = [[[UIApplication sharedApplication] currentUserNotificationSettings] categories];
+
+                    if (@available(iOS 10.0,*)) {
+                        [[UIApplication sharedApplication] registerUserNotificationSettings:[uiUserNotificationSettings settingsForTypes:UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge categories:categories]];
+                    }
+                    [[UIApplication sharedApplication] registerForRemoteNotifications];
+                } else {
+                    // iOS < 8.0
+                }
+            }];
+    #pragma clang diagnostic pop
+        }
     }
 }
 
