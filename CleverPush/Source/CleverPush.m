@@ -864,11 +864,9 @@ static CleverPush* singleInstance = nil;
 
     [CleverPushUNUserNotificationCenter injectSelectors];
 
-    if (@available(iOS 10.0,*)) {
-        UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
-        if (!currentNotificationCenter.delegate) {
-            currentNotificationCenter.delegate = (id)[CleverPush sharedInstance];
-        }
+    UNUserNotificationCenter* currentNotificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+    if (!currentNotificationCenter.delegate) {
+        currentNotificationCenter.delegate = (id)[CleverPush sharedInstance];
     }
 }
 

@@ -175,13 +175,11 @@
 #pragma mark - Get the array of attachments
 - (void)fetchAttachmentsToImageArray:(NSArray *)attachments {
     NSMutableArray *itemsArray = [[NSMutableArray alloc]init];
-    if (@available(iOS 10.0, *)) {
-        for (UNNotificationAttachment *attachment in attachments) {
-            if (attachment.URL.startAccessingSecurityScopedResource) {
-                UIImage *image = [UIImage imageWithContentsOfFile:attachment.URL.path];
-                if (image != nil) {
-                    [itemsArray addObject:image];
-                }
+    for (UNNotificationAttachment *attachment in attachments) {
+        if (attachment.URL.startAccessingSecurityScopedResource) {
+            UIImage *image = [UIImage imageWithContentsOfFile:attachment.URL.path];
+            if (image != nil) {
+                [itemsArray addObject:image];
             }
         }
     }
