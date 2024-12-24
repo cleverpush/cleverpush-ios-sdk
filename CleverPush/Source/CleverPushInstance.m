@@ -1729,10 +1729,7 @@ static id isNil(id object) {
     BOOL startedBackgroundJob = NO;
     [CPLog debug:@"handleSilentNotificationReceived"];
 
-    if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
-        [CleverPush handleNotificationReceived:messageDict isActive:NO];
-    }
-
+    [CleverPush handleNotificationReceived:messageDict isActive:NO];
     [self handleSilentNotificationReceivedWithAppBanner:messageDict];
 
     return startedBackgroundJob;
