@@ -259,15 +259,11 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 #pragma mark -  Frame height without safeArea.
 + (CGFloat)frameHeightWithoutSafeArea {
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-        CGFloat topPadding = window.safeAreaInsets.top;
-        CGFloat bottomPadding = window.safeAreaInsets.bottom;
-        CGFloat height = UIScreen.mainScreen.bounds.size.height - (topPadding + bottomPadding);
-        return height;
-    } else {
-        return UIScreen.mainScreen.bounds.size.height;
-    }
+    UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+    CGFloat topPadding = window.safeAreaInsets.top;
+    CGFloat bottomPadding = window.safeAreaInsets.bottom;
+    CGFloat height = UIScreen.mainScreen.bounds.size.height - (topPadding + bottomPadding);
+    return height;
 }
 
 #pragma mark -  Open safari and dismiss on a specific controller.

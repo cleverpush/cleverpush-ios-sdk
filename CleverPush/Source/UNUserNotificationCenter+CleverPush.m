@@ -23,12 +23,9 @@ __weak static id previousDelegate;
 
 #pragma mark - Initialise UNUserNotificationCenter
 + (void)injectSelectors {
-    if (@available(iOS 10.0, *)) {
-        injectSelector([UNUserNotificationCenter class], @selector(setDelegate:), [CleverPushUNUserNotificationCenter class], @selector(setCleverPushUNDelegate:));
-        injectSelector([UNUserNotificationCenter class], @selector(requestAuthorizationWithOptions:completionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushRequestAuthorizationWithOptions:completionHandler:));
-        injectSelector([UNUserNotificationCenter class], @selector(getNotificationSettingsWithCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushGetNotificationSettingsWithCompletionHandler:));
-
-    }
+    injectSelector([UNUserNotificationCenter class], @selector(setDelegate:), [CleverPushUNUserNotificationCenter class], @selector(setCleverPushUNDelegate:));
+    injectSelector([UNUserNotificationCenter class], @selector(requestAuthorizationWithOptions:completionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushRequestAuthorizationWithOptions:completionHandler:));
+    injectSelector([UNUserNotificationCenter class], @selector(getNotificationSettingsWithCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushGetNotificationSettingsWithCompletionHandler:));
 }
 
 - (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler  API_AVAILABLE(ios(10.0)) {

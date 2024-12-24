@@ -50,16 +50,13 @@
     for (int i = (int)currentCategories.count - MAX_CATEGORIES_SIZE; i >= 0; i--) {
         [categoriesToRemove addObject:currentCategories[i]];
     }
-    if (@available(iOS 10.0, *)) {
-        NSMutableSet<UNNotificationCategory*>* existingCategories = self.existingCategories;
-        
-        NSMutableSet<UNNotificationCategory *> *newCategories = [NSMutableSet new];
-        
-        for (UNNotificationCategory *category in existingCategories)
-            if (![categoriesToRemove containsObject:category.identifier])
-                [newCategories addObject:category];
-        [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:newCategories];
-    }
+    NSMutableSet<UNNotificationCategory*>* existingCategories = self.existingCategories;
+    NSMutableSet<UNNotificationCategory *> *newCategories = [NSMutableSet new];
+
+    for (UNNotificationCategory *category in existingCategories)
+        if (![categoriesToRemove containsObject:category.identifier])
+            [newCategories addObject:category];
+    [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:newCategories];
 }
 
 #pragma mark - Register notification category
