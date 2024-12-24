@@ -1809,6 +1809,11 @@ static id isNil(id object) {
 
     [self handleSilentNotificationReceivedWithAppBanner:messageDict];
 
+    if (handleNotificationReceived != nil) {
+        CPNotificationReceivedResult* result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
+        handleNotificationReceived(result);
+    }
+
     return startedBackgroundJob;
 }
 
