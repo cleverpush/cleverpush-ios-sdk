@@ -37,6 +37,7 @@ typedef void (^CPStoryViewOpenedBlock)(NSURL* url, CPStoryViewFinishedBlock fini
 @property (nonatomic, assign) BOOL storyWidgetShareButtonVisibility;
 @property (nonatomic, assign) BOOL sortToLastIndex;
 @property (nonatomic, assign) BOOL allowAutoRotation;
+@property (nonatomic, assign) BOOL hasTrackedStoriesShown;
 @property (nonatomic) int titleTextSize;
 @property (nonatomic) int storyIconHeight;
 @property (nonatomic) int storyIconWidth;

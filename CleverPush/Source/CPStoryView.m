@@ -306,9 +306,6 @@ CPStoryCell *previousAnimatedCell;
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
 
-                    if (self.widget != nil && self.stories != nil && self.stories.count > 0) {
-						[self trackStoriesShown];
-                    }
                 });
             }];
         } else {
@@ -337,8 +334,20 @@ CPStoryCell *previousAnimatedCell;
             self.storyCollection.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height + TEXT_HEIGHT);
         }
 
-        [self.storyCollection.collectionViewLayout invalidateLayout];
-        [self.storyCollection reloadData];
+        [self checkVisibilityAndTrack];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.storyCollection.collectionViewLayout invalidateLayout];
+            [self.storyCollection reloadData];
+        });
+    }
+}
+
+- (void)checkVisibilityAndTrack {
+    if (self.superview) {
+        CGRect visibleRect = self.superview.bounds;
+        if (CGRectIntersectsRect(self.frame, visibleRect)) {
+            [self trackStoriesShownIfNeeded];
+        }
     }
 }
 
@@ -351,6 +360,15 @@ CPStoryCell *previousAnimatedCell;
                 [self.storyCollection reloadData];
             } completion:nil];
         }];
+    }
+}
+
+- (void)trackStoriesShownIfNeeded {
+    if (!self.hasTrackedStoriesShown) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self trackStoriesShown];
+            self.hasTrackedStoriesShown = YES;
+        });
     }
 }
 

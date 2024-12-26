@@ -232,6 +232,9 @@
 		937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */; };
 		939046D02CEB0AD700182AC3 /* CPChatViewHtmlContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 939046CF2CEB0AD700182AC3 /* CPChatViewHtmlContent.html */; };
 		939E9C702CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html in Resources */ = {isa = PBXBuildFile; fileRef = 939E9C6F2CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html */; };
+		93BF43782D13FC4500BB1380 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
+		93BF43842D13FEBD00BB1380 /* CleverPushExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 93BF43822D13FEBD00BB1380 /* CleverPushExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		93BF43852D13FEBD00BB1380 /* CleverPushExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 93BF43832D13FEBD00BB1380 /* CleverPushExtension.m */; };
 		93C8FA3E2C5B924F00300B69 /* CPStoryWidgetCloseButtonPosition.h in Headers */ = {isa = PBXBuildFile; fileRef = 93C8FA3D2C5B921D00300B69 /* CPStoryWidgetCloseButtonPosition.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
 		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
@@ -345,6 +348,13 @@
 			remoteGlobalIDString = 297B4DF41E589AFE00BAF990;
 			remoteInfo = CleverPushFramework;
 		};
+		93BF437A2D13FC4500BB1380 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 297B4DEC1E589AFE00BAF990 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 297B4DF41E589AFE00BAF990;
+			remoteInfo = CleverPushFramework;
+		};
 		CB1B65D027577B6E0087AC49 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 297B4DEC1E589AFE00BAF990 /* Project object */;
@@ -388,6 +398,16 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		935BAD2928D1B1F20000CAC7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		93BF437C2D13FC4500BB1380 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -551,6 +571,9 @@
 		937390DC2BADACC200ADFA78 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		939046CF2CEB0AD700182AC3 /* CPChatViewHtmlContent.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = CPChatViewHtmlContent.html; sourceTree = "<group>"; };
 		939E9C6F2CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = CPStoryPlayerHtmlContent.html; sourceTree = "<group>"; };
+		93BF43702D13FC3600BB1380 /* CleverPushExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CleverPushExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		93BF43822D13FEBD00BB1380 /* CleverPushExtension.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushExtension.h; sourceTree = "<group>"; };
+		93BF43832D13FEBD00BB1380 /* CleverPushExtension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushExtension.m; sourceTree = "<group>"; };
 		93C8FA3D2C5B921D00300B69 /* CPStoryWidgetCloseButtonPosition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPStoryWidgetCloseButtonPosition.h; sourceTree = "<group>"; };
 		93D458322B3598C4000F4A80 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/ImageIO.framework; sourceTree = DEVELOPER_DIR; };
 		93D458342B3599D9000F4A80 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.2.sdk/System/iOSSupport/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
@@ -694,6 +717,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93BF436D2D13FC3600BB1380 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93BF43782D13FC4500BB1380 /* CleverPush.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB1B65C827577B6E0087AC49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -759,6 +790,7 @@
 				297B4E201E58A16600BAF990 /* CleverPush */,
 				297C34CC23FB70D600314A84 /* CleverPushLocation */,
 				CB1B65CC27577B6E0087AC49 /* CleverPushTests */,
+				93BF437E2D13FC6B00BB1380 /* CleverPushExtension */,
 				297B4DF61E589AFE00BAF990 /* Products */,
 				29C1BAF01E58B89500815CD6 /* Frameworks */,
 				93F417D72B19BCE700B908DB /* Recovered References */,
@@ -773,6 +805,7 @@
 				29DB95CE23FC3203008FC985 /* libCleverPush.a */,
 				29DB95DB23FC320C008FC985 /* libCleverPushLocation.a */,
 				CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */,
+				93BF43702D13FC3600BB1380 /* CleverPushExtension.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1015,6 +1048,15 @@
 			path = Source;
 			sourceTree = "<group>";
 		};
+		93BF437E2D13FC6B00BB1380 /* CleverPushExtension */ = {
+			isa = PBXGroup;
+			children = (
+				93BF43822D13FEBD00BB1380 /* CleverPushExtension.h */,
+				93BF43832D13FEBD00BB1380 /* CleverPushExtension.m */,
+			);
+			path = CleverPushExtension;
+			sourceTree = "<group>";
+		};
 		93F417D72B19BCE700B908DB /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1192,6 +1234,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93BF436B2D13FC3600BB1380 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93BF43842D13FEBD00BB1380 /* CleverPushExtension.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1268,6 +1318,28 @@
 			productReference = 29DB95DB23FC320C008FC985 /* libCleverPushLocation.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		93BF436F2D13FC3600BB1380 /* CleverPushExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 93BF43772D13FC3600BB1380 /* Build configuration list for PBXNativeTarget "CleverPushExtension" */;
+			buildPhases = (
+				93BF436B2D13FC3600BB1380 /* Headers */,
+				93BF436C2D13FC3600BB1380 /* Sources */,
+				93BF436D2D13FC3600BB1380 /* Frameworks */,
+				93BF436E2D13FC3600BB1380 /* Resources */,
+				93BF437C2D13FC4500BB1380 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				93BF437B2D13FC4500BB1380 /* PBXTargetDependency */,
+			);
+			name = CleverPushExtension;
+			packageProductDependencies = (
+			);
+			productName = CleverPushExtension;
+			productReference = 93BF43702D13FC3600BB1380 /* CleverPushExtension.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		CB1B65CA27577B6E0087AC49 /* CleverPushTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CB1B65D227577B6E0087AC49 /* Build configuration list for PBXNativeTarget "CleverPushTests" */;
@@ -1320,6 +1392,11 @@
 						LastSwiftMigration = 1210;
 						ProvisioningStyle = Automatic;
 					};
+					93BF436F2D13FC3600BB1380 = {
+						CreatedOnToolsVersion = 16.2;
+						DevelopmentTeam = KWJDGZUQ72;
+						ProvisioningStyle = Automatic;
+					};
 					CB1B65CA27577B6E0087AC49 = {
 						CreatedOnToolsVersion = 13.0;
 						DevelopmentTeam = FH9ENAZ4V3;
@@ -1346,6 +1423,7 @@
 				29DB95CD23FC3203008FC985 /* CleverPush */,
 				29DB95DA23FC320C008FC985 /* CleverPushLocation */,
 				CB1B65CA27577B6E0087AC49 /* CleverPushTests */,
+				93BF436F2D13FC3600BB1380 /* CleverPushExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1356,6 +1434,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				937390DE2BADAFCD00ADFA78 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		93BF436E2D13FC3600BB1380 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1606,6 +1691,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93BF436C2D13FC3600BB1380 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93BF43852D13FEBD00BB1380 /* CleverPushExtension.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CB1B65C727577B6E0087AC49 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1631,6 +1724,11 @@
 			isa = PBXTargetDependency;
 			target = 297B4DF41E589AFE00BAF990 /* CleverPushFramework */;
 			targetProxy = 29F9086B28E9EBDA00D8D4D8 /* PBXContainerItemProxy */;
+		};
+		93BF437B2D13FC4500BB1380 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 297B4DF41E589AFE00BAF990 /* CleverPushFramework */;
+			targetProxy = 93BF437A2D13FC4500BB1380 /* PBXContainerItemProxy */;
 		};
 		CB1B65D127577B6E0087AC49 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2032,6 +2130,115 @@
 			};
 			name = Release;
 		};
+		93BF43742D13FC3600BB1380 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 CleverPush. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushCPDemo.CleverPushExtension;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		93BF43752D13FC3600BB1380 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 CleverPush. All rights reserved.";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.CleverPushCPDemo.CleverPushExtension;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
 		CB1B65D327577B6E0087AC49 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2166,6 +2373,15 @@
 			buildConfigurations = (
 				29DB95E623FC3249008FC985 /* Debug */,
 				29DB95E723FC3249008FC985 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		93BF43772D13FC3600BB1380 /* Build configuration list for PBXNativeTarget "CleverPushExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93BF43742D13FC3600BB1380 /* Debug */,
+				93BF43752D13FC3600BB1380 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

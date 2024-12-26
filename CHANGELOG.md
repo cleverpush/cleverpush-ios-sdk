@@ -1,3 +1,18 @@
+## 1.32.0 (19.12.2024)
+* Optimised notification service extension service methods by creating separate sub-pods to prevent crashes.
+
+## 1.31.22 (28.11.2024)
+* Fixed crash for `StoryView`
+* Improved opened tracking for `StoryView`
+* Allow passing of empty array to `setSubscriptionTopics`
+
+## 1.31.21 (22.11.2024)
+* Added `copyToClipboard` method to HTML app banners
+
+## 1.31.20 (22.11.2024)
+* Optimised `getChannelConfigFromChannelId` for preventing crash.
+* Call trackStoryShown() when widget is visible.
+
 ## 1.31.19 (18.11.2024)
 * Fixed `notificationOpened` callback for notification action buttons when `initWithLaunchOptions` has been called delayed (e.g. not in `AppDelegate`)
 
