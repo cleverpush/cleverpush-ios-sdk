@@ -637,6 +637,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
                window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
            };\
+           window.CleverPush.getSubscriptionAttribute = function getSubscriptionAttribute(attributeId) {\
+                   window.webkit.messageHandlers.getSubscriptionAttribute.postMessage({ attributeKey: attributeId });\
+           };\
            window.CleverPush.addSubscriptionTag = function addSubscriptionTag(tagId) {\
                window.webkit.messageHandlers.addSubscriptionTag.postMessage(tagId);\
            };\
@@ -686,7 +689,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (NSArray<NSString *> *)scriptMessageNames {
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
-             @"setSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
+             @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
              @"showTopicsDialog", @"trackClick", @"openWebView"];
 }
@@ -699,7 +702,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
-    if (message != nil && message.body != nil && message.name != nil) {
+    if (message != nil && message.body != nil && ![message.body isKindOfClass:[NSNull class]] && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
             UIViewController *topController = [CleverPush topViewController];
             [topController dismissViewControllerAnimated:YES completion:nil];
@@ -715,6 +718,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
         } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
             [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
+        } else if ([message.name isEqualToString:@"getSubscriptionAttribute"]) {
+            NSDictionary *bodyDict = (NSDictionary *)message.body;
+            if (bodyDict && bodyDict.count > 0) {
+                NSString *attributeKey = bodyDict[@"attributeKey"];
+                if (![CPUtils isNullOrEmpty:attributeKey]) {
+                    NSString *attributeValue = (NSString *)[CleverPush getSubscriptionAttribute:attributeKey];
+                    if (![CPUtils isNullOrEmpty:attributeValue]) {
+                        NSString *jsCallback = [NSString stringWithFormat:@"window.CleverPush.callback('%@');", attributeValue];
+                        [message.webView evaluateJavaScript:jsCallback completionHandler:nil];
+                    }
+                }
+
+            }
         } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
             [CleverPush addSubscriptionTag:message.body];
         } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
