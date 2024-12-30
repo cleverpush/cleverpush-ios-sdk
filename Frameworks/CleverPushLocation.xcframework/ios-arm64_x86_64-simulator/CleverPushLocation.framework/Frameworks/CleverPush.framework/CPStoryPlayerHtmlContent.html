@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; padding: 0; }
+    amp-story-player { display: block; margin: 0; padding: 0; width: 100%; height: {{frameHeight}}; }
+  </style>
+  <script src="https://cdn.ampproject.org/amp-story-player-v0.js"></script>
+  <link rel="stylesheet" href="https://cdn.ampproject.org/amp-story-player-v0.css">
+</head>
+<body>
+  <script>
+    function loadAmpResources(callback) {
+      if (window.ampStoryPlayerLoaded) {
+        callback();
+        return;
+      }
+      window.ampStoryPlayerLoaded = true;
+      const script = document.createElement('script');
+      const link = document.createElement('link');
+      script.src = 'https://cdn.ampproject.org/amp-story-player-v0.js';
+      script.async = true;
+      script.onload = function() {
+        callback();
+      };
+      link.href = 'https://cdn.ampproject.org/amp-story-player-v0.css';
+      link.rel = 'stylesheet';
+      document.head.append(script, link);
+    }
+
+    function onPlayerReady(player) {
+      player.go({{storyIndex}});
+      window.webkit.messageHandlers.storyReady.postMessage({});
+    }
+
+    loadAmpResources(function() {
+      var playerEl = document.createElement('amp-story-player');
+      var storyURLs = {{storyURLs}};
+      storyURLs.forEach(function(storyURL) {
+        var anker = document.createElement('a');
+        anker.setAttribute('href', storyURL);
+        playerEl.appendChild(anker);
+      });
+      var player = new AmpStoryPlayer(window, playerEl);
+      document.body.appendChild(playerEl);
+      player.load();
+      window.player = player;
+      if (player.isReady) {
+        onPlayerReady(player);
+      } else {
+        player.addEventListener('ready', function(event) {
+          onPlayerReady(player);
+        });
+      }
+      playerEl.addEventListener('noNextStory', function(event) {
+        window.webkit.messageHandlers.next.postMessage({});
+      });
+      playerEl.addEventListener('storyNavigation', function(event) {
+        var subStoryIndex = Number(event.detail.pageId?.split('-')?.[1] || 0);
+        window.webkit.messageHandlers.storyNavigation.postMessage({ selectedPosition: {{storyIndex}}, subStoryIndex: subStoryIndex });
+      });
+      playerEl.addEventListener('navigation', function(event) {
+        window.webkit.messageHandlers.navigation.postMessage({ index: event.detail.index });
+      });
+      window.addEventListener('message', function (event) {
+        try {
+          var data = JSON.parse(event.data);
+          if (data.type === 'storyButtonCallback') {
+            window.webkit.messageHandlers.storyButtonCallbackUrl.postMessage(data);
+          }
+        } catch (ignored) {}
+      });
+    });
+  </script>
+</body>
+</html>

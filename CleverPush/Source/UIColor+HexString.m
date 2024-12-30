@@ -8,7 +8,14 @@
         return [UIColor blackColor];
     }
 
-    NSString *colorString = [[hexString stringByReplacingOccurrencesOfString: @"#" withString: @""] uppercaseString];
+    NSString *colorString = [[hexString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
+                              stringByReplacingOccurrencesOfString:@"#" withString:@""];
+    colorString = [[colorString stringByReplacingOccurrencesOfString:@" " withString:@""] uppercaseString];
+
+    if (colorString.length == 0) {
+        return [UIColor blackColor];
+    }
+
     CGFloat alpha, red, blue, green;
     switch ([colorString length]) {
         case 3: // #RGB

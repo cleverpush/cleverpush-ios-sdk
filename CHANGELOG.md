@@ -1,3 +1,58 @@
+## 1.32.0 (19.12.2024)
+* Optimised notification service extension service methods by creating separate sub-pods to prevent crashes.
+
+## 1.31.22 (28.11.2024)
+* Fixed crash for `StoryView`
+* Improved opened tracking for `StoryView`
+* Allow passing of empty array to `setSubscriptionTopics`
+
+## 1.31.21 (22.11.2024)
+* Added `copyToClipboard` method to HTML app banners
+
+## 1.31.20 (22.11.2024)
+* Optimised `getChannelConfigFromChannelId` for preventing crash.
+* Call trackStoryShown() when widget is visible.
+
+## 1.31.19 (18.11.2024)
+* Fixed `notificationOpened` callback for notification action buttons when `initWithLaunchOptions` has been called delayed (e.g. not in `AppDelegate`)
+
+## 1.31.18 (15.11.2024)
+* Add story loading animation in widget (border_color_loading, border_color_loading_dark_mode).
+* To remove white load html content, click on the widget once it is loaded, then display the detail screen.
+
+## 1.31.17 (25.10.2024)
+* Optimised SDK functions for performance improvements.
+* Resolved issue of `setSubscriptionTopics` function for callback was not working. 
+
+## 1.31.16 (23.10.2024) 
+* Optimised SDK functions for performance improvements.
+* Added optional successBlock and failureBlock callbacks for `setSubscriptionTopics`, `setSubscriptionAttribute` (Array), `pushSubscriptionAttributeValue` and `pullSubscriptionAttributeValue`
+
+## 1.31.15 (21.10.2024) 
+* Optimised `trackStoryOpened` function for passing parameters in API.
+
+## 1.31.14 (14.10.2024) 
+* Optimized `CPStoryView` statistic tracking.
+
+## 1.31.13 (09.10.2024) 
+* Optimized `CPStoryView` URL opened listener and provide a finished callback block.
+
+## 1.31.12 (05.10.2024) 
+* Optimized `CPStoryView` to make resuming work better after opening a URL inside a story
+
+## 1.31.11 (04.10.2024) 
+* Added more customization options to `CPStoryView` to support dark mode UI.
+* Optimised `getChannelConfig`.
+
+## 1.31.10 (26.09.2024) 
+* Track confirm-alerts also on denied notification permissions.
+
+## 1.31.9 (24.09.2024) 
+* Added more customization options, including support for group story categories for `CPStoryView`.
+
+## 1.31.8 (18.09.2024) 
+* Optimisation of the app banner UI for not displaying close button in iPad.
+
 ## 1.31.7 (13.09.2024) 
 * More customization options for `CPStoryView`.
 

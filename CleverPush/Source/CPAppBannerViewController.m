@@ -551,8 +551,14 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
 
+	[CPLog debug:@"App Banner: calling openURL %@", navigationAction.request.URL];
+
     decisionHandler(WKNavigationActionPolicyCancel);
-    [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:nil];
+	[[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:^(BOOL success) {
+		if (!success) {
+			[CPLog debug:@"App Banner: openURL was not successful: %@", navigationAction.request.URL];
+		}
+}];
 }
 
 #pragma mark - Callback event for tracking clicks

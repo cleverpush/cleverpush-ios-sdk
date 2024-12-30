@@ -1,0 +1,149 @@
+reviewers:
+  # The default reviewers
+  defaults:
+    - rotating-reviewers
+
+  # Reviewer groups each of which has a list of GitHub usernames
+  groups:
+    repository-owners:
+      - gbhrdt
+    all:
+      - anilprajapati1006
+      - namdev-jagtap
+      - cpKevinrodriguesnobre
+      - iboruch
+      - amitsingh8899
+      - Samru7181
+      - paavan-cleverpush
+      - snuricp
+      - cp-akshay-jadhav
+      - Resvan-cleverpush
+    rotating-reviewers:
+      - antaraB20
+      - Samru7181
+      - amitsingh8899
+      - cp-akshay-jadhav
+    email:
+      - iboruch
+      - anilprajapati1006
+      - paavan-cleverpush
+    pushqueuer:
+      - cpKevinrodriguesnobre
+      - namdev-jagtap
+      - cp-akshay-jadhav
+    admin:
+      - cp-akshay-jadhav
+    monitoring:
+      - cp-akshay-jadhav
+    pushworker:
+      - cp-akshay-jadhav
+      - namdev-jagtap
+      - cpKevinrodriguesnobre
+    appBuilder:
+      - snuricp
+    storyMaker:
+      - amitsingh8899
+    walletPush:
+      - iboruch
+    integrations:
+      - amitsingh8899
+      - cp-akshay-jadhav
+    whatsapp:
+      - cp-akshay-jadhav
+      - amitsingh8899
+    Ads:
+      - cp-akshay-jadhav
+      - iboruch
+    followupJourneyBuilder:
+      - anilprajapati1006
+      - namdev-jagtap
+      - cpKevinrodriguesnobre
+    surveys:
+      - samru7181
+      - antaraB20
+    statsworker:
+      - paavan-cleverpush
+      - anilprajapati1006
+    aiworker:
+      - namdev-jagtap
+    payments:
+      - snuricp
+      - iboruch
+    feeds:
+      - paavan-cleverpush
+      - amitsingh8899
+    jsSDK:
+      - samru7181
+      - paavan-cleverpush
+    liveapi:
+      - samru7181
+    dashboard:
+      - samru7181
+      - paavan-cleverpush
+    mobile:
+      - cp-akshay-jadhav
+    scylla:
+      - paavan-cleverpush
+      - anilprajapati1006
+      - cpKevinrodriguesnobre
+    redis:
+      - namdev-jagtap
+      - cpKevinrodriguesnobre
+    mongo:
+      - namdev-jagtap
+      - samru7181
+      - cpKevinrodriguesnobre
+    AMP:
+      - cp-akshay-jadhav
+      - anilprajapati1006
+    Android:
+      - unnaticleverpush
+      - gbhrdt
+      - cp-akshay-jadhav
+      - cpKevinrodriguesnobre
+    IOS:
+      - cpandya25
+      - gbhrdt
+      - cp-akshay-jadhav
+
+    
+     
+
+  # Reviewers per author.
+  # Keys are reviewees, each of which has an array of reviewers.
+  per_author:
+    email:
+      - email
+
+options:
+  ignore_draft: true
+  ignored_keywords:
+    - DO NOT REVIEW
+  enable_group_assignment: false
+
+  # Randomly pick reviewers up to this number.
+  # Do not set this option if you'd like to assign all matching reviewers.
+  number_of_reviewers: 3
+
+  # If it's true, the last matching files-change pattern takes the most precedence (CODEOWNERS-compatible)
+  # See https://github.com/necojackarc/auto-request-review/pull/80 for more details.
+  last_files_match_only: false
+
+files:
+  # Keys are glob expressions.
+  # You can assign groups defined above as well as GitHub usernames.
+  '**/*.yml':
+    - repository-owners
+  '.github/**':
+    - gbhrdt
+  '**':
+    - rotating-reviewers
+  'redis':
+    - redis
+  'email':
+    - email
+
+  # Important: Do not copy this part into other Repositories
+  '**':
+    - mobile
+    - IOS

@@ -10,7 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadReadStories:(NSArray *)array;
 @end
 
-@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate, iCarouselDataSource, iCarouselDelegate, WKScriptMessageHandler>
+@interface CPStoriesController : UIViewController<UIGestureRecognizerDelegate,SFSafariViewControllerDelegate, WKNavigationDelegate, WKScriptMessageHandler>
 
 @property (nonatomic, strong) NSMutableArray<CPStory*> *stories;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber *, NSNumber *> *storyStatusMap;
@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) CGFloat buttonHeight;
 @property (nonatomic, assign) CGFloat buttonXPosition;
 @property (nonatomic, assign) CGFloat topPadding;
-@property (nonatomic, strong) IBOutlet CleverPushiCarousel *carousel;
 @property (nonatomic, strong) IBOutlet UIButton *closeButton;
 @property (nonatomic, strong) NSMutableArray *readStories;
 @property (nonatomic, assign) BOOL storyWidgetShareButtonVisibility;
@@ -27,9 +26,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL allowAutoRotation;
 @property (nonatomic, assign) id delegate;
 @property (atomic, strong) CPStoryViewOpenedBlock openedCallback;
+@property (atomic, strong) CPStoryViewFinishedBlock finishedCallback;
 @property (nonatomic) CPStoryWidgetCloseButtonPosition closeButtonPosition;
 @property (nonatomic, strong) CPStoryWidget *widget;
 @property (nonatomic, assign) UIWindow* window;
+@property (nonatomic, strong) CPWKWebView *webview;
+@property (nonatomic, copy) void (^contentLoadedCompletion)(void);
+
+- (void)loadContentWithCompletion:(void (^)(void))completion;
 
 @end
 NS_ASSUME_NONNULL_END

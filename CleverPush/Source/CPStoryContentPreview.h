@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *posterLandscapeSrc;
 @property (nonatomic, strong) NSString *posterSquareSrc;
 @property (nonatomic, strong) NSString *widgetSrc;
+@property (nonatomic, strong) NSString *widgetDarkSrc;
 
 - (id)initWithJson:(NSDictionary*)json;
 

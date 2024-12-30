@@ -30,6 +30,10 @@
         if ([json objectForKey:@"widgetSrc"] != nil && ![[json objectForKey:@"widgetSrc"] isKindOfClass:[NSNull class]]) {
             self.widgetSrc = [json objectForKey:@"widgetSrc"];
         }
+        if ([json objectForKey:@"widgetDarkSrc"] != nil && ![[json objectForKey:@"widgetDarkSrc"] isKindOfClass:[NSNull class]]) {
+            self.widgetDarkSrc = [json objectForKey:@"widgetDarkSrc"];
+        }
+
     }
     return self;
 }

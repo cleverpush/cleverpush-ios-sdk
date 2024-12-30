@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.31.7";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.0";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -91,6 +91,7 @@ static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
 static BOOL confirmAlertShown = NO;
+static BOOL hasInitialized = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -439,16 +440,18 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
+    hasInitialized = NO;
 
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
-        if (pendingOpenedResult && handleNotificationOpened) {
-            handleNotificationOpened(pendingOpenedResult);
-        }
-        if (pendingDeliveryResult && handleNotificationReceived) {
-            handleNotificationReceived(pendingDeliveryResult);
-        }
+    }
+
+    if (pendingOpenedResult && handleNotificationOpened) {
+        handleNotificationOpened(pendingOpenedResult);
+    }
+    if (pendingDeliveryResult && handleNotificationReceived) {
+        handleNotificationReceived(pendingDeliveryResult);
     }
 
     if (self) {
@@ -537,14 +540,17 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
-    if (([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)])) {
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"
-        registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
+            registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
 #pragma clang diagnostic pop
-    } else {
-        registeredWithApple = deviceToken != nil;
-    }
+        } else {
+            registeredWithApple = deviceToken != nil;
+        }
+    });
 
     [self incrementAppOpens];
 
@@ -605,7 +611,7 @@ static id isNil(id object) {
             }
         }];
     } else {
-        [CPLog debug:@"There is no subscription for CleverPush SDK."];
+        [CPLog debug:@"There is no subscription for CleverPush SDK."];
     }
 
     [self initFeatures];
@@ -936,19 +942,28 @@ static id isNil(id object) {
 
 #pragma mark - API call and get the data of the specific Channel.
 - (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
-    if (channelConfig) {
-        callback(channelConfig);
-        return;
+    @synchronized(self) {
+        if (channelConfig) {
+            if (callback) {
+                callback(channelConfig);
+            }
+            return;
+        }
+
+        if (!pendingChannelConfigListeners) {
+            pendingChannelConfigListeners = [NSMutableArray new];
+        }
+        
+        [pendingChannelConfigListeners addObject:callback];
+        if (pendingChannelConfigRequest) {
+            return;
+        }
+        pendingChannelConfigRequest = YES;
     }
 
-    [pendingChannelConfigListeners addObject:callback];
-    if (pendingChannelConfigRequest) {
-        return;
-    }
-    pendingChannelConfigRequest = YES;
-
-    NSString*configPath = @"";
-    if ([self channelId] != NULL) {
+    NSString *configPath = @"";
+    NSString *channelId = [self channelId];
+    if (channelId != NULL) {
         configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", channelId];
         if ([self isDevelopmentModeEnabled]) {
             configPath = [NSString stringWithFormat:@"%@&t=%f", configPath, NSDate.date.timeIntervalSince1970];
@@ -959,6 +974,7 @@ static id isNil(id object) {
         [self getChannelConfigFromBundleId:configPath];
     }
 }
+
 - (NSString* _Nullable)getBundleName {
     return [[NSBundle mainBundle] bundleIdentifier];
 }
@@ -1244,7 +1260,7 @@ static id isNil(id object) {
                         if (subscriptionId == nil) {
                             [CPLog debug:@"syncSubscription called from subscribe"];
                             if (failureBlock) {
-                                [self performSelector:@selector(syncSubscription) withObject:failureBlock];
+                                [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
                             } else {
                                 [self performSelector:@selector(syncSubscription) withObject:nil];
                             }
@@ -1263,9 +1279,9 @@ static id isNil(id object) {
                                     }
                                 }
                             }];
-                            
-                            if (completion) {
-                                [self getSubscriptionId:^(NSString* subscriptionId) {
+
+                            if (completion && !completionCalled) {
+                                [self getSubscriptionId:^(NSString *subscriptionId) {
                                     if (!completionCalled) {
                                         completionCalled = YES;
                                         if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
@@ -1276,11 +1292,17 @@ static id isNil(id object) {
                                     }
                                 }];
                             }
-                        } else if (completion) {
+                        } else if (completion && !completionCalled) {
+                            completionCalled = YES;
                             completion(subscriptionId, nil);
                         }
-                    } else if (completion) {
-                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Can not subscribe because notifications have been disabled by the user. You can call CleverPush.setIgnoreDisabledNotificationPermission(true) to still allow subscriptions, e.g. for silent pushes."}]);
+                    } else if (completion && !completionCalled) {
+                        completionCalled = YES;
+                        completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
+                    }
+
+                    if (!granted && !ignoreDisabledNotificationPermission) {
+                        [self setConfirmAlertShown];
                     }
                 });
             }];
@@ -1688,14 +1710,11 @@ static id isNil(id object) {
                     [self setConfirmAlertShown];
                 }
 
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    if (successBlock) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            successBlock();
-                        });
-                    }
-                });
+                if (successBlock) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        successBlock();
+                    });
+                }
             }
         } onFailure:^(NSError* error) {
            [self setSubscriptionInProgress:false];
@@ -2107,21 +2126,25 @@ static id isNil(id object) {
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
 - (BOOL)clearBadge:(BOOL)fromNotificationOpened {
-    bool wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
-    if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+    __block BOOL wasSet = NO;
 
-        NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-        if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
-            [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
-            [userDefaults synchronize];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
+
+        if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
+            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+
+            NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+            if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
+                [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
+                [userDefaults synchronize];
+            }
         }
+    });
 
-    }
     return wasSet;
 }
-
 #pragma mark - Removed space from 32bytes and convert token in to string.
 - (NSString*)stringFromDeviceToken:(NSData*)deviceToken {
     // deviceToken = <4618be8f 70f2a10f ce0e7435 5528fac9 86221163 94b282b1 553afc3c e31ec99c>
@@ -2450,7 +2473,7 @@ static id isNil(id object) {
                 id value = [attributes objectForKey:key];
                 if (value != nil) {
                     if ([value isKindOfClass:[NSString class]]) {
-                        [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil];
+                        [self setSubscriptionAttributeObjectImplementation:key objectValue:@"" callback:nil onSuccess:nil onFailure:nil];
                     } else if ([value isKindOfClass:[NSArray class]]) {
                         [self setSubscriptionAttributeObjectImplementation:key arrayValue:@[]];
                     }
@@ -2517,18 +2540,35 @@ static id isNil(id object) {
 
 - (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
     [self waitForTrackingConsent:^{
-        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback];
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:callback onSuccess:nil onFailure:nil];
     }];
 }
 
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
-    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil];
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:nil onFailure:nil];
 }
 
-- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)())callback {
-    [self getSubscriptionId:^(NSString*subscriptionId) {
+- (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttribute:attributeId objectValue:value onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionAttribute:(NSString*)attributeId objectValue:(NSObject*)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self waitForTrackingConsent:^{
+        [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:successBlock onFailure:failureBlock];
+    }];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)(void))callback onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self getSubscriptionId:^(NSString *subscriptionId) {
         if (subscriptionId == nil) {
             [CPLog debug:@"CleverPushInstance: setSubscriptionAttributeObjectImplementation: There is no subscription for CleverPush SDK."];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+            }
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2552,20 +2592,30 @@ static id isNil(id object) {
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
 
+                if (successBlock) {
+                    successBlock(results);
+                }
                 if (callback) {
                     callback();
                 }
-            } onFailure:nil];
+            } onFailure:^(NSError *error) {
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
         });
     }];
 }
 
 #pragma mark - Push subscription array attribute value.
-- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString*subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pushSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+                if (failureBlock) {
+                    failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                }
                 return;
             }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -2602,18 +2652,33 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
-                } onFailure:nil];
+                    if (successBlock) {
+                        successBlock(results);
+                    }
+                } onFailure:^(NSError *error) {
+                    [CPLog debug:@"Failed to push attribute value: %@", error];
+                    if (failureBlock) {
+                        failureBlock(error);
+                    }
+                }];
             });
         }];
     }];
 }
 
+- (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    [self pushSubscriptionAttributeValue:attributeId value:value onSuccess:nil onFailure:nil];
+}
+
 #pragma mark - Pull subscription array attribute value.
-- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self waitForTrackingConsent:^{
         [self getSubscriptionId:^(NSString*subscriptionId) {
             if (subscriptionId == nil) {
                 [CPLog debug:@"CleverPushInstance: pullSubscriptionAttributeValue: There is no subscription for CleverPush SDK."];
+                if (failureBlock) {
+                    failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                }
                 return;
             }
             NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -2647,11 +2712,23 @@ static id isNil(id object) {
                 [request setHTTPBody:postData];
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                    [CPLog debug:@"Attribute value pulled successfully: %@ %@", attributeId, value];
-                } onFailure:nil];
+                    [CPLog debug:@"Attribute value pull successfully: %@ %@", attributeId, value];
+                    if (successBlock) {
+                        successBlock(results);
+                    }
+                } onFailure:^(NSError *error) {
+                    [CPLog debug:@"Failed to pull attribute value: %@", error];
+                    if (failureBlock) {
+                        failureBlock(error);
+                    }
+                }];
             });
         }];
     }];
+}
+
+- (void)pullSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    [self pullSubscriptionAttributeValue:attributeId value:value onSuccess:nil onFailure:nil];
 }
 
 #pragma mark - Check if subscription array attribute has a value.
@@ -2948,6 +3025,21 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
+- (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
+    [self setDefaultCheckedTopics:topics];
+    [self ensureMainThreadSync:^{
+        [self makeSyncSubscriptionRequest:^(NSError *error) {
+            if (failure) {
+                failure(error);
+            }
+        } successBlock:^{
+            if (successBlock) {
+                successBlock();
+            }
+        }];
+    }];
+}
+
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics {
     [self setDefaultCheckedTopics:topics];
     [self ensureMainThreadSync:^{
@@ -3974,12 +4066,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error];
         [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
     }];
 }
 
@@ -4006,7 +4096,6 @@ static id isNil(id object) {
                 }
 
                 [self handleInitialization:YES error:Nil];
-                [self fireChannelConfigListeners];
             } onFailure:^(NSError* error) {
                 NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
                 [CPLog error:@"%@", failureMessage];
@@ -4017,12 +4106,10 @@ static id isNil(id object) {
         }
 
         [self handleInitialization:YES error:nil];
-        [self fireChannelConfigListeners];
     } onFailure:^(NSError* error) {
         NSString*failureMessage = [NSString stringWithFormat:@"Failed getting the channel config %@", error];
         [CPLog error:@"%@", failureMessage];
         [self handleInitialization:NO error:failureMessage];
-        [self fireChannelConfigListeners];
     }];
 }
 
@@ -4062,9 +4149,14 @@ static id isNil(id object) {
 }
 
 - (void)handleInitialization:(BOOL)success error:(NSString* _Nullable)error {
+    if (hasInitialized) {
+        return;
+    }
+    hasInitialized = YES;
     if (handleInitialized) {
         handleInitialized(success, error);
     }
+    [self fireChannelConfigListeners];
 }
 
 #pragma mark - Handle the universal links from notification tap event

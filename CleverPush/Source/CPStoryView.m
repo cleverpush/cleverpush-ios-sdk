@@ -20,45 +20,48 @@ CPStoryViewOpenedBlock openedCallback;
 @implementation CPStoryView
 
 NSString* storyWidgetId;
+BOOL darkModeEnabled;
+NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNotification";
+CPStoryCell *previousAnimatedCell;
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:0 storyIconWidth:0 storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:YES titleTextSize:0 storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:id];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO  unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:nil];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:0 storyIconSpacing:0 storyIconBorderVisibility:YES storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:NO storyRestrictToItems:0 unreadStoryCountVisibility:NO  unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:nil];
 }
 
 - (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconShadow:(BOOL)storyIconShadow widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:storyIconShadow storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO widgetId:id];
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:0 storyIconBorderWidth:0 storyIconShadow:storyIconShadow storyRestrictToItems:0 unreadStoryCountVisibility:NO unreadStoryCountBackgroundColor:nil unreadStoryCountTextColor:nil storyViewCloseButtonPosition:CPStoryWidgetCloseButtonPositionLeftSide storyViewTextPosition:CPStoryWidgetTextPositionDefault storyWidgetShareButtonVisibility:YES sortToLastIndex:NO allowAutoRotation:NO borderColorDarkMode:nil borderColorLoadingDarkMode:nil backgroundColorDarkMode:nil textColorDarkMode:nil unreadStoryCountBackgroundColorDarkMode:nil unreadStoryCountTextColorDarkMode:nil widgetId:id];
 }
 
-- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor*)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor*)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation widgetId:(NSString *)id {
-    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:storyIconBorderMargin storyIconBorderWidth:storyIconBorderWidth storyIconShadow:storyIconShadow storyRestrictToItems:storyRestrictToItems unreadStoryCountVisibility:unreadStoryCountVisibility  unreadStoryCountBackgroundColor:unreadStoryCountBackgroundColor unreadStoryCountTextColor:unreadStoryCountTextColor storyViewCloseButtonPosition:storyViewCloseButtonPosition storyViewTextPosition:storyViewTextPosition storyWidgetShareButtonVisibility:storyWidgetShareButtonVisibility sortToLastIndex:sortToLastIndex allowAutoRotation:allowAutoRotation widgetId:id];
+- (id)initWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor borderColorLoading:(UIColor *)borderColorLoading titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor*)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor*)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation borderColorDarkMode:(UIColor *)borderColorDarkMode borderColorLoadingDarkMode:(UIColor *)borderColorLoadingDarkMode backgroundColorDarkMode:(UIColor *)backgroundColorDarkMode textColorDarkMode:(UIColor *)textColorDarkMode unreadStoryCountBackgroundColorDarkMode:(UIColor *)unreadStoryCountBackgroundColorDarkMode unreadStoryCountTextColorDarkMode:(UIColor *)unreadStoryCountTextColorDarkMode widgetId:(NSString *)id {
+    return [[super initWithFrame:frame] CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColorLoading titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:storyIconBorderMargin storyIconBorderWidth:storyIconBorderWidth storyIconShadow:storyIconShadow storyRestrictToItems:storyRestrictToItems unreadStoryCountVisibility:unreadStoryCountVisibility  unreadStoryCountBackgroundColor:unreadStoryCountBackgroundColor unreadStoryCountTextColor:unreadStoryCountTextColor storyViewCloseButtonPosition:storyViewCloseButtonPosition storyViewTextPosition:storyViewTextPosition storyWidgetShareButtonVisibility:storyWidgetShareButtonVisibility sortToLastIndex:sortToLastIndex allowAutoRotation:allowAutoRotation borderColorDarkMode:borderColorDarkMode borderColorLoadingDarkMode:borderColorLoadingDarkMode backgroundColorDarkMode:backgroundColorDarkMode textColorDarkMode:textColorDarkMode unreadStoryCountBackgroundColorDarkMode:unreadStoryCountBackgroundColorDarkMode unreadStoryCountTextColorDarkMode:unreadStoryCountTextColorDarkMode widgetId:id];
 }
 
-- (void)configureWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor *)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor *)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation widgetId:(NSString *)id {
-    [self CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:storyIconBorderMargin storyIconBorderWidth:storyIconBorderWidth storyIconShadow:storyIconShadow storyRestrictToItems:storyRestrictToItems unreadStoryCountVisibility:unreadStoryCountVisibility unreadStoryCountBackgroundColor:unreadStoryCountBackgroundColor unreadStoryCountTextColor:unreadStoryCountTextColor storyViewCloseButtonPosition:storyViewCloseButtonPosition storyViewTextPosition:storyViewTextPosition storyWidgetShareButtonVisibility:storyWidgetShareButtonVisibility sortToLastIndex:sortToLastIndex allowAutoRotation:allowAutoRotation widgetId:id];
+- (void)configureWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor borderColorLoading:(UIColor *)borderColorLoading titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor *)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor *)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation borderColorDarkMode:(UIColor *)borderColorDarkMode borderColorLoadingDarkMode:(UIColor *)borderColorLoadingDarkMode backgroundColorDarkMode:(UIColor *)backgroundColorDarkMode textColorDarkMode:(UIColor *)textColorDarkMode unreadStoryCountBackgroundColorDarkMode:(UIColor *)unreadStoryCountBackgroundColorDarkMode unreadStoryCountTextColorDarkMode:(UIColor *)unreadStoryCountTextColorDarkMode widgetId:(NSString *)id {
+    [self CPStoryViewinitWithFrame:frame backgroundColor:backgroundColor textColor:textColor fontFamily:fontFamily borderColor:borderColor borderColorLoading:borderColorLoading titleVisibility:titleVisibility titleTextSize:titleTextSize storyIconHeight:storyIconHeight storyIconWidth:storyIconWidth storyIconCornerRadius:storyIconCornerRadius storyIconSpacing:storyIconSpacing storyIconBorderVisibility:storyIconBorderVisibility storyIconBorderMargin:storyIconBorderMargin storyIconBorderWidth:storyIconBorderWidth storyIconShadow:storyIconShadow storyRestrictToItems:storyRestrictToItems unreadStoryCountVisibility:unreadStoryCountVisibility unreadStoryCountBackgroundColor:unreadStoryCountBackgroundColor unreadStoryCountTextColor:unreadStoryCountTextColor storyViewCloseButtonPosition:storyViewCloseButtonPosition storyViewTextPosition:storyViewTextPosition storyWidgetShareButtonVisibility:storyWidgetShareButtonVisibility sortToLastIndex:sortToLastIndex allowAutoRotation:allowAutoRotation borderColorDarkMode:borderColorDarkMode borderColorLoadingDarkMode:borderColorLoadingDarkMode backgroundColorDarkMode:backgroundColorDarkMode textColorDarkMode:textColorDarkMode unreadStoryCountBackgroundColorDarkMode:unreadStoryCountBackgroundColorDarkMode unreadStoryCountTextColorDarkMode:unreadStoryCountTextColorDarkMode widgetId:id];
 }
 
-- (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor*)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor*)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation widgetId:(NSString *)id {
+- (id)CPStoryViewinitWithFrame:(CGRect)frame backgroundColor:(UIColor *)backgroundColor textColor:(UIColor *)textColor fontFamily:(NSString *)fontFamily borderColor:(UIColor *)borderColor borderColorLoading:(UIColor *)borderColorLoading titleVisibility:(BOOL)titleVisibility titleTextSize:(int)titleTextSize storyIconHeight:(int)storyIconHeight storyIconWidth:(int)storyIconWidth storyIconCornerRadius:(int)storyIconCornerRadius storyIconSpacing:(int)storyIconSpacing storyIconBorderVisibility:(BOOL)storyIconBorderVisibility storyIconBorderMargin:(int)storyIconBorderMargin storyIconBorderWidth:(int)storyIconBorderWidth storyIconShadow:(BOOL)storyIconShadow storyRestrictToItems:(int)storyRestrictToItems unreadStoryCountVisibility:(BOOL)unreadStoryCountVisibility unreadStoryCountBackgroundColor:(UIColor*)unreadStoryCountBackgroundColor unreadStoryCountTextColor:(UIColor*)unreadStoryCountTextColor storyViewCloseButtonPosition:(CPStoryWidgetCloseButtonPosition)storyViewCloseButtonPosition storyViewTextPosition:(CPStoryWidgetTextPosition)storyViewTextPosition storyWidgetShareButtonVisibility:(BOOL)storyWidgetShareButtonVisibility sortToLastIndex:(BOOL)sortToLastIndex allowAutoRotation:(BOOL)allowAutoRotation borderColorDarkMode:(UIColor *)borderColorDarkMode borderColorLoadingDarkMode:(UIColor *)borderColorLoadingDarkMode backgroundColorDarkMode:(UIColor *)backgroundColorDarkMode textColorDarkMode:(UIColor *)textColorDarkMode unreadStoryCountBackgroundColorDarkMode:(UIColor *)unreadStoryCountBackgroundColorDarkMode unreadStoryCountTextColorDarkMode:(UIColor *)unreadStoryCountTextColorDarkMode widgetId:(NSString *)id {
     if (self) {
         NSString *customWidgetId = id;
         if (customWidgetId == nil || [customWidgetId isKindOfClass:[NSNull class]] || [customWidgetId isEqualToString:@""]) {
@@ -67,8 +70,19 @@ NSString* storyWidgetId;
         if (customWidgetId != nil && customWidgetId.length != 0) {
             [CPWidgetModule getWidgetsStories:customWidgetId completion:^(CPWidgetsStories *Widget) {
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
+
                     if (backgroundColor != nil) {
+                        self.backgroundColorLightMode = backgroundColor;
+                    }
+
+                    if (backgroundColorDarkMode != nil){
+                        self.backgroundColorDarkMode = backgroundColorDarkMode;
+                    }
+
+                    if (![CPStoryView getDarkModeEnabled] && backgroundColor != nil) {
                         self.backgroundColor = backgroundColor;
+                    } else if ([CPStoryView getDarkModeEnabled] && backgroundColorDarkMode != nil){
+                        self.backgroundColor = backgroundColorDarkMode;
                     } else {
                         self.backgroundColor = UIColor.whiteColor;
                     }
@@ -77,6 +91,12 @@ NSString* storyWidgetId;
                         self.ringBorderColor = borderColor;
                     } else {
                         self.ringBorderColor = UIColor.darkGrayColor;
+                    }
+
+                    if (borderColorLoading != nil) {
+                        self.borderColorLoading = borderColorLoading;
+                    } else {
+                        self.borderColorLoading = self.ringBorderColor;
                     }
 
                     if (textColor != nil) {
@@ -165,7 +185,7 @@ NSString* storyWidgetId;
                     if (allowAutoRotation == YES) {
                         self.allowAutoRotation = allowAutoRotation;
                     }
-                    
+
                     if (unreadStoryCountBackgroundColor != nil) {
                         self.unreadStoryCountBackgroundColor = unreadStoryCountBackgroundColor;
                     } else {
@@ -176,6 +196,36 @@ NSString* storyWidgetId;
                         self.unreadStoryCountTextColor = unreadStoryCountTextColor;
                     } else {
                         self.unreadStoryCountTextColor = UIColor.blackColor;
+                    }
+
+                    if (borderColorDarkMode != nil) {
+                        self.borderColorDarkMode = borderColorDarkMode;
+                    } else {
+                        self.borderColorDarkMode = self.ringBorderColor;
+                    }
+
+                    if (borderColorLoadingDarkMode != nil) {
+                        self.borderColorLoadingDarkMode = borderColorLoadingDarkMode;
+                    } else {
+                        self.borderColorLoadingDarkMode = self.borderColorDarkMode;
+                    }
+
+                    if (textColorDarkMode != nil) {
+                        self.textColorDarkMode = textColorDarkMode;
+                    } else {
+                        self.textColorDarkMode = self.textColor;
+                    }
+
+                    if (unreadStoryCountBackgroundColorDarkMode != nil) {
+                        self.unreadStoryCountBackgroundColorDarkMode = unreadStoryCountBackgroundColorDarkMode;
+                    } else {
+                        self.unreadStoryCountBackgroundColorDarkMode = self.unreadStoryCountBackgroundColor;
+                    }
+
+                    if (unreadStoryCountTextColorDarkMode != nil) {
+                        self.unreadStoryCountTextColorDarkMode = unreadStoryCountTextColorDarkMode;
+                    } else {
+                        self.unreadStoryCountTextColorDarkMode = self.unreadStoryCountBackgroundColor;
                     }
 
                     self.closeButtonPosition = storyViewCloseButtonPosition;
@@ -199,24 +249,63 @@ NSString* storyWidgetId;
                     self.stories = Widget.stories;
 
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                    NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
 
-                    for (CPStory *story in self.stories) {
-                        if (story.content.pages != nil) {
-                            story.subStoryCount = story.content.pages.count;
+                    if (self.widget != nil && self.widget.groupStoryCategories) {
+                        for (CPStory *story in self.stories) {
+                            NSString *storyIdString = story.id;
+                            if (storyIdString != nil) {
+                                NSArray *storyIdArray = [storyIdString componentsSeparatedByString:@","];
+                                NSInteger subStoryCount = storyIdArray.count;
+                                story.subStoryCount = subStoryCount;
+
+                                NSString *storyUnreadCountString = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+                                NSArray *readStoryIdArray = @[];
+                                if (storyUnreadCountString != nil) {
+                                    readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+                                }
+                                NSInteger readCount = 0;
+
+                                for (NSString *subStoryID in storyIdArray) {
+                                    if ([readStoryIdArray containsObject:subStoryID]) {
+                                        readCount++;
+                                        story.opened = YES;
+                                    }
+                                }
+
+                                NSInteger unreadCount = subStoryCount - readCount;
+                                story.unreadCount = unreadCount;
+                            }
                         }
 
-                        NSString *storyId = story.id;
-                        if (existingMap != nil && [existingMap objectForKey:storyId] != nil) {
-                            NSInteger unreadCount = [existingMap[storyId] integerValue];
-                            story.unreadCount = unreadCount;
-                        } else {
-                            story.unreadCount = story.content.pages.count;
+                        [self syncUnreadStoryIds];
+                    } else {
+                        NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+                        for (CPStory *story in self.stories) {
+                            if (story.content != nil && story.content.pages != nil) {
+                                story.subStoryCount = story.content.pages.count;
+                            }
+
+                            NSString *storyId = story.id;
+                            if (storyId != nil) {
+                                if (existingMap != nil && [existingMap objectForKey:storyId] != nil) {
+                                    NSInteger unreadCount = [existingMap[storyId] integerValue];
+                                    story.unreadCount = unreadCount;
+                                } else {
+                                    if (story.content != nil && story.content.pages != nil) {
+                                        story.unreadCount = story.content.pages.count;
+                                    } else {
+                                        story.unreadCount = 0;
+                                    }
+                                }
+                            }
                         }
                     }
-                    
+
+                    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadStoryView) name:CPAppearanceModeChangedNotification object:nil];
+
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
+
                 });
             }];
         } else {
@@ -245,8 +334,20 @@ NSString* storyWidgetId;
             self.storyCollection.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height + TEXT_HEIGHT);
         }
 
-        [self.storyCollection.collectionViewLayout invalidateLayout];
-        [self.storyCollection reloadData];
+        [self checkVisibilityAndTrack];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.storyCollection.collectionViewLayout invalidateLayout];
+            [self.storyCollection reloadData];
+        });
+    }
+}
+
+- (void)checkVisibilityAndTrack {
+    if (self.superview) {
+        CGRect visibleRect = self.superview.bounds;
+        if (CGRectIntersectsRect(self.frame, visibleRect)) {
+            [self trackStoriesShownIfNeeded];
+        }
     }
 }
 
@@ -262,6 +363,15 @@ NSString* storyWidgetId;
     }
 }
 
+- (void)trackStoriesShownIfNeeded {
+    if (!self.hasTrackedStoriesShown) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self trackStoriesShown];
+            self.hasTrackedStoriesShown = YES;
+        });
+    }
+}
+
 - (BOOL) shouldAutorotate {
     return self.allowAutoRotation;
 }
@@ -273,6 +383,15 @@ NSString* storyWidgetId;
 
 + (NSString*)getWidgetId {
     return storyWidgetId;
+}
+
++ (void)setDarkModeEnabled:(BOOL)enabled {
+    darkModeEnabled = enabled;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CPAppearanceModeChangedNotification object:nil];
+}
+
++ (BOOL)getDarkModeEnabled {
+    return darkModeEnabled;
 }
 
 #pragma mark - UICollectionView delegate
@@ -310,7 +429,7 @@ NSString* storyWidgetId;
     if (!cell.name) {
         cell.name = [[UILabel alloc] init];
         cell.name.textAlignment = NSTextAlignmentCenter;
-        cell.name.numberOfLines = 0;
+        cell.name.numberOfLines = 2;
         [cell addSubview:cell.name];
     }
 
@@ -340,7 +459,8 @@ NSString* storyWidgetId;
             if (self.textPosition == CPStoryWidgetTextPositionInsideTop) {
                 cell.name.frame = CGRectMake(5, 0, outerRingWidth - 10, outerRingHeight / 2);
             } else if (self.textPosition == CPStoryWidgetTextPositionInsideBottom) {
-                cell.name.frame = CGRectMake(5, outerRingHeight - TEXT_HEIGHT, outerRingWidth - 10, TEXT_HEIGHT);
+                CGFloat titleTextHeight = TEXT_HEIGHT + 10;
+                cell.name.frame = CGRectMake(5, outerRingHeight - titleTextHeight, outerRingWidth - 10, titleTextHeight);
             }
         } else {
             cell.image.frame = CGRectMake(0, 0, outerRingWidth, outerRingHeight);
@@ -372,24 +492,64 @@ NSString* storyWidgetId;
     NSURL *imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.posterPortraitSrc];
     if (![CPUtils isNullOrEmpty:self.stories[indexPath.item].content.preview.widgetSrc]) {
         imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.widgetSrc];
+        if (darkModeEnabled) {
+            imageURL = [NSURL URLWithString:self.stories[indexPath.item].content.preview.widgetDarkSrc];
+        }
     }
     [cell.image setImageWithURL:imageURL];
 
     if (self.titleVisibility) {
-        cell.name.text = self.stories[indexPath.item].title;
+        if (self.widget.groupStoryCategories) {
+            cell.name.text = self.stories[indexPath.item].content.subtitle;
+        } else {
+            cell.name.text = self.stories[indexPath.item].title;
+        }
         cell.name.textColor = self.textColor;
+        if (darkModeEnabled) {
+            cell.name.textColor = self.textColorDarkMode;
+        }
         cell.name.font = [self fontForTitleTextSize];
     }
 }
 
 - (void)configureCellAppearance:(CPStoryCell *)cell forIndexPath:(NSIndexPath *)indexPath {
     if (self.storyIconBorderVisibility) {
-        if ([self.readStories containsObject:self.stories[indexPath.item].id] || self.stories[indexPath.item].opened == YES) {
-            cell.outerRing.layer.borderWidth = self.storyIconBorderWidth - 0.5;
+        BOOL isStoryRead = [self.readStories containsObject:self.stories[indexPath.item].id] || self.stories[indexPath.item].opened;
+        CGFloat borderWidth = self.storyIconBorderWidth;
+        CGColorRef borderColor = self.ringBorderColor.CGColor;
+
+        if (darkModeEnabled) {
+            borderColor = self.borderColorDarkMode.CGColor;
+        }
+
+        if (isStoryRead) {
+            cell.outerRing.layer.borderWidth = borderWidth - 0.5;
             cell.outerRing.layer.borderColor = [UIColor colorWithRed:198.0/255.0 green:198.0/255.0 blue:198.0/255.0 alpha:1.0].CGColor;
+
+            if (self.widget != nil && self.widget.groupStoryCategories) {
+                NSString *storyIdString = self.stories[indexPath.item].id;
+                if (storyIdString) {
+                    NSArray *storyIdArray = [storyIdString componentsSeparatedByString:@","];
+                    NSString *storyUnreadCountString = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+                    NSArray *readStoryIdArray = storyUnreadCountString ? [storyUnreadCountString componentsSeparatedByString:@","] : @[];
+
+                    BOOL hasUnreadStories = NO;
+                    for (NSString *subStoryID in storyIdArray) {
+                        if (![readStoryIdArray containsObject:subStoryID]) {
+                            hasUnreadStories = YES;
+                            break;
+                        }
+                    }
+
+                    if (hasUnreadStories) {
+                        cell.outerRing.layer.borderWidth = borderWidth;
+                        cell.outerRing.layer.borderColor = borderColor;
+                    }
+                }
+            }
         } else {
-            cell.outerRing.layer.borderWidth = self.storyIconBorderWidth;
-            cell.outerRing.layer.borderColor = self.ringBorderColor.CGColor;
+            cell.outerRing.layer.borderWidth = borderWidth;
+            cell.outerRing.layer.borderColor = borderColor;
         }
     }
 
@@ -412,8 +572,16 @@ NSString* storyWidgetId;
         cell.unReadCount.frame = CGRectMake(CGRectGetWidth(cell.outerRing.frame) - 15, 0, 20, 20);
         cell.unReadCount.backgroundColor = self.unreadStoryCountBackgroundColor;
         cell.unReadCount.textColor = self.unreadStoryCountTextColor;
+        cell.unReadCount.layer.borderWidth = 1.0;
+        cell.unReadCount.layer.borderColor = [self.unreadStoryCountTextColor CGColor];
 
-        if (([self.readStories containsObject:self.stories[indexPath.item].id] || self.stories[indexPath.item].opened == YES) && self.stories[indexPath.item].unreadCount <= 0) {
+        if (darkModeEnabled) {
+            cell.unReadCount.backgroundColor = self.unreadStoryCountBackgroundColorDarkMode;
+            cell.unReadCount.textColor = self.unreadStoryCountTextColorDarkMode;
+            cell.unReadCount.layer.borderColor = [self.unreadStoryCountTextColorDarkMode CGColor];
+        } 
+
+        if (self.stories[indexPath.item].unreadCount <= 0) {
             [cell.unReadCount removeFromSuperview];
         } else {
             [cell addSubview:cell.unReadCount];
@@ -447,6 +615,9 @@ NSString* storyWidgetId;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    [self stopAnimationForCurrentCell];
+    CPStoryCell *cell = (CPStoryCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    [self animateCellBorder:cell];
     CPStoriesController* storiesController = [[CPStoriesController alloc] init];
     if (![self.readStories containsObject:self.stories[indexPath.item].id]) {
         [self.readStories addObject:self.stories[indexPath.item].id];
@@ -466,7 +637,10 @@ NSString* storyWidgetId;
     storiesController.storyWidgetShareButtonVisibility = self.storyWidgetShareButtonVisibility;
     storiesController.allowAutoRotation = self.allowAutoRotation;
     storiesController.widget = self.widget;
-    [topController presentViewController:storiesController animated:YES completion:nil];
+    [storiesController loadContentWithCompletion:^{
+           [self stopAnimationForCurrentCell];
+           [topController presentViewController:storiesController animated:YES completion:nil];
+       }];
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
@@ -498,6 +672,75 @@ NSString* storyWidgetId;
     cell.outerRing.alpha = 1.0;
 }
 
+#pragma mark - Story Cell Border Animation
+- (void)animateCellBorder:(CPStoryCell *)cell {
+    if (![self isGradientLayerAddedToCell:cell]) {
+        CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+
+        if (darkModeEnabled) {
+            gradientLayer.colors = @[(id)self.borderColorLoadingDarkMode.CGColor];
+        } else {
+            gradientLayer.colors = @[(id)self.borderColorLoading.CGColor];
+        }
+
+        gradientLayer.locations = @[@0.0, @0.5, @1.0];
+        gradientLayer.frame = cell.outerRing.bounds;
+        gradientLayer.startPoint = CGPointMake(0, 0.5);
+        gradientLayer.endPoint = CGPointMake(1, 0.5);
+
+        [cell.outerRing.layer insertSublayer:gradientLayer atIndex:0];
+        cell.outerRing.layer.borderWidth = 3.0;
+        cell.outerRing.layer.borderColor = [UIColor clearColor].CGColor;
+    }
+
+    CABasicAnimation *borderColorAnimation = [CABasicAnimation animationWithKeyPath:@"borderColor"];
+
+    if (darkModeEnabled) {
+        borderColorAnimation.fromValue = (id)[UIColor clearColor].CGColor;
+        borderColorAnimation.toValue = (id)self.borderColorLoadingDarkMode.CGColor;
+    } else {
+        borderColorAnimation.fromValue = (id)[UIColor clearColor].CGColor;
+        borderColorAnimation.toValue = (id)self.borderColorLoading.CGColor;
+    }
+
+    borderColorAnimation.duration = 1.0;
+    borderColorAnimation.autoreverses = YES;
+    borderColorAnimation.repeatCount = INFINITY;
+
+    if (![cell.outerRing.layer animationForKey:@"borderColorAnimation"]) {
+        [cell.outerRing.layer addAnimation:borderColorAnimation forKey:@"borderColorAnimation"];
+    }
+
+    previousAnimatedCell = cell;
+}
+
+- (void)stopAnimationForCurrentCell {
+    if (previousAnimatedCell) {
+        [previousAnimatedCell.outerRing.layer removeAnimationForKey:@"borderColorAnimation"];
+        previousAnimatedCell.outerRing.layer.borderColor = [UIColor clearColor].CGColor;
+        [self removeGradientLayerFromCell:previousAnimatedCell];
+    }
+}
+
+- (BOOL)isGradientLayerAddedToCell:(CPStoryCell *)cell {
+    for (CALayer *sublayer in cell.outerRing.layer.sublayers) {
+        if ([sublayer isKindOfClass:[CAGradientLayer class]]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (void)removeGradientLayerFromCell:(CPStoryCell *)cell {
+    for (CALayer *sublayer in cell.outerRing.layer.sublayers) {
+        if ([sublayer isKindOfClass:[CAGradientLayer class]]) {
+            [sublayer removeFromSuperlayer];
+            break;
+        }
+    }
+}
+
+
 - (void)reloadReadStories:(NSArray *)array {
     self.readStories = [NSMutableArray arrayWithArray:CleverPush.getSeenStories];
 
@@ -512,8 +755,12 @@ NSString* storyWidgetId;
                 for (CPStory *story in self.stories) {
                     if ([readStoriesSet containsObject:story.id]) {
                         [seenArray addObject:story];
+                        story.opened = YES;
+                        story.unreadCount = 0;
                     } else {
                         [unSeenArray addObject:story];
+                        story.unreadCount = story.content.pages.count;
+                        story.opened = NO;
                     }
                 }
 
@@ -527,22 +774,66 @@ NSString* storyWidgetId;
         }
     } else {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+        if (self.widget.groupStoryCategories) {
+            for (CPStory *story in self.stories) {
+                NSString *storyIdString = story.id;
+                if (storyIdString != nil) {
+                    NSArray *storyIdArray = [storyIdString componentsSeparatedByString:@","];
+                    NSInteger subStoryCount = storyIdArray.count;
+                    story.subStoryCount = subStoryCount;
 
-        for (CPStory *story in self.stories) {
-            BOOL isRead = [self.readStories containsObject:story.id];
-            if (isRead) {
-                NSNumber *unreadCountNumber = existingMap[story.id];
-                if (unreadCountNumber != nil) {
-                    story.unreadCount = [unreadCountNumber integerValue];
-                    story.opened = YES;
+                    NSString *storyUnreadCountString = [defaults stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+                    NSArray *readStoryIdArray = @[];
+                    if (storyUnreadCountString != nil) {
+                        readStoryIdArray = [storyUnreadCountString componentsSeparatedByString:@","];
+                    }
+                    NSInteger readCount = 0;
+
+                    for (NSString *subStoryID in storyIdArray) {
+                        if ([readStoryIdArray containsObject:subStoryID]) {
+                            readCount++;
+                            story.opened = YES;
+                        }
+                    }
+
+                    NSInteger unreadCount = subStoryCount - readCount;
+                    story.unreadCount = unreadCount;
+                }
+            }
+        } else {
+            NSDictionary *existingMap = [defaults objectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_KEY];
+            for (CPStory *story in self.stories) {
+                BOOL isRead = [self.readStories containsObject:story.id];
+                if (isRead) {
+                    if (existingMap != nil) {
+                        NSNumber *unreadCountNumber = existingMap[story.id];
+                        if (unreadCountNumber != nil) {
+                            story.unreadCount = [unreadCountNumber integerValue];
+                            story.opened = YES;
+                        } else {
+                            if (story.content != nil && story.content.pages != nil) {
+                                story.unreadCount = story.content.pages.count;
+                            } else {
+                                story.unreadCount = 0;
+                            }
+                            story.opened = NO;
+                        }
+                    } else {
+                        if (story.content != nil && story.content.pages != nil) {
+                            story.unreadCount = story.content.pages.count;
+                        } else {
+                            story.unreadCount = 0;
+                        }
+                        story.opened = NO;
+                    }
                 } else {
-                    story.unreadCount = story.content.pages.count;
+                    if (story.content != nil && story.content.pages != nil) {
+                        story.unreadCount = story.content.pages.count;
+                    } else {
+                        story.unreadCount = 0;
+                    }
                     story.opened = NO;
                 }
-            } else {
-                story.unreadCount = story.content.pages.count;
-                story.opened = NO;
             }
         }
 
@@ -555,6 +846,80 @@ NSString* storyWidgetId;
 #pragma mark - Callback function while storyview has been open-up url successfully
 - (void)setOpenedCallback:(__strong CPStoryViewOpenedBlock)callback {
     openedCallback = callback;
+}
+
+#pragma mark - Dark/Light mode UI Apperance
+- (void)reloadStoryView {
+    if (self.widget != nil && self.stories != nil && self.stories.count > 0 && self.storyCollection != nil && CGRectGetWidth(self.storyCollection.bounds) > 0 && CGRectGetHeight(self.storyCollection.bounds) > 0) {
+        if (![CPStoryView getDarkModeEnabled] && self.backgroundColorLightMode != nil) {
+            self.backgroundColor = self.backgroundColorLightMode;
+        } else if ([CPStoryView getDarkModeEnabled] && self.backgroundColorDarkMode != nil){
+            self.backgroundColor = self.backgroundColorDarkMode;
+        } else {
+            self.backgroundColor = UIColor.whiteColor;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.storyCollection reloadData];
+        });
+    }
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:CPAppearanceModeChangedNotification object:nil];
+}
+
+#pragma mark - Tracking when story widget has been rendered
+- (void)trackStoriesShown {
+    if (self.widget != nil) {
+		NSMutableArray <NSString*>* storyIdArray = [NSMutableArray new];
+		for (CPStory *story in self.stories) {
+			NSString *storyIdString = story.id;
+			if (storyIdString != nil) {
+				if (self.widget.groupStoryCategories) {
+					NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
+					for (NSString *storyId in currentStoryIds) {
+						[storyIdArray addObject:storyId];
+					}
+				} else {
+					[storyIdArray addObject:storyIdString];
+				}
+			}
+		}
+
+		[CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+			[CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
+		}];
+    }
+}
+
+#pragma mark - Unread Story ID Synchronization
+- (void)syncUnreadStoryIds {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *storyUnreadCountString = [userDefaults stringForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+
+    if (storyUnreadCountString != nil && storyUnreadCountString.length > 0) {
+        NSMutableSet *readStoryIds = [NSMutableSet setWithArray:[storyUnreadCountString componentsSeparatedByString:@","]];
+        NSMutableString *updatedUnreadStoryIds = [NSMutableString string];
+
+        for (CPStory *story in self.stories) {
+            NSArray *storyIdArray = [story.id componentsSeparatedByString:@","];
+
+            for (NSString *subStoryID in storyIdArray) {
+                if ([readStoryIds containsObject:subStoryID]) {
+                    if (updatedUnreadStoryIds.length == 0) {
+                        [updatedUnreadStoryIds appendString:subStoryID];
+                    } else {
+                        [updatedUnreadStoryIds appendFormat:@",%@", subStoryID];
+                    }
+                }
+            }
+        }
+
+        [userDefaults removeObjectForKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        [userDefaults setObject:updatedUnreadStoryIds forKey:CLEVERPUSH_SEEN_STORIES_UNREAD_COUNT_GROUP_KEY];
+        [userDefaults synchronize];
+    }
 }
 
 @end
