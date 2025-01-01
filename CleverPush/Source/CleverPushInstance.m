@@ -1195,10 +1195,17 @@ static id isNil(id object) {
     __block BOOL completionCalled = NO;
     hasCalledSubscribe = YES;
 
-    if (autoRequestNotificationPermission) {
-        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-        [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings*_Nonnull notificationSettings) {
-            
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull notificationSettings) {
+        if (notificationSettings.authorizationStatus == UNAuthorizationStatusDenied && !ignoreDisabledNotificationPermission) {
+            if (completion && !completionCalled) {
+                completionCalled = YES;
+                completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
+            }
+            return;
+        }
+
+        if (autoRequestNotificationPermission) {
             UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
             [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1258,12 +1265,11 @@ static id isNil(id object) {
                     }
                 });
             }];
-        }];
-        
-        [self ensureMainThreadSync:^{
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        }];
-    }
+            [self ensureMainThreadSync:^{
+                [[UIApplication sharedApplication] registerForRemoteNotifications];
+            }];
+        }
+    }];
 }
 
 - (void)autoSubscribeWithDelays {
