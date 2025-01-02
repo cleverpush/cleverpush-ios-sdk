@@ -213,7 +213,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)setAppBannerModalPresentationStyle:(UIModalPresentationStyle)style;
 - (void)setLocalEventTrackingRetentionDays:(int)days;
 - (void)setBadgeCount:(NSInteger)count;
-- (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
+- (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent;
 - (void)addStoryView:(CPStoryView* _Nullable)storyView;
 - (void)updateDeselectFlag:(BOOL)value;
 - (void)setOpenWebViewEnabled:(BOOL)opened;
@@ -264,8 +264,8 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;
 - (void)setDatabaseInfo;
 
-- (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
-- (UNMutableNotificationContent* _Nullable)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent API_AVAILABLE(ios(10.0));
+- (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent;
+- (UNMutableNotificationContent* _Nullable)serviceExtensionTimeWillExpireRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated"

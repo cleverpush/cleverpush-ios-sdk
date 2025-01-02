@@ -10,7 +10,7 @@
 @property CleverPushiCarousel *carousel;
 @property UIPageControl *pageControl;
 
-- (void)cleverpushDidReceiveNotification:(UNNotification *)notification API_AVAILABLE(ios(10.0));
-- (void)cleverpushDidReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(UNNotificationContentExtensionResponseOption))completion API_AVAILABLE(ios(10.0));
+- (void)cleverpushDidReceiveNotification:(UNNotification *)notification;
+- (void)cleverpushDidReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(UNNotificationContentExtensionResponseOption))completion;
 
 @end

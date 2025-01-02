@@ -443,29 +443,17 @@
     self.buttonHeight = 30.0;
     self.buttonXPosition = 10.0;
 
-    if (@available(iOS 11.0, *)) {
-        self.window = UIApplication.sharedApplication.windows.firstObject;
-        self.topPadding = self.window.safeAreaInsets.top;
-        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, self.topPadding + 10, 40, 40))];
+    self.window = UIApplication.sharedApplication.windows.firstObject;
+    self.topPadding = self.window.safeAreaInsets.top;
+    self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, self.topPadding + 10, 40, 40))];
 
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            self.buttonXPosition = self.window.frame.size.width - self.buttonWidth - 10.0;
-        } else {
-            self.buttonXPosition = 10.0;
-        }
-
-        self.closeButton.frame = CGRectMake(self.buttonXPosition, self.topPadding + 15, self.buttonWidth, self.buttonHeight);
+    if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+        self.buttonXPosition = self.window.frame.size.width - self.buttonWidth - 10.0;
     } else {
-        self.closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(10, 10, 40, 40))];
-
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            self.buttonXPosition = UIApplication.sharedApplication.windows.firstObject.frame.size.width - self.buttonWidth - 10.0;
-        } else {
-            self.buttonXPosition = 10.0;
-        }
-
-        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+        self.buttonXPosition = 10.0;
     }
+
+    self.closeButton.frame = CGRectMake(self.buttonXPosition, self.topPadding + 15, self.buttonWidth, self.buttonHeight);
     self.closeButton.layer.cornerRadius = 15.0;
     self.closeButton.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
 
@@ -482,25 +470,15 @@
 }
 
 - (void)updateCloseButtonPositionForSize:(CGSize)size {
-    if (@available(iOS 11.0, *)) {
-        CGFloat topPadding = self.window.safeAreaInsets.top;
+    CGFloat topPadding = self.window.safeAreaInsets.top;
 
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
-        } else {
-            self.buttonXPosition = 10.0;
-        }
-
-        self.closeButton.frame = CGRectMake(self.buttonXPosition, topPadding + 15, self.buttonWidth, self.buttonHeight);
+    if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
+        self.buttonXPosition = size.width - self.buttonWidth - 10.0;
     } else {
-        if (self.closeButtonPosition == CPStoryWidgetCloseButtonPositionRightSide) {
-            self.buttonXPosition = size.width - self.buttonWidth - 10.0;
-        } else {
-            self.buttonXPosition = 10.0;
-        }
-
-        self.closeButton.frame = CGRectMake(self.buttonXPosition, 10.0, self.buttonWidth, self.buttonHeight);
+        self.buttonXPosition = 10.0;
     }
+
+    self.closeButton.frame = CGRectMake(self.buttonXPosition, topPadding + 15, self.buttonWidth, self.buttonHeight);
 }
 
 @end
