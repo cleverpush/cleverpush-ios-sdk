@@ -10,25 +10,23 @@ reviewers:
     all:
       - anilprajapati1006
       - namdev-jagtap
-      - cpKevinrodriguesnobre
       - iboruch
       - amitsingh8899
-      - Samru7181
       - paavan-cleverpush
       - snuricp
       - cp-akshay-jadhav
       - Resvan-cleverpush
     rotating-reviewers:
-      - antaraB20
-      - Samru7181
       - amitsingh8899
       - cp-akshay-jadhav
+      - harkeshkumar196
+      - anilprajapati1006
+      - paavan-cleverpush
     email:
       - iboruch
       - anilprajapati1006
       - paavan-cleverpush
     pushqueuer:
-      - cpKevinrodriguesnobre
       - namdev-jagtap
       - cp-akshay-jadhav
     admin:
@@ -38,7 +36,6 @@ reviewers:
     pushworker:
       - cp-akshay-jadhav
       - namdev-jagtap
-      - cpKevinrodriguesnobre
     appBuilder:
       - snuricp
     storyMaker:
@@ -57,10 +54,8 @@ reviewers:
     followupJourneyBuilder:
       - anilprajapati1006
       - namdev-jagtap
-      - cpKevinrodriguesnobre
     surveys:
-      - samru7181
-      - antaraB20
+      - Resvan-cleverpush
     statsworker:
       - paavan-cleverpush
       - anilprajapati1006
@@ -73,26 +68,18 @@ reviewers:
       - paavan-cleverpush
       - amitsingh8899
     jsSDK:
-      - samru7181
       - paavan-cleverpush
-    liveapi:
-      - samru7181
     dashboard:
-      - samru7181
       - paavan-cleverpush
     mobile:
       - cp-akshay-jadhav
     scylla:
       - paavan-cleverpush
       - anilprajapati1006
-      - cpKevinrodriguesnobre
     redis:
       - namdev-jagtap
-      - cpKevinrodriguesnobre
     mongo:
       - namdev-jagtap
-      - samru7181
-      - cpKevinrodriguesnobre
     AMP:
       - cp-akshay-jadhav
       - anilprajapati1006
@@ -100,7 +87,6 @@ reviewers:
       - unnaticleverpush
       - gbhrdt
       - cp-akshay-jadhav
-      - cpKevinrodriguesnobre
     IOS:
       - cpandya25
       - gbhrdt
