@@ -28,7 +28,7 @@ __weak static id previousDelegate;
     injectSelector([UNUserNotificationCenter class], @selector(getNotificationSettingsWithCompletionHandler:), [CleverPushUNUserNotificationCenter class], @selector(cleverPushGetNotificationSettingsWithCompletionHandler:));
 }
 
-- (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler  API_AVAILABLE(ios(10.0)) {
+- (void)cleverPushRequestAuthorizationWithOptions:(UNAuthorizationOptions)options completionHandler:(void (^)(BOOL granted, NSError *__nullable error))completionHandler {
     
     id wrapperBlock = ^(BOOL granted, NSError* error) {
         completionHandler(granted, error);
@@ -37,7 +37,7 @@ __weak static id previousDelegate;
     [self cleverPushRequestAuthorizationWithOptions:options completionHandler:wrapperBlock];
 }
 
-- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler API_AVAILABLE(ios(10.0)) {
+- (void)cleverPushGetNotificationSettingsWithCompletionHandler:(void(^)(UNNotificationSettings *settings))completionHandler {
     id wrapperBlock = ^(UNNotificationSettings* settings) {
         completionHandler(settings);
     };
@@ -63,7 +63,7 @@ __weak static id previousDelegate;
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
                  willPresentNotification:(UNNotification *)notification
-                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler API_AVAILABLE(ios(10.0)) {
+                   withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
     NSUInteger completionHandlerOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
 
     [CPLog info:@"cleverPushUserNotificationCenter willPresentNotification"];
@@ -95,7 +95,7 @@ __weak static id previousDelegate;
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
-          didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler API_AVAILABLE(ios(10.0)) {
+          didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void(^)(void))completionHandler {
     [CPLog info:@"cleverPushUserNotificationCenter didReceiveNotificationResponse"];
 
     if ([CleverPushUNUserNotificationCenter isDismissEvent:response]) {
@@ -123,7 +123,7 @@ __weak static id previousDelegate;
     }
 }
 
-+ (BOOL)isDismissEvent:(UNNotificationResponse *)response  API_AVAILABLE(ios(10.0)) {
++ (BOOL)isDismissEvent:(UNNotificationResponse *)response {
     return [@"com.apple.UNNotificationDismissActionIdentifier" isEqual:response.actionIdentifier];
 }
 
@@ -132,7 +132,7 @@ __weak static id previousDelegate;
                        actionIdentifier:(NSString*)actionIdentifier
                                userText:(NSString*)userText
                 fromPresentNotification:(BOOL)fromPresentNotification
-                  withCompletionHandler:(void(^)(void))completionHandler  API_AVAILABLE(ios(10.0)) {
+                  withCompletionHandler:(void(^)(void))completionHandler {
     UIApplication *sharedApp = [UIApplication sharedApplication];
 
     BOOL isCustomAction = actionIdentifier && ![@"com.apple.UNNotificationDefaultActionIdentifier" isEqualToString:actionIdentifier];

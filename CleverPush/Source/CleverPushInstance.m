@@ -669,7 +669,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - clear Badge count and start tracking the session when application goes to the Foreground.
-- (void)applicationWillEnterForeground API_AVAILABLE(ios(10.0)) {
+- (void)applicationWillEnterForeground {
     [self updateBadge:nil];
     [self trackSessionStart];
     [CPAppBannerModule initSession:channelId afterInit:YES];
@@ -691,7 +691,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - clear Badge count and start tracking the session when application goes to the Background.
-- (void)applicationDidEnterBackground API_AVAILABLE(ios(10.0)) {
+- (void)applicationDidEnterBackground {
     [self updateBadge:nil];
     [self trackSessionEnd];
 }
@@ -1663,7 +1663,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - add Attachments to content
-- (void)addAttachments:(NSString*)mediaUrl toContent:(UNMutableNotificationContent*)content  API_AVAILABLE(ios(10.0)) {
+- (void)addAttachments:(NSString*)mediaUrl toContent:(UNMutableNotificationContent*)content {
     NSMutableArray* unAttachments = [NSMutableArray new];
 
     NSURL* nsURL = [NSURL URLWithString:mediaUrl];
@@ -1693,7 +1693,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - add Carousel Attachments to the content on a rich notification
-- (void)addCarouselAttachments:(NSDictionary*)notification toContent:(UNMutableNotificationContent*)content  API_AVAILABLE(ios(10.0)) {
+- (void)addCarouselAttachments:(NSDictionary*)notification toContent:(UNMutableNotificationContent*)content {
     NSMutableArray* unAttachments = [NSMutableArray new];
 
     NSArray*images = [[NSArray alloc] init];
@@ -1928,7 +1928,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - Update counts of the notification badge
-- (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent  API_AVAILABLE(ios(10.0)) {
+- (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY]) {
         if (replacementContent != nil) {
@@ -4174,7 +4174,7 @@ static id isNil(id object) {
 #pragma mark - Add actions buttons on the carousel.
 - (void)addActionButtonsToNotificationRequest:(UNNotificationRequest*)request
                                   withPayload:(NSDictionary*)payload
-               withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent  API_AVAILABLE(ios(10.0)) {
+               withMutableNotificationContent:(UNMutableNotificationContent*)replacementContent {
     if (request.content.categoryIdentifier && ![request.content.categoryIdentifier isEqualToString:@""]) {
         return;
     }

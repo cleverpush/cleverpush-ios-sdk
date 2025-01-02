@@ -85,7 +85,7 @@
 }
 
 #pragma mark - Carousel category
-- (UNNotificationCategory *)carouselCategory API_AVAILABLE(ios(10.0)) {
+- (UNNotificationCategory *)carouselCategory {
     NSMutableArray* actionArray = [NSMutableArray new];
     
     UNNotificationAction* nextAction = [UNNotificationAction actionWithIdentifier:@"next"
