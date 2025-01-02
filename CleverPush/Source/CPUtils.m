@@ -342,6 +342,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                               @"iPhone14,3": @"iPhone 13 Pro Max",
                               @"iPhone14,4": @"iPhone 13 mini",
                               @"iPhone14,5": @"iPhone 13",
+                              @"iPhone14,6" : @"iPhone SE 3rd Gen",
+                              @"iPhone14,7" : @"iPhone 14",
+                              @"iPhone14,8" : @"iPhone 14 Plus",
+                              @"iPhone15,2" : @"iPhone 14 Pro",
+                              @"iPhone15,3" : @"iPhone 14 Pro Max",
+                              @"iPhone15,4" : @"iPhone 15",
+                              @"iPhone15,5" : @"iPhone 15 Plus",
+                              @"iPhone16,1" : @"iPhone 15 Pro",
+                              @"iPhone16,2" : @"iPhone 15 Pro Max",
+                              @"iPhone17,1" : @"iPhone 16 Pro",
+                              @"iPhone17,2" : @"iPhone 16 Pro Max",
+                              @"iPhone17,3" : @"iPhone 16",
+                              @"iPhone17,4" : @"iPhone 16 Plus",
                               //iPods
                               @"iPod1,1": @"1st Gen iPod",
                               @"iPod2,1": @"2nd Gen iPod",
@@ -424,7 +437,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                               @"iPad12,1": @"iPad (9th generation) Wi-Fi",
                               @"iPad12,2": @"iPad (9th generation) Wi-Fi + Cellular",
                               @"iPad14,1": @"iPad mini (6th generation) Wi-Fi",
-                              @"iPad14,2": @"iPad mini (6th generation) Wi-Fi + Cellular"
+                              @"iPad14,2": @"iPad mini (6th generation) Wi-Fi + Cellular",
+                              @"iPad14,3" : @"iPad Pro 11 inch 4th Gen",
+                              @"iPad14,4" : @"iPad Pro 11 inch 4th Gen",
+                              @"iPad14,5" : @"iPad Pro 12.9 inch 6th Gen",
+                              @"iPad14,6" : @"iPad Pro 12.9 inch 6th Gen",
+                              @"iPad14,8" : @"iPad Air 6th Gen",
+                              @"iPad14,9" : @"iPad Air 6th Gen",
+                              @"iPad14,10" : @"iPad Air 7th Gen",
+                              @"iPad14,11" : @"iPad Air 7th Gen",
+                              @"iPad16,3" : @"iPad Pro 11 inch 5th Gen",
+                              @"iPad16,4" : @"iPad Pro 11 inch 5th Gen",
+                              @"iPad16,5" : @"iPad Pro 12.9 inch 7th Gen",
+                              @"iPad16,6" : @"iPad Pro 12.9 inch 7th Gen",
         };
     }
 
@@ -664,6 +689,14 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.trackClick = function trackClick(ID, properties) {\
                window.webkit.messageHandlers.trackClick.postMessage({ buttonId: ID, properties: properties });\
            };\
+           window.CleverPush.previousScreen = function previousScreen() {\
+               window.webkit.messageHandlers.previousScreen.postMessage(null);\
+           };\
+           window.CleverPush.nextScreen = function nextScreen() {\
+               window.webkit.messageHandlers.nextScreen.postMessage(null);\
+           };\
+           window.CleverPush.goToScreen = function goToScreen(screenId) {\
+               window.webkit.messageHandlers.goToScreen.postMessage(screenId);\
            window.CleverPush.copyToClipboard = function copyToClipboard(text) {\
                window.webkit.messageHandlers.copyToClipboard.postMessage(text);\
            };\
@@ -694,7 +727,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
              @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
-             @"showTopicsDialog", @"trackClick", @"openWebView", @"copyToClipboard"];
+             @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard"];
 }
 
 + (void)configureWebView:(WKWebView *)webView {
@@ -769,6 +802,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             if (webUrl && webUrl.scheme && webUrl.host) {
                 [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
             }
+        } else if ([message.name isEqualToString:@"goToScreen"]) {
+            if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {
+                if (![self isNullOrEmpty:message.body]) {
+                    NSDictionary *banner = @{
+                        @"screenId": message.body
+                    };
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPageNotification" object:nil userInfo:banner];
+                }
+            }
+        } else if ([message.name isEqualToString:@"nextScreen"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToNextPageNotification" object:nil];
+        } else if ([message.name isEqualToString:@"previousScreen"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPreviousPageNotification" object:nil];
         } else if ([message.name isEqualToString:@"copyToClipboard"]) {
             [UIPasteboard generalPasteboard].string = [NSString stringWithFormat:@"%@", message.body];
         }
