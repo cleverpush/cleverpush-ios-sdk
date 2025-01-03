@@ -386,7 +386,19 @@
 }
 
 - (void)actionCallback:(CPAppBannerAction *)action actions:(NSMutableArray<CPAppBannerAction *> *)actions from:(BOOL)buttonBlock {
+    NSMutableArray *urlActions = [NSMutableArray array];
+    NSMutableArray *nonUrlActions = [NSMutableArray array];
+
     for (CPAppBannerAction *actionItem in actions) {
+        if ([actionItem.type isEqualToString:@"url"]) {
+            [urlActions addObject:actionItem];
+        } else {
+            [nonUrlActions addObject:actionItem];
+        }
+    }
+
+    [nonUrlActions addObjectsFromArray:urlActions];
+    for (CPAppBannerAction *actionItem in nonUrlActions) {
         [self performActionCallback:actionItem];
     }
 }
