@@ -25,8 +25,8 @@
             if ([[json objectForKey:@"type"] isEqualToString:@"deepLink"]) {
                 self.type = CPAppBannerTriggerConditionTypeDeepLink;
             }
-            if ([[json objectForKey:@"type"] isEqualToString:@"daysSinceInstallation"]) {
-                self.type = CPAppBannerTriggerConditionTypeDaysSinceInstallation;
+            if ([[json objectForKey:@"type"] isEqualToString:@"daysSinceInitialization"]) {
+                self.type = CPAppBannerTriggerConditionTypeDaysSinceInitialization;
             }
         }
 

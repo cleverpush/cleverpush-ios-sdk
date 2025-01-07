@@ -1704,11 +1704,6 @@ static id isNil(id object) {
                 [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
                 [userDefaults synchronize];
 
-                if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY] != nil) {
-                    NSLog(@"CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEYDate = %@", [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY]);
-                }
-
-
                 if (handleSubscribed && ![self getHandleSubscribedCalled]) {
                     handleSubscribed(subscriptionId);
                     [self setHandleSubscribedCalled:YES];
