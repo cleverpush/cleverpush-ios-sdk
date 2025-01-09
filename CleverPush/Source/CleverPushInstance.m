@@ -1198,8 +1198,9 @@ static id isNil(id object) {
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     [center getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull notificationSettings) {
         BOOL isAuthorizationStatusDenied = (notificationSettings.authorizationStatus == UNAuthorizationStatusDenied);
+        BOOL isAuthorizationStatusNotDetermined = (notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined);
 
-        if ((notificationSettings.authorizationStatus == UNAuthorizationStatusNotDetermined || !isAuthorizationStatusDenied) && autoRequestNotificationPermission) {
+        if ((isAuthorizationStatusNotDetermined || !isAuthorizationStatusDenied) && autoRequestNotificationPermission) {
             UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
             [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
