@@ -1232,7 +1232,7 @@ static id isNil(id object) {
                                     }
                                 }
                             }];
-                            
+
                             if (completion && !completionCalled) {
                                 [self getSubscriptionId:^(NSString *subscriptionId) {
                                     if (!completionCalled) {
