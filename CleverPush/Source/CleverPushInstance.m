@@ -1253,7 +1253,7 @@ static id isNil(id object) {
                         completionCalled = YES;
                         completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
                     }
-                    
+
                     if (!granted && !ignoreDisabledNotificationPermission) {
                         [self setConfirmAlertShown];
                     }
