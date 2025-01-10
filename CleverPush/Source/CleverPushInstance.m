@@ -442,6 +442,20 @@ static id isNil(id object) {
     subscriptionTags = [[NSMutableArray alloc] init];
     hasInitialized = NO;
 
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+
+    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
+        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+            [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        } else {
+            [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        }
+
+        [userDefaults synchronize];
+    }
+
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;

@@ -122,6 +122,10 @@
             self.dismissTimeout = 60;
         }
 
+        if ([json cleverPushStringForKey:@"everyXDays"] != nil) {
+            self.everyXDays = [[json cleverPushStringForKey:@"everyXDays"] intValue];
+        }
+
         if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"forever"]) {
             self.stopAtType = CPAppBannerStopAtTypeForever;
         } else if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"specific_time"]) {
@@ -134,6 +138,8 @@
             self.frequency = CPAppBannerFrequencyOncePerSession;
         } else if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"every_trigger"]) {
             self.frequency = CPAppBannerFrequencyEveryTrigger;
+        } else if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"every_x_days"]) {
+            self.frequency = CPAppBannerFrequencyEveryXDays;
         }
 
         self.triggers = [NSMutableArray new];

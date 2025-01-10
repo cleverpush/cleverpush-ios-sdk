@@ -670,6 +670,75 @@ NSInteger currentScreenIndex = 0;
     }
 }
 
+- (BOOL)updateBannerFrequencyForBanner:(CPAppBanner *)banner {
+    NSDate *currentDate = [NSDate date];
+    NSMutableArray *bannerRecords = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_BANNER_DISPLAY_INTERVAL_DATE_KEY] mutableCopy];
+
+    if (!bannerRecords) {
+        bannerRecords = [NSMutableArray array];
+    }
+
+    NSMutableDictionary *bannerRecord = [self bannerRecordForID:banner.id fromRecords:bannerRecords];
+
+    if (bannerRecord) {
+        NSDate *lastDisplayedDate = bannerRecord[@"date"];
+
+        if (banner.frequency == CPAppBannerFrequencyEveryXDays) {
+            NSInteger frequency = banner.everyXDays;
+            NSDate *nextDisplayDate = [self calculateNextDisplayDateFrom:lastDisplayedDate frequency:frequency];
+            if ([currentDate compare:nextDisplayDate] != NSOrderedAscending) {
+                NSMutableDictionary *updatedBannerRecord = [bannerRecord mutableCopy];
+                updatedBannerRecord[@"date"] = nextDisplayDate;
+                for (NSUInteger i = 0; i < bannerRecords.count; i++) {
+                    NSMutableDictionary *existingBannerRecord = bannerRecords[i];
+                    if ([existingBannerRecord[@"id"] isEqualToString:bannerRecord[@"id"]]) {
+                        NSMutableDictionary *updatedBannerRecord = [existingBannerRecord mutableCopy];
+                        updatedBannerRecord[@"date"] = nextDisplayDate;
+                        bannerRecords[i] = updatedBannerRecord;
+                        break;
+                    }
+                }
+                [[NSUserDefaults standardUserDefaults] setObject:bannerRecords forKey:CLEVERPUSH_BANNER_DISPLAY_INTERVAL_DATE_KEY];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                return YES;
+            } else {
+                return NO;
+            }
+        }
+    } else {
+        if (banner.frequency == CPAppBannerFrequencyEveryXDays) {
+            NSMutableDictionary *newBannerRecord = [NSMutableDictionary dictionary];
+            newBannerRecord[@"id"] = banner.id;
+            newBannerRecord[@"date"] = currentDate;
+            [bannerRecords addObject:newBannerRecord];
+            [[NSUserDefaults standardUserDefaults] setObject:bannerRecords forKey:CLEVERPUSH_BANNER_DISPLAY_INTERVAL_DATE_KEY];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            return NO;
+        }
+    }
+
+    return NO;
+}
+
+- (NSDate *)calculateNextDisplayDateFrom:(NSDate *)lastDisplayedDate frequency:(NSInteger)frequency {
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [[NSDateComponents alloc] init];
+
+    [components setDay:frequency];
+    NSDate *nextDisplayDate = [calendar dateByAddingComponents:components toDate:lastDisplayedDate options:0];
+
+    return nextDisplayDate;
+}
+
+- (NSMutableDictionary *)bannerRecordForID:(NSString *)bannerID fromRecords:(NSArray *)records {
+    for (NSMutableDictionary *record in records) {
+        if ([record[@"id"] isEqualToString:bannerID]) {
+            return [record mutableCopy];
+        }
+    }
+    return nil;
+}
+
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
     return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
@@ -800,6 +869,22 @@ NSInteger currentScreenIndex = 0;
     return NO;
 }
 
+- (BOOL)checkDaysSinceInstallationTriggerCondition:(CPAppBannerTriggerCondition *)condition {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+
+    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
+        return NO;
+    }
+
+    NSInteger daysSinceInstallation = [CPUtils daysBetweenDate:installationDate andDate:[NSDate date]];
+    if (daysSinceInstallation >= condition.days) {
+        return YES;
+    }
+
+    return NO;
+}
+
 #pragma mark - Create banners based on conditional attributes within the objects
 - (void)createBanners:(NSMutableArray*)banners {
     NSMutableArray *bannersCopy = [banners mutableCopy];
@@ -829,6 +914,8 @@ NSInteger currentScreenIndex = 0;
                         conditionTrue = [self checkEventTriggerCondition:condition];
                     } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
                         conditionTrue = [self checkDeepLinkTriggerCondition:condition];
+                    } else if (condition.type == CPAppBannerTriggerConditionTypeDaysSinceInitialization) {
+                        conditionTrue = [self checkDaysSinceInstallationTriggerCondition:condition];
                     } else {
                         conditionTrue = NO;
                     }
@@ -948,27 +1035,32 @@ NSInteger currentScreenIndex = 0;
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         if (!force) {
             if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
-                [CPLog debug:@"Skipping banner because: already shown"];
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: already shown", banner.id]];
                 return;
             }
 
             if (banner.status == CPAppBannerStatusDraft && ![CleverPush getAppBannerDraftsEnabled]) {
-                [CPLog debug:@"Skipping banner because: status is draft"];
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: status is draft", banner.id]];
                 return;
             }
 
             if (![self bannerTargetingAllowed:banner]) {
-                [CPLog debug:@"Skipping banner because: targeting not allowed"];
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: targeting not allowed", banner.id]];
                 return;
             }
 
             if (![self bannerTargetingWithEventFiltersAllowed:banner]) {
-                [CPLog debug:@"Skipping banner because: event filters not allowed"];
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: event filters not allowed", banner.id]];
                 return;
             }
 
             if (![self bannerTimeAllowed:banner]) {
-                [CPLog debug:@"Skipping banner because: date is after stop date"];
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: date is after stop date", banner.id]];
+                return;
+            }
+
+            if (banner.frequency == CPAppBannerFrequencyEveryXDays && ![self updateBannerFrequencyForBanner:banner]) {
+                [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: every_x_days frequency", banner.id]];
                 return;
             }
         }
