@@ -1817,10 +1817,7 @@ static id isNil(id object) {
     BOOL startedBackgroundJob = NO;
     [CPLog debug:@"handleSilentNotificationReceived"];
 
-    if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")) {
-        [CleverPush handleNotificationReceived:messageDict isActive:NO];
-    }
-
+    [CleverPush handleNotificationReceived:messageDict isActive:NO];
     [self handleSilentNotificationReceivedWithAppBanner:messageDict];
 
     return startedBackgroundJob;
@@ -1976,7 +1973,12 @@ static id isNil(id object) {
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+        BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+        if (isActive) {
+            [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        } else {
+            [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+        }
     }
 }
 
