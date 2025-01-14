@@ -1,3 +1,9 @@
+## 1.32.1 (14.01.2025)
+* In app banner action “Open URL” is now always be the last executed action.
+* Implemented `goToScreen`, `nextScreen`, and `previousScreen` functions for app banner HTML blocks.
+* Added `every X days` frequency and `Days since installation` trigger feature in app banners.
+* Implemented functionality of app banners should be displayed while the application is in foreground mode and the push notification type is a silent push.
+
 ## 1.32.0 (19.12.2024)
 * Optimised notification service extension service methods by creating separate sub-pods to prevent crashes.
 

@@ -5,5 +5,6 @@ typedef NS_ENUM(NSInteger, CPAppBannerTriggerConditionType) {
     CPAppBannerTriggerConditionTypeDuration,
     CPAppBannerTriggerConditionTypeSessions,
     CPAppBannerTriggerConditionTypeUnsubscribe,
-    CPAppBannerTriggerConditionTypeDeepLink
+    CPAppBannerTriggerConditionTypeDeepLink,
+    CPAppBannerTriggerConditionTypeDaysSinceInitialization,
 };
