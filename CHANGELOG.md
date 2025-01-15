@@ -1,3 +1,6 @@
+## 1.32.2 (15.01.2025)
+* Fixed a crash in CPStoryView
+
 ## 1.32.1 (14.01.2025)
 * In app banner action “Open URL” is now always be the last executed action.
 * Implemented `goToScreen`, `nextScreen`, and `previousScreen` functions for app banner HTML blocks.
