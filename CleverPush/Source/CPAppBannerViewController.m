@@ -175,10 +175,8 @@ static CPAppBannerActionBlock appBannerActionCallback;
 - (void)setAppBannerWithMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGFloat topPadding = 0;
-    if (@available(iOS 11.0, *)) {
-        topPadding = window.safeAreaInsets.top;
-        self.topConstraint.constant = topPadding;
-    }
+    topPadding = window.safeAreaInsets.top;
+    self.topConstraint.constant = topPadding;
     self.bottomConstraint.constant = 34;
     self.leadingConstraint.constant = 25;
     self.trailingConstraint.constant = -25;
@@ -191,16 +189,14 @@ static CPAppBannerActionBlock appBannerActionCallback;
 #pragma mark - set app banner without margin padding from all of the edges will be zero
 - (void)setAppBannerWithoutMargin {
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-    if (@available(iOS 11.0, *)) {
-        CGFloat topPadding = window.safeAreaInsets.top;
-        CGFloat bottomPadding = window.safeAreaInsets.bottom + 20;
-        self.leadingConstraint.constant = 0;
-        self.trailingConstraint.constant = 0;
-        [self.bannerContainer.layer setCornerRadius:0.0];
-        [self.bannerContainer.layer setMasksToBounds:YES];
-        self.pageControllTopConstraint.constant = - bottomPadding;
-        self.btnTopConstraints.constant = topPadding;
-    }
+    CGFloat topPadding = window.safeAreaInsets.top;
+    CGFloat bottomPadding = window.safeAreaInsets.bottom + 20;
+    self.leadingConstraint.constant = 0;
+    self.trailingConstraint.constant = 0;
+    [self.bannerContainer.layer setCornerRadius:0.0];
+    [self.bannerContainer.layer setMasksToBounds:YES];
+    self.pageControllTopConstraint.constant = - bottomPadding;
+    self.btnTopConstraints.constant = topPadding;
 }
 
 #pragma mark - activate and deativate constraints based on the layout type
@@ -487,19 +483,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
         CGFloat topPadding = 0;
         CGFloat spacing = 10;
 
-        if (@available(iOS 11.0, *)) {
-            topPadding = window.safeAreaInsets.top;
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
-            if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
-            }
-        } else {
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, 10 + spacing, 40, 40))];
-            if (self.data.closeButtonPositionStaticEnabled) {
-                self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 40 + spacing, width, height) configuration:config];
-                closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, [UIApplication sharedApplication].statusBarFrame.size.height - 40 - spacing, 40, 40))];
-            }
+        topPadding = window.safeAreaInsets.top;
+        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
+        if (self.data.closeButtonPositionStaticEnabled) {
+            self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];
+            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
         }
 
         if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {

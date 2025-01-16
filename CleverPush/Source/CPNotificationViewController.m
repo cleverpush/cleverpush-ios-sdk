@@ -116,7 +116,7 @@
 }
 
 #pragma mark - Identify carousel notification and load in to the carousel
-- (void)cleverpushDidReceiveNotification:(UNNotification *)notification  API_AVAILABLE(ios(10.0)) {
+- (void)cleverpushDidReceiveNotification:(UNNotification *)notification {
     if ([notification.request.content.categoryIdentifier isEqualToString:@"carousel"]) {
         [self getImages:notification];
         [self createPageIndicator:self.items.count];
@@ -142,7 +142,7 @@
 }
 
 #pragma mark - Get carousel images from the notification payload
-- (void)getImages:(UNNotification *)notification API_AVAILABLE(ios(10.0)) {
+- (void)getImages:(UNNotification *)notification {
     NSArray <UNNotificationAttachment *> *attachments = notification.request.content.attachments;
     [self fetchAttachmentsToImageArray:attachments];
     NSDictionary* cpNotification = [notification.request.content.userInfo objectForKey:@"notification"];
@@ -175,13 +175,11 @@
 #pragma mark - Get the array of attachments
 - (void)fetchAttachmentsToImageArray:(NSArray *)attachments {
     NSMutableArray *itemsArray = [[NSMutableArray alloc]init];
-    if (@available(iOS 10.0, *)) {
-        for (UNNotificationAttachment *attachment in attachments) {
-            if (attachment.URL.startAccessingSecurityScopedResource) {
-                UIImage *image = [UIImage imageWithContentsOfFile:attachment.URL.path];
-                if (image != nil) {
-                    [itemsArray addObject:image];
-                }
+    for (UNNotificationAttachment *attachment in attachments) {
+        if (attachment.URL.startAccessingSecurityScopedResource) {
+            UIImage *image = [UIImage imageWithContentsOfFile:attachment.URL.path];
+            if (image != nil) {
+                [itemsArray addObject:image];
             }
         }
     }
@@ -189,7 +187,7 @@
 }
 
 #pragma mark - Action identifier to on dynamic next/previous button
-- (void)cleverpushDidReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(UNNotificationContentExtensionResponseOption))completion API_AVAILABLE(ios(10.0)) {
+- (void)cleverpushDidReceiveNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(UNNotificationContentExtensionResponseOption))completion {
     if ([response.actionIdentifier isEqualToString:@"next"]) {
         [carousel scrollToItemAtIndex:carousel.currentItemIndex + 1 animated:YES];
         completion(UNNotificationContentExtensionResponseOptionDoNotDismiss);
