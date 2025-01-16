@@ -1,3 +1,6 @@
+## 1.32.3 (16.01.2025)
+* Resolved the setAutoRequestNotificationPermission(false) issue with autoRegister: true.
+
 ## 1.32.2 (15.01.2025)
 * Fixed a crash in CPStoryView
 
