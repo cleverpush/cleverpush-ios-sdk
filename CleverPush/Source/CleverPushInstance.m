@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.0";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.2";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -441,6 +441,20 @@ static id isNil(id object) {
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
     hasInitialized = NO;
+
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+
+    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
+        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+            [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        } else {
+            [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+        }
+
+        [userDefaults synchronize];
+    }
 
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
@@ -1890,7 +1904,12 @@ static id isNil(id object) {
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+        BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+        if (isActive) {
+            [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        } else {
+            [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+        }
     }
 }
 

@@ -19,7 +19,31 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
     [self conditionalPresentation];
     [self setOrientation];
+    [self setupNotificationObservers];
     self.popupHeight.constant = [CPUtils frameHeightWithoutSafeArea];
+}
+
+#pragma mark - Add observers for screen navigations
+- (void)setupNotificationObservers {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleNavigateToNextPageNotification:)
+                                                 name:@"NavigateToNextPageNotification"
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleNavigateToPreviousPageNotification:)
+                                                 name:@"NavigateToPreviousPageNotification"
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(handleNavigateToPageNotification:)
+                                                         name:@"NavigateToPageNotification"
+                                                       object:nil];
+}
+
+#pragma mark - Remove observers
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Custom UI Functions
@@ -326,6 +350,10 @@ static CPAppBannerActionBlock appBannerActionCallback;
 }
 
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
+- (void)handleNavigateToNextPageNotification:(NSNotification *)notification {
+    [self navigateToNextPage];
+}
+
 - (void)navigateToNextPage {
     NSIndexPath *nextItem = [NSIndexPath indexPathForItem:self.index + 1 inSection:0];
     if (nextItem.row < self.data.screens.count) {
@@ -352,12 +380,39 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
 }
 
+#pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a previous screen
+- (void)handleNavigateToPreviousPageNotification:(NSNotification *)notification {
+    [self navigateToPreviousPage];
+}
+
+- (void)navigateToPreviousPage {
+    NSInteger previousIndex = self.index - 1;
+    if (previousIndex >= 0) {
+        NSIndexPath *previousItem = [NSIndexPath indexPathForItem:previousIndex inSection:0];
+        [self.cardCollectionView scrollToItemAtIndexPath:previousItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        self.pageControl.currentPage = previousIndex;
+        [self pageControlCurrentIndex:previousIndex];
+    }
+}
+
+#pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a particular screen
+- (void)handleNavigateToPageNotification:(NSNotification *)notification {
+    if (notification != nil && [notification.userInfo isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *userInfo = notification.userInfo;
+        NSString *screenId = userInfo[@"screenId"];
+        if (![CPUtils isNullOrEmpty:screenId]) {
+            [self navigateToNextPage:screenId];
+        }
+    }
+}
+
 #pragma mark - Set the value of pageControl from current index
 -(void)pageControlCurrentIndex:(NSInteger)value {
     NSDictionary *bannerInfo = @{
         @"currentIndex": @(value),
         @"appBanner": self.data
     };
+    self.index = value;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"getCurrentAppBannerPageIndexValue" object:nil userInfo:bannerInfo];
 }
 

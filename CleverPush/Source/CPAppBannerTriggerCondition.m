@@ -25,6 +25,9 @@
             if ([[json objectForKey:@"type"] isEqualToString:@"deepLink"]) {
                 self.type = CPAppBannerTriggerConditionTypeDeepLink;
             }
+            if ([[json objectForKey:@"type"] isEqualToString:@"daysSinceInitialization"]) {
+                self.type = CPAppBannerTriggerConditionTypeDaysSinceInitialization;
+            }
         }
 
         if ([json objectForKey:@"event"] && [[json objectForKey:@"event"] isKindOfClass:[NSString class]]) {
@@ -48,6 +51,10 @@
 
         if ([json objectForKey:@"seconds"]) {
             self.seconds = [[json objectForKey:@"seconds"] intValue];
+        }
+
+        if ([json objectForKey:@"days"]) {
+            self.days = [[json objectForKey:@"days"] intValue];
         }
 
         if (![CPUtils isNullOrEmpty:[json objectForKey:@"deepLinkUrl"]]) {

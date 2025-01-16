@@ -66,7 +66,7 @@
 		</data>
 		<key>Headers/CPAppBanner.h</key>
 		<data>
-		cRYHiQTKqsHRDS6k3wmpraDBrBI=
+		WypQWfnZm3rLJgIvTwr3stk2sYw=
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Headers/CPAppBannerFrequency.h</key>
 		<data>
-		NXiHAFhbr0nQSaIVQnLne0xcujs=
+		O6vhdC931KcZK84fb4zC/oqJSjU=
 		</data>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
 		<data>
@@ -142,7 +142,7 @@
 		</data>
 		<key>Headers/CPAppBannerTriggerCondition.h</key>
 		<data>
-		QytS3KBA2HbVY0U7U+tn8IPVD4c=
+		UuQc+0fbNKtznBkKPtp/m+pSfpo=
 		</data>
 		<key>Headers/CPAppBannerTriggerConditionEventProperty.h</key>
 		<data>
@@ -150,7 +150,7 @@
 		</data>
 		<key>Headers/CPAppBannerTriggerConditionType.h</key>
 		<data>
-		114tl++c511ELOqx/CAT34bP4uE=
+		75DWmSl/arU4jcsW6reU32/CzVo=
 		</data>
 		<key>Headers/CPAppBannerTriggerType.h</key>
 		<data>
@@ -214,7 +214,7 @@
 		</data>
 		<key>Headers/CPStoryView.h</key>
 		<data>
-		Kcn12XHll9+Dyyk540YuLtalx/8=
+		rlOxhz9V61wfzHYxN1uzXMAGZ1k=
 		</data>
 		<key>Headers/CPStoryWidget.h</key>
 		<data>
@@ -270,7 +270,7 @@
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		vjULYEhMhL+OJ1AcVAKKiGLFUPg=
+		0KEc+eupl5j8LBK0kxdAfFfotyE=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -278,7 +278,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		fP0Crci9+MA4D78yRVZxmDCAR7U=
+		+gB73hnILcS8tCU2uXb3o8OavfI=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -400,7 +400,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ewLURKnD8WamylUak00yNBHSINAh52blRyqZr2TYEt4=
+			sFZFHs44b8cqpp17tA/3pS2ciEcgSBCAR2wVZHJmeT0=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
@@ -470,7 +470,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			gX2UTcP1JKf9CrL0563cKtZp0a6m8QWDYLZxOKYVE5I=
+			Q4zTJuVeFANBBmjxMjU9JOkK+zKBQV15vYaHejgFAro=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerHTMLBlock.h</key>
@@ -533,7 +533,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			n9T7EaIiZCM+/0eiUFUYRmpXVgyRtp32P/WGui3uu/k=
+			Ef2axRLGAiZdb+B9xXAUVXJZPzpTDiLAX9tvn5bev3w=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerTriggerConditionEventProperty.h</key>
@@ -547,7 +547,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			iEw9XibakZHVXU7fp6/BA0eTF6J1Z03Xk/qKOMiNwpk=
+			yMcZhvwhmv7Ho0hhmkNUwbLB72vyZfbTJaNW5bihaNA=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerTriggerType.h</key>
@@ -659,7 +659,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zueePZ4wuOpF7rXsqD4DBH+vIL8woOgo9ELVIJXQN/g=
+			BX2EnVhlEMPSxsB+049RJUfbbPOKNLLQg8lZJtVN+mM=
 			</data>
 		</dict>
 		<key>Headers/CPStoryWidget.h</key>
@@ -757,7 +757,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			IPf7f6UrF4lJSULTXvp2yMKwIlgffe/uEQn0nGcAq2g=
+			aBcAXDQWiLxT+acnI51Yy9uMFysBGl9xRs4ufxMmiQU=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

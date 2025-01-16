@@ -50,6 +50,7 @@
 @property (nonatomic, strong) NSArray *attributes;
 @property (nonatomic) int dismissTimeout;
 @property (nonatomic) int delaySeconds;
+@property (nonatomic) int everyXDays;
 @property (nonatomic) BOOL multipleScreensEnabled;
 @property (nonatomic) BOOL carouselEnabled;
 @property (nonatomic) BOOL marginEnabled;

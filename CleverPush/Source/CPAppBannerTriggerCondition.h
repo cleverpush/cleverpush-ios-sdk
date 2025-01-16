@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSString *value;
 @property (nonatomic) int sessions;
 @property (nonatomic) int seconds;
+@property (nonatomic) int days;
 
 #pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;
