@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.3";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.4";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;

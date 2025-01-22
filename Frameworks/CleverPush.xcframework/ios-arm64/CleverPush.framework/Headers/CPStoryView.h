@@ -39,6 +39,8 @@ typedef void (^CPStoryViewOpenedBlock)(NSURL* url, CPStoryViewFinishedBlock fini
 @property (nonatomic, assign) BOOL allowAutoRotation;
 @property (nonatomic, assign) BOOL hasTrackedShown;
 @property (nonatomic, assign) BOOL autoTrackShown;
+@property (nonatomic, assign) BOOL pendingTrackShownCall;
+@property (nonatomic, assign) BOOL hasInitialized;
 @property (nonatomic) int titleTextSize;
 @property (nonatomic) int storyIconHeight;
 @property (nonatomic) int storyIconWidth;
