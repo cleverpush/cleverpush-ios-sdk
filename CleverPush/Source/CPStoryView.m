@@ -70,7 +70,7 @@ CPStoryCell *previousAnimatedCell;
         if (customWidgetId != nil && customWidgetId.length != 0) {
             [CPWidgetModule getWidgetsStories:customWidgetId completion:^(CPWidgetsStories *Widget) {
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
-					self.autoTrackShown = autoTrackShown;
+					          self.autoTrackShown = autoTrackShown;
 
                     if (backgroundColor != nil) {
                         self.backgroundColorLightMode = backgroundColor;
@@ -307,6 +307,10 @@ CPStoryCell *previousAnimatedCell;
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
 
+                    self.hasInitialized = YES;
+                    if (self.pendingTrackShownCall) {
+                        [self trackShown];
+                    }
                 });
             }];
         } else {
@@ -369,10 +373,8 @@ CPStoryCell *previousAnimatedCell;
 		return;
 	}
 
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-		[self trackShown];
-		self.hasTrackedShown = YES;
-	});
+  [self trackShown];
+  self.hasTrackedShown = YES;
 }
 
 - (BOOL) shouldAutorotate {
@@ -874,26 +876,34 @@ CPStoryCell *previousAnimatedCell;
 
 #pragma mark - Tracking when story widget has been rendered
 - (void)trackShown {
-    if (self.widget != nil) {
-		NSMutableArray <NSString*>* storyIdArray = [NSMutableArray new];
-		for (CPStory *story in self.stories) {
-			NSString *storyIdString = story.id;
-			if (storyIdString != nil) {
-				if (self.widget.groupStoryCategories) {
-					NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
-					for (NSString *storyId in currentStoryIds) {
-						[storyIdArray addObject:storyId];
-					}
-				} else {
-					[storyIdArray addObject:storyIdString];
-				}
-			}
-		}
+  if (!self.hasInitialized) {
+    self.pendingTrackShownCall = YES;
+    return;
+  }
+  self.pendingTrackShownCall = NO;
 
-		[CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
-			[CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
-		}];
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    if (self.widget != nil) {
+      NSMutableArray <NSString*>* storyIdArray = [NSMutableArray new];
+      for (CPStory *story in self.stories) {
+        NSString *storyIdString = story.id;
+        if (storyIdString != nil) {
+          if (self.widget.groupStoryCategories) {
+            NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
+            for (NSString *storyId in currentStoryIds) {
+              [storyIdArray addObject:storyId];
+            }
+          } else {
+            [storyIdArray addObject:storyIdString];
+          }
+        }
+      }
+
+      [CPWidgetModule trackWidgetShown:self.widget.id withStories:storyIdArray onSuccess:nil onFailure:^(NSError * _Nullable error) {
+        [CPLog error:@"Failed to mark story as shown: %@ %@", self.widget.id, error];
+      }];
     }
+	});
 }
 
 #pragma mark - Unread Story ID Synchronization

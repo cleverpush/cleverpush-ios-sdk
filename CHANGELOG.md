@@ -1,3 +1,6 @@
+## 1.32.4 (22.01.2025)
+* Improved tracking flow for `CPStoryView`
+
 ## 1.32.3 (16.01.2025)
 * Resolved the setAutoRequestNotificationPermission(false) issue with autoRegister: true.
 
