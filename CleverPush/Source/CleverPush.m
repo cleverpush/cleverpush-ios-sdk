@@ -378,6 +378,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionAttribute:attributeId arrayValue:value onSuccess:successBlock onFailure:failureBlock];
 }
 
++ (void)setSubscriptionAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes {
+    [self.CPSharedInstance setSubscriptionAttributes:attributes];
+}
+
 + (void)pushSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
     [self.CPSharedInstance pushSubscriptionAttributeValue:attributeId value:value];
 }
