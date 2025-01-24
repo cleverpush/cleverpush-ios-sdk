@@ -2509,6 +2509,13 @@ static id isNil(id object) {
     [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:successBlock onFailure:failureBlock];
 }
 
+- (void)setSubscriptionAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes {
+    for (NSString *key in attributes) {
+        NSString *value = attributes[key];
+        [self setSubscriptionAttributeObjectImplementation:key objectValue:value callback:nil onSuccess:nil onFailure:nil];
+    }
+}
+
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId objectValue:(NSObject*)value callback:(void(^)(void))callback onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self getSubscriptionId:^(NSString *subscriptionId) {
         if (subscriptionId == nil) {
