@@ -1230,7 +1230,7 @@ static id isNil(id object) {
 
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
-            [self requestNotificationPermission:isNotificationsDisplayAlertEnabled playSound:isNotificationsSoundEnabled setBadge:isNotificationsBadgeCountEnabled completionHandler:^(BOOL granted, NSError *error) {
+            [self requestNotificationPermission:isNotificationsDisplayAlertEnabled playSound:isNotificationsSoundEnabled setBadge:isNotificationsBadgeCountEnabled completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && !ignoreDisabledNotificationPermission) {
                         [self handleSubscriptionWithCompletion:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
