@@ -83,6 +83,9 @@ static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
 static BOOL incrementBadge = NO;
 static BOOL showNotificationsInForeground = YES;
+static BOOL isNotificationsDisplayAlertEnabled = YES;
+static BOOL isNotificationsSoundEnabled = YES;
+static BOOL isNotificationsBadgeCountEnabled = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
@@ -1205,9 +1208,20 @@ static id isNil(id object) {
     } failure:failureBlock skipTopicsDialog:skipTopicsDialog];
 }
 
-- (void)requestNotificationPermission:(void (^)(BOOL granted, NSError* error))completionHandler {
+- (void)requestNotificationPermission:(BOOL)shouldShowAlert playSound:(BOOL)shouldPlaySound setBadge:(BOOL)shouldSetBadge
+    completionHandler:(void (^)(BOOL granted, NSError* error))completionHandler {
+    UNAuthorizationOptions options = 0;
+    if (shouldShowAlert) {
+        options |= UNAuthorizationOptionAlert;
+    }
+    if (shouldPlaySound) {
+        options |= UNAuthorizationOptionSound;
+    }
+    if (shouldSetBadge) {
+        options |= UNAuthorizationOptionBadge;
+    }
+
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    UNAuthorizationOptions options = (UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge);
     [center requestAuthorizationWithOptions:options completionHandler:completionHandler];
 }
 
@@ -1216,7 +1230,7 @@ static id isNil(id object) {
 
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
-            [self requestNotificationPermission:^(BOOL granted, NSError* error) {
+            [self requestNotificationPermission:isNotificationsDisplayAlertEnabled playSound:isNotificationsSoundEnabled setBadge:isNotificationsBadgeCountEnabled completionHandler:^(BOOL granted, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && !ignoreDisabledNotificationPermission) {
                         [self handleSubscriptionWithCompletion:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
@@ -3760,6 +3774,21 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     [userDefaults setBool:show forKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY];
     [userDefaults synchronize];
+}
+
+#pragma mark - Notification Display Settings
+- (void)setNotificationsDisplayAlertEnabled:(BOOL)enabled {
+    isNotificationsDisplayAlertEnabled = enabled;
+}
+
+#pragma mark - Notification Sound Settings
+- (void)setNotificationsSoundEnabled:(BOOL)enabled {
+    isNotificationsSoundEnabled = enabled;
+}
+
+#pragma mark - Notification Badge Settings
+- (void)setNotificationsBadgeCountEnabled:(BOOL)enabled {
+    isNotificationsBadgeCountEnabled = enabled;
 }
 
 - (UIWindow*)keyWindow {

@@ -492,6 +492,18 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setShowNotificationsInForeground:show];
 }
 
++ (void)setNotificationsDisplayAlertEnabled:(BOOL)enabled {
+    [self.CPSharedInstance setNotificationsDisplayAlertEnabled:enabled];
+}
+
++ (void)setNotificationsSoundEnabled:(BOOL)enabled {
+    [self.CPSharedInstance setNotificationsSoundEnabled:enabled];
+}
+
++ (void)setNotificationsBadgeCountEnabled:(BOOL)enabled {
+    [self.CPSharedInstance setNotificationsBadgeCountEnabled:enabled];
+}
+
 + (void)addChatView:(CPChatView* _Nullable)chatView {
     [self.CPSharedInstance addChatView:chatView];
 }
