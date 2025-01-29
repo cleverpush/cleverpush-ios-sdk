@@ -2572,25 +2572,6 @@ static id isNil(id object) {
                 }
                 return;
             }
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            if (![arrayValue containsString:value]) {
-                [arrayValue addObject:value];
-            }
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
@@ -2606,6 +2587,27 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
+
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                    if (!subscriptionAttributes) {
+                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                    }
+
+                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                    if (!arrayValue) {
+                        arrayValue = [NSMutableArray new];
+                    } else {
+                        arrayValue = [arrayValue mutableCopy];
+                    }
+                    if (![arrayValue containsString:value]) {
+                        [arrayValue addObject:value];
+                    }
+
+                    [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                    [userDefaults synchronize];
+
                     if (successBlock) {
                         successBlock(results);
                     }
@@ -2635,23 +2637,6 @@ static id isNil(id object) {
                 }
                 return;
             }
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            [arrayValue removeObject:value];
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
@@ -2667,6 +2652,25 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pull successfully: %@ %@", attributeId, value];
+
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                    if (!subscriptionAttributes) {
+                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                    }
+
+                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                    if (!arrayValue) {
+                        arrayValue = [NSMutableArray new];
+                    } else {
+                        arrayValue = [arrayValue mutableCopy];
+                    }
+                    [arrayValue removeObject:value];
+
+                    [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                    [userDefaults synchronize];
+                    
                     if (successBlock) {
                         successBlock(results);
                     }

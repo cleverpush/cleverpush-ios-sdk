@@ -614,6 +614,22 @@ NSInteger currentScreenIndex = 0;
                 toValue = @"";
             }
 
+            if ([attributeValue isKindOfClass:[NSArray class]]) {
+                NSArray *availableValues = (NSArray *)attributeValue;
+                BOOL matchFound = NO;
+                for (NSString *arrayItem in availableValues) {
+                    if ([arrayItem isEqualToString:compareAttributeValue]) {
+                        attributeValue = arrayItem;
+                        matchFound = YES;
+                        break;
+                    }
+                }
+
+                if (!matchFound) {
+                    return NO;
+                }
+            }
+
             if ([CPUtils isNullOrEmpty:attributeValue]) {
                 return NO;
             }
