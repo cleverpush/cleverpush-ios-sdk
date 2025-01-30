@@ -145,6 +145,7 @@ CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
 CPInitializedBlock handleInitialized;
+CPDeviceTokenRegistrationBlock handleDeviceTokenRegistration;
 CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController*channelTopicsPicker;
 CPNotificationOpenedResult* pendingOpenedResult = nil;
@@ -1214,6 +1215,20 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     hasCalledSubscribe = YES;
 
+    if (deviceToken) {
+        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    } else {
+        [self registerForRemoteNotificationsWithCompletion:^(NSString *deviceToken, NSError *error) {
+            if (![CPUtils isNullOrEmpty:deviceToken] && error == nil) {
+                [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+            } else if (failureBlock) {
+                failureBlock(error);
+            }
+        }];
+    }
+}
+
+- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
             [self requestNotificationPermission:^(BOOL granted, NSError* error) {
@@ -1282,10 +1297,6 @@ static id isNil(id object) {
                 }
             }];
         }
-    }];
-
-    [self ensureMainThreadSync:^{
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
     }];
 }
 
@@ -1432,6 +1443,10 @@ static id isNil(id object) {
         cpTokenUpdateSuccessBlock = successBlock;
         cpTokenUpdateFailureBlock = failureBlock;
 
+        if (handleDeviceTokenRegistration) {
+            handleDeviceTokenRegistration(deviceToken, nil);
+        }
+
         [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
             if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
                 [CPLog debug:@"syncSubscription called from registerDeviceToken"];
@@ -1459,6 +1474,10 @@ static id isNil(id object) {
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
+
+    if (handleDeviceTokenRegistration) {
+        handleDeviceTokenRegistration(deviceToken, nil);
+    }
 
     [self ensureMainThreadSync:^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
@@ -2116,6 +2135,16 @@ static id isNil(id object) {
         [CPLog info:@"Device Registered with CleverPush: %@", subscriptionId];
     } onFailure:^(NSError* error) {
         [CPLog error:@"Error in CleverPush Registration: %@", error];
+        if (handleDeviceTokenRegistration) {
+            handleDeviceTokenRegistration(nil, error);
+        }
+    }];
+}
+
+- (void)registerForRemoteNotificationsWithCompletion:(CPDeviceTokenRegistrationBlock)completion {
+    handleDeviceTokenRegistration = completion;
+    [self ensureMainThreadSync:^{
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
     }];
 }
 
