@@ -1214,6 +1214,33 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     hasCalledSubscribe = YES;
 
+    if (![UIApplication sharedApplication].isRegisteredForRemoteNotifications) {
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    }
+
+    if (!deviceToken) {
+        [self waitForDeviceTokenWithCompletion:^{
+            [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        }];
+        return;
+    }
+
+    [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+}
+
+- (void)waitForDeviceTokenWithCompletion:(void (^)(void))completion {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (deviceToken) {
+            if (completion) {
+                completion();
+            }
+        } else {
+            [self waitForDeviceTokenWithCompletion:completion];
+        }
+    });
+}
+
+- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
             [self requestNotificationPermission:^(BOOL granted, NSError* error) {
@@ -1257,13 +1284,13 @@ static id isNil(id object) {
         } else {
             [self performSelector:@selector(syncSubscription) withObject:nil];
         }
-          
+
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
                 if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:YES];
                 }
-                
+
                 if (!skipTopicsDialog) {
                     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                     [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
@@ -1282,10 +1309,6 @@ static id isNil(id object) {
                 }
             }];
         }
-    }];
-
-    [self ensureMainThreadSync:^{
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
     }];
 }
 
