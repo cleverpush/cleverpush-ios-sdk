@@ -1,3 +1,6 @@
+## 1.32.5 (30.01.2025)
+* Fixed `subscribe()` with `setIgnoreDisabledNotificationPermission(true)`
+
 ## 1.32.4 (22.01.2025)
 * Improved tracking flow for `CPStoryView`
 
