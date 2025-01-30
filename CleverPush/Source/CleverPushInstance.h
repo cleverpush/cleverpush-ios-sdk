@@ -53,8 +53,6 @@ typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* 
 typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* _Nullable result);
 typedef void (^CPInitializedBlock)(BOOL success, NSString* _Nullable failureMessage);
 
-typedef void (^CPDeviceTokenRegistrationBlock)(NSString* _Nullable deviceToken, NSError* _Nullable error);
-
 typedef void (^CPResultSuccessBlock)(NSDictionary* _Nullable result);
 typedef void (^CPFailureBlock)(NSError* _Nullable error);
 
