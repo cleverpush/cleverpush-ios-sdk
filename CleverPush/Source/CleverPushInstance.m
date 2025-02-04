@@ -1214,9 +1214,11 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     hasCalledSubscribe = YES;
 
-    if (![UIApplication sharedApplication].isRegisteredForRemoteNotifications) {
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    }
+    [self ensureMainThreadSync:^{
+        if (![UIApplication sharedApplication].isRegisteredForRemoteNotifications) {
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }
+    }];
 
     if (!deviceToken) {
         [self waitForDeviceTokenWithCompletion:^{
