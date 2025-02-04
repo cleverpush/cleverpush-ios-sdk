@@ -308,7 +308,7 @@ CPStoryCell *previousAnimatedCell;
 
                     self.hasInitialized = YES;
                     if (self.pendingTrackShownCall) {
-                        [self trackShownInternal];
+                        [self trackShown];
                     }
 
                     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadStoryView) name:CPAppearanceModeChangedNotification object:nil];
