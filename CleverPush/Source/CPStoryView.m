@@ -22,6 +22,7 @@ CPStoryViewOpenedBlock openedCallback;
 NSString* storyWidgetId;
 BOOL darkModeEnabled;
 NSString * const CPAppearanceModeChangedNotification = @"AppearanceModeChangedNotification";
+NSString * const CPCallTrackStoryNotification = @"CallTrackStoryNotification";
 CPStoryCell *previousAnimatedCell;
 
 #pragma mark - Initialise the Widgets with UICollectionView frame
@@ -302,8 +303,6 @@ CPStoryCell *previousAnimatedCell;
                         }
                     }
 
-                    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadStoryView) name:CPAppearanceModeChangedNotification object:nil];
-
                     [self reloadReadStories:CleverPush.getSeenStories];
                     [CleverPush addStoryView:self];
 
@@ -311,6 +310,9 @@ CPStoryCell *previousAnimatedCell;
                     if (self.pendingTrackShownCall) {
                         [self trackShown];
                     }
+
+                    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadStoryView) name:CPAppearanceModeChangedNotification object:nil];
+                    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(trackShownInternal) name:CPCallTrackStoryNotification object:nil];
                 });
             }];
         } else {
@@ -871,11 +873,15 @@ CPStoryCell *previousAnimatedCell;
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:CPAppearanceModeChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Tracking when story widget has been rendered
 - (void)trackShown {
+    [[NSNotificationCenter defaultCenter] postNotificationName:CPCallTrackStoryNotification object:nil];
+}
+
+- (void)trackShownInternal {
   if (!self.hasInitialized) {
     self.pendingTrackShownCall = YES;
     return;
