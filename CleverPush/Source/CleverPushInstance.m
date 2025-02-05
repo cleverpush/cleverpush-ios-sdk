@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.4";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.6";
 
 static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
@@ -1228,6 +1228,35 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     hasCalledSubscribe = YES;
 
+    [self ensureMainThreadSync:^{
+        if (![UIApplication sharedApplication].isRegisteredForRemoteNotifications) {
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        }
+    }];
+
+    if (!deviceToken) {
+        [self waitForDeviceTokenWithCompletion:^{
+            [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        }];
+        return;
+    }
+
+    [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+}
+
+- (void)waitForDeviceTokenWithCompletion:(void (^)(void))completion {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (deviceToken) {
+            if (completion) {
+                completion();
+            }
+        } else {
+            [self waitForDeviceTokenWithCompletion:completion];
+        }
+    });
+}
+
+- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
             [self requestNotificationPermission:isNotificationsDisplayAlertEnabled playSound:isNotificationsSoundEnabled setBadge:isNotificationsBadgeCountEnabled completionHandler:^(BOOL granted, NSError* error) {
@@ -1271,13 +1300,13 @@ static id isNil(id object) {
         } else {
             [self performSelector:@selector(syncSubscription) withObject:nil];
         }
-          
+
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
                 if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:YES];
                 }
-                
+
                 if (!skipTopicsDialog) {
                     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                     [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
@@ -1296,10 +1325,6 @@ static id isNil(id object) {
                 }
             }];
         }
-    }];
-
-    [self ensureMainThreadSync:^{
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
     }];
 }
 
@@ -2586,25 +2611,6 @@ static id isNil(id object) {
                 }
                 return;
             }
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            if (![arrayValue containsString:value]) {
-                [arrayValue addObject:value];
-            }
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
@@ -2620,6 +2626,27 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pushed successfully: %@ %@", attributeId, value];
+
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                    if (!subscriptionAttributes) {
+                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                    }
+
+                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                    if (!arrayValue) {
+                        arrayValue = [NSMutableArray new];
+                    } else {
+                        arrayValue = [arrayValue mutableCopy];
+                    }
+                    if (![arrayValue containsString:value]) {
+                        [arrayValue addObject:value];
+                    }
+
+                    [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                    [userDefaults synchronize];
+
                     if (successBlock) {
                         successBlock(results);
                     }
@@ -2649,23 +2676,6 @@ static id isNil(id object) {
                 }
                 return;
             }
-            NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-            NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-            if (!subscriptionAttributes) {
-                subscriptionAttributes = [[NSMutableDictionary alloc] init];
-            }
-
-            NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-            if (!arrayValue) {
-                arrayValue = [NSMutableArray new];
-            } else {
-                arrayValue = [arrayValue mutableCopy];
-            }
-            [arrayValue removeObject:value];
-
-            [subscriptionAttributes setObject:arrayValue forKey:attributeId];
-            [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
-            [userDefaults synchronize];
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
@@ -2681,6 +2691,25 @@ static id isNil(id object) {
 
                 [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                     [CPLog debug:@"Attribute value pull successfully: %@ %@", attributeId, value];
+
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                    if (!subscriptionAttributes) {
+                        subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                    }
+
+                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
+                    if (!arrayValue) {
+                        arrayValue = [NSMutableArray new];
+                    } else {
+                        arrayValue = [arrayValue mutableCopy];
+                    }
+                    [arrayValue removeObject:value];
+
+                    [subscriptionAttributes setObject:arrayValue forKey:attributeId];
+                    [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                    [userDefaults synchronize];
+                    
                     if (successBlock) {
                         successBlock(results);
                     }

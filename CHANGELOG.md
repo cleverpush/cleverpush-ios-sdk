@@ -1,3 +1,10 @@
+## 1.32.6 (04.02.2025)
+* Resolved the issue of `trackshown` function not working in story view.
+* Optimised `handleSubscriptionWithCompletion` function for [UIApplication isRegisteredForRemoteNotifications] & [UIApplication registerForRemoteNotifications] is called on the main thread to avoid threading issues.
+
+## 1.32.5 (30.01.2025)
+* Fixed `subscribe()` with `setIgnoreDisabledNotificationPermission(true)`
+
 ## 1.32.4 (22.01.2025)
 * Improved tracking flow for `CPStoryView`
 
