@@ -219,6 +219,15 @@
             NSDictionary *bodyDict = (NSDictionary *)message.body;
             if (bodyDict && bodyDict.count > 0) {
                 NSString *callbackURLString = bodyDict[@"callbackUrl"];
+                NSString *requestURLString = bodyDict[@"url"];
+
+                if (![CPUtils isNullOrEmpty:requestURLString]) {
+                    if ([CPUtils isValidURL:[NSURL URLWithString:requestURLString]]) {
+                        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:requestURLString];
+                        [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
+                    }
+                }
+                
                 if (![CPUtils isNullOrEmpty:callbackURLString]) {
                     NSURL *storyElementCallBackURL = [NSURL URLWithString:callbackURLString];
                     if ([CPUtils isValidURL:storyElementCallBackURL]) {
@@ -230,14 +239,6 @@
                             self.openedCallback(storyElementCallBackURL, self.finishedCallback);
                         } else {
                             [CPUtils openSafari:storyElementCallBackURL];
-                        }
-
-                        NSString *requestURLString = bodyDict[@"url"];
-                        if (![CPUtils isNullOrEmpty:requestURLString]) {
-                            if ([CPUtils isValidURL:[NSURL URLWithString:requestURLString]]) {
-                                NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:requestURLString];
-                                [CleverPush enqueueRequest:request onSuccess:nil onFailure:nil];
-                            }
                         }
                     }
                 }
