@@ -83,9 +83,9 @@ static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
 static BOOL incrementBadge = NO;
 static BOOL showNotificationsInForeground = YES;
-static BOOL isNotificationsDisplayAlertEnabled = YES;
-static BOOL isNotificationsSoundEnabled = YES;
-static BOOL isNotificationsBadgeCountEnabled = YES;
+static BOOL isDisplayAlertEnabledForNotifications = YES;
+static BOOL isSoundEnabledForNotifications = YES;
+static BOOL isBadgeCountEnabledForNotifications = YES;
 static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
@@ -1259,7 +1259,7 @@ static id isNil(id object) {
 - (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
-            [self requestNotificationPermission:isNotificationsDisplayAlertEnabled playSound:isNotificationsSoundEnabled setBadge:isNotificationsBadgeCountEnabled completionHandler:^(BOOL granted, NSError* error) {
+            [self requestNotificationPermission:isDisplayAlertEnabledForNotifications playSound:isSoundEnabledForNotifications setBadge:isBadgeCountEnabledForNotifications completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && !ignoreDisabledNotificationPermission) {
                         [self handleSubscriptionWithCompletion:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
@@ -3806,18 +3806,16 @@ static id isNil(id object) {
 }
 
 #pragma mark - Notification Display Settings
-- (void)setNotificationsDisplayAlertEnabled:(BOOL)enabled {
-    isNotificationsDisplayAlertEnabled = enabled;
+- (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled {
+    isDisplayAlertEnabledForNotifications = enabled;
 }
 
-#pragma mark - Notification Sound Settings
-- (void)setNotificationsSoundEnabled:(BOOL)enabled {
-    isNotificationsSoundEnabled = enabled;
+- (void)setSoundEnabledForNotifications:(BOOL)enabled {
+    isSoundEnabledForNotifications = enabled;
 }
 
-#pragma mark - Notification Badge Settings
-- (void)setNotificationsBadgeCountEnabled:(BOOL)enabled {
-    isNotificationsBadgeCountEnabled = enabled;
+- (void)setBadgeCountEnabledForNotifications:(BOOL)enabled {
+    isBadgeCountEnabledForNotifications = enabled;
 }
 
 - (UIWindow*)keyWindow {
