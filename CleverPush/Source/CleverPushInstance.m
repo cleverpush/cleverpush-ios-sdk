@@ -637,7 +637,6 @@ static id isNil(id object) {
         [self initIabTcf];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
@@ -686,9 +685,10 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - clear Badge count and start tracking the session when application goes to the Foreground.
-- (void)applicationWillEnterForeground {
+#pragma mark - clear Badge count and start tracking the session when application in the active state 
+- (void)applicationDidBecomeActive {
     [self updateBadge:nil];
+    [self trackSessionStart];
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
@@ -711,11 +711,6 @@ static id isNil(id object) {
 - (void)applicationDidEnterBackground {
     [self updateBadge:nil];
     [self trackSessionEnd];
-}
-
-#pragma mark - Track the session when application is in the active state
-- (void)applicationDidBecomeActive {
-    [self trackSessionStart];
 }
 
 #pragma mark - Initialised Features.
