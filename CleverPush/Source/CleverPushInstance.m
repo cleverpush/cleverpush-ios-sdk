@@ -637,9 +637,9 @@ static id isNil(id object) {
         [self initIabTcf];
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground) name:UIApplicationWillEnterForegroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate) name:UIApplicationWillTerminateNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)initTopicsDialogData:(NSDictionary* _Nullable)config syncToBackend:(BOOL)syncToBackend {
@@ -685,8 +685,8 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-#pragma mark - clear Badge count and start tracking the session when application goes to the Foreground.
-- (void)applicationWillEnterForeground {
+#pragma mark - clear Badge count and start tracking the session when application in the active state 
+- (void)applicationDidBecomeActive {
     [self updateBadge:nil];
     [self trackSessionStart];
     [CPAppBannerModule initSession:channelId afterInit:YES];
@@ -3564,7 +3564,26 @@ static id isNil(id object) {
                     [request setHTTPBody:postData];
 
                     [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                        if (results != nil) {
+                            NSString *syncAfterString = [results objectForKey:@"sdkForceSyncAfter"];
 
+                            if (![CPUtils isNullOrEmpty:syncAfterString]) {
+                                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                                [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+
+                                NSDate *apiDate = [dateFormatter dateFromString:syncAfterString];
+
+                                if (apiDate) {
+                                    NSDate *lastUpdatedDate = [[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
+
+                                    if (!lastUpdatedDate || [apiDate compare:lastUpdatedDate] == NSOrderedDescending) {
+                                        [self ensureMainThreadSync:^{
+                                            [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+                                        }];
+                                    }
+                                }
+                            }
+                        }
                     } onFailure:nil];
                 } else if (subscriptionId == nil) {
                     [CPLog debug:@"CleverPushInstance: trackSessionStart: There is no subscription for CleverPush SDK."];
