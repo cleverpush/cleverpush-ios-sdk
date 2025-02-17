@@ -1,3 +1,8 @@
+## 1.32.7 (17.02.2025)
+* Optimised click tracking in the story widget.
+* Added methods for customizing notification permissions and settings.
+* Optimised `trackSessionStart` function by optimising its handling of updated subscription topics.
+
 ## 1.32.6 (04.02.2025)
 * Resolved the issue of `trackshown` function not working in story view.
 * Optimised `handleSubscriptionWithCompletion` function for [UIApplication isRegisteredForRemoteNotifications] & [UIApplication registerForRemoteNotifications] is called on the main thread to avoid threading issues.
