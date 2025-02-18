@@ -1,3 +1,6 @@
+## 1.32.8 (18.02.2025)
+* Removed unnecessary scripts
+
 ## 1.32.7 (17.02.2025)
 * Optimised click tracking in the story widget.
 * Added methods for customizing notification permissions and settings.
