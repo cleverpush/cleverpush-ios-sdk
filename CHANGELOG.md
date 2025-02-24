@@ -1,3 +1,7 @@
+## 1.33.0 (24.02.2025)
+* Various improvements for App Banners with multiple screens
+* Improved Device Token handling
+
 ## 1.32.8 (18.02.2025)
 * Removed unnecessary scripts
 

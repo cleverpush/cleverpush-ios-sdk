@@ -47,5 +47,11 @@
 + (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 + (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize;
++ (NSCache *)sharedImageCache;
+
+/**
+ * Returns a shared NSCache instance for caching images across the app
+ */
++ (NSCache *)sharedImageCache;
 
 @end
