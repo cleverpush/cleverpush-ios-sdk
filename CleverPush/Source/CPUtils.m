@@ -986,4 +986,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return resizedImage;
 }
 
++ (NSCache *)sharedImageCache {
+    static NSCache *sharedImageCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedImageCache = [[NSCache alloc] init];
+    });
+    return sharedImageCache;
+}
+
 @end

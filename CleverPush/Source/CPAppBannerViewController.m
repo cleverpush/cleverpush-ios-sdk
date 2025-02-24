@@ -17,6 +17,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
     self.voucherCode = [CPUtils valueForKey:self.data.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
 
+    [self preloadImages];
     [self conditionalPresentation];
     [self setOrientation];
     [self setupNotificationObservers];
@@ -59,6 +60,15 @@ static CPAppBannerActionBlock appBannerActionCallback;
         [self setDynamicBannerConstraints:self.data.marginEnabled];
         [self setDynamicCloseButton:NO];
         [self setCollectionViewSwipeEnabled];
+        
+        // Set page control colors for dark mode
+        if ([self.data darkModeEnabled:self.traitCollection]) {
+            self.pageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
+            self.pageControl.pageIndicatorTintColor = [UIColor grayColor];
+        } else {
+            self.pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+            self.pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
+        }
     }
 }
 
@@ -87,7 +97,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
     [self.backGroundImage setContentMode:UIViewContentModeScaleAspectFill];
 
     if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]]) {
-        [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+        [self.backGroundImage setImageWithURL:[NSURL URLWithString:self.data.background.darkImageUrl]];
         return;
     }
 
@@ -343,8 +353,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
     return cell;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
+    [self setBackgroundColor];
     [cell setNeedsLayout];
     [cell layoutIfNeeded];
 }
@@ -370,10 +381,14 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
-                CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
-                [self.cardCollectionView scrollRectToVisible:rect animated:NO];
+                if (self.data.carouselEnabled) {
+                    [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+                } else {
+                    CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
+                    [self.cardCollectionView scrollRectToVisible:rect animated:NO];
+                }
                 self.pageControl.currentPage = i;
-                [self pageControlCurrentIndex: i];
+                [self pageControlCurrentIndex:i];
                 break;
             }
         }
@@ -420,13 +435,21 @@ static CPAppBannerActionBlock appBannerActionCallback;
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.cardCollectionView.frame.size.width;
     float currentPage = self.cardCollectionView.contentOffset.x / pageWidth;
-    if (0.0f != fmodf(currentPage, 1.0f)) {
-        self.pageControl.currentPage = currentPage + 1;
-    } else {
-        self.pageControl.currentPage = currentPage;
-    }
-    self.index = self.pageControl.currentPage;
-    [self pageControlCurrentIndex: currentPage];
+    
+    NSInteger page = round(currentPage);
+    self.pageControl.currentPage = page;
+    self.index = page;
+    [self setBackgroundColor];
+    [self pageControlCurrentIndex:page];
+}
+
+- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
+    CGFloat pageWidth = self.cardCollectionView.frame.size.width;
+    NSInteger page = round(scrollView.contentOffset.x / pageWidth);
+    self.pageControl.currentPage = page;
+    self.index = page;
+    [self setBackgroundColor];
+    [self pageControlCurrentIndex:page];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -596,6 +619,53 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 - (IBAction)btnClose:(UIButton *)sender {
     [self onDismiss];
+}
+
+- (void)preloadImages {
+    // Pre-load banner background images
+    if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
+        [self preloadImageWithURL:self.data.background.imageUrl];
+    }
+    if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
+        [self preloadImageWithURL:self.data.background.darkImageUrl];
+    }
+    
+    // Pre-load all screen images
+    for (CPAppBannerCarouselBlock *screen in self.data.screens) {
+        for (CPAppBannerBlock *block in screen.blocks) {
+            if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
+                CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
+                if (imageBlock.imageUrl && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && ![imageBlock.imageUrl isEqualToString:@""]) {
+                    [self preloadImageWithURL:imageBlock.imageUrl];
+                }
+                if (imageBlock.darkImageUrl && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && ![imageBlock.darkImageUrl isEqualToString:@""]) {
+                    [self preloadImageWithURL:imageBlock.darkImageUrl];
+                }
+            }
+        }
+    }
+}
+
+- (void)preloadImageWithURL:(NSString *)urlString {
+    if (![urlString isKindOfClass:[NSString class]] || [urlString isKindOfClass:[NSNull class]] || [urlString isEqualToString:@""]) {
+        return;
+    }
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (!url) return;
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            [CPLog error:@"Failed to preload image: %@", error];
+            return;
+        }
+        // Cache the image data
+        UIImage *image = [UIImage imageWithData:data];
+        if (image) {
+            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+        }
+    }] resume];
 }
 
 @end

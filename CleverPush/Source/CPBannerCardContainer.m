@@ -21,15 +21,15 @@
     self.tblCPBanner.delegate = self;
     self.tblCPBanner.dataSource = self;
     [self.tblCPBanner addObserver:self forKeyPath:@"contentSize" options:0 context:NULL];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self backgroundPopupShadow];
-        [self setBackground];
-        [self setBackgroundColor];
-    });
+
+    [self backgroundPopupShadow];
+    [self setBackground];
+    [self setBackgroundColor];
+
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                                     selector:@selector(getCurrentAppBannerPageIndex:)
-                                                         name:@"getCurrentAppBannerPageIndexValue"
-                                                       object:nil];
+                                          selector:@selector(getCurrentAppBannerPageIndex:)
+                                              name:@"getCurrentAppBannerPageIndexValue"
+                                            object:nil];
 }
 
 - (void)dealloc {
@@ -82,7 +82,6 @@
     self.currentScreenIndex = index;
     CPAppBanner *appBanner = pagevalue[@"appBanner"];
     self.data = appBanner;
-    [self setBackground];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -123,24 +122,37 @@
             cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
             [cell.activitydata startAnimating];
             if (@available(iOS 13.0, *)) {
-                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleMedium;
+                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
             } else {
-                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleGray;
+                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
             }
 
-            [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
-                if (callback) {
-                    [UIView performWithoutAnimation:^{
-                        [cell setNeedsLayout];
-                        [cell layoutIfNeeded];
-                        [tableView beginUpdates];
-                        [tableView endUpdates];
-                        [cell.activitydata stopAnimating];
-                    }];
-                }
-            }];
+            // Check cache first
+            UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:imageUrl];
+            if (cachedImage) {
+                cell.imgCPBanner.image = cachedImage;
+                [cell.activitydata stopAnimating];
+                [UIView performWithoutAnimation:^{
+                    [cell setNeedsLayout];
+                    [cell layoutIfNeeded];
+                    [tableView beginUpdates];
+                    [tableView endUpdates];
+                }];
+            } else {
+                [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl] callback:^(BOOL callback) {
+                    if (callback) {
+                        [UIView performWithoutAnimation:^{
+                            [cell setNeedsLayout];
+                            [cell layoutIfNeeded];
+                            [tableView beginUpdates];
+                            [tableView endUpdates];
+                            [cell.activitydata stopAnimating];
+                        }];
+                    }
+                }];
+            }
         }
-        return  cell;
+        return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
 
@@ -468,30 +480,53 @@
 - (void)setBackground {
     [self.imgviewBackground setContentMode:UIViewContentModeScaleAspectFill];
 
-    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]]) {
-        [self.imgviewBackground setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
+    BOOL isDarkMode = [self.data darkModeEnabled:self.traitCollection];
+
+    // First check if we're in a carousel/multi-screen mode and have a screen-specific dark mode setting
+    if ((self.data.carouselEnabled || self.data.multipleScreensEnabled) && 
+        self.data.screens.count > self.currentScreenIndex) {
+        CPAppBannerCarouselBlock *currentScreen = self.data.screens[self.currentScreenIndex];
+        if (currentScreen.background != nil && ![currentScreen.background isKindOfClass:[NSNull class]]) {
+            if (isDarkMode && currentScreen.background.darkColor != nil && 
+                ![currentScreen.background.darkColor isKindOfClass:[NSNull class]]) {
+                [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:currentScreen.background.darkColor]];
+                return;
+            } else if (currentScreen.background.color != nil && 
+                      ![currentScreen.background.color isKindOfClass:[NSNull class]] && 
+                      ![currentScreen.background.color isEqualToString:@""]) {
+                [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:currentScreen.background.color]];
+                return;
+            }
+        }
+    }
+
+    // Fall back to banner-level settings
+    if (isDarkMode && self.data.background.darkImageUrl != nil && 
+        ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]]) {
+        NSString *imageUrl = self.data.background.darkImageUrl;
+        UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:imageUrl];
+        if (cachedImage) {
+            self.imgviewBackground.image = cachedImage;
+        } else {
+            [self.imgviewBackground setImageWithURL:[NSURL URLWithString:imageUrl]];
+        }
         return;
     }
 
-    if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+    if (isDarkMode && self.data.background.darkColor != nil && 
+        ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
         [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.darkColor]];
         return;
     }
 
-    if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
+    if (self.data.background.imageUrl != nil && 
+        ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && 
+        ![self.data.background.imageUrl isEqualToString:@""]) {
         [self.imgviewBackground setImageWithURL:[NSURL URLWithString:self.data.background.imageUrl]];
         return;
     }
 
-    if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
-        if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
-            [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
-        } else {
-            [self.imgviewBackground setBackgroundColor:[UIColor whiteColor]];
-        }
-    } else {
-        [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
-    }
+    [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
 }
 
 - (void)setUpPageControl {
@@ -500,6 +535,15 @@
         self.pageControl.hidden = NO;
         self.pageControlHeightConstraint.constant = 30;
         self.tblviewBottomBannerConstraint.constant = 25;
+        
+        // Set page control colors for dark mode
+        if ([self.data darkModeEnabled:self.traitCollection]) {
+            self.pageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
+            self.pageControl.pageIndicatorTintColor = [UIColor grayColor];
+        } else {
+            self.pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+            self.pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
+        }
     } else {
         [self.pageControl setNumberOfPages:0];
         self.pageControl.hidden = YES;
