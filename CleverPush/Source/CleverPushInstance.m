@@ -75,7 +75,6 @@
 
 NSString* const CLEVERPUSH_SDK_VERSION = @"1.32.8";
 
-static BOOL registeredWithApple = NO;
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
 static BOOL autoResubscribe = NO;
@@ -95,6 +94,7 @@ static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
 static BOOL confirmAlertShown = NO;
 static BOOL hasInitialized = NO;
+static BOOL hasRequestedDeviceToken = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -141,8 +141,6 @@ UIWindow* topicsDialogWindow;
 
 CPChatView* currentChatView;
 CPStoryView* currentStoryView;
-CPResultSuccessBlock cpTokenUpdateSuccessBlock;
-CPFailureBlock cpTokenUpdateFailureBlock;
 CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
@@ -558,17 +556,6 @@ static id isNil(id object) {
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([sharedApp respondsToSelector:@selector(currentUserNotificationSettings)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-            registeredWithApple = [sharedApp currentUserNotificationSettings].types != (NSUInteger)nil;
-#pragma clang diagnostic pop
-        } else {
-            registeredWithApple = deviceToken != nil;
-        }
-    });
-
     [self incrementAppOpens];
 
     if (autoRegister && ![self getUnsubscribeStatus]) {
@@ -614,9 +601,7 @@ static id isNil(id object) {
                     [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
                 }];
             } else {
-                [self ensureMainThreadSync:^{
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
-                }];
+                [self requestDeviceToken];
 
                 if ([self getSubscribeHandler] && ![self getHandleSubscribedCalled]) {
                     [self getSubscribeHandler](subscriptionId);
@@ -918,9 +903,7 @@ static id isNil(id object) {
             [CPLog debug:@"Failed to write sync file or Error excluding file from backup: %@", error];
         }
 
-        [self ensureMainThreadSync:^{
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        }];
+        [self requestDeviceToken];
 
         return YES;
     }
@@ -1225,35 +1208,25 @@ static id isNil(id object) {
     [center requestAuthorizationWithOptions:options completionHandler:completionHandler];
 }
 
-- (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
-    hasCalledSubscribe = YES;
-
-    [self ensureMainThreadSync:^{
-        if (![UIApplication sharedApplication].isRegisteredForRemoteNotifications) {
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        }
-    }];
-
-    if (!deviceToken) {
-        [self waitForDeviceTokenWithCompletion:^{
-            [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
-        }];
+- (void)requestDeviceToken {
+    if (hasRequestedDeviceToken) {
         return;
     }
 
-    [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    hasRequestedDeviceToken = YES;
+    [self ensureMainThreadSync:^{
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    }];
 }
 
-- (void)waitForDeviceTokenWithCompletion:(void (^)(void))completion {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (deviceToken) {
-            if (completion) {
-                completion();
-            }
-        } else {
-            [self waitForDeviceTokenWithCompletion:completion];
-        }
-    });
+- (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    hasCalledSubscribe = YES;
+
+	[self requestDeviceToken];
+
+    [self getDeviceToken:^(NSString * _Nullable deviceToken) {
+        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    }];
 }
 
 - (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
@@ -1465,30 +1438,7 @@ static id isNil(id object) {
 }
 
 #pragma mark - register Device Token
-- (void)registerDeviceToken:(id)newDeviceToken onSuccess:(CPResultSuccessBlock)successBlock onFailure:(CPFailureBlock)failureBlock {
-    if (subscriptionId == nil) {
-        deviceToken = newDeviceToken;
-        cpTokenUpdateSuccessBlock = successBlock;
-        cpTokenUpdateFailureBlock = failureBlock;
-
-        [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings* settings) {
-            if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
-                [CPLog debug:@"syncSubscription called from registerDeviceToken"];
-                [self ensureMainThreadSync:^{
-                    [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-                }];
-            }
-        }];
-        return;
-    }
-
-    if ([deviceToken isEqualToString:newDeviceToken]) {
-        if (successBlock) {
-            successBlock(nil);
-        }
-        return;
-    }
-
+- (void)registerDeviceToken:(id)newDeviceToken {
     deviceToken = newDeviceToken;
 
     for (id(^listener)() in pendingDeviceTokenListeners) {
@@ -1498,10 +1448,6 @@ static id isNil(id object) {
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-
-    [self ensureMainThreadSync:^{
-        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
-    }];
 }
 
 - (BOOL)isSubscriptionInProgress {
@@ -2151,11 +2097,7 @@ static id isNil(id object) {
 - (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)deviceToken {
     NSString* parsedDeviceToken = [self stringFromDeviceToken:deviceToken];
     [CPLog info:@"Device Registered with Apple: %@", parsedDeviceToken];
-    [self registerDeviceToken:parsedDeviceToken onSuccess:^(NSDictionary* results) {
-        [CPLog info:@"Device Registered with CleverPush: %@", subscriptionId];
-    } onFailure:^(NSError* error) {
-        [CPLog error:@"Error in CleverPush Registration: %@", error];
-    }];
+    [self registerDeviceToken:parsedDeviceToken];
 }
 
 #pragma mark - Generalised Api call.
