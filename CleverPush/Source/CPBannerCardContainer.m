@@ -18,13 +18,14 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    [CPLog debug:@"awakeFromNib - data: %@", self.data];
+    [CPLog debug:@"awakeFromNib - traitCollection: %@", self.traitCollection];
+    
     self.tblCPBanner.delegate = self;
     self.tblCPBanner.dataSource = self;
     [self.tblCPBanner addObserver:self forKeyPath:@"contentSize" options:0 context:NULL];
 
     [self backgroundPopupShadow];
-    [self setBackground];
-    [self setBackgroundColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                           selector:@selector(getCurrentAppBannerPageIndex:)
@@ -477,7 +478,7 @@
 }
 
 #pragma mark - setup background image
-- (void)setBackground {
+- (void)setBackgroundInner {
     [self.imgviewBackground setContentMode:UIViewContentModeScaleAspectFill];
 
     BOOL isDarkMode = [self.data darkModeEnabled:self.traitCollection];
@@ -553,22 +554,60 @@
 }
 
 #pragma mark - setup background color
-- (void)setBackgroundColor {
+- (void)setBackgroundOuter {
     [self.contentView setBackgroundColor:[UIColor clearColor]];
 
     if (self.data.type == CPAppBannerTypeFull) {
+        BOOL isDarkMode = [self.data darkModeEnabled:self.traitCollection];
+        
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
-            if (self.data.screens[self.currentScreenIndex].background != nil && ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]] && self.data.screens[self.currentScreenIndex].background.color != nil && ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
-                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+            if (self.data.screens[self.currentScreenIndex].background != nil && 
+                ![self.data.screens[self.currentScreenIndex].background isKindOfClass:[NSNull class]]) {
+                
+                if (isDarkMode && self.data.screens[self.currentScreenIndex].background.darkColor != nil && 
+                    ![self.data.screens[self.currentScreenIndex].background.darkColor isKindOfClass:[NSNull class]]) {
+                    [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.darkColor]];
+                } else if (self.data.screens[self.currentScreenIndex].background.color != nil && 
+                         ![self.data.screens[self.currentScreenIndex].background.color isKindOfClass:[NSNull class]] && 
+                         ![self.data.screens[self.currentScreenIndex].background.color isEqualToString:@""]) {
+                    [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.currentScreenIndex].background.color]];
+                } else {
+                    [self.contentView setBackgroundColor:[UIColor whiteColor]];
+                }
             } else {
                 [self.contentView setBackgroundColor:[UIColor whiteColor]];
             }
         } else {
-            [self.contentView setBackgroundColor:[UIColor whiteColor]];
-            if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+            if (isDarkMode && self.data.background.darkColor != nil && 
+                ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+                [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.darkColor]];
+            } else if (self.data.background.color != nil && 
+                     ![self.data.background.color isKindOfClass:[NSNull class]] && 
+                     ![self.data.background.color isEqualToString:@""]) {
                 [self.contentView setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            } else {
+                [self.contentView setBackgroundColor:[UIColor whiteColor]];
             }
         }
+    }
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self setBackgroundInner];
+            [self setBackgroundOuter];
+        }
+    }
+}
+
+- (void)setData:(CPAppBanner *)data {
+    _data = data;
+    if (data != nil) {
+        [self setBackgroundInner];
+        [self setBackgroundOuter];
     }
 }
 

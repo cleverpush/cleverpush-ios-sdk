@@ -230,16 +230,35 @@ static CPAppBannerActionBlock appBannerActionCallback;
     if ([self.data.contentType isEqualToString:@"html"]) {
         [self.view setBackgroundColor:[UIColor clearColor]];
     } else {
+        BOOL isDarkMode = [self.data darkModeEnabled:self.traitCollection];
+        
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
-            if (self.data.screens[self.index].background != nil && ![self.data.screens[self.index].background isKindOfClass:[NSNull class]] && self.data.screens[self.index].background.color != nil && ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && ![self.data.screens[self.index].background.color isEqualToString:@""]) {
-                [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+            if (self.data.screens[self.index].background != nil && 
+                ![self.data.screens[self.index].background isKindOfClass:[NSNull class]]) {
+                
+                if (isDarkMode && self.data.screens[self.index].background.darkColor != nil && 
+                    ![self.data.screens[self.index].background.darkColor isKindOfClass:[NSNull class]]) {
+                    [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.darkColor]];
+                } else if (self.data.screens[self.index].background.color != nil && 
+                         ![self.data.screens[self.index].background.color isKindOfClass:[NSNull class]] && 
+                         ![self.data.screens[self.index].background.color isEqualToString:@""]) {
+                    [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.screens[self.index].background.color]];
+                } else {
+                    [self.view setBackgroundColor:[UIColor whiteColor]];
+                }
             } else {
                 [self.view setBackgroundColor:[UIColor whiteColor]];
             }
         } else {
-            [self.view setBackgroundColor:[UIColor whiteColor]];
-            if (self.data.background.color != nil && ![self.data.background.color isKindOfClass:[NSNull class]] && ![self.data.background.color isEqualToString:@""] ) {
+            if (isDarkMode && self.data.background.darkColor != nil && 
+                ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
+                [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.darkColor]];
+            } else if (self.data.background.color != nil && 
+                     ![self.data.background.color isKindOfClass:[NSNull class]] && 
+                     ![self.data.background.color isEqualToString:@""]) {
                 [self.view setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+            } else {
+                [self.view setBackgroundColor:[UIColor whiteColor]];
             }
         }
     }
@@ -355,7 +374,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
     [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
-    [self setBackgroundColor];
     [cell setNeedsLayout];
     [cell layoutIfNeeded];
 }
@@ -439,7 +457,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSInteger page = round(currentPage);
     self.pageControl.currentPage = page;
     self.index = page;
-    [self setBackgroundColor];
     [self pageControlCurrentIndex:page];
 }
 
@@ -448,7 +465,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSInteger page = round(scrollView.contentOffset.x / pageWidth);
     self.pageControl.currentPage = page;
     self.index = page;
-    [self setBackgroundColor];
     [self pageControlCurrentIndex:page];
 }
 
