@@ -626,20 +626,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSString *)cleverPushJavaScript {
     return @"\
        <script>\
-           /*function onCloseClick() {\
-               try {\
-                   window.webkit.messageHandlers.close.postMessage(null);\
-               } catch (error) {\
-                   console.log('Caught error on closeBTN click', error);\
-               }\
-           }\
-           var closeElements = document.getElementsByTagName(\"*\");\
-           for (var i = 0, len = closeElements.length; i < len; i++) {\
-               var item = closeElements[i];\
-               if (item.id && item.id.indexOf && item.id.indexOf(\"close\") == 0 || item.className && item.className.indexOf && item.className.indexOf(\"close\") == 0) {\
-                   item.addEventListener('click', onCloseClick);\
-               }\
-           }*/\
            if (typeof window.CleverPush === 'undefined') {\
                window.CleverPush = {};\
            }\
@@ -693,6 +679,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            };\
            window.CleverPush.goToScreen = function goToScreen(screenId) {\
                window.webkit.messageHandlers.goToScreen.postMessage(screenId);\
+           };\
            window.CleverPush.copyToClipboard = function copyToClipboard(text) {\
                window.webkit.messageHandlers.copyToClipboard.postMessage(text);\
            };\
@@ -734,10 +721,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
-    if (message != nil && message.body != nil && ![message.body isKindOfClass:[NSNull class]] && message.name != nil) {
-        if ([message.name isEqualToString:@"close"] || ([message.name isEqualToString:@"closeBanner"])) {
+    [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
+    
+    if (message != nil && message.name != nil) {
+        if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
             UIViewController *topController = [CleverPush topViewController];
-            [topController dismissViewControllerAnimated:YES completion:nil];
+            if (topController) {
+                [CPLog debug:@"Dismissing controller: %@", topController];
+                [topController dismissViewControllerAnimated:YES completion:^{
+                    [CPLog debug:@"Controller dismissed"];
+                }];
+            } else {
+                [CPLog debug:@"No controller to dismiss"];
+            }
+        } else if ([message.name isEqualToString:@"nextScreen"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToNextPageNotification" object:nil];
+        } else if ([message.name isEqualToString:@"previousScreen"]) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPreviousPageNotification" object:nil];
         } else if ([message.name isEqualToString:@"subscribe"]) {
             [self handleSubscribeActionWithCallback:^(BOOL success) {
                 if (success) {
@@ -746,73 +746,73 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }];
         } else if ([message.name isEqualToString:@"unsubscribe"]) {
             [CleverPush unsubscribe];
-        } else if ([message.name isEqualToString:@"trackEvent"]) {
-            [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
-        } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
-            [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
-        } else if ([message.name isEqualToString:@"getSubscriptionAttribute"]) {
-            NSDictionary *bodyDict = (NSDictionary *)message.body;
-            if (bodyDict && bodyDict.count > 0) {
-                NSString *attributeKey = bodyDict[@"attributeKey"];
-                if (![CPUtils isNullOrEmpty:attributeKey]) {
-                    NSString *attributeValue = (NSString *)[CleverPush getSubscriptionAttribute:attributeKey];
-                    if (![CPUtils isNullOrEmpty:attributeValue]) {
-                        NSString *jsCallback = [NSString stringWithFormat:@"window.CleverPush.callback('%@');", attributeValue];
-                        [message.webView evaluateJavaScript:jsCallback completionHandler:nil];
-                    }
-                }
-
-            }
-        } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
-            [CleverPush addSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
-            [CleverPush removeSubscriptionTag:message.body];
-        } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
-            [CleverPush setSubscriptionTopics:message.body];
-        } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
-            [CleverPush addSubscriptionTopic:message.body];
-        } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
-            [CleverPush removeSubscriptionTopic:message.body];
         } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
             [CleverPush showTopicsDialog];
-        } else if ([message.name isEqualToString:@"trackClick"]) {
-            CPAppBannerAction *action;
-            NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
-            buttonBlockDic = [message.body mutableCopy];
-            buttonBlockDic[@"bannerAction"] = @"type";
-            action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
+        }
 
-            NSBundle *bundle = [CPUtils getAssetsBundle];
-            if (!bundle) {
-                bundle = [NSBundle mainBundle];
-            }
+        if (message.body != nil && ![message.body isKindOfClass:[NSNull class]]) {
+            if ([message.name isEqualToString:@"trackEvent"]) {
+                [CleverPush trackEvent:[message.body objectForKey:@"eventId"] properties:[message.body objectForKey:@"properties"]];
+            } else if ([message.name isEqualToString:@"setSubscriptionAttribute"]) {
+                [CleverPush setSubscriptionAttribute:[message.body objectForKey:@"attributeKey"] value:[message.body objectForKey:@"attributeValue"]];
+            } else if ([message.name isEqualToString:@"getSubscriptionAttribute"]) {
+                NSDictionary *bodyDict = (NSDictionary *)message.body;
+                if (bodyDict && bodyDict.count > 0) {
+                    NSString *attributeKey = bodyDict[@"attributeKey"];
+                    if (![CPUtils isNullOrEmpty:attributeKey]) {
+                        NSString *attributeValue = (NSString *)[CleverPush getSubscriptionAttribute:attributeKey];
+                        if (![CPUtils isNullOrEmpty:attributeValue]) {
+                            NSString *jsCallback = [NSString stringWithFormat:@"window.CleverPush.callback('%@');", attributeValue];
+                            [message.webView evaluateJavaScript:jsCallback completionHandler:nil];
+                        }
+                    }
 
-            CPAppBannerViewController *appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
-
-            if (appBannerViewController && action) {
-                [appBannerViewController actionCallback:action];
-            }
-
-        } else if ([message.name isEqualToString:@"openWebView"]) {
-            NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
-            if (webUrl && webUrl.scheme && webUrl.host) {
-                [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
-            }
-        } else if ([message.name isEqualToString:@"goToScreen"]) {
-            if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {
-                if (![self isNullOrEmpty:message.body]) {
-                    NSDictionary *banner = @{
-                        @"screenId": message.body
-                    };
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPageNotification" object:nil userInfo:banner];
                 }
+            } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
+                [CleverPush addSubscriptionTag:message.body];
+            } else if ([message.name isEqualToString:@"removeSubscriptionTag"]) {
+                [CleverPush removeSubscriptionTag:message.body];
+            } else if ([message.name isEqualToString:@"setSubscriptionTopics"]) {
+                [CleverPush setSubscriptionTopics:message.body];
+            } else if ([message.name isEqualToString:@"addSubscriptionTopic"]) {
+                [CleverPush addSubscriptionTopic:message.body];
+            } else if ([message.name isEqualToString:@"removeSubscriptionTopic"]) {
+                [CleverPush removeSubscriptionTopic:message.body];
+            } else if ([message.name isEqualToString:@"trackClick"]) {
+                CPAppBannerAction *action;
+                NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
+                buttonBlockDic = [message.body mutableCopy];
+                buttonBlockDic[@"bannerAction"] = @"type";
+                action = [[CPAppBannerAction alloc] initWithJson:buttonBlockDic];
+
+                NSBundle *bundle = [CPUtils getAssetsBundle];
+                if (!bundle) {
+                    bundle = [NSBundle mainBundle];
+                }
+
+                CPAppBannerViewController *appBannerViewController = [[CPAppBannerViewController alloc] initWithNibName:@"CPAppBannerViewController" bundle:bundle];
+
+                if (appBannerViewController && action) {
+                    [appBannerViewController actionCallback:action];
+                }
+
+            } else if ([message.name isEqualToString:@"openWebView"]) {
+                NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
+                if (webUrl && webUrl.scheme && webUrl.host) {
+                    [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
+                }
+            } else if ([message.name isEqualToString:@"goToScreen"]) {
+                if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {
+                    if (![self isNullOrEmpty:message.body]) {
+                        NSDictionary *banner = @{
+                            @"screenId": message.body
+                        };
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPageNotification" object:nil userInfo:banner];
+                    }
+                }
+            } else if ([message.name isEqualToString:@"copyToClipboard"]) {
+                [UIPasteboard generalPasteboard].string = [NSString stringWithFormat:@"%@", message.body];
             }
-        } else if ([message.name isEqualToString:@"nextScreen"]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToNextPageNotification" object:nil];
-        } else if ([message.name isEqualToString:@"previousScreen"]) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToPreviousPageNotification" object:nil];
-        } else if ([message.name isEqualToString:@"copyToClipboard"]) {
-            [UIPasteboard generalPasteboard].string = [NSString stringWithFormat:@"%@", message.body];
         }
     }
 }
