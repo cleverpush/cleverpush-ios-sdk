@@ -1,7 +1,10 @@
+## 1.33.1 (24.02.2025)
+* Fixed issue with App Banners not displaying correctly in dark mode
+
 ## 1.33.0 (24.02.2025)
 * Various improvements for App Banners with multiple screens
 * Improved Device Token handling
-
+f
 ## 1.32.8 (18.02.2025)
 * Removed unnecessary scripts
 
