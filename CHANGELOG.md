@@ -1,3 +1,6 @@
+## 1.33.2 (24.02.2025)
+* Fixed issues with some HTML app banner HTML methods
+
 ## 1.33.1 (24.02.2025)
 * Fixed issue with App Banners not displaying correctly in dark mode
 
