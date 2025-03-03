@@ -95,6 +95,7 @@ static BOOL isSessionStartCalled = NO;
 static BOOL confirmAlertShown = NO;
 static BOOL hasInitialized = NO;
 static BOOL hasRequestedDeviceToken = NO;
+static BOOL isAutoHandleSilentAppBannersEnabled = NO;
 static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
@@ -1889,11 +1890,15 @@ static id isNil(id object) {
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
-        if (isActive) {
-            [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        if ([CleverPush getAutoHandleSilentAppBanners]) {
+            [CPAppBannerModuleInstance setLastReceivedAppBannerId:appBanner notificationId:notificationId];
         } else {
-            [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+            BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+            if (isActive) {
+                [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+            } else {
+                [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
+            }
         }
     }
 }
@@ -3974,8 +3979,20 @@ static id isNil(id object) {
     [CPAppBannerModule setTrackingEnabled:enabled];
 }
 
+- (void)setAutoHandleSilentAppBanners:(BOOL)enabled {
+    isAutoHandleSilentAppBannersEnabled = enabled;
+}
+
+- (void)showLastReceivedSilentAppBanner {
+   [CPAppBannerModule showLastReceivedSilentAppBanner];
+}
+
 - (BOOL)getAppBannerDraftsEnabled {
     return isShowDraft;
+}
+
+- (BOOL)getAutoHandleSilentAppBanners {
+    return isAutoHandleSilentAppBannersEnabled;
 }
 
 - (BOOL)getSubscriptionChanged {

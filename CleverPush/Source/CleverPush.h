@@ -90,6 +90,8 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)disableAppBanners;
 + (void)enableAppBanners;
 + (void)setAppBannerTrackingEnabled:(BOOL)enabled;
++ (void)setAutoHandleSilentAppBanners:(BOOL)enabled;
++ (void)showLastReceivedSilentAppBanner;
 + (BOOL)popupVisible;
 + (void)unsubscribe;
 + (void)unsubscribe:(void(^ _Nullable)(BOOL))callback;
@@ -225,6 +227,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 
 + (BOOL)isDevelopmentModeEnabled;
 + (BOOL)getAppBannerDraftsEnabled;
++ (BOOL)getAutoHandleSilentAppBanners;
 + (BOOL)getSubscriptionChanged;
 + (BOOL)isSubscribed;
 + (BOOL)handleSilentNotificationReceived:(UIApplication* _Nullable)application UserInfo:(NSDictionary* _Nullable)messageDict completionHandler:(void(^ _Nullable)(UIBackgroundFetchResult))completionHandler;

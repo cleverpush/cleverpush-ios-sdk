@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableDictionary *lastReceivedAppBannerId;
 NSMutableArray *bannersForDeepLink;
 NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
@@ -1356,6 +1357,68 @@ NSInteger currentScreenIndex = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+#pragma mark - Set Latest App Banner IDs from Silent Push
++ (void)setLastReceivedAppBannerId:(NSString*)appBannerId notificationId:(NSString*)notificationId {
+    if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog debug:@"CPAppBannerModuleInstance: setLastReceivedAppBannerId: appBannerId or notification ID is blank, null, or empty."];
+        return;
+    }
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableDictionary *existingDictionary = [[NSMutableDictionary alloc] init];
+    existingDictionary = [[defaults objectForKey:CLEVERPUSH_LAST_RECEIVED_APP_BANNER_ID_KEY] mutableCopy];
+
+    if (!existingDictionary) {
+        existingDictionary = [[NSMutableDictionary alloc] init];
+    }
+
+    [existingDictionary setObject:appBannerId forKey:@"appBanner"];
+    [existingDictionary setObject:notificationId forKey:@"notificationId"];
+    
+    [defaults setObject:existingDictionary forKey:CLEVERPUSH_LAST_RECEIVED_APP_BANNER_ID_KEY];
+    [defaults synchronize];
+}
+
+#pragma mark - Get Latest App Banner IDs from Silent Push
++ (NSMutableDictionary *)getLastReceivedAppBannerId {
+    lastReceivedAppBannerId = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_LAST_RECEIVED_APP_BANNER_ID_KEY] mutableCopy];
+    return lastReceivedAppBannerId;
+}
+
+#pragma mark - Show Recently Received App Banner
+- (void)showLastReceivedSilentAppBanner {
+    if ([CleverPush getAutoHandleSilentAppBanners]) {
+        NSMutableDictionary *appBanners = [[CPAppBannerModuleInstance getLastReceivedAppBannerId] mutableCopy];
+        
+        if (appBanners != nil && appBanners.count > 0) {
+            
+            NSString *appBanner = [appBanners cleverPushStringForKey:@"appBanner"];
+            NSString *notificationId = [appBanners cleverPushStringForKey:@"notificationId"];
+            
+            if ([CPUtils isNullOrEmpty:appBanner] || [CPUtils isNullOrEmpty:notificationId]) {
+                [CPLog debug:@"CPAppBannerModuleInstance: showLastReceivedSilentAppBanner: appBannerId or notification ID is blank, null, or empty."];
+                return;
+            }
+            
+            [self getBanners:[CleverPush channelId] bannerId:appBanner notificationId:notificationId groupId:nil
+                  completion:^(NSMutableArray<CPAppBanner *> *banners) {
+                NSMutableArray<CPAppBanner *> *bannersCopy = [banners mutableCopy];
+                
+                for (CPAppBanner *banner in bannersCopy) {
+                    if ([banner.id isEqualToString:appBanner]) {
+                        
+                        [self showBanner:banner force:YES];
+                        
+                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_LAST_RECEIVED_APP_BANNER_ID_KEY];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        break;
+                    }
+                }
+            }];
+        }
+    }
 }
 
 - (void)setCurrentEventId:(NSString*)eventId {

@@ -225,6 +225,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAppBannerTrackingEnabled:enabled];
 }
 
++ (void)setAutoHandleSilentAppBanners:(BOOL)enabled {
+    [self.CPSharedInstance setAutoHandleSilentAppBanners:enabled];
+}
+
++ (void)showLastReceivedSilentAppBanner {
+    [self.CPSharedInstance showLastReceivedSilentAppBanner];
+}
+
 + (BOOL)popupVisible {
     return [self.CPSharedInstance popupVisible];
 }
@@ -772,6 +780,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)getAppBannerDraftsEnabled {
     return [self.CPSharedInstance getAppBannerDraftsEnabled];
+}
+
++ (BOOL)getAutoHandleSilentAppBanners {
+    return [self.CPSharedInstance getAutoHandleSilentAppBanners];
 }
 
 + (BOOL)getSubscriptionChanged {

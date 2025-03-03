@@ -170,6 +170,10 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setTrackingEnabled:enabled];
 }
 
++ (void)showLastReceivedSilentAppBanner {
+    [self.moduleInstance showLastReceivedSilentAppBanner];
+}
+
 + (void)setCurrentEventId:(NSString*)eventId {
     [self.moduleInstance setCurrentEventId:eventId];
 }

@@ -62,6 +62,7 @@
 - (void)disableBanners;
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
+- (void)showLastReceivedSilentAppBanner;
 - (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
@@ -93,6 +94,8 @@
 + (NSMutableArray*)getBannersForDeepLink;
 + (void)updateBannersForDeepLinkWithURL:(NSURL*)url;
 + (void)setSilentPushAppBannersIds:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (void)setLastReceivedAppBannerId:(NSString*)appBannerId notificationId:(NSString*)notificationId;
 + (NSMutableArray*)getSilentPushAppBannersIds;
++ (NSMutableDictionary*)getLastReceivedAppBannerId;
 
 @end
