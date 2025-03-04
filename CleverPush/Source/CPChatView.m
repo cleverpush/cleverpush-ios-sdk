@@ -212,19 +212,23 @@ UIColor* chatReceiverBubbleTextColor;
       didReceiveScriptMessage:(WKScriptMessage*)message {
 
     if ([message.body isEqualToString:@"subscribe"]) {
-        if (subscribeCallback != nil) {
-            subscribeCallback();
-            return;
-        }
-
-        [CleverPush subscribe:^(NSString* subscriptionId) {
-            // wait for ID
-            [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
-                if (subscriptionId == nil) {
-                    [CPLog debug:@"CPChatView: didReceiveScriptMessage: There is no subscription for CleverPush SDK."];
+        [CPUtils handleSubscribeActionWithCallback:^(BOOL success) {
+            if (success) {
+                if (subscribeCallback != nil) {
+                    subscribeCallback();
+                    return;
                 }
-                [self loadChat];
-            }];
+
+                [CleverPush subscribe:^(NSString* subscriptionId) {
+                    // wait for ID
+                    [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
+                        if (subscriptionId == nil) {
+                            [CPLog debug:@"CPChatView: didReceiveScriptMessage: There is no subscription for CleverPush SDK."];
+                        }
+                        [self loadChat];
+                    }];
+                }];
+            }
         }];
     } else if ([message.body isEqualToString:@"reload"]) {
         if (lastSubscriptionId != nil) {
