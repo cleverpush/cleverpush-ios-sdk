@@ -1,3 +1,6 @@
+## 1.33.3 (05.03.2025)
+* Fixed the issue of redirecting users to the app settings if the user had declined the push notification permission from the chatview.
+
 ## 1.33.2 (24.02.2025)
 * Fixed issues with some HTML app banner HTML methods
 
