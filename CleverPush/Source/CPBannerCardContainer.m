@@ -45,6 +45,32 @@
     CGRect frame = self.tblCPBanner.frame;
     CGFloat maxHeight = [CPUtils frameHeightWithoutSafeArea] - 50;
     CGFloat contentHeight = self.tblCPBanner.contentSize.height;
+    
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    BOOL isLandscape = screenWidth > screenHeight;
+    
+    if (isIPad && isLandscape) {
+        
+        NSInteger imageCount = 0;
+        NSInteger buttonCount = 0;
+        
+        for (CPAppBannerBlock *block in self.blocks) {
+            if (block.type == CPAppBannerBlockTypeImage) {
+                imageCount++;
+            } else if (block.type == CPAppBannerBlockTypeButton) {
+                buttonCount++;
+            }
+        }
+        
+        
+
+        if (imageCount > 0 && buttonCount > 0) {
+            maxHeight = screenHeight * 0.7;
+        }
+    }
+    
     if (contentHeight > maxHeight) {
         frame.size.height = maxHeight - 40;
     } else {
@@ -65,9 +91,35 @@
     if (![self.data.contentType isEqualToString:@"html"]) {
         CGFloat viewHeight = self.tblCPBanner.frame.size.height;
         CGFloat tableViewContentHeight = self.tblCPBanner.contentSize.height;
+        
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+        BOOL isLandscape = screenWidth > screenHeight;
 
         if (tableViewContentHeight < viewHeight) {
             CGFloat marginHeight = (viewHeight - tableViewContentHeight) / 2.0;
+            
+            if (isIPad && isLandscape) {
+                NSInteger imageCount = 0;
+                NSInteger buttonCount = 0;
+                
+                for (CPAppBannerBlock *block in self.blocks) {
+                    if (block.type == CPAppBannerBlockTypeImage) {
+                        imageCount++;
+                    } else if (block.type == CPAppBannerBlockTypeButton) {
+                        buttonCount++;
+                    }
+                }
+                
+                if (imageCount > 0 && buttonCount > 0) {
+                    [CPLog debug:@"Adjusting content position for iPad landscape - moving content to top"];
+                    self.tblCPBanner.contentInset = UIEdgeInsetsMake(0, 0, viewHeight - tableViewContentHeight, 0);
+                    self.tblCPBanner.contentOffset = CGPointMake(0, 0);
+                    return;
+                }
+            }
+            
             self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, -marginHeight, 0);
             self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
         } else {
@@ -104,9 +156,34 @@
             }
 
             CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+            
+            BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+            BOOL isLandscape = screenWidth > screenHeight;
+            
+            [CPLog debug:@"Device: %@, Orientation: %@, Screen size: %.1f x %.1f", 
+                isIPad ? @"iPad" : @"iPhone",
+                isLandscape ? @"Landscape" : @"Portrait",
+                screenWidth, screenHeight];
+            
             CGFloat scale = (CGFloat)block.scale / 100.0;
             CGFloat imageViewWidth = screenWidth * scale;
             CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+            
+            if (isIPad && isLandscape) {
+                CGFloat scaleFactor = 0.6;
+                [CPLog debug:@"iPad in landscape detected - scaling image by factor: %.2f", scaleFactor];
+                
+                imageViewWidth = imageViewWidth * scaleFactor;
+                imageViewHeight = imageViewHeight * scaleFactor;
+                
+                CGFloat availableHeight = screenHeight * 0.8;
+                
+                if (imageViewHeight > availableHeight * 0.7) {
+                    CGFloat heightScaleFactor = (availableHeight * 0.7) / imageViewHeight;
+                    imageViewWidth *= heightScaleFactor;
+                    imageViewHeight *= heightScaleFactor;
+                }               
 
             cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
             cell.imgCPBannerHeightConstraint.constant = imageViewHeight;

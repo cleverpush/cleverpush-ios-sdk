@@ -482,9 +482,30 @@ static CPAppBannerActionBlock appBannerActionCallback;
             aspectRatio = 1.0;
         }
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+        
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+        BOOL isLandscape = screenWidth > screenHeight;
+        
+        
         CGFloat scale = (CGFloat)block.scale / 100.0;
         CGFloat imageViewWidth = screenWidth * scale;
         CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+        
+        if (isIPad && isLandscape) {
+            CGFloat scaleFactor = 0.6;
+            
+            imageViewWidth = imageViewWidth * scaleFactor;
+            imageViewHeight = imageViewHeight * scaleFactor;
+            
+            CGFloat availableHeight = screenHeight * 0.8;
+            
+            if (imageViewHeight > availableHeight * 0.7) {
+                CGFloat heightScaleFactor = (availableHeight * 0.7) / imageViewHeight;
+                imageViewWidth *= heightScaleFactor;
+                imageViewHeight *= heightScaleFactor;
+            }
+        }
 
         return CGSizeMake(imageViewWidth, imageViewHeight);
     }

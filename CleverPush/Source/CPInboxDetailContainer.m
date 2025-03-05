@@ -44,7 +44,35 @@
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
+            
+            CGFloat contentWidth = cell.contentView.frame.size.width;
+            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+            CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+            
+            BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+            BOOL isLandscape = screenWidth > screenHeight;
+            
+            
+            CGFloat scale = (CGFloat)block.scale / 100.0;
+            CGFloat originalWidth = contentWidth * scale;
+            CGFloat originalHeight = originalWidth / aspectRatio;
+            
+            if (isIPad && isLandscape) {
+                CGFloat scaleFactor = 0.6;                
+                contentWidth = contentWidth * scale * scaleFactor;
+                
+                CGFloat availableHeight = screenHeight * 0.8;
+                CGFloat estimatedImageHeight = contentWidth / aspectRatio;
+                
+                if (estimatedImageHeight > availableHeight * 0.7) {
+                    CGFloat heightScaleFactor = (availableHeight * 0.7) / estimatedImageHeight;
+                    contentWidth *= heightScaleFactor;
+                }
+            } else {
+                contentWidth = contentWidth * scale;
+            }
+            
+            cell.imgCPBannerHeightConstraint.constant = (contentWidth / aspectRatio);
         }
 
         NSString *imageUrl;
