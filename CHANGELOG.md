@@ -1,3 +1,6 @@
+## 1.33.4 (05.03.2025)
+* Fixed an edge case with App Banners in landscape mode on tablets (image too large)
+
 ## 1.33.3 (05.03.2025)
 * Fixed the issue of redirecting users to the app settings if the user had declined the push notification permission from the chatview.
 
