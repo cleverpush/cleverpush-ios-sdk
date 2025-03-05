@@ -80,7 +80,7 @@ static BOOL autoClearBadge = YES;
 static BOOL autoResubscribe = NO;
 static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
-static BOOL incrementBadge = NO;
+static BOOL incrementBadge = YES;
 static BOOL showNotificationsInForeground = YES;
 static BOOL isDisplayAlertEnabledForNotifications = YES;
 static BOOL isSoundEnabledForNotifications = YES;
@@ -1937,15 +1937,29 @@ static id isNil(id object) {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY]) {
         if (replacementContent != nil) {
-            dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-            [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
-                replacementContent.badge = @([notifications count] + 1);
-
-                dispatch_semaphore_signal(sema);
-            }];
-
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            NSInteger currentBadgeCount = 0;
+            
+            if (@available(iOS 16.0, *)) {
+                dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+                
+                [[UNUserNotificationCenter currentNotificationCenter] getBadgeCountWithCompletionHandler:^(NSInteger count) {
+                    currentBadgeCount = count;
+                    replacementContent.badge = @(currentBadgeCount + 1);
+                    dispatch_semaphore_signal(sema);
+                }];
+                
+                dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            } else {
+                dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+                
+                [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+                    currentBadgeCount = [notifications count];
+                    replacementContent.badge = @(currentBadgeCount + 1);
+                    dispatch_semaphore_signal(sema);
+                }];
+                
+                dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            }
         } else {
             [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -1957,7 +1971,6 @@ static id isNil(id object) {
                 });
             }];
         }
-
     } else {
         [CPLog debug:@"updateBadge - no incrementBadge used"];
     }
