@@ -49,22 +49,27 @@
             CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
             CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
             
+            // Check if device is iPad and in landscape mode
             BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
             BOOL isLandscape = screenWidth > screenHeight;
-            
             
             CGFloat scale = (CGFloat)block.scale / 100.0;
             CGFloat originalWidth = contentWidth * scale;
             CGFloat originalHeight = originalWidth / aspectRatio;
             
+            // For iPad in landscape, scale down the entire image
             if (isIPad && isLandscape) {
-                CGFloat scaleFactor = 0.6;                
+                // More balanced scale factor for iPad in landscape (60% of original size)
+                CGFloat scaleFactor = 0.6;
+                
                 contentWidth = contentWidth * scale * scaleFactor;
                 
-                CGFloat availableHeight = screenHeight * 0.8;
+                // Calculate available height for the banner
+                CGFloat availableHeight = screenHeight * 0.8; // 80% of screen height
                 CGFloat estimatedImageHeight = contentWidth / aspectRatio;
                 
-                if (estimatedImageHeight > availableHeight * 0.7) {
+                // If the image is still too tall, scale it down further to fit
+                if (estimatedImageHeight > availableHeight * 0.7) { // Allow 70% of available height for image
                     CGFloat heightScaleFactor = (availableHeight * 0.7) / estimatedImageHeight;
                     contentWidth *= heightScaleFactor;
                 }
