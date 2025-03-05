@@ -482,9 +482,33 @@ static CPAppBannerActionBlock appBannerActionCallback;
             aspectRatio = 1.0;
         }
         CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+        
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+        BOOL isLandscape = screenWidth > screenHeight;
+        
         CGFloat scale = (CGFloat)block.scale / 100.0;
         CGFloat imageViewWidth = screenWidth * scale;
         CGFloat imageViewHeight = imageViewWidth / aspectRatio;
+        
+        // For iPad in landscape, scale down the entire image
+        if (isIPad && isLandscape) {
+            // More balanced scale factor for iPad in landscape (60% of original size)
+            CGFloat scaleFactor = 0.6;
+            
+            imageViewWidth = imageViewWidth * scaleFactor;
+            imageViewHeight = imageViewHeight * scaleFactor;
+            
+            // Calculate available height for the banner
+            CGFloat availableHeight = screenHeight * 0.8; // 80% of screen height
+            
+            // If the image is still too tall, scale it down further to fit
+            if (imageViewHeight > availableHeight * 0.7) { // Allow 70% of available height for image
+                CGFloat heightScaleFactor = (availableHeight * 0.7) / imageViewHeight;
+                imageViewWidth *= heightScaleFactor;
+                imageViewHeight *= heightScaleFactor;
+            }
+        }
 
         return CGSizeMake(imageViewWidth, imageViewHeight);
     }
