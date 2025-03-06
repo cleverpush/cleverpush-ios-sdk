@@ -203,6 +203,9 @@
 		29F9086628E9EAD500D8D4D8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */; };
 		29F9086928E9EBD900D8D4D8 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		29F9086A28E9EBDA00D8D4D8 /* CleverPush.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		883BF72C2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m in Sources */ = {isa = PBXBuildFile; fileRef = 883BF72B2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m */; };
+		883BF72D2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h in Headers */ = {isa = PBXBuildFile; fileRef = 883BF72A2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h */; };
+		883BF72E2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m in Sources */ = {isa = PBXBuildFile; fileRef = 883BF72B2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m */; };
 		9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9310FD662A602D1F004B400B /* CPInboxDetailView.h */; };
 		9310FD692A602D1F004B400B /* CPInboxDetailView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9310FD662A602D1F004B400B /* CPInboxDetailView.h */; };
 		9310FD6A2A602D1F004B400B /* CPInboxDetailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9310FD672A602D1F004B400B /* CPInboxDetailView.m */; };
@@ -559,6 +562,8 @@
 		29DC4AC1218204960051F6E9 /* UIApplicationDelegate+CleverPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIApplicationDelegate+CleverPush.h"; sourceTree = "<group>"; };
 		29E5DA0E2694DE0100A89CE3 /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/SafariServices.framework; sourceTree = DEVELOPER_DIR; };
 		29F9086528E9EAD500D8D4D8 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		883BF72A2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushSwizzlingForwarder.h; sourceTree = "<group>"; };
+		883BF72B2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushSwizzlingForwarder.m; sourceTree = "<group>"; };
 		9310FD662A602D1F004B400B /* CPInboxDetailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPInboxDetailView.h; sourceTree = "<group>"; };
 		9310FD672A602D1F004B400B /* CPInboxDetailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPInboxDetailView.m; sourceTree = "<group>"; };
 		9310FD6F2A602D2A004B400B /* CPInboxDetailView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CPInboxDetailView.xib; sourceTree = "<group>"; };
@@ -897,6 +902,8 @@
 				297B4E241E58A16600BAF990 /* CleverPushHTTPClient.m */,
 				29DC4ABE2181E3200051F6E9 /* CleverPushSelectorHelpers.h */,
 				29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */,
+				883BF72A2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h */,
+				883BF72B2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m */,
 				290187F527C1020200535617 /* CleverPushUserDefaults.h */,
 				298676B52572CFE50002E9F1 /* CPAppBanner.h */,
 				298676B62572CFEF0002E9F1 /* CPAppBanner.m */,
@@ -1170,6 +1177,7 @@
 				934D88FC2A654CFB00B0E319 /* CPInboxDetailContainer.h in Headers */,
 				CB73FFA0272C3EBB0099B648 /* CPTextBlockCell.h in Headers */,
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
+				883BF72D2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h in Headers */,
 				29A9E556276FAD8200DD43A4 /* CPAppBannerSubscribedType.h in Headers */,
 				CBA989A12679D5FF003DE995 /* CPWidgetVariant.h in Headers */,
 				93E289432C5CDEEE00D95720 /* CPStoryWidgetTextPosition.h in Headers */,
@@ -1524,6 +1532,7 @@
 				CBA989A72679D62D003DE995 /* CPWidgetsStories.m in Sources */,
 				296A134225BE128700A2BEED /* CPSubscription.m in Sources */,
 				9310FD6A2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
+				883BF72E2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m in Sources */,
 				934D88FE2A654CFB00B0E319 /* CPInboxDetailContainer.m in Sources */,
 				CB88F91A262FE9570037787E /* CPWKWebKitView.m in Sources */,
 				2905218A276B8BC100D81148 /* CPInboxCell.m in Sources */,
@@ -1602,6 +1611,7 @@
 				298F4FC125002D6700F086D3 /* CPUtils.m in Sources */,
 				29DB960123FC3763008FC985 /* CleverPush.m in Sources */,
 				291FCD2D2525DC2800F5185E /* DWAlertView.m in Sources */,
+				883BF72C2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m in Sources */,
 				CBA989992679D58C003DE995 /* CPStoryContent.m in Sources */,
 				29DB95F323FC33C6008FC985 /* UNUserNotificationCenter+CleverPush.m in Sources */,
 				935A5F1B2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
