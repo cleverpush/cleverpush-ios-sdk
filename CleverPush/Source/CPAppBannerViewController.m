@@ -186,10 +186,31 @@ static CPAppBannerActionBlock appBannerActionCallback;
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGFloat topPadding = 0;
     topPadding = window.safeAreaInsets.top;
-    self.topConstraint.constant = topPadding;
-    self.bottomConstraint.constant = 34;
-    self.leadingConstraint.constant = 25;
-    self.trailingConstraint.constant = -25;
+    
+    // Check if device is iPad and in landscape mode
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    BOOL isLandscape = screenWidth > screenHeight;
+    
+    if (isIPad && isLandscape) {
+        // For iPad in landscape, limit the width of the banner container
+        // to create a more centered, wrapped appearance
+        CGFloat maxWidth = MIN(screenWidth * 0.6, 550); // 60% of screen width or max 550pt
+        CGFloat horizontalMargin = (screenWidth - maxWidth) / 2;
+        
+        self.topConstraint.constant = topPadding;
+        self.bottomConstraint.constant = 34;
+        self.leadingConstraint.constant = horizontalMargin;
+        self.trailingConstraint.constant = -horizontalMargin;
+    } else {
+        // For other devices/orientations, use standard margins
+        self.topConstraint.constant = topPadding;
+        self.bottomConstraint.constant = 34;
+        self.leadingConstraint.constant = 25;
+        self.trailingConstraint.constant = -25;
+    }
+    
     [self.bannerContainer.layer setCornerRadius:15.0];
     [self.bannerContainer.layer setMasksToBounds:YES];
     self.pageControllTopConstraint.constant = - 20;
@@ -201,9 +222,29 @@ static CPAppBannerActionBlock appBannerActionCallback;
     UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
     CGFloat topPadding = window.safeAreaInsets.top;
     CGFloat bottomPadding = window.safeAreaInsets.bottom + 20;
-    self.leadingConstraint.constant = 0;
-    self.trailingConstraint.constant = 0;
-    [self.bannerContainer.layer setCornerRadius:0.0];
+    
+    // Check if device is iPad and in landscape mode
+    CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    BOOL isLandscape = screenWidth > screenHeight;
+    
+    if (isIPad && isLandscape) {
+        // For iPad in landscape, limit the width of the banner container
+        // to create a more centered, wrapped appearance
+        CGFloat maxWidth = MIN(screenWidth * 0.7, 600); // 70% of screen width or max 600pt
+        CGFloat horizontalMargin = (screenWidth - maxWidth) / 2;
+        
+        self.leadingConstraint.constant = horizontalMargin;
+        self.trailingConstraint.constant = -horizontalMargin;
+        [self.bannerContainer.layer setCornerRadius:15.0]; // Add rounded corners
+    } else {
+        // For other devices/orientations, use full width
+        self.leadingConstraint.constant = 0;
+        self.trailingConstraint.constant = 0;
+        [self.bannerContainer.layer setCornerRadius:0.0];
+    }
+    
     [self.bannerContainer.layer setMasksToBounds:YES];
     self.pageControllTopConstraint.constant = - bottomPadding;
     self.btnTopConstraints.constant = topPadding;
