@@ -1,3 +1,6 @@
+## 1.33.6 (06.03.2025)
+* Further improvements for App Banners in landscape mode on tablets
+
 ## 1.33.5 (06.03.2025)
 * Resolved issue of appDelegate methods not being called when the app uses `@UIApplicationDelegateAdaptor`
 
