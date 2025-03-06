@@ -62,6 +62,7 @@
                 // More balanced scale factor for iPad in landscape (60% of original size)
                 CGFloat scaleFactor = 0.6;
                 
+                // Apply scale factor to width first
                 contentWidth = contentWidth * scale * scaleFactor;
                 
                 // Calculate available height for the banner
@@ -73,6 +74,13 @@
                     CGFloat heightScaleFactor = (availableHeight * 0.7) / estimatedImageHeight;
                     contentWidth *= heightScaleFactor;
                 }
+                
+                // Center the image by adding left and right constraints
+                cell.imgCPBanner.translatesAutoresizingMaskIntoConstraints = NO;
+                [NSLayoutConstraint activateConstraints:@[
+                    [cell.imgCPBanner.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
+                    [cell.imgCPBanner.widthAnchor constraintEqualToConstant:contentWidth]
+                ]];
             } else {
                 contentWidth = contentWidth * scale;
             }

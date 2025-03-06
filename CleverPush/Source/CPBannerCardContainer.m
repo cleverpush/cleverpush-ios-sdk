@@ -112,16 +112,18 @@
                     }
                 }
                 
-                // If we have both images and buttons, position content at the top
+                // If we have both images and buttons, position content at the top with less bottom padding
                 if (imageCount > 0 && buttonCount > 0) {
-                    [CPLog debug:@"Adjusting content position for iPad landscape - moving content to top"];
-                    self.tblCPBanner.contentInset = UIEdgeInsetsMake(0, 0, viewHeight - tableViewContentHeight, 0);
-                    self.tblCPBanner.contentOffset = CGPointMake(0, 0);
+                    // Use a smaller top inset to move content up slightly
+                    CGFloat topInset = marginHeight * 0.5;
+                    CGFloat bottomInset = marginHeight * 1.5;
+                    self.tblCPBanner.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
+                    self.tblCPBanner.contentOffset = CGPointMake(0, -topInset);
                     return;
                 }
             }
             
-            self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, -marginHeight, 0);
+            self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, marginHeight, 0);
             self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
         } else {
             self.tblCPBanner.contentInset = UIEdgeInsetsZero;
