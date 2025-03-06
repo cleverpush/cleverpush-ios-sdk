@@ -38,7 +38,7 @@ static NSMutableSet<Class>* swizzledClasses;
     }
     Class delegateClass = [delegate class];
     
-    if (delegate == nil || [CleverPushAppDelegate swizzledClassInHeirarchy:delegateClass]) {
+    if (delegate == nil || [CleverPushAppDelegate swizzledClassInHierarchy:delegateClass]) {
         [self setCleverPushDelegate:delegate];
         return;
     }
@@ -182,7 +182,7 @@ static NSMutableSet<Class>* swizzledClasses;
     }
 }
 
-+ (BOOL)swizzledClassInHeirarchy:(Class)delegateClass {
++ (BOOL)swizzledClassInHierarchy:(Class)delegateClass {
     if ([swizzledClasses containsObject:delegateClass]) {
         return true;
     }
