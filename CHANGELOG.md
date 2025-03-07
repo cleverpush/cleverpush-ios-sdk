@@ -1,3 +1,6 @@
+## 1.33.7 (07.03.2025)
+* Optimizing App Banners for landscape view on tablets.
+
 ## 1.33.6 (06.03.2025)
 * Further improvements for App Banners in landscape mode on tablets
 
