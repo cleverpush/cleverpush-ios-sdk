@@ -37,5 +37,9 @@
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)setDynamicCloseButton:(BOOL)closeButtonEnabled;
 - (void)setUpPageControl;
+- (void)updateTableViewContentInset;
+- (void)setBackgroundInner;
+- (void)setBackgroundOuter;
+- (void)updateForOrientationChange;
 
 @end

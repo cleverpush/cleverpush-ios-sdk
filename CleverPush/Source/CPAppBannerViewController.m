@@ -336,18 +336,72 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 #pragma mark - Update the UI while the device detects rotation.
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    // Store current orientation before transition
+    CGFloat currentWidth = [UIScreen mainScreen].bounds.size.width;
+    CGFloat currentHeight = [UIScreen mainScreen].bounds.size.height;
+    BOOL wasLandscape = currentWidth > currentHeight;
+    BOOL willBeLandscape = size.width > size.height;
+    
+    // Only perform special handling if we're changing orientation
+    BOOL isChangingOrientation = (wasLandscape != willBeLandscape);
+    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        // Update layout constraints based on new orientation
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+        
+        // Re-apply the appropriate margin settings based on the new orientation
+        [self setDynamicBannerConstraints:self.data.marginEnabled];
+        
+        // Force layout update
+        [self.view layoutIfNeeded];
         [self.cardCollectionView.collectionViewLayout invalidateLayout];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        // Completely reload the collection view to ensure proper sizing
         [self.cardCollectionView performBatchUpdates:^{
             [self.cardCollectionView reloadData];
-        } completion:nil];
-
-        NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
-        for (NSIndexPath *indexPath in visibleIndexPaths) {
-            CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
-            [cell.tblCPBanner reloadData];
-        }
+        } completion:^(BOOL finished) {
+            // After reload, make sure we're showing the correct page
+            if (self.index < self.data.screens.count) {
+                NSIndexPath *currentItem = [NSIndexPath indexPathForItem:self.index inSection:0];
+                [self.cardCollectionView scrollToItemAtIndexPath:currentItem 
+                                               atScrollPosition:UICollectionViewScrollPositionNone 
+                                                       animated:NO];
+            }
+            
+            // If we're changing from landscape to portrait, ensure we update all cells
+            if (isChangingOrientation) {
+                // Force each visible cell to update its table view
+                NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
+                for (NSIndexPath *indexPath in visibleIndexPaths) {
+                    CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+                    if (cell) {
+                        // Force a complete reload of the table view
+                        [cell.tblCPBanner reloadData];
+                        
+                        // Call updateTableViewContentInset if available
+                        if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
+                            [cell updateTableViewContentInset];
+                        }
+                        
+                        // Force layout update
+                        [cell setNeedsLayout];
+                        [cell layoutIfNeeded];
+                    }
+                }
+            } else {
+                // For minor adjustments, just update the visible cells
+                NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
+                for (NSIndexPath *indexPath in visibleIndexPaths) {
+                    CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
+                    [cell.tblCPBanner reloadData];
+                    
+                    // Call updateTableViewContentInset if available
+                    if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
+                        [cell updateTableViewContentInset];
+                    }
+                }
+            }
+        }];
     }];
 }
 
@@ -499,6 +553,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
     self.pageControl.currentPage = page;
     self.index = page;
     [self pageControlCurrentIndex:page];
+    
+    // Ensure the current page is fully visible and properly laid out
+    [self ensureCurrentPageIsProperlyDisplayed:page];
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
@@ -507,6 +564,39 @@ static CPAppBannerActionBlock appBannerActionCallback;
     self.pageControl.currentPage = page;
     self.index = page;
     [self pageControlCurrentIndex:page];
+    
+    // Ensure the current page is fully visible and properly laid out
+    [self ensureCurrentPageIsProperlyDisplayed:page];
+}
+
+// Helper method to ensure the current page is properly displayed
+- (void)ensureCurrentPageIsProperlyDisplayed:(NSInteger)page {
+    if (page < self.data.screens.count) {
+        NSIndexPath *currentItem = [NSIndexPath indexPathForItem:page inSection:0];
+        CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:currentItem];
+        
+        if (cell) {
+            // Force the cell to update its layout
+            [cell.tblCPBanner reloadData];
+            
+            // Call methods if they are available
+            if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
+                [cell updateTableViewContentInset];
+            }
+            
+            [cell setNeedsLayout];
+            [cell layoutIfNeeded];
+            
+            // Update background if methods are available
+            if ([cell respondsToSelector:@selector(setBackgroundInner)]) {
+                [cell setBackgroundInner];
+            }
+            
+            if ([cell respondsToSelector:@selector(setBackgroundOuter)]) {
+                [cell setBackgroundOuter];
+            }
+        }
+    }
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
