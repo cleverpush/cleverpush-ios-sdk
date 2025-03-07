@@ -117,16 +117,26 @@
                     // Use a smaller top inset to move content up slightly
                     CGFloat topInset = marginHeight * 0.5;
                     CGFloat bottomInset = marginHeight * 1.5;
-                    self.tblCPBanner.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
-                    self.tblCPBanner.contentOffset = CGPointMake(0, -topInset);
+                    
+                    // Apply insets without animation to prevent laggy movement
+                    [UIView performWithoutAnimation:^{
+                        self.tblCPBanner.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
+                        self.tblCPBanner.contentOffset = CGPointMake(0, -topInset);
+                    }];
                     return;
                 }
             }
             
-            self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, marginHeight, 0);
-            self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
+            // Apply insets without animation to prevent laggy movement
+            [UIView performWithoutAnimation:^{
+                self.tblCPBanner.contentInset = UIEdgeInsetsMake(marginHeight, 0, marginHeight, 0);
+                self.tblCPBanner.contentOffset = CGPointMake(0, -marginHeight);
+            }];
         } else {
-            self.tblCPBanner.contentInset = UIEdgeInsetsZero;
+            // Apply insets without animation to prevent laggy movement
+            [UIView performWithoutAnimation:^{
+                self.tblCPBanner.contentInset = UIEdgeInsetsZero;
+            }];
         }
     }
 }
@@ -211,9 +221,11 @@
                 }
             }
             
-            // Set the width and height constraints directly
-            cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
-            cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
+            // Set the width and height constraints directly without animation
+            [UIView performWithoutAnimation:^{
+                cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
+                cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
+            }];
         }
 
         NSString *imageUrl;
@@ -240,8 +252,6 @@
                 [UIView performWithoutAnimation:^{
                     [cell setNeedsLayout];
                     [cell layoutIfNeeded];
-                    [tableView beginUpdates];
-                    [tableView endUpdates];
                 }];
             } else {
                 [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl] callback:^(BOOL callback) {
@@ -249,8 +259,6 @@
                         [UIView performWithoutAnimation:^{
                             [cell setNeedsLayout];
                             [cell layoutIfNeeded];
-                            [tableView beginUpdates];
-                            [tableView endUpdates];
                             [cell.activitydata stopAnimating];
                         }];
                     }
@@ -702,33 +710,32 @@
     // Handle both dark mode changes and orientation changes
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-            [self setBackgroundInner];
-            [self setBackgroundOuter];
+            [UIView performWithoutAnimation:^{
+                [self setBackgroundInner];
+                [self setBackgroundOuter];
+            }];
         }
     }
     
     // Check if orientation has changed
     UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
     if (UIDeviceOrientationIsLandscape(currentOrientation) || UIDeviceOrientationIsPortrait(currentOrientation)) {
-        // Reload the table view to update image sizes for the new orientation
-        [self.tblCPBanner reloadData];
-        [self updateTableViewContentInset];
-        
-        // Force layout update
-        [self setNeedsLayout];
-        [self layoutIfNeeded];
+        // Use the optimized method for orientation changes
+        [self updateForOrientationChange];
     }
 }
 
 // Method to handle orientation changes and update the view accordingly
 - (void)updateForOrientationChange {
-    // Reload the table view to update image sizes for the new orientation
-    [self.tblCPBanner reloadData];
-    [self updateTableViewContentInset];
-    
-    // Force layout update
-    [self setNeedsLayout];
-    [self layoutIfNeeded];
+    // Disable animations during updates to prevent lags
+    [UIView performWithoutAnimation:^{
+        // Update table view content inset
+        [self updateTableViewContentInset];
+        
+        // Force layout update
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    }];
 }
 
 - (void)setData:(CPAppBanner *)data {

@@ -345,40 +345,57 @@ static CPAppBannerActionBlock appBannerActionCallback;
     // Only perform special handling if we're changing orientation
     BOOL isChangingOrientation = (wasLandscape != willBeLandscape);
     
+    // Save current index before rotation
+    NSInteger currentIndex = self.index;
+    
+    // Disable scrolling during rotation to prevent unwanted page changes
+    BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
+    self.cardCollectionView.scrollEnabled = NO;
+    
+    // Prevent laggy animation by temporarily hiding the collection view
+    self.cardCollectionView.alpha = 0.0;
+    
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         // Update layout constraints based on new orientation
-        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-        
-        // Re-apply the appropriate margin settings based on the new orientation
         [self setDynamicBannerConstraints:self.data.marginEnabled];
         
         // Force layout update
         [self.view layoutIfNeeded];
+        
+        // Invalidate layout but don't reload yet
         [self.cardCollectionView.collectionViewLayout invalidateLayout];
+        
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        // Completely reload the collection view to ensure proper sizing
-        [self.cardCollectionView performBatchUpdates:^{
-            [self.cardCollectionView reloadData];
-        } completion:^(BOOL finished) {
-            // After reload, make sure we're showing the correct page
-            if (self.index < self.data.screens.count) {
-                NSIndexPath *currentItem = [NSIndexPath indexPathForItem:self.index inSection:0];
-                [self.cardCollectionView scrollToItemAtIndexPath:currentItem 
-                                               atScrollPosition:UICollectionViewScrollPositionNone 
-                                                       animated:NO];
-            }
-            
-            // If we're changing from landscape to portrait, ensure we update all cells
-            if (isChangingOrientation) {
-                // Force each visible cell to update its table view
+        // After rotation is complete, update the collection view
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Now reload the collection view
+            [self.cardCollectionView performBatchUpdates:^{
+                [self.cardCollectionView reloadData];
+            } completion:^(BOOL finished) {
+                // After reload, make sure we're showing the correct page
+                if (currentIndex < self.data.screens.count) {
+                    NSIndexPath *currentItem = [NSIndexPath indexPathForItem:currentIndex inSection:0];
+                    [self.cardCollectionView scrollToItemAtIndexPath:currentItem 
+                                                   atScrollPosition:UICollectionViewScrollPositionNone 
+                                                           animated:NO];
+                    self.pageControl.currentPage = currentIndex;
+                    self.index = currentIndex;
+                }
+                
+                // Restore scrolling state
+                self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+                
+                // Fade the collection view back in
+                [UIView animateWithDuration:0.2 animations:^{
+                    self.cardCollectionView.alpha = 1.0;
+                }];
+                
+                // Update visible cells without excessive reloading
                 NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
                 for (NSIndexPath *indexPath in visibleIndexPaths) {
                     CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
                     if (cell) {
-                        // Force a complete reload of the table view
-                        [cell.tblCPBanner reloadData];
-                        
-                        // Call updateTableViewContentInset if available
+                        // Update table view content inset
                         if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
                             [cell updateTableViewContentInset];
                         }
@@ -388,20 +405,8 @@ static CPAppBannerActionBlock appBannerActionCallback;
                         [cell layoutIfNeeded];
                     }
                 }
-            } else {
-                // For minor adjustments, just update the visible cells
-                NSArray *visibleIndexPaths = [self.cardCollectionView indexPathsForVisibleItems];
-                for (NSIndexPath *indexPath in visibleIndexPaths) {
-                    CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:indexPath];
-                    [cell.tblCPBanner reloadData];
-                    
-                    // Call updateTableViewContentInset if available
-                    if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
-                        [cell updateTableViewContentInset];
-                    }
-                }
-            }
-        }];
+            }];
+        });
     }];
 }
 
@@ -481,9 +486,22 @@ static CPAppBannerActionBlock appBannerActionCallback;
 - (void)navigateToNextPage {
     NSIndexPath *nextItem = [NSIndexPath indexPathForItem:self.index + 1 inSection:0];
     if (nextItem.row < self.data.screens.count) {
-        [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        // Temporarily disable scrolling to prevent unwanted animations
+        BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
+        self.cardCollectionView.scrollEnabled = NO;
+        
+        // Update the page control first
         self.pageControl.currentPage = self.index + 1;
         [self pageControlCurrentIndex: self.index + 1];
+        
+        // Scroll to the next page with a smooth animation
+        [UIView animateWithDuration:0.3 animations:^{
+            [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+            [self.cardCollectionView layoutIfNeeded];
+        } completion:^(BOOL finished) {
+            // Re-enable scrolling after animation completes
+            self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+        }];
     }
 }
 
@@ -494,14 +512,34 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
-                if (self.data.carouselEnabled) {
-                    [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
-                } else {
-                    CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
-                    [self.cardCollectionView scrollRectToVisible:rect animated:NO];
-                }
+                // Temporarily disable scrolling to prevent unwanted animations
+                BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
+                self.cardCollectionView.scrollEnabled = NO;
+                
+                // Update the page control first
                 self.pageControl.currentPage = i;
                 [self pageControlCurrentIndex:i];
+                
+                if (self.data.carouselEnabled) {
+                    // Scroll with a smooth animation
+                    [UIView animateWithDuration:0.3 animations:^{
+                        [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+                        [self.cardCollectionView layoutIfNeeded];
+                    } completion:^(BOOL finished) {
+                        // Re-enable scrolling after animation completes
+                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+                    }];
+                } else {
+                    // For non-carousel mode, use a different approach
+                    [UIView animateWithDuration:0.3 animations:^{
+                        CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
+                        [self.cardCollectionView scrollRectToVisible:rect animated:NO];
+                        [self.cardCollectionView layoutIfNeeded];
+                    } completion:^(BOOL finished) {
+                        // Re-enable scrolling after animation completes
+                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+                    }];
+                }
                 break;
             }
         }
@@ -516,10 +554,24 @@ static CPAppBannerActionBlock appBannerActionCallback;
 - (void)navigateToPreviousPage {
     NSInteger previousIndex = self.index - 1;
     if (previousIndex >= 0) {
-        NSIndexPath *previousItem = [NSIndexPath indexPathForItem:previousIndex inSection:0];
-        [self.cardCollectionView scrollToItemAtIndexPath:previousItem atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
+        // Temporarily disable scrolling to prevent unwanted animations
+        BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
+        self.cardCollectionView.scrollEnabled = NO;
+        
+        // Update the page control first
         self.pageControl.currentPage = previousIndex;
         [self pageControlCurrentIndex:previousIndex];
+        
+        NSIndexPath *previousItem = [NSIndexPath indexPathForItem:previousIndex inSection:0];
+        
+        // Scroll with a smooth animation
+        [UIView animateWithDuration:0.3 animations:^{
+            [self.cardCollectionView scrollToItemAtIndexPath:previousItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+            [self.cardCollectionView layoutIfNeeded];
+        } completion:^(BOOL finished) {
+            // Re-enable scrolling after animation completes
+            self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+        }];
     }
 }
 
@@ -550,23 +602,33 @@ static CPAppBannerActionBlock appBannerActionCallback;
     float currentPage = self.cardCollectionView.contentOffset.x / pageWidth;
     
     NSInteger page = round(currentPage);
-    self.pageControl.currentPage = page;
-    self.index = page;
-    [self pageControlCurrentIndex:page];
     
-    // Ensure the current page is fully visible and properly laid out
-    [self ensureCurrentPageIsProperlyDisplayed:page];
+    // Only update if the page has actually changed
+    if (page != self.pageControl.currentPage) {
+        // Update page control and index
+        self.pageControl.currentPage = page;
+        self.index = page;
+        [self pageControlCurrentIndex:page];
+        
+        // Ensure the current page is fully visible and properly laid out
+        [self ensureCurrentPageIsProperlyDisplayed:page];
+    }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
     CGFloat pageWidth = self.cardCollectionView.frame.size.width;
     NSInteger page = round(scrollView.contentOffset.x / pageWidth);
-    self.pageControl.currentPage = page;
-    self.index = page;
-    [self pageControlCurrentIndex:page];
     
-    // Ensure the current page is fully visible and properly laid out
-    [self ensureCurrentPageIsProperlyDisplayed:page];
+    // Only update if the page has actually changed
+    if (page != self.pageControl.currentPage) {
+        // Update page control and index
+        self.pageControl.currentPage = page;
+        self.index = page;
+        [self pageControlCurrentIndex:page];
+        
+        // Ensure the current page is fully visible and properly laid out
+        [self ensureCurrentPageIsProperlyDisplayed:page];
+    }
 }
 
 // Helper method to ensure the current page is properly displayed
@@ -576,25 +638,28 @@ static CPAppBannerActionBlock appBannerActionCallback;
         CPBannerCardContainer *cell = (CPBannerCardContainer *)[self.cardCollectionView cellForItemAtIndexPath:currentItem];
         
         if (cell) {
-            // Force the cell to update its layout
-            [cell.tblCPBanner reloadData];
-            
-            // Call methods if they are available
-            if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
-                [cell updateTableViewContentInset];
-            }
-            
-            [cell setNeedsLayout];
-            [cell layoutIfNeeded];
-            
-            // Update background if methods are available
-            if ([cell respondsToSelector:@selector(setBackgroundInner)]) {
-                [cell setBackgroundInner];
-            }
-            
-            if ([cell respondsToSelector:@selector(setBackgroundOuter)]) {
-                [cell setBackgroundOuter];
-            }
+            // Use performWithoutAnimation to prevent laggy updates
+            [UIView performWithoutAnimation:^{
+                // Force the cell to update its layout
+                [cell.tblCPBanner reloadData];
+                
+                // Call methods if they are available
+                if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
+                    [cell updateTableViewContentInset];
+                }
+                
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+                
+                // Update background if methods are available
+                if ([cell respondsToSelector:@selector(setBackgroundInner)]) {
+                    [cell setBackgroundInner];
+                }
+                
+                if ([cell respondsToSelector:@selector(setBackgroundOuter)]) {
+                    [cell setBackgroundOuter];
+                }
+            }];
         }
     }
 }
@@ -793,12 +858,21 @@ static CPAppBannerActionBlock appBannerActionCallback;
 }
 
 - (void)preloadImages {
+    // Create a dispatch group to track when all preloading is complete
+    dispatch_group_t preloadGroup = dispatch_group_create();
+    
     // Pre-load banner background images
     if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
-        [self preloadImageWithURL:self.data.background.imageUrl];
+        dispatch_group_enter(preloadGroup);
+        [self preloadImageWithURL:self.data.background.imageUrl completion:^{
+            dispatch_group_leave(preloadGroup);
+        }];
     }
     if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
-        [self preloadImageWithURL:self.data.background.darkImageUrl];
+        dispatch_group_enter(preloadGroup);
+        [self preloadImageWithURL:self.data.background.darkImageUrl completion:^{
+            dispatch_group_leave(preloadGroup);
+        }];
     }
     
     // Pre-load all screen images
@@ -807,28 +881,52 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && ![imageBlock.imageUrl isEqualToString:@""]) {
-                    [self preloadImageWithURL:imageBlock.imageUrl];
+                    dispatch_group_enter(preloadGroup);
+                    [self preloadImageWithURL:imageBlock.imageUrl completion:^{
+                        dispatch_group_leave(preloadGroup);
+                    }];
                 }
                 if (imageBlock.darkImageUrl && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && ![imageBlock.darkImageUrl isEqualToString:@""]) {
-                    [self preloadImageWithURL:imageBlock.darkImageUrl];
+                    dispatch_group_enter(preloadGroup);
+                    [self preloadImageWithURL:imageBlock.darkImageUrl completion:^{
+                        dispatch_group_leave(preloadGroup);
+                    }];
                 }
             }
         }
     }
+    
+    // When all images are preloaded, ensure the UI is updated
+    dispatch_group_notify(preloadGroup, dispatch_get_main_queue(), ^{
+        // Reload the collection view to use the cached images
+        [self.cardCollectionView reloadData];
+    });
 }
 
-- (void)preloadImageWithURL:(NSString *)urlString {
+- (void)preloadImageWithURL:(NSString *)urlString completion:(void(^)(void))completion {
     if (![urlString isKindOfClass:[NSString class]] || [urlString isKindOfClass:[NSNull class]] || [urlString isEqualToString:@""]) {
+        if (completion) completion();
+        return;
+    }
+    
+    // Check if image is already cached
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    if (cachedImage) {
+        if (completion) completion();
         return;
     }
     
     NSURL *url = [NSURL URLWithString:urlString];
-    if (!url) return;
+    if (!url) {
+        if (completion) completion();
+        return;
+    }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             [CPLog error:@"Failed to preload image: %@", error];
+            if (completion) completion();
             return;
         }
         // Cache the image data
@@ -836,6 +934,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (image) {
             [[CPUtils sharedImageCache] setObject:image forKey:urlString];
         }
+        if (completion) completion();
     }] resume];
 }
 
