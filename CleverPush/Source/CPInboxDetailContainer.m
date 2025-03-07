@@ -44,48 +44,7 @@
             if (isnan(aspectRatio) || aspectRatio == 0.0) {
                 aspectRatio = 1.0;
             }
-            
-            CGFloat contentWidth = cell.contentView.frame.size.width;
-            CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
-            CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
-            
-            // Check if device is iPad and in landscape mode
-            BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-            BOOL isLandscape = screenWidth > screenHeight;
-            
-            CGFloat scale = (CGFloat)block.scale / 100.0;
-            CGFloat originalWidth = contentWidth * scale;
-            CGFloat originalHeight = originalWidth / aspectRatio;
-            
-            // For iPad in landscape, scale down the entire image
-            if (isIPad && isLandscape) {
-                // More balanced scale factor for iPad in landscape (60% of original size)
-                CGFloat scaleFactor = 0.6;
-                
-                // Apply scale factor to width first
-                contentWidth = contentWidth * scale * scaleFactor;
-                
-                // Calculate available height for the banner
-                CGFloat availableHeight = screenHeight * 0.8; // 80% of screen height
-                CGFloat estimatedImageHeight = contentWidth / aspectRatio;
-                
-                // If the image is still too tall, scale it down further to fit
-                if (estimatedImageHeight > availableHeight * 0.7) { // Allow 70% of available height for image
-                    CGFloat heightScaleFactor = (availableHeight * 0.7) / estimatedImageHeight;
-                    contentWidth *= heightScaleFactor;
-                }
-                
-                // Center the image by adding left and right constraints
-                cell.imgCPBanner.translatesAutoresizingMaskIntoConstraints = NO;
-                [NSLayoutConstraint activateConstraints:@[
-                    [cell.imgCPBanner.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
-                    [cell.imgCPBanner.widthAnchor constraintEqualToConstant:contentWidth]
-                ]];
-            } else {
-                contentWidth = contentWidth * scale;
-            }
-            
-            cell.imgCPBannerHeightConstraint.constant = (contentWidth / aspectRatio);
+            cell.imgCPBannerHeightConstraint.constant = (cell.contentView.frame.size.width / aspectRatio) * (block.scale / 100.0);
         }
 
         NSString *imageUrl;
