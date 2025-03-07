@@ -165,21 +165,14 @@
             BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
             BOOL isLandscape = screenWidth > screenHeight;
             
-            // Log device and orientation information for testing
-            [CPLog debug:@"Device: %@, Orientation: %@, Screen size: %.1f x %.1f", 
-                isIPad ? @"iPad" : @"iPhone",
-                isLandscape ? @"Landscape" : @"Portrait",
-                screenWidth, screenHeight];
-            
             CGFloat scale = (CGFloat)block.scale / 100.0;
             CGFloat imageViewWidth = screenWidth * scale;
             CGFloat imageViewHeight = imageViewWidth / aspectRatio;
             
-            // For iPad in landscape, scale down the entire image much more aggressively
+            // For iPad in landscape, scale down the entire image
             if (isIPad && isLandscape) {
                 // More balanced scale factor for iPad in landscape (60% of original size)
                 CGFloat scaleFactor = 0.6;
-                [CPLog debug:@"iPad in landscape detected - scaling image by factor: %.2f", scaleFactor];
                 
                 imageViewWidth = imageViewWidth * scaleFactor;
                 imageViewHeight = imageViewHeight * scaleFactor;
@@ -192,15 +185,33 @@
                     CGFloat heightScaleFactor = (availableHeight * 0.7) / imageViewHeight;
                     imageViewWidth *= heightScaleFactor;
                     imageViewHeight *= heightScaleFactor;
-                    [CPLog debug:@"Further scaling image height to fit: factor %.2f", heightScaleFactor];
+                }
+            } else if (isIPad && !isLandscape) {
+                // For iPad in portrait, ensure the image isn't too big
+                // Use a more moderate scaling factor
+                CGFloat scaleFactor = 0.7; // Slightly reduced from 0.8 to ensure it's not too big
+                
+                imageViewWidth = imageViewWidth * scaleFactor;
+                imageViewHeight = imageViewHeight * scaleFactor;
+                
+                // Limit maximum width in portrait mode
+                CGFloat maxPortraitWidth = screenWidth * 0.85; // 85% of screen width
+                if (imageViewWidth > maxPortraitWidth) {
+                    CGFloat widthScaleFactor = maxPortraitWidth / imageViewWidth;
+                    imageViewWidth = maxPortraitWidth;
+                    imageViewHeight *= widthScaleFactor;
                 }
                 
-                // Log the image dimensions before and after scaling
-                [CPLog debug:@"Image dimensions - Original: %.1f x %.1f, Scaled: %.1f x %.1f", 
-                    screenWidth * scale, (screenWidth * scale) / aspectRatio,
-                    imageViewWidth, imageViewHeight];
+                // Limit maximum height in portrait mode
+                CGFloat maxPortraitHeight = screenHeight * 0.5; // 50% of screen height
+                if (imageViewHeight > maxPortraitHeight) {
+                    CGFloat heightScaleFactor = maxPortraitHeight / imageViewHeight;
+                    imageViewHeight = maxPortraitHeight;
+                    imageViewWidth *= heightScaleFactor;
+                }
             }
-
+            
+            // Set the width and height constraints directly
             cell.imgCPBannerWidthConstraint.constant = imageViewWidth;
             cell.imgCPBannerHeightConstraint.constant = imageViewHeight;
         }
@@ -688,12 +699,36 @@
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
     
+    // Handle both dark mode changes and orientation changes
     if (@available(iOS 13.0, *)) {
         if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
             [self setBackgroundInner];
             [self setBackgroundOuter];
         }
     }
+    
+    // Check if orientation has changed
+    UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsLandscape(currentOrientation) || UIDeviceOrientationIsPortrait(currentOrientation)) {
+        // Reload the table view to update image sizes for the new orientation
+        [self.tblCPBanner reloadData];
+        [self updateTableViewContentInset];
+        
+        // Force layout update
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    }
+}
+
+// Method to handle orientation changes and update the view accordingly
+- (void)updateForOrientationChange {
+    // Reload the table view to update image sizes for the new orientation
+    [self.tblCPBanner reloadData];
+    [self updateTableViewContentInset];
+    
+    // Force layout update
+    [self setNeedsLayout];
+    [self layoutIfNeeded];
 }
 
 - (void)setData:(CPAppBanner *)data {

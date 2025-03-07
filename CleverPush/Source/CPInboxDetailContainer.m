@@ -74,18 +74,33 @@
                     CGFloat heightScaleFactor = (availableHeight * 0.7) / estimatedImageHeight;
                     contentWidth *= heightScaleFactor;
                 }
+            } else if (isIPad && !isLandscape) {
+                // For iPad in portrait, ensure the image isn't too big
+                // Use a more moderate scaling factor
+                CGFloat scaleFactor = 0.7; // Slightly reduced from 0.8 to ensure it's not too big
+                contentWidth = contentWidth * scale * scaleFactor;
                 
-                // Center the image by adding left and right constraints
-                cell.imgCPBanner.translatesAutoresizingMaskIntoConstraints = NO;
-                [NSLayoutConstraint activateConstraints:@[
-                    [cell.imgCPBanner.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
-                    [cell.imgCPBanner.widthAnchor constraintEqualToConstant:contentWidth]
-                ]];
+                // Limit maximum width in portrait mode
+                CGFloat maxPortraitWidth = screenWidth * 0.85; // 85% of screen width
+                if (contentWidth > maxPortraitWidth) {
+                    contentWidth = maxPortraitWidth;
+                }
+                
+                // Calculate estimated height
+                CGFloat estimatedImageHeight = contentWidth / aspectRatio;
+                
+                // Limit maximum height in portrait mode
+                CGFloat maxPortraitHeight = screenHeight * 0.5; // 50% of screen height
+                if (estimatedImageHeight > maxPortraitHeight) {
+                    CGFloat heightScaleFactor = maxPortraitHeight / estimatedImageHeight;
+                    contentWidth *= heightScaleFactor;
+                }
             } else {
                 contentWidth = contentWidth * scale;
             }
             
             cell.imgCPBannerHeightConstraint.constant = (contentWidth / aspectRatio);
+            cell.imgCPBannerWidthConstraint.constant = contentWidth;
         }
 
         NSString *imageUrl;
@@ -344,6 +359,28 @@
     }
 
     [self.imgviewBackground setBackgroundColor:[UIColor colorWithHexString:self.data.background.color]];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    
+    // Handle both dark mode changes and orientation changes
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self setBackground];
+        }
+    }
+    
+    // Check if orientation has changed
+    UIDeviceOrientation currentOrientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsLandscape(currentOrientation) || UIDeviceOrientationIsPortrait(currentOrientation)) {
+        // Reload the table view to update image sizes for the new orientation
+        [self.tblCPBanner reloadData];
+        
+        // Force layout update
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+    }
 }
 
 @end
