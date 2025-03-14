@@ -1,3 +1,6 @@
+## 1.33.8 (14.03.2025)
+* Fixed silent app banners that were received when the app is killed.
+
 ## 1.33.7 (07.03.2025)
 * Optimizing App Banners for landscape view on tablets.
 

@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.33.7";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.33.8";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -551,7 +551,6 @@ static id isNil(id object) {
 - (void)initWithChannelId {
     [CPLog info:@"Initializing SDK %@ with channelId: %@ and autoRegister: %@", CLEVERPUSH_SDK_VERSION, channelId, autoRegister ? @"YES": @"NO"];
 
-    UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
