@@ -92,7 +92,7 @@
 + (void)setBannersForDeepLink:(NSMutableArray*)appBanner;
 + (NSMutableArray*)getBannersForDeepLink;
 + (void)updateBannersForDeepLinkWithURL:(NSURL*)url;
-+ (void)setSilentPushAppBannersIds:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId;
 + (NSMutableArray*)getSilentPushAppBannersIds;
 
 @end
