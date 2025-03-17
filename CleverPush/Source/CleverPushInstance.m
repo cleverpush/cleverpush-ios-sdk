@@ -1763,6 +1763,8 @@ static id isNil(id object) {
                 withSubscriptionId:[messageDict cleverPushStringForKeyPath:@"subscription._id"]
     ];
 
+	  [self handleSilentNotificationReceivedWithAppBanner:messageDict];
+
     if (isActive && notification != nil && [notification objectForKey:@"chatNotification"] != nil && ![[notification objectForKey:@"chatNotification"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"chatNotification"] boolValue]) {
 
         if (currentChatView != nil) {
@@ -1777,8 +1779,6 @@ static id isNil(id object) {
     CPNotificationReceivedResult* result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
 
     handleNotificationReceived(result);
-
-	[self handleSilentNotificationReceivedWithAppBanner:messageDict];
 }
 
 - (void)handleNotificationOpened:(NSDictionary* _Nullable)payload isActive:(BOOL)isActive actionIdentifier:(NSString* _Nullable)actionIdentifier {
