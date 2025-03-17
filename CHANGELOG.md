@@ -1,3 +1,6 @@
+## 1.33.9 (17.03.2025)
+* Improved previous fix for silent app banners that were received when the app is killed.
+
 ## 1.33.8 (14.03.2025)
 * Fixed silent app banners that were received when the app is killed.
 
