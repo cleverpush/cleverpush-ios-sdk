@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.33.7";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.33.8";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -551,7 +551,6 @@ static id isNil(id object) {
 - (void)initWithChannelId {
     [CPLog info:@"Initializing SDK %@ with channelId: %@ and autoRegister: %@", CLEVERPUSH_SDK_VERSION, channelId, autoRegister ? @"YES": @"NO"];
 
-    UIApplication* sharedApp = [UIApplication sharedApplication];
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     subscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
     deviceToken = [userDefaults stringForKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
@@ -674,6 +673,7 @@ static id isNil(id object) {
 - (void)applicationDidBecomeActive {
     [self updateBadge:nil];
     [self trackSessionStart];
+
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
@@ -1738,7 +1738,6 @@ static id isNil(id object) {
     [CPLog debug:@"handleSilentNotificationReceived"];
 
     [CleverPush handleNotificationReceived:messageDict isActive:NO];
-    [self handleSilentNotificationReceivedWithAppBanner:messageDict];
 
     return startedBackgroundJob;
 }
@@ -1778,6 +1777,8 @@ static id isNil(id object) {
     CPNotificationReceivedResult* result = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
 
     handleNotificationReceived(result);
+
+	[self handleSilentNotificationReceivedWithAppBanner:messageDict];
 }
 
 - (void)handleNotificationOpened:(NSDictionary* _Nullable)payload isActive:(BOOL)isActive actionIdentifier:(NSString* _Nullable)actionIdentifier {
@@ -1889,12 +1890,12 @@ static id isNil(id object) {
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
 
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
-        BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
-        if (isActive) {
-            [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
-        } else {
-            [CPAppBannerModuleInstance setSilentPushAppBannersIds:appBanner notificationId:notificationId];
-        }
+      BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+      if (isActive) {
+        [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+      } else {
+        [CPAppBannerModuleInstance addSilentPushAppBannersId:appBanner notificationId:notificationId];
+      }
     }
 }
 
@@ -2006,7 +2007,7 @@ static id isNil(id object) {
     [userDefaults setObject:notificationId forKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
     [userDefaults synchronize];
 
-    NSMutableDictionary*notificationMutable = [notification mutableCopy];
+    NSMutableDictionary *notificationMutable = [notification mutableCopy];
     [notificationMutable removeObjectsForKeys:[notification allKeysForObject:[NSNull null]]];
     if (![[notificationMutable objectForKey:@"createdAt"] isKindOfClass:[NSString class]] || [[notificationMutable objectForKey:@"createdAt"] length] == 0) {
         [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
@@ -2018,7 +2019,7 @@ static id isNil(id object) {
     }
     [notifications addObject:notificationMutable];
     notifications = [self filterDuplicateNotifications:notifications];
-    NSArray*notificationsArray = [NSArray arrayWithArray:notifications];
+    NSArray *notificationsArray = [NSArray arrayWithArray:notifications];
 
     if ([userDefaults objectForKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT] != nil) {
         maximumNotifications = (int) [userDefaults integerForKey:CLEVERPUSH_MAXIMUM_NOTIFICATION_COUNT];

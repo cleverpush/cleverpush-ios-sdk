@@ -158,6 +158,8 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - Initialised a session
 - (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
+	[self showPendingSilentPushAppBannersIds:channelId];
+
     if ([self getLastSessionTimestamp] > 0
         && ((long)NSDate.date.timeIntervalSince1970 - [self getLastSessionTimestamp]) < [self getMinimumSessionLength]
         ) {
@@ -277,22 +279,6 @@ NSInteger currentScreenIndex = 0;
             }
             [self setPendingBannerRequest:NO];
             [self setPendingBannerListeners:[NSMutableArray new]];
-
-            NSMutableArray *appBanners = [[NSMutableArray alloc] init];
-            appBanners = [[CPAppBannerModuleInstance getSilentPushAppBannersIds] mutableCopy];
-            if (appBanners != nil && appBanners.count > 0) {
-                NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
-
-                for (NSMutableDictionary *eventsObject in appBanners) {
-                    [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
-                    [objectsToRemove addObject:eventsObject];
-                }
-
-                [appBanners removeObjectsInArray:objectsToRemove];
-
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            } 
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
@@ -1442,9 +1428,9 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - set app banner ids from silent push
-+ (void)setSilentPushAppBannersIds:(NSString *)appBannerId notificationId:(NSString *)notificationId {
++ (void)addSilentPushAppBannersId:(NSString *)appBannerId notificationId:(NSString *)notificationId {
     if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
-        [CPLog debug:@"CPAppBannerModuleInstance: setSilentPushAppBannersIds: appBannerId or notification ID is blank, null, or empty."];
+        [CPLog debug:@"CPAppBannerModuleInstance: addSilentPushAppBannersId: appBannerId or notification ID is blank, null, or empty."];
         return;
     }
 
@@ -1471,9 +1457,21 @@ NSInteger currentScreenIndex = 0;
 }
 
 #pragma mark - get app banner ids from silent push
-+ (NSMutableArray *)getSilentPushAppBannersIds {
-    silentPushAppBannersIds = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-    return silentPushAppBannersIds;
+- (void)showPendingSilentPushAppBannersIds:(NSString*)channelId {
+	NSMutableArray *appBanners = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+	if (appBanners != nil && appBanners.count > 0) {
+		NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
+
+		for (NSMutableDictionary *eventsObject in appBanners) {
+			[self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
+			[objectsToRemove addObject:eventsObject];
+		}
+
+		[appBanners removeObjectsInArray:objectsToRemove];
+
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+	}
 }
 
 #pragma mark - Get the value of pageControl from current index

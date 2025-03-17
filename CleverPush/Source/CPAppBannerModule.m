@@ -47,18 +47,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance triggerEvent:eventId properties:properties];
 }
 
-#pragma mark - Show banners by channel-id and banner-id
-+ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil];
-}
-
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force {
     [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil force:force];
-}
-
-#pragma mark - Show banners by channel-id and banner-id
-+ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId];
 }
 
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
@@ -128,11 +118,6 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 #pragma mark - manage the schedule to display the banner at a specific time
 + (void)scheduleBanners {
     [self.moduleInstance scheduleBanners];
-}
-
-#pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
-+ (void)showBanner:(CPAppBanner*)banner {
-    [self.moduleInstance showBanner:banner];
 }
 
 + (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {

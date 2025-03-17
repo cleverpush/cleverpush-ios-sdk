@@ -1,3 +1,18 @@
+## 1.33.8 (14.03.2025)
+* Fixed silent app banners that were received when the app is killed.
+
+## 1.33.7 (07.03.2025)
+* Optimizing App Banners for landscape view on tablets.
+
+## 1.33.6 (06.03.2025)
+* Further improvements for App Banners in landscape mode on tablets
+
+## 1.33.5 (06.03.2025)
+* Resolved issue of appDelegate methods not being called when the app uses `@UIApplicationDelegateAdaptor`
+
+## 1.33.4 (05.03.2025)
+* Fixed an edge case with App Banners in landscape mode on tablets (image too large)
+
 ## 1.33.3 (05.03.2025)
 * Fixed the issue of redirecting users to the app settings if the user had declined the push notification permission from the chatview.
 
