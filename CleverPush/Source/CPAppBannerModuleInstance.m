@@ -1197,8 +1197,8 @@ NSInteger currentScreenIndex = 0;
     }
 }
 
-- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController  banner:(CPAppBanner*)banner {
-    if ([CleverPush popupVisible]) {
+- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner {
+    if ([CleverPush popupVisible] && !handleBannerDisplayed) {
         [activePendingBanners addObject:banner];
         return;
     }
