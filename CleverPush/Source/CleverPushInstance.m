@@ -458,11 +458,11 @@ static id isNil(id object) {
     }
 
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-        if (userInfo) {
-            startFromNotification = YES;
-        } else if (!launchOptions) {
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLaunching:) name:UIApplicationDidFinishLaunchingNotification object:nil];
-        }
+    if (userInfo) {
+        startFromNotification = YES;
+    } else if (!launchOptions) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDidFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
+    }
 
     if (pendingOpenedResult && handleNotificationOpened) {
         handleNotificationOpened(pendingOpenedResult);
@@ -517,7 +517,8 @@ static id isNil(id object) {
     return self;
 }
 
-- (void)didFinishLaunching:(NSNotification *)notification {
+#pragma mark - Handle App Launch Notification
+- (void)onDidFinishLaunchingNotification:(NSNotification *)notification {
     NSDictionary *launchOptions = notification.userInfo;
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
