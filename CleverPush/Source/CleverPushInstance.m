@@ -80,7 +80,7 @@ static BOOL autoClearBadge = YES;
 static BOOL autoResubscribe = NO;
 static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
-static BOOL incrementBadge = NO;
+static BOOL incrementBadge = YES;
 static BOOL showNotificationsInForeground = YES;
 static BOOL isDisplayAlertEnabledForNotifications = YES;
 static BOOL isSoundEnabledForNotifications = YES;
@@ -4170,8 +4170,25 @@ static id isNil(id object) {
 
     [self handleNotificationReceived:payload isActive:NO];
 
+    // Ensure badge count setting is enabled by default
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults objectForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] == nil) {
+        [userDefaults setBool:YES forKey:CLEVERPUSH_INCREMENT_BADGE_KEY];
+        [userDefaults synchronize];
+    }
+
     // badge count
     [self updateBadge:replacementContent];
+    
+    // Ensure badge is set explicitly when incrementBadge is enabled
+    if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] && replacementContent.badge == nil) {
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+            replacementContent.badge = @([notifications count] + 1);
+            dispatch_semaphore_signal(sema);
+        }];
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    }
 
     // rich notifications
     if (notification != nil) {
