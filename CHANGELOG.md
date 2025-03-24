@@ -1,3 +1,9 @@
+## 1.34.0 (23.03.2025)
+* [Breaking]: Changed the way badge counts work in the default configuration (autoClearBadge: YES, incrementBadge: NO).
+  Previously, all pending notifications were cleared from the notification center, when a notification was opened. This is not the case anymore.
+  The badge count is now also cleared, when the app is brought from background to foreground.
+* Resolved issue where `setShowAppBannerCallback` was sometimes not called due to the `popupVisible` condition
+
 ## 1.33.9 (17.03.2025)
 * Improved previous fix for silent app banners that were received when the app is killed.
 

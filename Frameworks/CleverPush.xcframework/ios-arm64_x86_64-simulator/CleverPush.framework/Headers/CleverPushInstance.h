@@ -292,7 +292,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)clearSubscriptionData;
 - (void)fireChannelConfigListeners;
 - (BOOL)getAutoClearBadge;
-- (BOOL)clearBadge:(BOOL)fromNotificationOpened;
+- (void)clearBadge;
 - (BOOL)shouldSync;
 - (void)setHandleSubscribedCalled:(BOOL)subscribed;
 - (BOOL)getHandleSubscribedCalled;

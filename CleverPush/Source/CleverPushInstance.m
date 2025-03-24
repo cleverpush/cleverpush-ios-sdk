@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.33.9";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.0";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -506,9 +506,7 @@ static id isNil(id object) {
         }
     }
 
-    if ([self getAutoClearBadge]) {
-        [self clearBadge:false];
-    }
+	[self clearBadge];
 
     if (!handleUrlFromSceneDelegate) {
         handleUrlFromAppDelegate = YES;
@@ -686,6 +684,8 @@ static id isNil(id object) {
 - (void)applicationDidBecomeActive {
     [self updateBadge:nil];
     [self trackSessionStart];
+
+	[self clearBadge];
 
     [CPAppBannerModule initSession:channelId afterInit:YES];
 
@@ -1826,9 +1826,7 @@ static id isNil(id object) {
                       withAction:action
     ];
 
-    if ([self getAutoClearBadge]) {
-        [self clearBadge:true];
-    }
+	[self clearBadge];
 
     [self updateBadge:nil];
 
@@ -2071,26 +2069,14 @@ static id isNil(id object) {
 }
 
 #pragma mark - Removed badge count from the app icon while open-up an application by tapped on the notification
-- (BOOL)clearBadge:(BOOL)fromNotificationOpened {
-    __block BOOL wasSet = NO;
+- (void)clearBadge {
+	if (![self getAutoClearBadge]) {
+		return;
+	}
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        wasSet = [UIApplication sharedApplication].applicationIconBadgeNumber > 0;
-
-        if ((!(NSFoundationVersionNumber > NSFoundationVersionNumber_iOS_7_1) && fromNotificationOpened) || wasSet) {
-            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
-            [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-
-            NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-            if ([userDefaults objectForKey:CLEVERPUSH_BADGE_COUNT_KEY] != nil) {
-                [userDefaults setInteger:0 forKey:CLEVERPUSH_BADGE_COUNT_KEY];
-                [userDefaults synchronize];
-            }
-        }
-    });
-
-    return wasSet;
+	[self setBadgeCount:0];
 }
+
 #pragma mark - Removed space from 32bytes and convert token in to string.
 - (NSString*)stringFromDeviceToken:(NSData*)deviceToken {
     // deviceToken = <4618be8f 70f2a10f ce0e7435 5528fac9 86221163 94b282b1 553afc3c e31ec99c>
