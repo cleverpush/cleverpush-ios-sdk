@@ -80,7 +80,7 @@ static BOOL autoClearBadge = YES;
 static BOOL autoResubscribe = NO;
 static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
-static BOOL incrementBadge = YES;
+static BOOL incrementBadge = NO;
 static BOOL showNotificationsInForeground = YES;
 static BOOL isDisplayAlertEnabledForNotifications = YES;
 static BOOL isSoundEnabledForNotifications = YES;
@@ -4169,13 +4169,6 @@ static id isNil(id object) {
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
 
     [self handleNotificationReceived:payload isActive:NO];
-
-    // Ensure badge count setting is enabled by default
-    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-    if ([userDefaults objectForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] == nil) {
-        [userDefaults setBool:YES forKey:CLEVERPUSH_INCREMENT_BADGE_KEY];
-        [userDefaults synchronize];
-    }
 
     // badge count
     [self updateBadge:replacementContent];
