@@ -2510,7 +2510,6 @@ static id isNil(id object) {
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
-                
                 if (value == nil) {
                     [subscriptionAttributes setObject:@"" forKey:attributeId];
                 } else {
