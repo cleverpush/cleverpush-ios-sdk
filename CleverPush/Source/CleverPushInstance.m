@@ -116,7 +116,7 @@ NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
-NSString* apiEndpoint = @"https://api.cleverpush.com";
+NSString* apiEndpoint = @"https://api-mobile.cleverpush.com";
 NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
