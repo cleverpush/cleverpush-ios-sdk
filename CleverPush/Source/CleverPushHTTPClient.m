@@ -22,7 +22,7 @@
     return sharedClient;
 }
 
-#pragma mark - creatinting dynamic endpoint with api base URL : @"https://api.cleverpush.com"
+#pragma mark - creatinting dynamic endpoint with api base URL : @"https://api-mobile.cleverpush.com"
 - (id)init {
     self = [super init];
     if (self) {
