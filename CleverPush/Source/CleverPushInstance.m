@@ -460,6 +460,8 @@ static id isNil(id object) {
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
+    } else if (!launchOptions) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDidFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
     }
 
     if (pendingOpenedResult && handleNotificationOpened) {
@@ -511,6 +513,17 @@ static id isNil(id object) {
     }
 
     return self;
+}
+
+#pragma mark - Handle App Launch Notification
+- (void)onDidFinishLaunchingNotification:(NSNotification *)notification {
+    NSDictionary *launchOptions = notification.userInfo;
+    NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo) {
+        startFromNotification = YES;
+    }
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationDidFinishLaunchingNotification object:nil];
 }
 
 #pragma mark - Define the rootview controller of the UINavigation-Stack
