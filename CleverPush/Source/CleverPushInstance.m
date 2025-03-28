@@ -4162,6 +4162,16 @@ static id isNil(id object) {
 
     // badge count
     [self updateBadge:replacementContent];
+    
+    // Ensure badge is set explicitly when incrementBadge is enabled
+    if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] && replacementContent.badge == nil) {
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+            replacementContent.badge = @([notifications count] + 1);
+            dispatch_semaphore_signal(sema);
+        }];
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    }
 
     // rich notifications
     if (notification != nil) {
