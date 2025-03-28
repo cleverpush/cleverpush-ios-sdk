@@ -1,5 +1,7 @@
 ## 1.34.1 (28.03.2025)
 * Optimised in-app banners for trigger conditions (All events are triggering the banner, not just the filtered ones.)
+* Changed the default SDK endpoint to the new subdomain.
+* Resolved the issue of the application crashing if we set the value as nil for the `setSubscriptionAttribute`
 
 ## 1.34.0 (23.03.2025)
 * [Breaking]: Changed the way badge counts work in the default configuration (autoClearBadge: YES, incrementBadge: NO).
