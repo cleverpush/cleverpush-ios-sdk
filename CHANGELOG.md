@@ -1,3 +1,6 @@
+## 1.34.1 (28.03.2025)
+* Optimised in-app banners for trigger conditions (All events are triggering the banner, not just the filtered ones.)
+
 ## 1.34.0 (23.03.2025)
 * [Breaking]: Changed the way badge counts work in the default configuration (autoClearBadge: YES, incrementBadge: NO).
   Previously, all pending notifications were cleared from the notification center, when a notification was opened. This is not the case anymore.
