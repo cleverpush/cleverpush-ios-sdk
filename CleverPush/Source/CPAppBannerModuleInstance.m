@@ -1567,9 +1567,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Get the value of pageControl from current index
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
-    currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
-    CPAppBanner *appBanner = pagevalue[@"appBanner"];
-    [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+    if (currentScreenIndex != [pagevalue[@"currentIndex"] integerValue]) {
+        currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
+        CPAppBanner *appBanner = pagevalue[@"appBanner"];
+        [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+    }
 }
 
 #pragma mark - refactor for testcases
