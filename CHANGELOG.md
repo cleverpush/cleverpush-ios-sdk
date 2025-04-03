@@ -1,3 +1,8 @@
+## 1.34.2 (03.04.2025)
+* Resolved the crash issue that occurred when rotating the device from portrait to landscape while the banner type was set to HTML & Optimized the close button frame.
+* Resolved the delivered API count issue in app banners.
+* Resolved the issue of badgeCount is not increasing properly when app is not in focus
+
 ## 1.34.1 (28.03.2025)
 * Optimised in-app banners for trigger conditions (All events are triggering the banner, not just the filtered ones.)
 * Changed the default SDK endpoint to the new subdomain.

@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.1";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.2";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -4157,6 +4157,7 @@ static id isNil(id object) {
 
     NSDictionary* payload = request.content.userInfo;
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     [self handleNotificationReceived:payload isActive:NO];
 

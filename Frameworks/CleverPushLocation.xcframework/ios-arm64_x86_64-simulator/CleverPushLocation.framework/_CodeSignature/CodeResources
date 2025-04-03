@@ -6,7 +6,7 @@
 	<dict>
 		<key>Frameworks/CleverPush.framework/CPAppBannerViewController.nib</key>
 		<data>
-		ob8wCRI4Hy8ATgJDs3XqU4RHl4E=
+		4hdNtUkmhFT3inPrRisGb5mGnWY=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPHTMLBlockCell.nib</key>
 		<data>
-		+DVdB7RLGyep4eIHyOempyd8sms=
+		wENUKj4KAEXWK+/3G6WOK8ZgT18=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
 		<data>
@@ -46,11 +46,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/objects-14.0+.nib</key>
 		<data>
-		+WN3vtheypkN40gd6eWFy0ivWpw=
+		xHExdAUWzZkBaIKUQ9CM/pOWQSA=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<data>
-		Fk7Kr6noiTLoOFy5349MCIpYwOs=
+		orjS2BS2vV/bQSfgh38dzhCRY0o=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
 		<data>
@@ -66,11 +66,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		cKhpRkuZW4JbwpLEyRjznIE4ruE=
+		Ql+OOrymreaNY0x0r8pJutY7pT0=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		fNoNQlT3IZBZfCqWrT6aSQtfPpw=
+		2xx+qeLH11pHEOp4kxi4/Nt4Nko=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -78,7 +78,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		9fzd62JHnTHj7fCJa7uB2OExP2o=
+		qs3uf9Nat2YD3/KKqnlXRI777GY=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -114,7 +114,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		X/WgmB+BtLyL4RNNta9gpc74/Ow=
+		s5xOyYndT5yAAAVG074yt36pxFI=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -131,7 +131,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			G8cuFk6+UXq5STfI4d6PZNvBG4f6JH5skJQ1y/GF4Lc=
+			HJ30PcYkGc69RGqiPbL0R5icowIIXAbTvLMw0rxpbfo=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
@@ -166,7 +166,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			TLZsTcvDLNlfE2H1shiWA+JqfjDn4nDNLy916bFxfdU=
+			pblsZ+r/4tb7alUhmukV8eHyWVUmMU9eM0nOqPTLTVc=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPImageBlockCell.nib</key>
@@ -201,14 +201,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			gMz4Czwb7eoE6We0hTxqHI+ovSkFwExRHzTmwfAlEpo=
+			1dUAZPcHlPj+iPt0gBFSmI18Z7SWvjqUQbjcSaGBo4Q=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPInboxDetailView.nib/runtime.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			q/TnAvY+79zHE7xNka3jcASPVPu/gZvuAnbU68Tuhtg=
+			5sIos+RG4e1sJ+Szpyrw7yaNcfLEk9BkfX7zzfRcOEo=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPStoryPlayerHtmlContent.html</key>
@@ -236,14 +236,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			MbBVnMEJnDaNDpT1AKM4v3VpmzhIERfh+lN+DU3XEqA=
+			lHyXHA/O9EFpve30+EyL8ghe8LXZlQBaWudVi8guBxM=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			VVVLdHfxfARWURF5MgZMwfo6y9NOXmAmSqZy5ZZgS18=
+			IVZLfmtYuH++dUiGBZlfzvhUGVsRaKJ8IUhJKriisSs=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -257,7 +257,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			6iEcgTOQvwHyl4TsewfeoIwft2Es5dOdzbKkjDqQ32g=
+			RNMwks3UT6QApDFXfeIIuCI/2eWAZ1roAgnbc0jqdko=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
