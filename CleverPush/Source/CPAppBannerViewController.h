@@ -51,6 +51,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControllTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerTraillingConstraint;
+@property (strong, nonatomic) UIButton *htmlCloseButton;
 
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;
