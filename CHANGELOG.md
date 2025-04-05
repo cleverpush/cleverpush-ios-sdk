@@ -1,3 +1,6 @@
+## 1.34.3 (05.04.2025)
+* Crash fixed when numbers were provided to `trackEvent` properties
+
 ## 1.34.2 (03.04.2025)
 * Resolved the crash issue that occurred when rotating the device from portrait to landscape while the banner type was set to HTML & Optimized the close button frame.
 * Resolved the delivered API count issue in app banners.
