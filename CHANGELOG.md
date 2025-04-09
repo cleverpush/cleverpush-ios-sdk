@@ -1,3 +1,6 @@
+## 1.34.4 (09.04.2025)
+* Optimised the `colorWithHexString` function to prevent crashes when providing an invalid color code.
+
 ## 1.34.3 (05.04.2025)
 * Crash fixed when numbers were provided to `trackEvent` properties
 
