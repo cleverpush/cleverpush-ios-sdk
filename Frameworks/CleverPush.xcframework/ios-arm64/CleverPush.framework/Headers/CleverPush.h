@@ -174,6 +174,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)showAppBanner:(NSString* _Nullable)bannerId;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback;
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback;
++ (void)setAppBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)callback;
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback;
 + (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;
 + (void)getAppBannersByGroup:(NSString* _Nullable)groupId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;

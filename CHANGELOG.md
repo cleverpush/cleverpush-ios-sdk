@@ -1,3 +1,6 @@
+## 1.34.5 (10.04.2025)
+* implemented a listener callback `setAppBannerClosedCallback` for when the app banner is dismissed.
+
 ## 1.34.4 (09.04.2025)
 * Optimised the `colorWithHexString` function to prevent crashes when providing an invalid color code.
 

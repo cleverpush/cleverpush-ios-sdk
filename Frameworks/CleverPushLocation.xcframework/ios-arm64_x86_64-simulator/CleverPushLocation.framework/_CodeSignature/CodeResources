@@ -66,7 +66,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		ZN8vaALgfW0MVJGRwr2eg4i9Tno=
+		N9gGlfGzcB/J47knRB1quptOk9M=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		m6AxOM6jLC+HCOY3S1UF6Hf7kbI=
+		begjUtwIr1/QA5N2FTYaOuo9beU=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -236,7 +236,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			j0VXIlYkGa4S8NzBjqTZUsFhqz7uOSzUzCPCH5MsE5w=
+			l7DEpUIyZPyYBaGFDD04bJ4aK57FIFWTUtLTTYn2RBk=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
@@ -306,7 +306,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			bVkoK3O/xpKtGrg8+yPaEga10PIm65DPk2RTZgeSUW8=
+			0P/a/nSrSj63kbwl/fVT1SKT7alLsy3jvzW+JpGmAec=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>
