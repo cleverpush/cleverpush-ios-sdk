@@ -28,6 +28,7 @@
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
+@property (nonatomic,copy) CPAppBannerClosedBlock handleBannerClosed;
 @property (nonatomic, assign) id controller;
 @property (nonatomic, weak) id <HeightDelegate> delegate;
 @property (nonatomic, weak) id <NavigateNextPage> changePage;

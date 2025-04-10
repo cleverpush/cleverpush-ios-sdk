@@ -472,7 +472,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-
+    
+    if (self.handleBannerClosed) {
+        cell.handleBannerClosed = self.handleBannerClosed;
+    }
+    
     if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
         cell.voucherCode = self.voucherCode;
     }
@@ -889,6 +893,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
         [self jumpOut];
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        if (self.handleBannerClosed) {
+            self.handleBannerClosed();
+        }
         [self dismissViewControllerAnimated:NO completion:nil];
         [CPAppBannerModule showNextActivePendingBanner:self.data];
     });

@@ -31,6 +31,7 @@
 - (void)saveSessions;
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
+- (void)setBannerClosedCallback:(CPAppBannerClosedBlock)callback;
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 - (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;

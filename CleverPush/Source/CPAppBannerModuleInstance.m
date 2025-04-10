@@ -26,6 +26,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
+CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 
@@ -64,6 +65,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
     handleBannerShown = callback;
+}
+
+#pragma mark - Call back while banner has been closed
+- (void)setBannerClosedCallback:(CPAppBannerClosedBlock)callback {
+    handleBannerClosed = callback;
 }
 
 #pragma mark - Callback while banner has been successfully ready to display
@@ -1299,6 +1305,10 @@ NSInteger currentScreenIndex = 0;
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
+    if (handleBannerClosed) {
+        appBannerViewController.handleBannerClosed = handleBannerClosed;
+    }
+    
     UIViewController* topController = [CleverPush topViewController];
     if (handleBannerDisplayed) {
         handleBannerDisplayed(appBannerViewController);
