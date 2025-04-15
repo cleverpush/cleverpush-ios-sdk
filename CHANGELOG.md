@@ -1,3 +1,6 @@
+## 1.34.6 (15.04.2025)
+* Resolved the issue where `setSubscriptionTopics` and `getSubscriptionTopics` should not be updated if the API call fails.
+
 ## 1.34.5 (10.04.2025)
 * implemented a listener callback `setAppBannerClosedCallback` for when the app banner is dismissed.
 
