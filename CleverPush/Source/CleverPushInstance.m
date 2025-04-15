@@ -103,6 +103,7 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
+NSInteger subscriptionTopicsVersion = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -129,6 +130,7 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
+NSMutableArray* subscriptionTopics;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -441,6 +443,7 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
+    subscriptionTopics = [[NSMutableArray alloc] init];
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -656,9 +659,8 @@ static id isNil(id object) {
     } else {
         topicsVersion += 1;
     }
-    [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-    [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-    [userDefaults synchronize];
+    subscriptionTopics = [topics mutableCopy];
+    subscriptionTopicsVersion = topicsVersion;
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
@@ -1544,12 +1546,12 @@ static id isNil(id object) {
           [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
         }
 
-    NSArray* topics = [self getSubscriptionTopics];
+    NSMutableArray* topics = [[NSMutableArray alloc] init];
+    topics = [subscriptionTopics mutableCopy];
     if (topics != nil && [topics count] >= 0) {
         [dataDic setObject:topics forKey:@"topics"];
-        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-        if (topicsVersion) {
-            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
+        if (subscriptionTopicsVersion) {
+            [dataDic setObject:[NSNumber numberWithInteger:subscriptionTopicsVersion] forKey:@"topicsVersion"];
         } else {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
@@ -1604,6 +1606,8 @@ static id isNil(id object) {
                 if ([results objectForKey:@"topicsVersion"] != nil) {
                     [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
                 }
+                subscriptionTopics = nil;
+                subscriptionTopicsVersion = 0;
                 [userDefaults synchronize];
             }
 
@@ -1653,8 +1657,9 @@ static id isNil(id object) {
                 }
             }
         } onFailure:^(NSError* error) {
-           [self setSubscriptionInProgress:false];
-            
+            [self setSubscriptionInProgress:false];
+            subscriptionTopics = nil;
+            subscriptionTopicsVersion = 0;
             if (failureBlock) {
                 failureBlock(error);
             }
