@@ -1,3 +1,6 @@
+## 1.34.7 (16.04.2025)
+* implemented an app-banner dismiss event listener for the show app-banner-function.
+
 ## 1.34.6 (15.04.2025)
 * Resolved the issue where `setSubscriptionTopics` and `getSubscriptionTopics` should not be updated if the API call fails.
 
