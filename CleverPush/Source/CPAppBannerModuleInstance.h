@@ -31,12 +31,14 @@
 - (void)saveSessions;
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
-- (void)setBannerClosedCallback:(CPAppBannerClosedBlock)callback;
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 - (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId;
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force;
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force;
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 - (void)startup;
 - (NSMutableArray*)shownAppBanners;
 - (BOOL)isBannerShown:(NSString*)bannerId;

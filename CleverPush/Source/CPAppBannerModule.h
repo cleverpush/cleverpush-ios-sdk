@@ -26,10 +26,11 @@
 #pragma mark - Class Methods
 + (void)initBannersWithChannel:(NSString*)channel showDrafts:(BOOL)showDrafts fromNotification:(BOOL)fromNotification;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force;
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force;
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
-+ (void)setBannerClosedCallback:(CPAppBannerClosedBlock)callback;
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;
 + (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback;
 + (void)presentAppBanner:(UIViewController*)controller banner:(CPAppBanner*)banner;
