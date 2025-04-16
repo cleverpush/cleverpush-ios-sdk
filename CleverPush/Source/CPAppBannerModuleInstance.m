@@ -67,11 +67,6 @@ NSInteger currentScreenIndex = 0;
     handleBannerShown = callback;
 }
 
-#pragma mark - Call back while banner has been closed
-- (void)setBannerClosedCallback:(CPAppBannerClosedBlock)callback {
-    handleBannerClosed = callback;
-}
-
 #pragma mark - Callback while banner has been successfully ready to display
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
     handleBannerDisplayed = callback;
@@ -94,15 +89,27 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force{
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback{
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:appBannerClosedCallback];
 }
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
+    [self showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
         NSMutableArray<CPAppBanner *> *bannersCopy = [banners mutableCopy];
         for (CPAppBanner* banner in bannersCopy) {
@@ -112,6 +119,10 @@ NSInteger currentScreenIndex = 0;
                     break;
                 }
                 [self showBanner:banner force:force];
+                if (appBannerClosedCallback != nil) {
+                    handleBannerClosed = appBannerClosedCallback;
+                }
+                
                 break;
             }
         }

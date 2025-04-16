@@ -3921,7 +3921,11 @@ static id isNil(id object) {
 
 #pragma mark - App Banner methods
 - (void)showAppBanner:(NSString* _Nullable)bannerId {
-    [self showAppBanner:bannerId notificationId:nil];
+    [self showAppBanner:bannerId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString* _Nullable)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)appBannerClosedCallback {
+    [self showAppBanner:bannerId notificationId:nil appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
@@ -3937,13 +3941,21 @@ static id isNil(id object) {
 }
 
 - (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES];
+    [self showAppBanner:bannerId notificationId:notificationId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
+    [self showAppBanner:bannerId channelId:channelId notificationId:notificationId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
     BOOL fromNotification = notificationId != nil;
     [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
@@ -3952,10 +3964,6 @@ static id isNil(id object) {
 
 - (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback {
     [CPAppBannerModule setBannerShownCallback:callback];
-}
-
-- (void)setAppBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)callback {
-    [CPAppBannerModule setBannerClosedCallback:callback];
 }
 
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback {

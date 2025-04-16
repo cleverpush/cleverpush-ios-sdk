@@ -576,6 +576,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance showAppBanner:bannerId];
 }
 
++ (void)showAppBanner:(NSString* _Nullable)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)appBannerClosedCallback {
+    [self.CPSharedInstance showAppBanner:bannerId appBannerClosedCallback:appBannerClosedCallback];
+}
+
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerOpenedCallback:^(CPAppBannerAction*action) {
         callback(action);
@@ -585,12 +589,6 @@ static CleverPush* singleInstance = nil;
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerShownCallback:^(CPAppBanner*appBanner) {
         callback(appBanner);
-    }];
-}
-
-+ (void)setAppBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)callback {
-    [self.CPSharedInstance setAppBannerClosedCallback:^{
-        callback();
     }];
 }
 
