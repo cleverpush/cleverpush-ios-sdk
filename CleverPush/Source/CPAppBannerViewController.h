@@ -32,6 +32,7 @@
 @property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, strong) IBOutlet CPAspectKeepImageView *backGroundImage;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;
+@property (nonatomic,copy) CPAppBannerClosedBlock handleBannerClosed;
 @property (nonatomic, assign) long index;
 @property (nonatomic, strong) NSString *voucherCode;
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
@@ -51,6 +52,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *pageControllTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webBannerTraillingConstraint;
+@property (strong, nonatomic) UIButton *htmlCloseButton;
 
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;

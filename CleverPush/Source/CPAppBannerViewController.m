@@ -336,72 +336,76 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 #pragma mark - Update the UI while the device detects rotation.
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    // Store current orientation before transition
-    CGFloat currentWidth = [UIScreen mainScreen].bounds.size.width;
-    CGFloat currentHeight = [UIScreen mainScreen].bounds.size.height;
-    BOOL wasLandscape = currentWidth > currentHeight;
-    BOOL willBeLandscape = size.width > size.height;
-    
-    // Only perform special handling if we're changing orientation
-    BOOL isChangingOrientation = (wasLandscape != willBeLandscape);
-    BOOL isPortraitToLandscape = !wasLandscape && willBeLandscape;
-    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-    
-    // Save current index before rotation
-    NSInteger currentIndex = self.index;
-    
-    // Disable scrolling during rotation to prevent unwanted page changes
-    BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
-    self.cardCollectionView.scrollEnabled = NO;
-    
-    // Prevent laggy animation by temporarily hiding the collection view
-    self.cardCollectionView.alpha = 0.0;
-    
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        // Update layout constraints based on new orientation
-        [self setDynamicBannerConstraints:self.data.marginEnabled];
+    if ([self.data.contentType isEqualToString:@"html"]) {
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            self.webBannerHeight.constant = size.height;
+            
+            CGRect webViewFrame = self.webView.frame;
+            webViewFrame.size.width = size.width;
+            webViewFrame.size.height = size.height;
+            self.webView.frame = webViewFrame;
+            
+            [self.view layoutIfNeeded];
+            
+            if (self.data.closeButtonEnabled && self.htmlCloseButton) {
+                [self updateCloseButtonForSize:size];
+            }
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            [self.view setNeedsLayout];
+            [self.view layoutIfNeeded];
+        }];
+    } else {
+        CGFloat currentWidth = [UIScreen mainScreen].bounds.size.width;
+        CGFloat currentHeight = [UIScreen mainScreen].bounds.size.height;
+        BOOL wasLandscape = currentWidth > currentHeight;
+        BOOL willBeLandscape = size.width > size.height;
         
-        // Force layout update
-        [self.view layoutIfNeeded];
+        BOOL isChangingOrientation = (wasLandscape != willBeLandscape);
+        BOOL isPortraitToLandscape = !wasLandscape && willBeLandscape;
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
         
-        // Invalidate layout but don't reload yet
-        [self.cardCollectionView.collectionViewLayout invalidateLayout];
+        NSInteger currentIndex = self.index;
         
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        // After rotation is complete, update the collection view
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // Force a complete reload to ensure proper image sizing
-            [self.cardCollectionView performBatchUpdates:^{
-                [self.cardCollectionView reloadData];
-            } completion:^(BOOL finished) {
-                // After reload, make sure we're showing the correct page
-                if (currentIndex < self.data.screens.count) {
-                    NSIndexPath *currentItem = [NSIndexPath indexPathForItem:currentIndex inSection:0];
-                    [self.cardCollectionView scrollToItemAtIndexPath:currentItem 
-                                                   atScrollPosition:UICollectionViewScrollPositionNone 
-                                                           animated:NO];
-                    self.pageControl.currentPage = currentIndex;
-                    self.index = currentIndex;
-                }
-                
-                // Restore scrolling state
-                self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-                
-                // Fade the collection view back in
-                [UIView animateWithDuration:0.2 animations:^{
-                    self.cardCollectionView.alpha = 1.0;
+        BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
+        self.cardCollectionView.scrollEnabled = NO;
+        self.cardCollectionView.alpha = 0.0;
+        
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            [self setDynamicBannerConstraints:self.data.marginEnabled];
+            
+            [self.view layoutIfNeeded];
+            [self.cardCollectionView.collectionViewLayout invalidateLayout];
+            
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.cardCollectionView performBatchUpdates:^{
+                    [self.cardCollectionView reloadData];
+                } completion:^(BOOL finished) {
+                    if (self.data.screens.count > 0 && currentIndex < self.data.screens.count) {
+                        NSIndexPath *currentItem = [NSIndexPath indexPathForItem:currentIndex inSection:0];
+                        if (currentIndex < [self.cardCollectionView numberOfItemsInSection:0]) {
+                            [self.cardCollectionView scrollToItemAtIndexPath:currentItem
+                                                            atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
+                        }
+                        self.pageControl.currentPage = currentIndex;
+                        self.index = currentIndex;
+                    }
+                    
+                    self.cardCollectionView.scrollEnabled = originalScrollEnabled;
+                    
+                    [UIView animateWithDuration:0.2 animations:^{
+                        self.cardCollectionView.alpha = 1.0;
+                    }];
+                    
+                    if (isIPad && isPortraitToLandscape) {
+                        [self handleIPadPortraitToLandscapeTransition];
+                    } else {
+                        [self updateVisibleCells];
+                    }
                 }];
-                
-                // Special handling for iPad portrait to landscape transition
-                if (isIPad && isPortraitToLandscape) {
-                    [self handleIPadPortraitToLandscapeTransition];
-                } else {
-                    // Force update all visible cells to ensure proper sizing
-                    [self updateVisibleCells];
-                }
-            }];
-        });
-    }];
+            });
+        }];
+    }
 }
 
 // Helper method to update all visible cells
@@ -468,7 +472,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
     CPBannerCardContainer *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CPBannerCardContainer" forIndexPath:indexPath];
     cell.data = self.data;
     [cell setActionCallback:self.actionCallback];
-
+    
+    if (self.handleBannerClosed) {
+        cell.handleBannerClosed = self.handleBannerClosed;
+    }
+    
     if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
         cell.voucherCode = self.voucherCode;
     }
@@ -775,7 +783,7 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
     if (self.data.closeButtonEnabled) {
         UIColor *backgroundColor;
-        UIButton *closeButton = [[UIButton alloc]init];
+        self.htmlCloseButton = [[UIButton alloc] init];
         UIWindow *window = [UIApplication sharedApplication].keyWindow;
         CGRect frame = window.rootViewController.view.frame;
         CGFloat width = frame.size.width;
@@ -784,10 +792,10 @@ static CPAppBannerActionBlock appBannerActionCallback;
         CGFloat spacing = 10;
 
         topPadding = window.safeAreaInsets.top;
-        closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
+        self.htmlCloseButton = [[UIButton alloc] initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
         if (self.data.closeButtonPositionStaticEnabled) {
             self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];
-            closeButton = [[UIButton alloc]initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
+            self.htmlCloseButton = [[UIButton alloc] initWithFrame:(CGRectMake(width - 40 - spacing, self.view.safeAreaInsets.top - 40 - spacing, 40, 40))];
         }
 
         if ([self.data darkModeEnabled:self.traitCollection] && self.data.background.darkColor != nil && ![self.data.background.darkColor isKindOfClass:[NSNull class]]) {
@@ -796,22 +804,22 @@ static CPAppBannerActionBlock appBannerActionCallback;
             backgroundColor = [UIColor colorWithHexString:self.data.background.color];
         }
 
-        [closeButton setBackgroundColor:UIColor.blackColor];
+        [self.htmlCloseButton setBackgroundColor:UIColor.blackColor];
 
         if (@available(iOS 13.0, *)) {
-            [closeButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
-            [closeButton setTintColor:UIColor.whiteColor];
+            [self.htmlCloseButton setImage:[UIImage systemImageNamed:@"multiply"] forState:UIControlStateNormal];
+            [self.htmlCloseButton setTintColor:UIColor.whiteColor];
         } else {
-            [closeButton setTitle:@"X" forState:UIControlStateNormal];
-            [closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+            [self.htmlCloseButton setTitle:@"X" forState:UIControlStateNormal];
+            [self.htmlCloseButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
         }
 
-        closeButton.alpha = 0.7;
-        closeButton.layer.cornerRadius = CGRectGetWidth(closeButton.frame) / 2;
-        [closeButton.layer setMasksToBounds:false];
-        [closeButton addTarget:self action:@selector(onDismiss)
+        self.htmlCloseButton.alpha = 0.7;
+        self.htmlCloseButton.layer.cornerRadius = CGRectGetWidth(self.htmlCloseButton.frame) / 2;
+        [self.htmlCloseButton.layer setMasksToBounds:false];
+        [self.htmlCloseButton addTarget:self action:@selector(onDismiss)
               forControlEvents:UIControlEventTouchUpInside];
-        [self.webView addSubview:closeButton];
+        [self.webView addSubview:self.htmlCloseButton];
     }
     [self.view addSubview:self.webView];
 
@@ -885,6 +893,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
         [self jumpOut];
         [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        if (self.handleBannerClosed) {
+            self.handleBannerClosed();
+        }
         [self dismissViewControllerAnimated:NO completion:nil];
         [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
@@ -977,6 +988,23 @@ static CPAppBannerActionBlock appBannerActionCallback;
         }
         if (completion) completion();
     }] resume];
+}
+
+#pragma mark - Update close button position during rotation
+- (void)updateCloseButtonForSize:(CGSize)size {
+    if (!self.htmlCloseButton) {
+        return;
+    }
+    
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    CGFloat topPadding = window.safeAreaInsets.top;
+    CGFloat spacing = 10.0;
+    CGRect buttonFrame = self.htmlCloseButton.frame;
+    buttonFrame.origin.x = size.width - 40 - spacing;
+    buttonFrame.origin.y = topPadding + spacing;
+    
+    self.htmlCloseButton.frame = buttonFrame;
+    [self.webView bringSubviewToFront:self.htmlCloseButton];
 }
 
 @end

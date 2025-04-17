@@ -128,7 +128,7 @@
         NSInteger subStoryIndex = [self getSubStoryPosition:i];
         BOOL hasMultiplePages = (self.stories[i].content.pages != nil && self.stories[i].content.pages.count > 1);
 
-        NSString *customURL = [NSString stringWithFormat:@"https://api.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=%@&widgetId=%@%@",
+        NSString *customURL = [NSString stringWithFormat:@"https://api-mobile.cleverpush.com/channel/%@/story/%@/html?hideStoryShareButton=%@&widgetId=%@%@",
                                self.stories[i].channel,
                                storyId,
                                self.storyWidgetShareButtonVisibility ? @"false" : @"true",

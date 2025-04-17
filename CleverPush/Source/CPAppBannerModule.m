@@ -48,11 +48,19 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
 }
 
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force {
-    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil force:force];
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:nil];
+}
+
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:appBannerClosedCallback];
 }
 
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
-    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId force:force];
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:nil];
+}
+
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [self.moduleInstance showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:appBannerClosedCallback];
 }
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners

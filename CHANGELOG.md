@@ -1,3 +1,28 @@
+## 1.34.7 (16.04.2025)
+* implemented an app-banner dismiss event listener for the show app-banner-function.
+
+## 1.34.6 (15.04.2025)
+* Resolved the issue where `setSubscriptionTopics` and `getSubscriptionTopics` should not be updated if the API call fails.
+
+## 1.34.5 (10.04.2025)
+* implemented a listener callback `setAppBannerClosedCallback` for when the app banner is dismissed.
+
+## 1.34.4 (09.04.2025)
+* Optimised the `colorWithHexString` function to prevent crashes when providing an invalid color code.
+
+## 1.34.3 (05.04.2025)
+* Crash fixed when numbers were provided to `trackEvent` properties
+
+## 1.34.2 (03.04.2025)
+* Resolved the crash issue that occurred when rotating the device from portrait to landscape while the banner type was set to HTML & Optimized the close button frame.
+* Resolved the delivered API count issue in app banners.
+* Resolved the issue of badgeCount is not increasing properly when app is not in focus
+
+## 1.34.1 (28.03.2025)
+* Optimised in-app banners for trigger conditions (All events are triggering the banner, not just the filtered ones.)
+* Changed the default SDK endpoint to the new subdomain.
+* Resolved the issue of the application crashing if we set the value as nil for the `setSubscriptionAttribute`
+
 ## 1.34.0 (23.03.2025)
 * [Breaking]: Changed the way badge counts work in the default configuration (autoClearBadge: YES, incrementBadge: NO).
   Previously, all pending notifications were cleared from the notification center, when a notification was opened. This is not the case anymore.

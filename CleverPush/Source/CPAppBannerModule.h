@@ -26,7 +26,9 @@
 #pragma mark - Class Methods
 + (void)initBannersWithChannel:(NSString*)channel showDrafts:(BOOL)showDrafts fromNotification:(BOOL)fromNotification;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force;
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 + (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force;
++ (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback;
 + (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback;
 + (void)setBannerShownCallback:(CPAppBannerShownBlock)callback;
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback;

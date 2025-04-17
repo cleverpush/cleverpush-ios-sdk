@@ -172,6 +172,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)trackPageView:(NSString* _Nullable)url params:(NSDictionary* _Nullable)params;
 + (void)increaseSessionVisits;
 + (void)showAppBanner:(NSString* _Nullable)bannerId;
++ (void)showAppBanner:(NSString* _Nullable)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)appBannerClosedCallback;
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback;
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback;
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback;

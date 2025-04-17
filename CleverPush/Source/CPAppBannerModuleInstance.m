@@ -15,6 +15,7 @@
 NSString *ShownAppBannersDefaultsKey = CLEVERPUSH_SHOWN_APP_BANNERS_KEY;
 NSString *currentEventId = @"";
 NSMutableDictionary *currentVoucherCodePlaceholder;
+NSMutableDictionary *currentEvent;
 NSMutableArray *bannersForDeepLink;
 NSMutableArray *silentPushAppBannersIds;
 NSMutableArray<CPAppBanner*> *banners;
@@ -25,6 +26,7 @@ NSMutableArray* pendingBannerListeners;
 NSMutableArray<NSDictionary*> *events;
 CPAppBannerActionBlock handleBannerOpened;
 CPAppBannerShownBlock handleBannerShown;
+CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 
@@ -73,10 +75,12 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - load the events
 - (void)triggerEvent:(NSString *)eventId properties:(NSDictionary *)properties {
     if ([self getEvents] != nil) {
-        [events addObject:@{
+        NSDictionary *event = @{
             @"id": eventId,
             @"properties": properties ?: [NSDictionary new]
-        }];
+        };
+        [events addObject:event];
+        currentEvent = [event mutableCopy];
     } else {
         [CPLog debug:@"triggerEvent - events are nil"];
     }
@@ -85,15 +89,27 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId {
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:NO appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force{
-    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force];
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback{
+    [self showBanner:channelId bannerId:bannerId notificationId:nil force:force appBannerClosedCallback:appBannerClosedCallback];
 }
 
 #pragma mark - Show banners by channel-id and banner-id
 - (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force {
+    [self showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:nil];
+}
+
+- (void)showBanner:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId force:(BOOL)force appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
     [self getBanners:channelId bannerId:bannerId notificationId:notificationId groupId:nil completion:^(NSMutableArray<CPAppBanner *> *banners) {
         NSMutableArray<CPAppBanner *> *bannersCopy = [banners mutableCopy];
         for (CPAppBanner* banner in bannersCopy) {
@@ -103,6 +119,10 @@ NSInteger currentScreenIndex = 0;
                     break;
                 }
                 [self showBanner:banner force:force];
+                if (appBannerClosedCallback != nil) {
+                    handleBannerClosed = appBannerClosedCallback;
+                }
+                
                 break;
             }
         }
@@ -111,6 +131,7 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - Initialised and load the data in to banner by creating banner and schedule banners
 - (void)startup {
+    activeBanners = [[NSMutableArray alloc] init];
     [self createBanners:banners];
     [self scheduleBanners];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -821,28 +842,75 @@ NSInteger currentScreenIndex = 0;
     return allowed;
 }
 
-- (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition*)condition {
-    NSMutableArray<NSDictionary*> *eventsCopy = [events mutableCopy];
-
-    for (NSDictionary* triggeredEvent in eventsCopy) {
-        if (![[triggeredEvent cleverPushStringForKey:@"id"] isEqualToString:condition.event]) {
+- (BOOL)checkEventTriggerCondition:(CPAppBannerTriggerCondition *)condition
+                   isMultipleEvent:(BOOL)isMultipleEvent
+                      eventTriggers:(NSArray<CPAppBannerTriggerCondition *> *)triggers {
+    
+    if (currentEvent == nil) {
+        return NO;
+    }
+    
+    BOOL currentEventMatches = NO;
+    
+    for (CPAppBannerTriggerCondition *triggerCondition in triggers) {
+        if (currentEvent[@"id"] != nil && [currentEvent[@"id"] isEqualToString:triggerCondition.event]) {
+            if (triggerCondition.eventProperties == nil || triggerCondition.eventProperties.count == 0) {
+                currentEventMatches = YES;
+                break;
+            } else {
+                for (CPAppBannerTriggerConditionEventProperty *eventProperty in triggerCondition.eventProperties) {
+                    NSString *propertyValue = [NSString stringWithFormat:@"%@", currentEvent[@"properties"][eventProperty.property]];
+                    NSString *comparePropertyValue = eventProperty.value;
+                    BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue
+                                                           compareWith:comparePropertyValue
+                                                              relation:eventProperty.relation
+                                                           isAllowed:YES
+                                                  compareWithFrom:comparePropertyValue
+                                                      compareWithTo:comparePropertyValue];
+                    if (eventPropertiesMatching) {
+                        currentEventMatches = YES;
+                        break;
+                    }
+                }
+                if (currentEventMatches) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!currentEventMatches) {
+        return NO;
+    }
+    
+    if (!isMultipleEvent) {
+        return currentEventMatches;
+    }
+    
+    NSMutableArray<NSDictionary *> *eventsCopy = [[NSMutableArray alloc] init];
+    eventsCopy = [events mutableCopy];
+    
+    for (NSDictionary *triggeredEvent in eventsCopy) {
+        if (triggeredEvent[@"id"] == nil || ![triggeredEvent[@"id"] isEqualToString:condition.event]) {
             continue;
         }
-
         if (condition.eventProperties == nil || condition.eventProperties.count == 0) {
             return YES;
         }
-
-        BOOL conditionTrue = YES;
-
-        NSDictionary *properties = (NSDictionary*) [triggeredEvent objectForKey:@"properties"];
-        for (CPAppBannerTriggerConditionEventProperty* eventProperty in condition.eventProperties) {
-            NSString *propertyValue = [properties cleverPushStringForKey:eventProperty.property];
+        
+        BOOL conditionTrue = NO;
+        
+        for (CPAppBannerTriggerConditionEventProperty *eventProperty in condition.eventProperties) {
+            NSString *propertyValue = [NSString stringWithFormat:@"%@", triggeredEvent[@"properties"][eventProperty.property]];
             NSString *comparePropertyValue = eventProperty.value;
-
-            BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue compareWith:comparePropertyValue relation:eventProperty.relation isAllowed:YES compareWithFrom:comparePropertyValue compareWithTo:comparePropertyValue];
-            if (!eventPropertiesMatching) {
-                conditionTrue = NO;
+            BOOL eventPropertiesMatching = [self checkRelationFilter:propertyValue
+                                                       compareWith:comparePropertyValue
+                                                          relation:eventProperty.relation
+                                                       isAllowed:YES
+                                              compareWithFrom:comparePropertyValue
+                                                  compareWithTo:comparePropertyValue];
+            if (eventPropertiesMatching) {
+                conditionTrue = YES;
                 break;
             }
         }
@@ -913,8 +981,20 @@ NSInteger currentScreenIndex = 0;
                             conditionTrue = sessions > condition.sessions;
                         }
                     } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
-                        conditionTrue = [self checkEventTriggerCondition:condition];
-                    } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
+                        NSUInteger eventConditionCount = 1;
+                        NSMutableArray<CPAppBannerTriggerCondition *> *eventTriggers = [NSMutableArray array];
+                        
+                        for (CPAppBannerTriggerCondition *triggerCondition in trigger.conditions) {
+                            if (triggerCondition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
+                                [eventTriggers addObject:triggerCondition];
+                            }
+                        }
+
+                        eventConditionCount = eventTriggers.count;
+                        BOOL isMultipleEvent = eventConditionCount > 1;
+
+                        conditionTrue = [self checkEventTriggerCondition:condition isMultipleEvent:isMultipleEvent eventTriggers:eventTriggers];
+                    }  else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
                         conditionTrue = [self checkDeepLinkTriggerCondition:condition];
                     } else if (condition.type == CPAppBannerTriggerConditionTypeDaysSinceInitialization) {
                         conditionTrue = [self checkDaysSinceInstallationTriggerCondition:condition];
@@ -971,6 +1051,10 @@ NSInteger currentScreenIndex = 0;
         [self scheduleBannersForEvent:currentEventId fromActiveBanners:activeBanners];
     } else {
         [self scheduleBannersForNoEventFromActiveBanners:activeBanners];
+    }
+    
+    if (currentEvent != nil) {
+        currentEvent = [[NSMutableDictionary alloc] init];
     }
 }
 
@@ -1177,10 +1261,33 @@ NSInteger currentScreenIndex = 0;
 
         [self setBannerIsShown:banner];
 
-        // remove banner so it will not show again this session
-        if (currentEventId == nil || [currentEventId isKindOfClass:[NSNull class]] || [currentEventId isEqualToString:@""] || banner.frequency != CPAppBannerFrequencyEveryTrigger) {
+        BOOL shouldUpdateBanners = [CPUtils isNullOrEmpty:currentEventId] || banner.frequency != CPAppBannerFrequencyEveryTrigger;
+
+        if (shouldUpdateBanners) {
+            NSMutableArray *bannersCopy = [[NSMutableArray alloc] init];
+            NSMutableArray *activeBannersCopy = [[NSMutableArray alloc] init];
+            
+            for (CPAppBanner *banner in banners) {
+                if (banner.frequency == CPAppBannerFrequencyEveryTrigger) {
+                    [bannersCopy addObject:banner];
+                }
+            }
+            
+            for (CPAppBanner *banner in activeBanners) {
+                if (banner.frequency == CPAppBannerFrequencyEveryTrigger) {
+                    [activeBannersCopy addObject:banner];
+                }
+            }
+            
             [banners removeObject:banner];
             [activeBanners removeObject:banner];
+            
+            if (bannersCopy.count > 0) {
+                banners = [bannersCopy mutableCopy];
+            }
+            if (activeBannersCopy.count > 0) {
+                activeBanners = [activeBannersCopy mutableCopy];
+            }
         } else {
             currentEventId = @"";
         }
@@ -1209,6 +1316,10 @@ NSInteger currentScreenIndex = 0;
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
+    if (handleBannerClosed) {
+        appBannerViewController.handleBannerClosed = handleBannerClosed;
+    }
+    
     UIViewController* topController = [CleverPush topViewController];
     if (handleBannerDisplayed) {
         handleBannerDisplayed(appBannerViewController);
@@ -1477,9 +1588,11 @@ NSInteger currentScreenIndex = 0;
 #pragma mark - Get the value of pageControl from current index
 - (void)getCurrentAppBannerPageIndex:(NSNotification *)notification {
     NSDictionary *pagevalue = notification.userInfo;
-    currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
-    CPAppBanner *appBanner = pagevalue[@"appBanner"];
-    [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+    if (currentScreenIndex != [pagevalue[@"currentIndex"] integerValue]) {
+        currentScreenIndex = [pagevalue[@"currentIndex"] integerValue];
+        CPAppBanner *appBanner = pagevalue[@"appBanner"];
+        [self sendBannerEvent:@"delivered" forBanner:appBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+    }
 }
 
 #pragma mark - refactor for testcases

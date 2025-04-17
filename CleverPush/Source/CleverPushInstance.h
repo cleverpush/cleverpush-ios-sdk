@@ -59,6 +59,7 @@ typedef void (^CPFailureBlock)(NSError* _Nullable error);
 typedef void (^CPAppBannerActionBlock)(CPAppBannerAction* _Nullable action);
 typedef void (^CPAppBannerShownBlock)(CPAppBanner* _Nullable appBanner);
 typedef void (^CPAppBannerDisplayBlock)(UIViewController * _Nullable viewController);
+typedef void (^CPAppBannerClosedBlock)(void);
 
 typedef void (^CPLogListener)(NSString* _Nullable message);
 
@@ -204,6 +205,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)trackPageView:(NSString* _Nullable)url params:(NSDictionary* _Nullable)params;
 - (void)increaseSessionVisits;
 - (void)showAppBanner:(NSString* _Nullable)bannerId;
+- (void)showAppBanner:(NSString* _Nullable)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)appBannerClosedCallback;
 - (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;
 - (void)getAppBannersByGroup:(NSString* _Nullable)groupId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback;
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback;

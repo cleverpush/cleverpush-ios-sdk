@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.0";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.7";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -103,6 +103,7 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
+NSInteger subscriptionTopicsVersion = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -116,7 +117,7 @@ NSDate* lastSync;
 NSString* subscriptionId;
 NSString* deviceToken;
 NSString* currentPageUrl;
-NSString* apiEndpoint = @"https://api.cleverpush.com";
+NSString* apiEndpoint = @"https://api-mobile.cleverpush.com";
 NSString* appGroupIdentifier = @".cleverpush";
 NSString* authorizationToken;
 NSArray* appBanners;
@@ -129,6 +130,7 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
+NSMutableArray* subscriptionTopics;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -441,6 +443,7 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
+    subscriptionTopics = [[NSMutableArray alloc] init];
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -669,9 +672,8 @@ static id isNil(id object) {
     } else {
         topicsVersion += 1;
     }
-    [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-    [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-    [userDefaults synchronize];
+    subscriptionTopics = [topics mutableCopy];
+    subscriptionTopicsVersion = topicsVersion;
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
@@ -1557,12 +1559,12 @@ static id isNil(id object) {
           [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
         }
 
-    NSArray* topics = [self getSubscriptionTopics];
+    NSMutableArray* topics = [[NSMutableArray alloc] init];
+    topics = [subscriptionTopics mutableCopy];
     if (topics != nil && [topics count] >= 0) {
         [dataDic setObject:topics forKey:@"topics"];
-        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-        if (topicsVersion) {
-            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
+        if (subscriptionTopicsVersion) {
+            [dataDic setObject:[NSNumber numberWithInteger:subscriptionTopicsVersion] forKey:@"topicsVersion"];
         } else {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
@@ -1617,6 +1619,8 @@ static id isNil(id object) {
                 if ([results objectForKey:@"topicsVersion"] != nil) {
                     [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
                 }
+                subscriptionTopics = nil;
+                subscriptionTopicsVersion = 0;
                 [userDefaults synchronize];
             }
 
@@ -1666,8 +1670,9 @@ static id isNil(id object) {
                 }
             }
         } onFailure:^(NSError* error) {
-           [self setSubscriptionInProgress:false];
-            
+            [self setSubscriptionInProgress:false];
+            subscriptionTopics = nil;
+            subscriptionTopicsVersion = 0;
             if (failureBlock) {
                 failureBlock(error);
             }
@@ -2523,7 +2528,11 @@ static id isNil(id object) {
                 if (!subscriptionAttributes) {
                     subscriptionAttributes = [[NSMutableDictionary alloc] init];
                 }
-                [subscriptionAttributes setObject:value forKey:attributeId];
+                if (value == nil) {
+                    [subscriptionAttributes setObject:@"" forKey:attributeId];
+                } else {
+                    [subscriptionAttributes setObject:value forKey:attributeId];
+                }
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
 
@@ -3219,7 +3228,7 @@ static id isNil(id object) {
                 for (NSString *key in properties) {
                     id value = [properties objectForKey:key];
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                        [databaseManager updateCountForEventWithId:eventId eventValue:value eventProperty:key updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
+                        [databaseManager updateCountForEventWithId:eventId eventValue:[NSString stringWithFormat:@"%@", value] eventProperty:[NSString stringWithFormat:@"%@", key] updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
                     });
                 }
             } else {
@@ -3925,7 +3934,11 @@ static id isNil(id object) {
 
 #pragma mark - App Banner methods
 - (void)showAppBanner:(NSString* _Nullable)bannerId {
-    [self showAppBanner:bannerId notificationId:nil];
+    [self showAppBanner:bannerId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString* _Nullable)bannerId appBannerClosedCallback:(CPAppBannerClosedBlock _Nullable)appBannerClosedCallback {
+    [self showAppBanner:bannerId notificationId:nil appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
@@ -3941,13 +3954,21 @@ static id isNil(id object) {
 }
 
 - (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId {
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES];
+    [self showAppBanner:bannerId notificationId:notificationId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString*)bannerId notificationId:(NSString*)notificationId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:YES appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId {
+    [self showAppBanner:bannerId channelId:channelId notificationId:notificationId appBannerClosedCallback:nil];
+}
+
+- (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId appBannerClosedCallback:(CPAppBannerClosedBlock)appBannerClosedCallback {
     BOOL fromNotification = notificationId != nil;
     [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
-    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO appBannerClosedCallback:appBannerClosedCallback];
 }
 
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
@@ -4166,11 +4187,22 @@ static id isNil(id object) {
 
     NSDictionary* payload = request.content.userInfo;
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     [self handleNotificationReceived:payload isActive:NO];
 
     // badge count
     [self updateBadge:replacementContent];
+    
+    // Ensure badge is set explicitly when incrementBadge is enabled
+    if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] && replacementContent.badge == nil) {
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+            replacementContent.badge = @([notifications count] + 1);
+            dispatch_semaphore_signal(sema);
+        }];
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    }
 
     // rich notifications
     if (notification != nil) {
