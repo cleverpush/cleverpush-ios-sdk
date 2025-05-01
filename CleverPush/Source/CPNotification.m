@@ -45,6 +45,9 @@
     if ([json objectForKey:@"inboxAppBanner"] != nil && ![[json objectForKey:@"inboxAppBanner"] isKindOfClass:[NSNull class]]) {
         self.inboxAppBanner = [json objectForKey:@"inboxAppBanner"];
     }
+    if ([json objectForKey:@"notificationIdentifier"] != nil && ![[json objectForKey:@"notificationIdentifier"] isKindOfClass:[NSNull class]]) {
+        self.notificationIdentifier = [json objectForKey:@"notificationIdentifier"];
+    }
     
     NSArray* actions = [json objectForKey:@"actions"];
     if (actions && ![actions isKindOfClass:[NSNull class]] && [actions count] > 0) {

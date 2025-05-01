@@ -229,6 +229,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (NSArray<NSString*>* _Nullable)getSubscriptionTags;
 - (NSArray<CPNotification*>* _Nullable)getNotifications;
 - (void)removeNotification:(NSString* _Nullable)notificationId;
+- (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter;
 - (void)setMaximumNotificationCount:(int)limit;
 - (void)getNotifications:(BOOL)combineWithApi callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback;
 - (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback;
