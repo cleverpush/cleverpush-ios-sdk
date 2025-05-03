@@ -3028,7 +3028,6 @@ static id isNil(id object) {
     }
     
     if (removeFromCenter && ![CPUtils isNullOrEmpty:notificationIdentifier]) {
-        [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[notificationIdentifier]];
     }
 }
 
