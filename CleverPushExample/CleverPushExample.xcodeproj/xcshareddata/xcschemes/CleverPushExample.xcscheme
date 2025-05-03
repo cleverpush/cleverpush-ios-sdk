@@ -20,6 +20,34 @@
                ReferencedContainer = "container:CleverPushExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9310FD392A6025F9004B400B"
+               BuildableName = "CleverPushNotificationServiceExtension.appex"
+               BlueprintName = "CleverPushNotificationServiceExtension"
+               ReferencedContainer = "container:CleverPushExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "93AEEB82293A2B3700A137F5"
+               BuildableName = "CleverPushWidgetExtensionExtension.appex"
+               BlueprintName = "CleverPushWidgetExtensionExtension"
+               ReferencedContainer = "container:CleverPushExample.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

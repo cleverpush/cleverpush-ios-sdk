@@ -8,5 +8,6 @@
  
 @property (weak, nonatomic) IBOutlet UILabel *lblStatusDisplay;
 @property (weak, nonatomic) IBOutlet UITextField *txtLiveActivityName;
+@property (weak, nonatomic) IBOutlet UILabel *lblNotificationCount;
 
 @end
