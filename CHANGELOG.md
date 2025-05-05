@@ -1,3 +1,7 @@
+## 1.34.8 (05.05.2025)
+* Added an optional argument for removing notification center from the notification center in the `removeNotification` function.
+* Optimise `showTopicsDialogue` functionality with subscription flow.
+
 ## 1.34.7 (16.04.2025)
 * implemented an app-banner dismiss event listener for the show app-banner-function.
 

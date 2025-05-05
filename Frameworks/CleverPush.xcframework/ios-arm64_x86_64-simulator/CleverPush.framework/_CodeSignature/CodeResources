@@ -186,7 +186,7 @@
 		</data>
 		<key>Headers/CPNotification.h</key>
 		<data>
-		HaD/rdOM4s8qYk7RGcYYquukNzo=
+		dgCWFD/yBIajcbg0j14w7K4EcJo=
 		</data>
 		<key>Headers/CPNotificationViewController.h</key>
 		<data>
@@ -258,7 +258,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		1F1akzWu/yP8w2JfUYaGX2whiiI=
+		KPpInY/Wo9uvNFPUv9QbuIO3Va0=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -266,7 +266,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		rIDkzSyYblqqyw7nTzOn/vyRz8A=
+		e1ZqYJGMDoJQJULvHX0MY5Ioa7Y=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -278,7 +278,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		2xx+qeLH11pHEOp4kxi4/Nt4Nko=
+		ZIA2JZ02tCvB1oAOw6Ali0xaj48=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -610,7 +610,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			/DW7hC7uSyz0N/5dMqwOkpELh2MDcM1ZQY+vcyHHozs=
+			k1ICWyXfS43u4Q123iD41Tnc7f16Yqt/6Qf7o7pHuY8=
 			</data>
 		</dict>
 		<key>Headers/CPNotificationViewController.h</key>
@@ -736,7 +736,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			mPhLkjl+iuyvmXtcW+E3XhOsr3vIQYsbKWJPiEIKxHc=
+			+lqJGSCOl44BlQhgwLeGZ+Q2Zb1gUqu5DGD3wmJhgNs=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -750,7 +750,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			KDUQTLOMJLzjSEROOgdTfzuUMWa7jJB/Hw8RRERH5pY=
+			aRFaQ1ws91va4svCKvNqLLWKvFqMIs2sJUMLDl3kuSs=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

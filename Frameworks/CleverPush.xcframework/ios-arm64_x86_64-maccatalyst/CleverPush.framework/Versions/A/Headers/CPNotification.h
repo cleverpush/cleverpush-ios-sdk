@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *soundFilename;
 @property (nonatomic, strong) NSString *appBanner;
 @property (nonatomic, strong) NSString *inboxAppBanner;
+@property (nonatomic, strong) NSString *notificationIdentifier;
 @property (nonatomic, strong) NSArray *actions;
 @property (nonatomic, strong) NSDictionary *customData;
 @property (nonatomic, strong) NSDictionary *carouselItems;
