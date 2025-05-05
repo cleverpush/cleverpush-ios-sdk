@@ -147,6 +147,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
+CPHandleSubscribedBlock handlePendingSubscriptionCallback;
 CPInitializedBlock handleInitialized;
 CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController*channelTopicsPicker;
@@ -169,6 +170,7 @@ BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
 BOOL handleUrlFromSceneDelegate = NO;
 BOOL handleUrlFromAppDelegate = NO;
+BOOL isTopicsDialogBeingShown = NO;
 
 int sessionVisits;
 long sessionStartedTimestamp;
@@ -1286,12 +1288,20 @@ static id isNil(id object) {
                     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                     [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
                     [userDefaults synchronize];
+                    
+                    if (completion) {
+                        isTopicsDialogBeingShown = YES;
+                        handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
+                            completion(subscriptionId, nil);
+                        };
+                    }
+                    
                     [self showPendingTopicsDialog];
                 }
             }
         }];
 
-        if (completion) {
+        if (completion && !isTopicsDialogBeingShown) {
             [self getSubscriptionId:^(NSString *subscriptionId) {
                 if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                     completion(subscriptionId, nil);
@@ -1466,6 +1476,10 @@ static id isNil(id object) {
 }
 
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock {
+    [self syncSubscription:nil successBlock:nil];
+}
+
+- (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock successBlock:(void(^)())successBlock {
     if (!hasCalledSubscribe) {
         [CPLog debug:@"CleverPushInstance: syncSubscription: Cleverpush SDK not initialised"];
         return;
@@ -1489,6 +1503,10 @@ static id isNil(id object) {
     } successBlock:^() {
         if (topicsChangedBlock) {
             topicsChangedBlock();
+        }
+        
+        if (successBlock) {
+            successBlock();
         }
     }];
 }
@@ -3606,6 +3624,15 @@ static id isNil(id object) {
 - (void)showPendingTopicsDialog {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     if (![userDefaults boolForKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY]) {
+        if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+            [self getSubscriptionId:^(NSString *subscriptionId) {
+                if (subscriptionId) {
+                    handlePendingSubscriptionCallback(subscriptionId);
+                    isTopicsDialogBeingShown = NO;
+                    handlePendingSubscriptionCallback = nil;
+                }
+            }];
+        }
         return;
     }
 
@@ -3697,14 +3724,28 @@ static id isNil(id object) {
                         if (![self isSubscribed]) {
                             [self subscribe:nil skipTopicsDialog:YES];
                         } else {
-                            [self syncSubscription];
+                            [self syncSubscription:^(NSError *error) {
+                                if (error) {
+                                    [CPLog error:@"Error syncing subscription: %@", error];
+                                }
+                            } successBlock:^{
+                                if (callback) {
+                                    callback();
+                                }
+                                
+                                if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+                                    [self getSubscriptionId:^(NSString *subscriptionId) {
+                                        if (subscriptionId) {
+                                            handlePendingSubscriptionCallback(subscriptionId);
+                                            isTopicsDialogBeingShown = NO;
+                                            handlePendingSubscriptionCallback = nil;
+                                        }
+                                    }];
+                                }
+                            }];
                         }
                     }
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
-
-                    if (callback) {
-                        callback();
-                    }
                 }];
                 [channelTopicsPicker addAction:okAction];
 
