@@ -2015,6 +2015,10 @@ static id isNil(id object) {
     if (![[notificationMutable objectForKey:@"createdAt"] isKindOfClass:[NSString class]] || [[notificationMutable objectForKey:@"createdAt"] length] == 0) {
         [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
     }
+    
+    if ([CPUtils isNullOrEmpty:[notification objectForKey:@"notificationIdentifier"]]) {
+        [notificationMutable setObject:@"" forKey:@"notificationIdentifier"];
+    }
 
     NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY]];
     if (!notifications) {
@@ -2993,18 +2997,34 @@ static id isNil(id object) {
 }
 
 - (void)removeNotification:(NSString* _Nullable)notificationId {
+    [self removeNotification:notificationId removeFromNotificationCenter:NO];
+}
+
+- (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {
+    NSString *notificationIdentifier = nil;
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    
     if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATIONS_KEY] != nil) {
         NSArray* notifications = [userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
-        NSMutableArray*tempNotifications = [notifications mutableCopy];
+        NSMutableArray* tempNotifications = [notifications mutableCopy];
+        
         if ([notifications count] != 0) {
             for (NSDictionary* notification in notifications) {
-                if ([[notification cleverPushStringForKey:@"_id"] isEqualToString: notificationId])
-                    [tempNotifications removeObject: notification];
+                if ([[notification cleverPushStringForKey:@"_id"] isEqualToString:notificationId]) {
+                    if (![CPUtils isNullOrEmpty:[notification objectForKey:@"notificationIdentifier"]]) {
+                        notificationIdentifier = [notification objectForKey:@"notificationIdentifier"];
+                    }
+                    [tempNotifications removeObject:notification];
+                }
             }
         }
+        
         [userDefaults setObject:tempNotifications forKey:CLEVERPUSH_NOTIFICATIONS_KEY];
         [userDefaults synchronize];
+    }
+    
+    if (removeFromCenter && ![CPUtils isNullOrEmpty:notificationIdentifier]) {
+        [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[notificationIdentifier]];
     }
 }
 
@@ -4176,6 +4196,14 @@ static id isNil(id object) {
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
+    if (![CPUtils isNullOrEmpty:request.identifier]) {
+        NSMutableDictionary* mutablePayload = [payload mutableCopy];
+        NSMutableDictionary* mutableNotification = [notification mutableCopy];
+        [mutableNotification setObject:request.identifier forKey:@"notificationIdentifier"];
+        [mutablePayload setObject:mutableNotification forKey:@"notification"];
+        payload = [mutablePayload copy];
+    }
+    
     [self handleNotificationReceived:payload isActive:NO];
 
     // badge count
