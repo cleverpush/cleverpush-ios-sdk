@@ -2016,12 +2016,8 @@ static id isNil(id object) {
         [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
     }
     
-    if (!([notification objectForKey:@"notificationIdentifier"] != nil && 
-        ![[notification objectForKey:@"notificationIdentifier"] isKindOfClass:[NSNull class]])) {
-        if ([notification objectForKey:@"_id"] != nil &&
-            ![[notification objectForKey:@"_id"] isKindOfClass:[NSNull class]]) {
-            [notificationMutable setObject:[notification objectForKey:@"_id"] forKey:@"notificationIdentifier"];
-        }
+    if ([CPUtils isNullOrEmpty:[notification objectForKey:@"notificationIdentifier"]]) {
+        [notificationMutable setObject:@"" forKey:@"notificationIdentifier"];
     }
 
     NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY]];
