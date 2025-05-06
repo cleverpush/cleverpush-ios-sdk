@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.7";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.8";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -147,6 +147,7 @@ CPHandleNotificationOpenedBlock handleNotificationOpened;
 CPHandleNotificationReceivedBlock handleNotificationReceived;
 CPHandleSubscribedBlock handleSubscribed;
 CPHandleSubscribedBlock handleSubscribedInternal;
+CPHandleSubscribedBlock handlePendingSubscriptionCallback;
 CPInitializedBlock handleInitialized;
 CPTopicsChangedBlock topicsChangedBlock;
 DWAlertController*channelTopicsPicker;
@@ -169,6 +170,7 @@ BOOL hasSubscribeConsentCalled = NO;
 BOOL handleSubscribedCalled = NO;
 BOOL handleUrlFromSceneDelegate = NO;
 BOOL handleUrlFromAppDelegate = NO;
+BOOL isTopicsDialogBeingShown = NO;
 
 int sessionVisits;
 long sessionStartedTimestamp;
@@ -1299,12 +1301,20 @@ static id isNil(id object) {
                     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                     [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
                     [userDefaults synchronize];
+                    
+                    if (completion) {
+                        isTopicsDialogBeingShown = YES;
+                        handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
+                            completion(subscriptionId, nil);
+                        };
+                    }
+                    
                     [self showPendingTopicsDialog];
                 }
             }
         }];
 
-        if (completion) {
+        if (completion && !isTopicsDialogBeingShown) {
             [self getSubscriptionId:^(NSString *subscriptionId) {
                 if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
                     completion(subscriptionId, nil);
@@ -1479,6 +1489,10 @@ static id isNil(id object) {
 }
 
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock {
+    [self syncSubscription:nil successBlock:nil];
+}
+
+- (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock successBlock:(void(^)())successBlock {
     if (!hasCalledSubscribe) {
         [CPLog debug:@"CleverPushInstance: syncSubscription: Cleverpush SDK not initialised"];
         return;
@@ -1502,6 +1516,10 @@ static id isNil(id object) {
     } successBlock:^() {
         if (topicsChangedBlock) {
             topicsChangedBlock();
+        }
+        
+        if (successBlock) {
+            successBlock();
         }
     }];
 }
@@ -2027,6 +2045,10 @@ static id isNil(id object) {
     [notificationMutable removeObjectsForKeys:[notification allKeysForObject:[NSNull null]]];
     if (![[notificationMutable objectForKey:@"createdAt"] isKindOfClass:[NSString class]] || [[notificationMutable objectForKey:@"createdAt"] length] == 0) {
         [notificationMutable setObject:[CPUtils getCurrentDateString] forKey:@"createdAt"];
+    }
+    
+    if ([CPUtils isNullOrEmpty:[notification objectForKey:@"notificationIdentifier"]]) {
+        [notificationMutable setObject:@"" forKey:@"notificationIdentifier"];
     }
 
     NSMutableArray* notifications = [NSMutableArray arrayWithArray:[userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY]];
@@ -3006,18 +3028,34 @@ static id isNil(id object) {
 }
 
 - (void)removeNotification:(NSString* _Nullable)notificationId {
+    [self removeNotification:notificationId removeFromNotificationCenter:NO];
+}
+
+- (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {
+    NSString *notificationIdentifier = nil;
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    
     if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATIONS_KEY] != nil) {
         NSArray* notifications = [userDefaults arrayForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
-        NSMutableArray*tempNotifications = [notifications mutableCopy];
+        NSMutableArray* tempNotifications = [notifications mutableCopy];
+        
         if ([notifications count] != 0) {
             for (NSDictionary* notification in notifications) {
-                if ([[notification cleverPushStringForKey:@"_id"] isEqualToString: notificationId])
-                    [tempNotifications removeObject: notification];
+                if ([[notification cleverPushStringForKey:@"_id"] isEqualToString:notificationId]) {
+                    if (![CPUtils isNullOrEmpty:[notification objectForKey:@"notificationIdentifier"]]) {
+                        notificationIdentifier = [notification objectForKey:@"notificationIdentifier"];
+                    }
+                    [tempNotifications removeObject:notification];
+                }
             }
         }
+        
         [userDefaults setObject:tempNotifications forKey:CLEVERPUSH_NOTIFICATIONS_KEY];
         [userDefaults synchronize];
+    }
+    
+    if (removeFromCenter && ![CPUtils isNullOrEmpty:notificationIdentifier]) {
+        [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[notificationIdentifier]];
     }
 }
 
@@ -3599,6 +3637,15 @@ static id isNil(id object) {
 - (void)showPendingTopicsDialog {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     if (![userDefaults boolForKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY]) {
+        if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+            [self getSubscriptionId:^(NSString *subscriptionId) {
+                if (subscriptionId) {
+                    handlePendingSubscriptionCallback(subscriptionId);
+                    isTopicsDialogBeingShown = NO;
+                    handlePendingSubscriptionCallback = nil;
+                }
+            }];
+        }
         return;
     }
 
@@ -3690,14 +3737,28 @@ static id isNil(id object) {
                         if (![self isSubscribed]) {
                             [self subscribe:nil skipTopicsDialog:YES];
                         } else {
-                            [self syncSubscription];
+                            [self syncSubscription:^(NSError *error) {
+                                if (error) {
+                                    [CPLog error:@"Error syncing subscription: %@", error];
+                                }
+                            } successBlock:^{
+                                if (callback) {
+                                    callback();
+                                }
+                                
+                                if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+                                    [self getSubscriptionId:^(NSString *subscriptionId) {
+                                        if (subscriptionId) {
+                                            handlePendingSubscriptionCallback(subscriptionId);
+                                            isTopicsDialogBeingShown = NO;
+                                            handlePendingSubscriptionCallback = nil;
+                                        }
+                                    }];
+                                }
+                            }];
                         }
                     }
                     [topicsController dismissViewControllerAnimated:YES completion:nil];
-
-                    if (callback) {
-                        callback();
-                    }
                 }];
                 [channelTopicsPicker addAction:okAction];
 
@@ -4189,6 +4250,14 @@ static id isNil(id object) {
     NSDictionary* notification = [payload cleverPushDictionaryForKey:@"notification"];
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
+    if (![CPUtils isNullOrEmpty:request.identifier]) {
+        NSMutableDictionary* mutablePayload = [payload mutableCopy];
+        NSMutableDictionary* mutableNotification = [notification mutableCopy];
+        [mutableNotification setObject:request.identifier forKey:@"notificationIdentifier"];
+        [mutablePayload setObject:mutableNotification forKey:@"notification"];
+        payload = [mutablePayload copy];
+    }
+    
     [self handleNotificationReceived:payload isActive:NO];
 
     // badge count
