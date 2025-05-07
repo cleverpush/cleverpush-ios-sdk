@@ -42,4 +42,9 @@
     return request;
 }
 
+#pragma mark - Configure the API endpoint
+- (void)configureEndpoint:(NSString*)endpoint {
+    [self setValue:[NSURL URLWithString:[NSString stringWithFormat:@"%@/", endpoint]] forKey:@"apiEndpoint"];
+}
+
 @end
