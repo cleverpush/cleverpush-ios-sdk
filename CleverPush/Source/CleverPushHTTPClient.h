@@ -6,5 +6,6 @@
 + (CleverPushHTTPClient *)sharedClient;
 @property (readonly, nonatomic) NSURL *apiEndpoint;
 - (NSMutableURLRequest*) requestWithMethod:(NSString*)method path:(NSString*)path;
+- (void)configureEndpoint:(NSString*)endpoint;
 
 @end

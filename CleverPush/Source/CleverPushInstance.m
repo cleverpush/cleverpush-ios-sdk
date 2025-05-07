@@ -3917,6 +3917,7 @@ static id isNil(id object) {
 
 - (void)setApiEndpoint:(NSString* _Nullable)endpoint {
     apiEndpoint = endpoint;
+    [[CleverPushHTTPClient sharedClient] configureEndpoint:endpoint];
 }
 
 - (void)setAppGroupIdentifierSuffix:(NSString* _Nullable)suffix {
