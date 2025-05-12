@@ -1974,28 +1974,21 @@ static id isNil(id object) {
 - (void)updateBadge:(UNMutableNotificationContent* _Nullable)replacementContent {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY]) {
-        if (replacementContent != nil) {
-            dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-            [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
-                replacementContent.badge = @([notifications count] + 1);
-
-                dispatch_semaphore_signal(sema);
-            }];
-
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-        } else {
-            [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
+            NSInteger badgeCount = [notifications count];
+            
+            if (replacementContent != nil) {
+                replacementContent.badge = @(badgeCount + 1);
+            } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (@available(iOS 16.0, *)) {
-                        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:[notifications count] withCompletionHandler:nil];
+                        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:badgeCount withCompletionHandler:nil];
                     } else {
-                        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[notifications count]];
+                        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:badgeCount];
                     }
                 });
-            }];
-        }
-
+            }
+        }];
     } else {
         [CPLog debug:@"updateBadge - no incrementBadge used"];
     }
@@ -3957,10 +3950,23 @@ static id isNil(id object) {
 }
 
 - (void)setBadgeCount:(NSInteger)count {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     if (@available(iOS 16.0, *)) {
-        [[UNUserNotificationCenter currentNotificationCenter] setBadgeCount:count withCompletionHandler:nil];
+        [center setBadgeCount:count withCompletionHandler:nil];
     } else {
-        [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:count];
+    }
+    
+    if (count == 0) {
+        [center getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
+            if (notifications.count > 0) {
+                NSMutableArray *identifiers = [NSMutableArray arrayWithCapacity:notifications.count];
+                for (UNNotification *notification in notifications) {
+                    [identifiers addObject:notification.request.identifier];
+                }
+                [center removeDeliveredNotificationsWithIdentifiers:identifiers];
+            }
+        }];
     }
 }
 
@@ -4266,16 +4272,6 @@ static id isNil(id object) {
 
     // badge count
     [self updateBadge:replacementContent];
-    
-    // Ensure badge is set explicitly when incrementBadge is enabled
-    if ([userDefaults boolForKey:CLEVERPUSH_INCREMENT_BADGE_KEY] && replacementContent.badge == nil) {
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>*notifications) {
-            replacementContent.badge = @([notifications count] + 1);
-            dispatch_semaphore_signal(sema);
-        }];
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    }
 
     // rich notifications
     if (notification != nil) {
