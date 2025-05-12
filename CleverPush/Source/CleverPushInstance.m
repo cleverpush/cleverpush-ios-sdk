@@ -73,7 +73,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.8";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.9";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -3933,6 +3933,7 @@ static id isNil(id object) {
 
 - (void)setApiEndpoint:(NSString* _Nullable)endpoint {
     apiEndpoint = endpoint;
+    [[CleverPushHTTPClient sharedClient] configureEndpoint:endpoint];
 }
 
 - (void)setAppGroupIdentifierSuffix:(NSString* _Nullable)suffix {

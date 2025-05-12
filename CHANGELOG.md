@@ -1,3 +1,6 @@
+## 1.34.9 (07.05.2025)
+* Fixed an issue with calling init again after changing API endpoint
+
 ## 1.34.8 (05.05.2025)
 * Added an optional argument for removing notification center from the notification center in the `removeNotification` function.
 * Optimise `showTopicsDialogue` functionality with subscription flow.
