@@ -540,8 +540,8 @@ NSInteger currentScreenIndex = 0;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
     BOOL allowed = YES;
 
-    if (banner.languages.count > 0 && [NSLocale preferredLanguages].count > 0) {
-        if (![banner.languages containsObject:[[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0]]) {
+    if (banner.languages.count > 0 && ![CPUtils isNullOrEmpty:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
+        if (![banner.languages containsObject:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
             allowed = NO;
         }
     }
@@ -1108,6 +1108,8 @@ NSInteger currentScreenIndex = 0;
 }
 
 - (void)scheduleBannerDisplay:(CPAppBanner *)banner withDelaySeconds:(NSTimeInterval)delay {
+    [CPAppBannerViewController preloadImagesForBanner:banner];
+    
     dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * delay);
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
@@ -1151,6 +1153,7 @@ NSInteger currentScreenIndex = 0;
             }
         }
 
+        [CPAppBannerViewController preloadImagesForBanner:banner];
         NSBundle *bundle = [CPUtils getAssetsBundle];
         CPAppBannerViewController *appBannerViewController;
         if (bundle) {
@@ -1320,11 +1323,22 @@ NSInteger currentScreenIndex = 0;
         appBannerViewController.handleBannerClosed = handleBannerClosed;
     }
     
+    [CPAppBannerViewController preloadImagesForBanner:banner];
     UIViewController* topController = [CleverPush topViewController];
     if (handleBannerDisplayed) {
         handleBannerDisplayed(appBannerViewController);
     } else {
-        [topController presentViewController:appBannerViewController animated:YES completion:nil];
+        appBannerViewController.view.alpha = 0.0;
+        [topController presentViewController:appBannerViewController animated:NO completion:^{
+            [appBannerViewController finishSetup];
+            if (!appBannerViewController.isPreloading) {
+                [appBannerViewController.cardCollectionView reloadData];
+                [appBannerViewController setBackground];
+                [UIView animateWithDuration:0.3 animations:^{
+                    appBannerViewController.view.alpha = 1.0;
+                }];
+            }
+        }];
     }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {

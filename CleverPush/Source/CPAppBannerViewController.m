@@ -16,8 +16,15 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
 
     self.voucherCode = [CPUtils valueForKey:self.data.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
-
+    self.view.alpha = 0.0;
     [self preloadImages];
+}
+
+- (void)finishSetup {
+    if (self.data == nil) {
+        return;
+    }
+    
     [self conditionalPresentation];
     [self setOrientation];
     [self setupNotificationObservers];
@@ -910,21 +917,24 @@ static CPAppBannerActionBlock appBannerActionCallback;
 }
 
 - (void)preloadImages {
-    // Create a dispatch group to track when all preloading is complete
-    dispatch_group_t preloadGroup = dispatch_group_create();
+    if (self.isPreloading) {
+        return;
+    }
     
-    // Pre-load banner background images
+    dispatch_group_t preloadGroup = dispatch_group_create();
+    dispatch_queue_t backgroundQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    
+    NSMutableArray *imageURLsToPreload = [NSMutableArray array];
+    
     if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
-        dispatch_group_enter(preloadGroup);
-        [self preloadImageWithURL:self.data.background.imageUrl completion:^{
-            dispatch_group_leave(preloadGroup);
-        }];
+        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.imageUrl]) {
+            [imageURLsToPreload addObject:self.data.background.imageUrl];
+        }
     }
     if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
-        dispatch_group_enter(preloadGroup);
-        [self preloadImageWithURL:self.data.background.darkImageUrl completion:^{
-            dispatch_group_leave(preloadGroup);
-        }];
+        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.darkImageUrl]) {
+            [imageURLsToPreload addObject:self.data.background.darkImageUrl];
+        }
     }
     
     // Pre-load all screen images
@@ -933,26 +943,48 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && ![imageBlock.imageUrl isEqualToString:@""]) {
-                    dispatch_group_enter(preloadGroup);
-                    [self preloadImageWithURL:imageBlock.imageUrl completion:^{
-                        dispatch_group_leave(preloadGroup);
-                    }];
+                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                        [imageURLsToPreload addObject:imageBlock.imageUrl];
+                    }
                 }
                 if (imageBlock.darkImageUrl && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && ![imageBlock.darkImageUrl isEqualToString:@""]) {
-                    dispatch_group_enter(preloadGroup);
-                    [self preloadImageWithURL:imageBlock.darkImageUrl completion:^{
-                        dispatch_group_leave(preloadGroup);
-                    }];
+                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                        [imageURLsToPreload addObject:imageBlock.darkImageUrl];
+                    }
                 }
             }
         }
     }
     
-    // When all images are preloaded, ensure the UI is updated
-    dispatch_group_notify(preloadGroup, dispatch_get_main_queue(), ^{
-        // Reload the collection view to use the cached images
+    if (imageURLsToPreload.count > 0) {
+        self.isPreloading = YES;
+        
+        dispatch_async(backgroundQueue, ^{
+            for (NSString *urlString in imageURLsToPreload) {
+                dispatch_group_enter(preloadGroup);
+                [self preloadImageWithURL:urlString completion:^{
+                    dispatch_group_leave(preloadGroup);
+                }];
+            }
+            
+            dispatch_group_notify(preloadGroup, dispatch_get_main_queue(), ^{
+                self.isPreloading = NO;
+                [self finishSetup];
+                [self.cardCollectionView reloadData];
+                [self setBackground];
+                
+                [UIView animateWithDuration:0.3 animations:^{
+                    self.view.alpha = 1.0;
+                }];
+            });
+        });
+    } else {
+        self.isPreloading = NO;
+        [self finishSetup];
         [self.cardCollectionView reloadData];
-    });
+        [self setBackground];
+        self.view.alpha = 1.0;
+    }
 }
 
 - (void)preloadImageWithURL:(NSString *)urlString completion:(void(^)(void))completion {
@@ -974,18 +1006,111 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0];
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            [CPLog error:@"Failed to preload image: %@", error];
             if (completion) completion();
             return;
         }
-        // Cache the image data
+        
         UIImage *image = [UIImage imageWithData:data];
         if (image) {
             [[CPUtils sharedImageCache] setObject:image forKey:urlString];
         }
+        
+        if (completion) completion();
+    }] resume];
+}
+
++ (void)preloadImagesForBanner:(CPAppBanner *)banner {
+    if (!banner) return;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [self preloadImagesForBannerInBackground:banner];
+    });
+}
+
++ (void)preloadImagesForBannerInBackground:(CPAppBanner *)banner {
+    if (!banner) {
+        return;
+    }
+    
+    dispatch_group_t preloadGroup = dispatch_group_create();
+    NSMutableArray *imageURLsToPreload = [NSMutableArray array];
+    if (banner.background.imageUrl && ![banner.background.imageUrl isKindOfClass:[NSNull class]] && ![banner.background.imageUrl isEqualToString:@""]) {
+        if (![[CPUtils sharedImageCache] objectForKey:banner.background.imageUrl]) {
+            [imageURLsToPreload addObject:banner.background.imageUrl];
+        }
+    }
+    if (banner.background.darkImageUrl && ![banner.background.darkImageUrl isKindOfClass:[NSNull class]] && ![banner.background.darkImageUrl isEqualToString:@""]) {
+        if (![[CPUtils sharedImageCache] objectForKey:banner.background.darkImageUrl]) {
+            [imageURLsToPreload addObject:banner.background.darkImageUrl];
+        }
+    }
+    
+    for (CPAppBannerCarouselBlock *screen in banner.screens) {
+        for (CPAppBannerBlock *block in screen.blocks) {
+            if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
+                CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
+                if (imageBlock.imageUrl && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && ![imageBlock.imageUrl isEqualToString:@""]) {
+                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                        [imageURLsToPreload addObject:imageBlock.imageUrl];
+                    }
+                }
+                if (imageBlock.darkImageUrl && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && ![imageBlock.darkImageUrl isEqualToString:@""]) {
+                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                        [imageURLsToPreload addObject:imageBlock.darkImageUrl];
+                    }
+                }
+            }
+        }
+    }
+    
+    if (imageURLsToPreload.count == 0) {
+        return;
+    }
+    
+    for (NSString *urlString in imageURLsToPreload) {
+        dispatch_group_enter(preloadGroup);
+        [self preloadImageWithURLInBackground:urlString completion:^{
+            dispatch_group_leave(preloadGroup);
+        }];
+    }
+    
+    dispatch_group_notify(preloadGroup, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    });
+}
+
++ (void)preloadImageWithURLInBackground:(NSString *)urlString completion:(void(^)(void))completion {
+    if (![urlString isKindOfClass:[NSString class]] || [urlString isKindOfClass:[NSNull class]] || [urlString isEqualToString:@""]) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    if (cachedImage) {
+        if (completion) completion();
+        return;
+    }
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (!url) {
+        if (completion) completion();
+        return;
+    }
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0];
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (completion) completion();
+            return;
+        }
+        
+        UIImage *image = [UIImage imageWithData:data];
+        if (image) {
+            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+        }
+        
         if (completion) completion();
     }] resume];
 }

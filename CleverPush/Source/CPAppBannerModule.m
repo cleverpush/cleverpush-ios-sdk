@@ -167,4 +167,8 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setCurrentEventId:eventId];
 }
 
++ (void)preloadBannerImages:(CPAppBanner*)banner {
+    [CPAppBannerViewController preloadImagesForBanner:banner];
+}
+
 @end

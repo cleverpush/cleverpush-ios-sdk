@@ -43,5 +43,6 @@
 + (void)resetInitialization;
 + (void)setCurrentEventId:(NSString*)eventId;
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type;
++ (void)preloadBannerImages:(CPAppBanner*)banner;
 
 @end
