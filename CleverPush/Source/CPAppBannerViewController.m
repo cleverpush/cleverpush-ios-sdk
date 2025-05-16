@@ -1009,7 +1009,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0];
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            [CPLog error:@"Failed to preload image: %@", error];
             if (completion) completion();
             return;
         }
@@ -1068,11 +1067,8 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
     
     if (imageURLsToPreload.count == 0) {
-        [CPLog debug:@"All banner images already cached, no preloading needed"];
         return;
     }
-    
-    [CPLog debug:@"Preloading %lu banner images in background", (unsigned long)imageURLsToPreload.count];
     
     for (NSString *urlString in imageURLsToPreload) {
         dispatch_group_enter(preloadGroup);
@@ -1082,7 +1078,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
     
     dispatch_group_notify(preloadGroup, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [CPLog debug:@"All banner images preloading completed"];
     });
 }
 
