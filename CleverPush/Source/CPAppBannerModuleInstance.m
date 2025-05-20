@@ -540,9 +540,18 @@ NSInteger currentScreenIndex = 0;
 - (BOOL)bannerTargetingAllowed:(CPAppBanner*)banner {
     BOOL allowed = YES;
 
-    if (banner.languages.count > 0 && ![CPUtils isNullOrEmpty:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
-        if (![banner.languages containsObject:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
-            allowed = NO;
+    if (banner.languages.count > 0) {
+        if ([CleverPush isSubscribed]) {
+            if (![CPUtils isNullOrEmpty:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
+                if (![banner.languages containsObject:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
+                    allowed = NO;
+                }
+            }
+        } else if ([NSLocale preferredLanguages].count > 0) {
+            NSString *preferredLanguage = [[NSBundle mainBundle] preferredLocalizations].firstObject;
+            if (![banner.languages containsObject:preferredLanguage]) {
+                allowed = NO;
+            }
         }
     }
     
