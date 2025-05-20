@@ -35,6 +35,7 @@
 @property (nonatomic,copy) CPAppBannerClosedBlock handleBannerClosed;
 @property (nonatomic, assign) long index;
 @property (nonatomic, strong) NSString *voucherCode;
+@property (nonatomic, assign) BOOL isPreloading;
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
@@ -62,5 +63,8 @@
 - (void)onDismiss;
 - (IBAction)tapOutSideBanner:(UIButton *)sender;
 - (IBAction)btnClose:(UIButton *)sender;
+- (void)finishSetup;
+- (void)setBackground;
++ (void)preloadImagesForBanner:(CPAppBanner *)banner;
 
 @end
