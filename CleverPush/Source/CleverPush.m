@@ -29,6 +29,7 @@
 
 static CleverPushInstance* singletonInstance = nil;
 static CleverPush* singleInstance = nil;
+static NSDictionary *swizzled_applicationLaunchOptions = nil;
 
 #pragma mark - Singleton shared instance of the cleverpush.
 
@@ -770,6 +771,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getSubscriptionAttributes];
 }
 
++ (NSDictionary* _Nullable)getStoredLaunchOptions {
+    return swizzled_applicationLaunchOptions;
+}
+
 + (BOOL)isDevelopmentModeEnabled {
     return [self.CPSharedInstance isDevelopmentModeEnabled];
 }
@@ -878,6 +883,7 @@ static CleverPush* singleInstance = nil;
 #pragma clang diagnostic pop
 
     [self setupUNUserNotificationCenterDelegate];
+    [self setupAppDelegateLaunchSwizzling];
 }
 
 #pragma mark - Notification delegates injections.
@@ -894,4 +900,29 @@ static CleverPush* singleInstance = nil;
     }
 }
 
++ (void)setupAppDelegateLaunchSwizzling {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class appDelegateClass = [UIApplication sharedApplication].delegate.class;
+        SEL originalSelector = @selector(application:didFinishLaunchingWithOptions:);
+        SEL swizzledSelector = @selector(swizzled_application:didFinishLaunchingWithOptions:);
+        
+        Method originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector);
+        if (!originalMethod) return;
+        
+        IMP swizzledIMP = imp_implementationWithBlock(^BOOL(id self, UIApplication *application, NSDictionary *launchOptions) {
+            swizzled_applicationLaunchOptions = launchOptions;
+            return ((BOOL (*)(id, SEL, UIApplication *, NSDictionary *))method_getImplementation(originalMethod))(self, originalSelector, application, launchOptions);
+        });
+        
+        class_addMethod(appDelegateClass, swizzledSelector, swizzledIMP, method_getTypeEncoding(originalMethod));
+        Method swizzledMethod = class_getInstanceMethod(appDelegateClass, swizzledSelector);
+        method_exchangeImplementations(originalMethod, swizzledMethod);
+    });
+}
+
+- (BOOL)swizzled_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    swizzled_applicationLaunchOptions = launchOptions;
+    return [self swizzled_application:application didFinishLaunchingWithOptions:launchOptions];
+}
 @end

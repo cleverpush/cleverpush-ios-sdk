@@ -224,6 +224,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 
 + (NSMutableArray* _Nullable)getAvailableAttributes __attribute__((deprecated));
 + (NSDictionary* _Nullable)getSubscriptionAttributes;
++ (NSDictionary * _Nullable)getStoredLaunchOptions;
 
 + (BOOL)isDevelopmentModeEnabled;
 + (BOOL)getAppBannerDraftsEnabled;

@@ -462,6 +462,10 @@ static id isNil(id object) {
         [userDefaults synchronize];
     }
 
+    if (launchOptions == nil) {
+        launchOptions = [CleverPush getStoredLaunchOptions];
+    }
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onDidFinishLaunchingNotification:)
                                                  name:UIApplicationDidFinishLaunchingNotification
