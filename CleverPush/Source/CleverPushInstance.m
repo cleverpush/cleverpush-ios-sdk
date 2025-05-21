@@ -29,6 +29,7 @@
 #import "NSString+VersionComparator.h"
 #import "CPSQLiteManager.h"
 #import "CPIabTcfMode.h"
+#import "CleverPushLaunchOptionsSwizzler.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -463,7 +464,7 @@ static id isNil(id object) {
     }
 
     if (launchOptions == nil) {
-        launchOptions = [CleverPush getStoredLaunchOptions];
+        launchOptions = [CleverPushLaunchOptionsSwizzler getStoredLaunchOptions];
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self
