@@ -262,9 +262,6 @@
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BC0FD8FD2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.h in Headers */ = {isa = PBXBuildFile; fileRef = BC0FD8FB2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.h */; };
-		BC0FD8FE2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = BC0FD8FC2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m */; };
-		BC0FD8FF2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = BC0FD8FC2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m */; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
@@ -593,8 +590,6 @@
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		93F417DD2B19C03900B908DB /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
-		BC0FD8FB2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushLaunchOptionsSwizzler.h; sourceTree = "<group>"; };
-		BC0FD8FC2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushLaunchOptionsSwizzler.m; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -909,8 +904,6 @@
 				29DC4ABC2181E3100051F6E9 /* CleverPushSelectorHelpers.m */,
 				883BF72A2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h */,
 				883BF72B2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.m */,
-				BC0FD8FB2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.h */,
-				BC0FD8FC2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m */,
 				290187F527C1020200535617 /* CleverPushUserDefaults.h */,
 				298676B52572CFE50002E9F1 /* CPAppBanner.h */,
 				298676B62572CFEF0002E9F1 /* CPAppBanner.m */,
@@ -1198,7 +1191,6 @@
 				2906A0992585546F0078FD61 /* CPAppBannerModule.h in Headers */,
 				2906A149258557B20078FD61 /* CPAppBannerBlockType.h in Headers */,
 				2906A114258557640078FD61 /* CPAppBannerFrequency.h in Headers */,
-				BC0FD8FD2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.h in Headers */,
 				CBA989A62679D62A003DE995 /* CPWidgetsStories.h in Headers */,
 				2967EA8C284E51DE00303648 /* CPFilterRelationType.h in Headers */,
 				2906A176258557D40078FD61 /* CPAppBannerTextBlock.h in Headers */,
@@ -1596,7 +1588,6 @@
 				2956402D258822F000FE7611 /* CPAppBannerTriggerCondition.m in Sources */,
 				298677902572E60B0002E9F1 /* CPAppBannerModule.m in Sources */,
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
-				BC0FD8FE2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m in Sources */,
 				29BB7E2128F5A19F0022426E /* NSString+VersionComparator.m in Sources */,
 				2906A2C625857E680078FD61 /* CPUIBlockButton.m in Sources */,
 				297810C52573E44B0083D1A6 /* CPAppBannerBackground.m in Sources */,
@@ -1688,7 +1679,6 @@
 				29DB95F823FC33D6008FC985 /* CleverPushHTTPClient.m in Sources */,
 				298676912572CD580002E9F1 /* UIColor+HexString.m in Sources */,
 				291FCD252525DC2800F5185E /* DWAlertAction.m in Sources */,
-				BC0FD8FF2DDDDC020003BEFB /* CleverPushLaunchOptionsSwizzler.m in Sources */,
 				CBA9898A2679D543003DE995 /* CPWidgetModule.m in Sources */,
 				CBA989962679D57B003DE995 /* CPStoryContentMeta.m in Sources */,
 				298677502572DFD30002E9F1 /* CPAppBannerImageBlock.m in Sources */,
