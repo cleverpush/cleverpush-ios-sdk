@@ -1,3 +1,7 @@
+## 1.34.12 (23.05.2025)
+* Optimizing the functionality for displaying app banners.
+* Fixed a bug in `AppBanner`, where the banner targeting with language not working properly.
+
 ## 1.34.11 (14.05.2025)
 * Fixed latest release for deployment target
 
