@@ -514,6 +514,7 @@ static id isNil(id object) {
         }
     }
 
+    [self clearBadge];
 
     if (!handleUrlFromSceneDelegate) {
         handleUrlFromAppDelegate = YES;
