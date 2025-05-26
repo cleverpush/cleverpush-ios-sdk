@@ -467,16 +467,9 @@ static id isNil(id object) {
         launchOptions = [CleverPushSelectorHelpers getStoredLaunchOptions];
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onDidFinishLaunchingNotification:)
-                                                 name:UIApplicationDidFinishLaunchingNotification
-                                               object:nil];
-
-    if (launchOptions) {
-        NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
-        if (userInfo) {
-            startFromNotification = YES;
-        }
+    NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo) {
+        startFromNotification = YES;
     }
 
     if (pendingOpenedResult && handleNotificationOpened) {
@@ -521,7 +514,6 @@ static id isNil(id object) {
         }
     }
 
-	[self clearBadge];
 
     if (!handleUrlFromSceneDelegate) {
         handleUrlFromAppDelegate = YES;
