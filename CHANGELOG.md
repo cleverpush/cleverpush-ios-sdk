@@ -1,3 +1,13 @@
+## 1.34.12 (23.05.2025)
+* Optimizing the functionality for displaying app banners.
+* Fixed a bug in `AppBanner`, where the banner targeting with language not working properly.
+
+## 1.34.11 (14.05.2025)
+* Fixed latest release for deployment target
+
+## 1.34.10 (14.05.2025)
+* Optimise `setBadgeCount` and `updateBadge` functions to correctly update badge count on push notifications.
+
 ## 1.34.9 (07.05.2025)
 * Fixed an issue with calling init again after changing API endpoint
 
