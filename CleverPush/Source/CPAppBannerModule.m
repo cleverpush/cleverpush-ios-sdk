@@ -142,6 +142,11 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:button forImageBlock:image blockType:type];
 }
 
++ (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type
+         withCustomData:(NSMutableDictionary*)customData {
+    [self.moduleInstance sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:block forImageBlock:image blockType:type withCustomData:customData];
+}
+
 #pragma mark - Apps can disable banners for a certain time and enable them later again (e.g. when user is currently watching a video)
 + (void)loadBannersDisabled {
     [self.moduleInstance loadBannersDisabled];

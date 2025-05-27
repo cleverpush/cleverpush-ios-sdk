@@ -795,6 +795,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 if (appBannerViewController && action) {
                     [appBannerViewController actionCallback:action];
                 }
+                
+                UIViewController *topController = [CleverPush topViewController];
+                CPAppBanner *banner = nil;
+                
+                if ([topController isKindOfClass:[CPAppBannerViewController class]]) {
+                    banner = ((CPAppBannerViewController *)topController).data;
+                    if (banner != nil) {
+                        [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
+                    }
+                }
 
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];

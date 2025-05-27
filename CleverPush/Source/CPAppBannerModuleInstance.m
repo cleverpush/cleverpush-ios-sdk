@@ -1364,6 +1364,10 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
+    [self sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:block forImageBlock:image blockType:type withCustomData:nil];
+}
+
+- (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type withCustomData:(NSMutableDictionary*)customData {
     if (!trackingEnabled) {
         [CPLog debug:@"sendBannerEvent: not sending event because tracking has been disabled."];
         return;
@@ -1414,17 +1418,24 @@ NSInteger currentScreenIndex = 0;
                 }
                 dataDic[@"isElementAlreadyClicked"] = @(image.isimageClicked);
             }
+        } else if (customData != nil && customData.count > 0) {
+            if (![CPUtils isNullOrEmpty:[customData valueForKey:@"buttonId"]]) {
+                [dataDic setObject:[customData valueForKey:@"buttonId"] forKey:@"blockId"];
+                dataDic[@"isElementAlreadyClicked"] = @(false);
+            }
         }
 
         [CPLog info:@"sendBannerEvent: %@ %@", event, dataDic];
         NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
         [request setHTTPBody:postData];
         [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-            ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
+            if (customData == nil && customData.count == 0) {
+                ([type isEqualToString:@"button"]) ? (block.isButtonClicked = YES) : (image.isimageClicked = YES);
 
-            if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
-                if (screen.id != nil) {
-                    screen.isScreenClicked = true;
+                if ([dataDic valueForKey:@"screenId"] != nil && ![[dataDic valueForKey:@"screenId"]  isEqual: @""]) {
+                    if (screen.id != nil) {
+                        screen.isScreenClicked = true;
+                    }
                 }
             }
         } onFailure:nil withRetry:NO];
