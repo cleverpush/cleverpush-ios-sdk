@@ -29,6 +29,7 @@
 #import "NSString+VersionComparator.h"
 #import "CPSQLiteManager.h"
 #import "CPIabTcfMode.h"
+#import "CleverPushSelectorHelpers.h"
 #endif
 
 @implementation CPNotificationReceivedResult
@@ -462,6 +463,10 @@ static id isNil(id object) {
         [userDefaults synchronize];
     }
 
+    if (launchOptions == nil) {
+        launchOptions = [CleverPushSelectorHelpers getStoredLaunchOptions];
+    }
+    
     NSDictionary* userInfo = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     if (userInfo) {
         startFromNotification = YES;
@@ -509,7 +514,7 @@ static id isNil(id object) {
         }
     }
 
-	[self clearBadge];
+    [self clearBadge];
 
     if (!handleUrlFromSceneDelegate) {
         handleUrlFromAppDelegate = YES;
