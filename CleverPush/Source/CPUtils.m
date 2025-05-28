@@ -9,6 +9,7 @@
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
+static CPAppBanner *htmlAppBanner = nil;
 NSString * const dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 NSString * const localeIdentifier = @"en_US_POSIX";
 
@@ -722,7 +723,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
     [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
-    
+
+    UIViewController *topController = [CleverPush topViewController];
+    if ([topController isKindOfClass:[CPAppBannerViewController class]]) {
+        htmlAppBanner = ((CPAppBannerViewController *)topController).data;
+    }
+
     if (message != nil && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
             UIViewController *topController = [CleverPush topViewController];
@@ -730,6 +736,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 [CPLog debug:@"Dismissing controller: %@", topController];
                 [topController dismissViewControllerAnimated:YES completion:^{
                     [CPLog debug:@"Controller dismissed"];
+                    htmlAppBanner = nil;
                 }];
             } else {
                 [CPLog debug:@"No controller to dismiss"];
@@ -766,7 +773,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                             [message.webView evaluateJavaScript:jsCallback completionHandler:nil];
                         }
                     }
-
                 }
             } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
                 [CleverPush addSubscriptionTag:message.body];
@@ -795,17 +801,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 if (appBannerViewController && action) {
                     [appBannerViewController actionCallback:action];
                 }
-                
-                UIViewController *topController = [CleverPush topViewController];
-                CPAppBanner *banner = nil;
-                
-                if ([topController isKindOfClass:[CPAppBannerViewController class]]) {
-                    banner = ((CPAppBannerViewController *)topController).data;
-                    if (banner != nil) {
-                        [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
-                    }
+                if (htmlAppBanner != nil) {
+                    [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:htmlAppBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
                 }
-
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
                 if (webUrl && webUrl.scheme && webUrl.host) {
