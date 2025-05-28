@@ -630,6 +630,10 @@ NSInteger currentScreenIndex = 0;
                 toValue = @"";
             }
 
+            if ([CPUtils isNullOrEmpty:relation]) {
+                relation = @"equals";
+            }
+            
             if ([attributeValue isKindOfClass:[NSArray class]]) {
                 NSArray *availableValues = (NSArray *)attributeValue;
                 BOOL matchFound = NO;
@@ -642,16 +646,17 @@ NSInteger currentScreenIndex = 0;
                 }
 
                 if (!matchFound) {
-                    return NO;
+                    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
+                        attributeValue = @"";
+                    } else {
+                        return NO;
+                    }
+                    
                 }
             }
 
-            if ([CPUtils isNullOrEmpty:attributeValue]) {
+            if (![relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)] && [CPUtils isNullOrEmpty:attributeValue]) {
                 return NO;
-            }
-
-            if ([CPUtils isNullOrEmpty:relation]) {
-                relation = @"equals";
             }
 
             BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
