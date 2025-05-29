@@ -9,7 +9,6 @@
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
-static CPAppBanner *htmlAppBanner = nil;
 NSString * const dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 NSString * const localeIdentifier = @"en_US_POSIX";
 
@@ -721,13 +720,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     webView.contentMode = UIViewContentModeScaleToFill;
 }
 
-+ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
++ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message withBanner:(CPAppBanner *)banner {
     [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
-
-    UIViewController *topController = [CleverPush topViewController];
-    if ([topController isKindOfClass:[CPAppBannerViewController class]]) {
-        htmlAppBanner = ((CPAppBannerViewController *)topController).data;
-    }
 
     if (message != nil && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
@@ -736,7 +730,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 [CPLog debug:@"Dismissing controller: %@", topController];
                 [topController dismissViewControllerAnimated:YES completion:^{
                     [CPLog debug:@"Controller dismissed"];
-                    htmlAppBanner = nil;
                 }];
             } else {
                 [CPLog debug:@"No controller to dismiss"];
@@ -801,8 +794,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 if (appBannerViewController && action) {
                     [appBannerViewController actionCallback:action];
                 }
-                if (htmlAppBanner != nil) {
-                    [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:htmlAppBanner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
+                if (banner != nil) {
+                    [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
                 }
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
