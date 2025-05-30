@@ -482,7 +482,7 @@
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
     if (message != nil && message.body != nil && message.name != nil) {
-        [CPUtils userContentController:userContentController didReceiveScriptMessage:message];
+        [CPUtils userContentController:userContentController didReceiveScriptMessage:message withBanner:self.data];
     }
 }
 

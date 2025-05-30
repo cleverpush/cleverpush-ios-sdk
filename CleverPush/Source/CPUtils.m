@@ -720,9 +720,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     webView.contentMode = UIViewContentModeScaleToFill;
 }
 
-+ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
++ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message withBanner:(CPAppBanner *)banner {
     [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
-    
+
     if (message != nil && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
             UIViewController *topController = [CleverPush topViewController];
@@ -766,7 +766,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                             [message.webView evaluateJavaScript:jsCallback completionHandler:nil];
                         }
                     }
-
                 }
             } else if ([message.name isEqualToString:@"addSubscriptionTag"]) {
                 [CleverPush addSubscriptionTag:message.body];
@@ -795,7 +794,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 if (appBannerViewController && action) {
                     [appBannerViewController actionCallback:action];
                 }
-
+                if (banner != nil) {
+                    [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil withCustomData:buttonBlockDic];
+                }
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
                 if (webUrl && webUrl.scheme && webUrl.host) {

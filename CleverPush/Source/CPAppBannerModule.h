@@ -43,6 +43,8 @@
 + (void)resetInitialization;
 + (void)setCurrentEventId:(NSString*)eventId;
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type;
++ (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type
+         withCustomData:(NSMutableDictionary*)customData;
 + (void)preloadBannerImages:(CPAppBanner*)banner;
 
 @end
