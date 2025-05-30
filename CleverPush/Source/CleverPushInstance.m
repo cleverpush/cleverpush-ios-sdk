@@ -2915,10 +2915,11 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics];
-                if (callback) {
-                    callback(topicId);
-                }
+                [self setSubscriptionTopics:topics onSuccess:^{
+                    if (callback) {
+                        callback(topicId);
+                    }
+                } onFailure:failureBlock];
             } onFailure:^(NSError* error) {
                 [CPLog error:@"Failed adding subscription topic %@", error];
                 if (failureBlock) {
@@ -2965,10 +2966,11 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
 
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics];
-                if (callback) {
-                    callback(topicId);
-                }
+                [self setSubscriptionTopics:topics onSuccess:^{
+                    if (callback) {
+                        callback(topicId);
+                    }
+                } onFailure:failureBlock];
             } onFailure:^(NSError* error) {
                 [CPLog error:@"Failed removing subscription topic %@", error];
                 if (failureBlock) {
