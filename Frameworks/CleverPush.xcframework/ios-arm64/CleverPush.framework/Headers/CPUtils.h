@@ -3,6 +3,8 @@
 #import <SafariServices/SafariServices.h>
 #import "CleverPush.h"
 
+@class CPAppBanner;
+
 @interface CPUtils : NSObject
 
 #define HTTP_GET @"GET"
@@ -37,7 +39,7 @@
 + (NSString *)generateBannerHTMLStringWithFunctions:(NSString *)content;
 + (NSArray<NSString *> *)scriptMessageNames;
 + (void)configureWebView:(WKWebView *)webView;
-+ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message;
++ (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message withBanner:(CPAppBanner *)banner;
 + (void)handleSubscribeActionWithCallback:(void (^)(BOOL))callback;
 + (BOOL)isNullOrEmpty:(NSString *)string;
 + (NSURL*)replaceAndEncodeURL:(NSURL *)url withReplacement:(NSString *)replacement;

@@ -1,3 +1,9 @@
+## 1.34.13 (30.05.2025)
+* Optimized `initWithLaunchOptions` to handle nil launchOptions by observing didFinishLaunchingNotification.
+* Resolved the issue of the in-app banner targeting attribute with not contains" not working.
+* Optimized `addSubscriptionTopic` and `removeSubscriptionTopic` callbacks to ensure `getSubscriptionTopics` returns up-to-date data immediately after changes.
+* Optimizing the click-rate of HTML app banners.
+
 ## 1.34.12 (23.05.2025)
 * Optimizing the functionality for displaying app banners.
 * Fixed a bug in `AppBanner`, where the banner targeting with language not working properly.
