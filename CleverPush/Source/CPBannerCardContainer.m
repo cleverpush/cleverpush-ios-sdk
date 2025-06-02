@@ -358,9 +358,9 @@
                 }
             }
 
-            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:block forImageBlock:nil blockType:@"button"];
-
             if (hasActionsArray) {
+                [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:block forImageBlock:nil blockType:@"button"];
+                
                 [self actionCallback:block.action actions:block.actions from:YES];
             } else {
                 [self actionCallback:block.action from:YES];
@@ -459,9 +459,10 @@
                 }
             }
         }
-        [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:nil forImageBlock:block blockType:@"image"];
-
+        
         if (hasActionsArray) {
+            [CPAppBannerModule sendBannerEvent:@"clicked" forBanner:self.data forScreen:screen forButtonBlock:nil forImageBlock:block blockType:@"image"];
+            
             [self actionCallback:block.action actions:block.actions from:NO];
         } else {
             [self actionCallback:block.action from:NO];
