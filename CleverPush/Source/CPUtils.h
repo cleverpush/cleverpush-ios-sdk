@@ -12,6 +12,7 @@
 
 #pragma mark - Utilities singleton functions
 + (NSString*)downloadMedia:(NSString*)urlString;
++ (NSString*)extensionFromMimeType:(NSString*)mimeType;
 + (NSDictionary *)dictionaryWithPropertiesOfObject:(id)obj;
 + (NSInteger)daysBetweenDate:(NSDate*)fromDateTime andDate:(NSDate*)toDateTime;
 + (void)updateLastTopicCheckedTime;

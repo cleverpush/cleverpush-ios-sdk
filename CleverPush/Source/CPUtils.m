@@ -155,19 +155,36 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 
     NSString* name = [self randomStringWithLength:8];
-    if (extension) {
-        name = [name stringByAppendingString:[NSString stringWithFormat:@".%@", extension]];
-    }
-
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString* filePath = [paths[0] stringByAppendingPathComponent:name];
 
     @try {
         NSError *error;
-        [NSURLSession downloadItemAtURL:url toFile:filePath error:&error];
+        NSString *mimeType = [NSURLSession downloadItemAtURL:url toFile:filePath error:&error];
         if (error) {
             [CPLog error:@"error while attempting to download file with URL: %@", error];
             return nil;
+        }
+
+        if (!extension && mimeType) {
+            extension = [self extensionFromMimeType:mimeType];
+            if (!extension || ![supportedAttachmentTypes containsObject:extension]) {
+                [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                return nil;
+            }
+        }
+        
+        if (extension) {
+            NSString* newName = [name stringByAppendingString:[NSString stringWithFormat:@".%@", extension]];
+            NSString* newFilePath = [paths[0] stringByAppendingPathComponent:newName];
+            NSError *moveError;
+            [[NSFileManager defaultManager] moveItemAtPath:filePath toPath:newFilePath error:&moveError];
+            if (moveError) {
+                [CPLog error:@"error while renaming downloaded file: %@", moveError];
+                [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                return nil;
+            }
+            return newName;
         }
 
         return name;
@@ -175,6 +192,22 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         [CPLog error:@"error while downloading file (%@), error: %@", url, exception.description];
         return nil;
     }
+}
+
+#pragma mark - Get file extension from MIME type
++ (NSString*)extensionFromMimeType:(NSString*)mimeType {
+    if (!mimeType) return nil;
+
+    NSString *lowerMimeType = [mimeType lowercaseString];
+
+    if ([lowerMimeType isEqualToString:@"image/jpeg"] || [lowerMimeType isEqualToString:@"image/jpg"]) {
+        return @"jpeg";
+    } else if ([lowerMimeType isEqualToString:@"image/png"]) {
+        return @"png";
+    } else if ([lowerMimeType isEqualToString:@"image/gif"]) {
+        return @"gif";
+    }
+    return nil;
 }
 
 #pragma mark - daysBetweenDate(instance method and class method)
