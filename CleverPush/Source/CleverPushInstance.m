@@ -1630,7 +1630,7 @@ static id isNil(id object) {
                         [arrTopics addObject:obj];
                     }
                 }];
-                
+
                 NSInteger newTopicsVersion = 1;
                 if ([results objectForKey:@"topicsVersion"] != nil) {
                     newTopicsVersion = [[results objectForKey:@"topicsVersion"] integerValue];
