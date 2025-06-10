@@ -104,7 +104,6 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
-NSInteger subscriptionTopicsVersion = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -131,7 +130,6 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
-NSMutableArray* subscriptionTopics;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -446,7 +444,6 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
-    subscriptionTopics = [[NSMutableArray alloc] init];
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -659,21 +656,18 @@ static id isNil(id object) {
 
 #pragma mark - update the user defaults value of selected Topics Dialog.
 - (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
-    NSInteger topicsVersion = subscriptionTopicsVersion;
-    if (!topicsVersion) {
+    @synchronized(self) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
         if (!topicsVersion) {
             topicsVersion = 1;
         } else {
             topicsVersion += 1;
         }
-    } else {
-        topicsVersion += 1;
+        [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+        [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+        [userDefaults synchronize];
     }
-    
-    subscriptionTopics = [topics mutableCopy];
-    subscriptionTopicsVersion = topicsVersion;
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
@@ -1575,12 +1569,12 @@ static id isNil(id object) {
           [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
         }
 
-    NSMutableArray* topics = [[NSMutableArray alloc] init];
-    topics = [subscriptionTopics mutableCopy];
+    NSArray* topics = [self getSubscriptionTopics];
     if (topics != nil && [topics count] >= 0) {
         [dataDic setObject:topics forKey:@"topics"];
-        if (subscriptionTopicsVersion) {
-            [dataDic setObject:[NSNumber numberWithInteger:subscriptionTopicsVersion] forKey:@"topicsVersion"];
+        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+        if (topicsVersion) {
+            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
         } else {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
@@ -1631,20 +1625,11 @@ static id isNil(id object) {
                     }
                 }];
 
-                NSInteger newTopicsVersion = 1;
+                [userDefaults setObject:arrTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
                 if ([results objectForKey:@"topicsVersion"] != nil) {
-                    newTopicsVersion = [[results objectForKey:@"topicsVersion"] integerValue];
+                    [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
                 }
-                
-                if (subscriptionTopics == nil || subscriptionTopicsVersion == 0) {
-                    [userDefaults setObject:arrTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-                    [userDefaults setInteger:newTopicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-                    subscriptionTopics = [arrTopics mutableCopy];
-                    subscriptionTopicsVersion = newTopicsVersion;
-                    [userDefaults synchronize];
-                } else {
-                    subscriptionTopicsVersion = newTopicsVersion;
-                }
+                [userDefaults synchronize];
             }
 
             if ([results objectForKey:@"id"] != nil) {
@@ -2875,28 +2860,22 @@ static id isNil(id object) {
 
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (NSArray<NSString*>* _Nullable)getSubscriptionTopics {
-    if (subscriptionTopics == nil || subscriptionTopicsVersion == 0) {
+    NSArray* subscriptionTopics;
+    @synchronized(self) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSArray* storedTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-        if (storedTopics != nil) {
-            subscriptionTopics = [storedTopics mutableCopy];
-            subscriptionTopicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-            if (subscriptionTopicsVersion == 0) {
-                subscriptionTopicsVersion = 1;
-            }
-        } else {
-            subscriptionTopics = [[NSMutableArray alloc] init];
-            subscriptionTopicsVersion = 1;
-        }
+        subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     }
-    
-    return [subscriptionTopics copy];
+    if (!subscriptionTopics) {
+        return [[NSArray alloc] init];
+    }
+    return subscriptionTopics;
 }
 
 #pragma mark - Check if the any topic is exists in the NSUserDefaults or not
 - (BOOL)hasSubscriptionTopics {
-    NSArray* topics = [self getSubscriptionTopics];
-    return topics && [topics count] > 0;
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    return subscriptionTopics ? YES : NO;
 }
 
 - (void)addSubscriptionTopic:(NSString* _Nullable)topicId {
@@ -2920,7 +2899,7 @@ static id isNil(id object) {
             }
             return;
         }
-
+        NSArray *originalTopics = [self getSubscriptionTopics];
         [topics addObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2934,13 +2913,30 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
 
+            __weak typeof(self) weakSelf = self;
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics onSuccess:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setSubscriptionTopics:topics onSuccess:^{
                     if (callback) {
                         callback(topicId);
                     }
-                } onFailure:failureBlock];
+                } onFailure:^(NSError *syncError) {
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) return;
+                    
+                    [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
+                    [CPLog error:@"Failed syncing subscription topics after add: %@", syncError];
+                    if (failureBlock) {
+                        failureBlock(syncError);
+                    }
+                }];
             } onFailure:^(NSError* error) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
                 [CPLog error:@"Failed adding subscription topic %@", error];
                 if (failureBlock) {
                     failureBlock(error);
@@ -2971,7 +2967,7 @@ static id isNil(id object) {
             }
             return;
         }
-
+        NSArray *originalTopics = [self getSubscriptionTopics];
         [topics removeObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2985,13 +2981,30 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
 
+            __weak typeof(self) weakSelf = self;
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics onSuccess:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setSubscriptionTopics:topics onSuccess:^{
                     if (callback) {
                         callback(topicId);
                     }
-                } onFailure:failureBlock];
+                } onFailure:^(NSError *syncError) {
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) return;
+                    
+                    [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
+                    [CPLog error:@"Failed syncing subscription topics after remove: %@", syncError];
+                    if (failureBlock) {
+                        failureBlock(syncError);
+                    }
+                }];
             } onFailure:^(NSError* error) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
                 [CPLog error:@"Failed removing subscription topic %@", error];
                 if (failureBlock) {
                     failureBlock(error);
@@ -3003,27 +3016,22 @@ static id isNil(id object) {
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray* previousSubscriptionTopics = nil;
-    if (subscriptionTopics) {
-        previousSubscriptionTopics = [subscriptionTopics mutableCopy];
-    }
-    NSInteger previousSubscriptionTopicsVersion = subscriptionTopicsVersion;
-    
+    NSArray *originalTopics = [self getSubscriptionTopics];
     [self setDefaultCheckedTopics:topics];
+    __weak typeof(self) weakSelf = self;
     [self ensureMainThreadSync:^{
-        [self makeSyncSubscriptionRequest:^(NSError *error) {
-            subscriptionTopics = previousSubscriptionTopics;
-            subscriptionTopicsVersion = previousSubscriptionTopicsVersion;
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf makeSyncSubscriptionRequest:^(NSError *error) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) return;
             
+            [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
             if (failure) {
                 failure(error);
             }
         } successBlock:^{
-            [userDefaults setObject:subscriptionTopics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-            [userDefaults setInteger:subscriptionTopicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-            [userDefaults synchronize];
-            
             if (successBlock) {
                 successBlock();
             }
