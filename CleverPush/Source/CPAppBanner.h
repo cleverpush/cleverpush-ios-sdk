@@ -16,6 +16,7 @@
 #import "CPFilterRelationType.h"
 #import "CPAppBannerEventFilters.h"
 #import "CPAppBannerNotificationPermission.h"
+#import "CPAppBannerAttributeLogicType.h"
 #import "CPUtils.h"
 
 @interface CPAppBanner : NSObject
@@ -29,6 +30,7 @@
 @property (nonatomic) CPAppBannerTriggerType triggerType;
 @property (nonatomic) CPAppBannerSubscribedType subscribedType;
 @property (nonatomic) CPAppBannerNotificationPermission notificationPermission;
+@property (nonatomic) CPAppBannerAttributeLogicType attributesLogic;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerTrigger*> *triggers;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerCarouselBlock*> *screens;
@@ -41,6 +43,13 @@
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) NSString *HTMLContent;
 @property (nonatomic, strong) NSString *contentType;
+@property (nonatomic, strong) NSString *appVersionFilterRelation;
+@property (nonatomic, strong) NSString *appVersionFilterValue;
+@property (nonatomic, strong) NSString *fromVersion;
+@property (nonatomic, strong) NSString *toVersion;
+@property (nonatomic, strong) NSString *title;
+@property (nonatomic, strong) NSString *bannerDescription;
+@property (nonatomic, strong) NSString *mediaUrl;
 @property (nonatomic, strong) NSDate *startAt;
 @property (nonatomic, strong) NSDate *stopAt;
 @property (nonatomic, strong) NSArray *tags;
@@ -57,13 +66,6 @@
 @property (nonatomic) BOOL closeButtonEnabled;
 @property (nonatomic) BOOL closeButtonPositionStaticEnabled;
 @property (nonatomic) BOOL darkModeEnabled;
-@property (nonatomic, strong) NSString *appVersionFilterRelation;
-@property (nonatomic, strong) NSString *appVersionFilterValue;
-@property (nonatomic, strong) NSString *fromVersion;
-@property (nonatomic, strong) NSString *toVersion;
-@property (nonatomic, strong) NSString *title;
-@property (nonatomic, strong) NSString *bannerDescription;
-@property (nonatomic, strong) NSString *mediaUrl;
 
 - (id)initWithJson:(NSDictionary*)json;
 - (BOOL)darkModeEnabled:(UITraitCollection*)traitCollection;
