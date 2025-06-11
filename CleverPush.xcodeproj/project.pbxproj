@@ -262,6 +262,7 @@
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BC74F1CC2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
 		CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65D527577B960087AC49 /* CPTagsTest.m */; };
@@ -590,6 +591,7 @@
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		93F417DD2B19C03900B908DB /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
+		BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerAttributeLogicType.h; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
 		CB1B65CB27577B6E0087AC49 /* CleverPushTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CleverPushTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -947,6 +949,7 @@
 				295640002588224100FE7611 /* CPAppBannerTriggerType.h */,
 				298676F62572D08B0002E9F1 /* CPAppBannerType.h */,
 				18B5BD83283FB14C0046577F /* CPFilterRelationType.h */,
+				BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */,
 				2960688E2574451E002159D0 /* CPAspectKeepImageView.h */,
 				2960688F2574452B002159D0 /* CPAspectKeepImageView.m */,
 				296A136B25BE16DF00A2BEED /* CPChannelTag.h */,
@@ -1179,6 +1182,7 @@
 				29DB578B23D75C990040E823 /* CPNotificationViewController.h in Headers */,
 				883BF72D2D798BC500A3BD9C /* CleverPushSwizzlingForwarder.h in Headers */,
 				29A9E556276FAD8200DD43A4 /* CPAppBannerSubscribedType.h in Headers */,
+				BC74F1CC2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h in Headers */,
 				CBA989A12679D5FF003DE995 /* CPWidgetVariant.h in Headers */,
 				93E289432C5CDEEE00D95720 /* CPStoryWidgetTextPosition.h in Headers */,
 				2956401B258822E000FE7611 /* CPAppBannerTrigger.h in Headers */,

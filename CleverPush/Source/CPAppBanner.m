@@ -224,6 +224,13 @@
         } else {
             self.notificationPermission = CPAppBannerNotificationPermissionAll;
         }
+        
+        self.attributesLogic = CPAppBannerAttributeLogicTypeAnd;
+        if ([[json cleverPushStringForKey:@"attributesLogic"] isEqual:@"and"]) {
+            self.attributesLogic = CPAppBannerAttributeLogicTypeAnd;
+        } else if ([[json cleverPushStringForKey:@"attributesLogic"] isEqual:@"or"]) {
+            self.attributesLogic = CPAppBannerAttributeLogicTypeOr;
+        }
     }
     return self;
 }

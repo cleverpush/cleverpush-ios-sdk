@@ -655,13 +655,16 @@ NSInteger currentScreenIndex = 0;
                 }
             }
 
-            if (![relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)] && [CPUtils isNullOrEmpty:attributeValue]) {
+            if (![relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)] &&
+                ([CPUtils isNullOrEmpty:attributeValue] && banner.attributesLogic == CPAppBannerAttributeLogicTypeAnd)) {
                 return NO;
             }
 
             BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
 
-            if (!attributeFilterAllowed) {
+            if (attributeFilterAllowed && banner.attributesLogic == CPAppBannerAttributeLogicTypeOr) {
+                break;
+            } else if (!attributeFilterAllowed) {
                 allowed = NO;
                 break;
             }
