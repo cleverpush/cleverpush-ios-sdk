@@ -713,8 +713,10 @@ static id isNil(id object) {
         [self showTopicDialogOnNewAdded];
         [self initAppReview];
 
-        [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
-        [CPAppBannerModule initSession:channelId afterInit:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
+            [CPAppBannerModule initSession:channelId afterInit:NO];
+        });
     });
 }
 
