@@ -656,18 +656,16 @@ static id isNil(id object) {
 
 #pragma mark - update the user defaults value of selected Topics Dialog.
 - (void)setDefaultCheckedTopics:(NSMutableArray*)topics {
-    @synchronized(self) {
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-        if (!topicsVersion) {
-            topicsVersion = 1;
-        } else {
-            topicsVersion += 1;
-        }
-        [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-        [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
-        [userDefaults synchronize];
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+    if (!topicsVersion) {
+        topicsVersion = 1;
+    } else {
+        topicsVersion += 1;
     }
+    [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+    [userDefaults synchronize];
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
@@ -2860,11 +2858,8 @@ static id isNil(id object) {
 
 #pragma mark - Retrieving subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (NSArray<NSString*>* _Nullable)getSubscriptionTopics {
-    NSArray* subscriptionTopics;
-    @synchronized(self) {
-        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
-    }
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* subscriptionTopics = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     if (!subscriptionTopics) {
         return [[NSArray alloc] init];
     }
