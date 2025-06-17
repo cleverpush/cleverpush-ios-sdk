@@ -66,7 +66,7 @@
 		</data>
 		<key>Headers/CPAppBanner.h</key>
 		<data>
-		WypQWfnZm3rLJgIvTwr3stk2sYw=
+		AO0hJxLGaNNFQawJMYrpd3b72go=
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
@@ -75,6 +75,10 @@
 		<key>Headers/CPAppBannerAlignment.h</key>
 		<data>
 		cPipFuqMByvcu9e0ssABNgbpLeg=
+		</data>
+		<key>Headers/CPAppBannerAttributeLogicType.h</key>
+		<data>
+		dWbn03phoIkVeU/CcTh0jsRipfk=
 		</data>
 		<key>Headers/CPAppBannerBackground.h</key>
 		<data>
@@ -234,7 +238,7 @@
 		</data>
 		<key>Headers/CPUtils.h</key>
 		<data>
-		2Kvk2Gv6miTKQr5ponMCWYzjDNs=
+		TXv6uHLE1pTIUT5mFaM2+8WzjY0=
 		</data>
 		<key>Headers/CPWKWebKitView.h</key>
 		<data>
@@ -400,7 +404,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			sFZFHs44b8cqpp17tA/3pS2ciEcgSBCAR2wVZHJmeT0=
+			ccers/BWLOOnRazVP2b0DcSauY2zGl/9q5zKYussAlI=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
@@ -415,6 +419,13 @@
 			<key>hash2</key>
 			<data>
 			KaTECQlEzGFProETQg0v4EILm09t0XeIRuLDV9YLyx4=
+			</data>
+		</dict>
+		<key>Headers/CPAppBannerAttributeLogicType.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ZBR2lnwRK9YwLznbYrM9/WdOmJ0mDg2a6axRoH8n0G4=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerBackground.h</key>
@@ -694,7 +705,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			mwjv5f/AmN9UzAr4ckjilRZzagTsWckfRiKiR/if9II=
+			/ExxkLIOhGk3XqIO0u/baWzkyS8911VKEJUARRe7RZg=
 			</data>
 		</dict>
 		<key>Headers/CPWKWebKitView.h</key>

@@ -1,3 +1,9 @@
+## 1.34.14 (17.06.2025)
+* Optimized `initFeatures` functions for preventing crashes regarding the UI thread.
+* Added OR Logic to In-App-Banner Targeting with Attributes.
+* Resolved the issue of the image not displaying if the filename does not end with .jpg or .png and a push is sent from the API.
+* Resolved the issue of unexpected click events when actions were not defined in image and button blocks in app banners.
+
 ## 1.34.13 (30.05.2025)
 * Optimized `initWithLaunchOptions` to handle nil launchOptions by observing didFinishLaunchingNotification.
 * Resolved the issue of the in-app banner targeting attribute with not contains" not working.
