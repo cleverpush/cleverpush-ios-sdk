@@ -46,5 +46,9 @@
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type
          withCustomData:(NSMutableDictionary*)customData;
 + (void)preloadBannerImages:(CPAppBanner*)banner;
++ (void)setAppBannerPerDayValue:(int)dayValue;
++ (void)setAppBannerPerEachSessionValue:(int)sessionValue;
++ (int)getAppBannerPerDayValue;
++ (int)getAppBannerPerEachSessionValue;
 
 @end

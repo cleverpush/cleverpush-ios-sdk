@@ -44,6 +44,9 @@ long sessions = 0;
 
 NSInteger currentScreenIndex = 0;
 
+int appBannerPerEachSessionValue = 0;
+int appBannerPerDayValue = 0;
+
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -118,7 +121,11 @@ NSInteger currentScreenIndex = 0;
                     [pendingBanners addObject:banner];
                     break;
                 }
-                [self showBanner:banner force:force];
+                if (![CPUtils isNullOrEmpty:notificationId]) {
+                    [self showBanner:banner force:force notificationId:notificationId];
+                } else {
+                    [self showBanner:banner force:force];
+                }
                 if (appBannerClosedCallback != nil) {
                     handleBannerClosed = appBannerClosedCallback;
                 }
@@ -219,6 +226,7 @@ NSInteger currentScreenIndex = 0;
     [self setSessions:[self getSessions]];
     [self updateInitialisedFlag:YES];
     [self setFromNotification:fromNotification];
+    [self resetSessionBannerCount];
     if (![self isFromNotification]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             [self getBanners:channelId completion:^(NSMutableArray<CPAppBanner*>* banners) {
@@ -1137,6 +1145,10 @@ NSInteger currentScreenIndex = 0;
 
 #pragma mark - show banner with the call back of the send banner event "clicked", "delivered"
 - (void)showBanner:(CPAppBanner*)banner force:(BOOL)force {
+    [self showBanner:banner force:force notificationId:nil];
+}
+
+- (void)showBanner:(CPAppBanner*)banner force:(BOOL)force notificationId:(NSString*)notificationId {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         if (!force) {
             if (banner.frequency == CPAppBannerFrequencyOnce && [self isBannerShown:banner.id]) {
@@ -1167,6 +1179,20 @@ NSInteger currentScreenIndex = 0;
             if (banner.frequency == CPAppBannerFrequencyEveryXDays && ![self updateBannerFrequencyForBanner:banner]) {
                 [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping banner %@ because: every_x_days frequency", banner.id]];
                 return;
+            }
+            
+            if ([CPUtils isNullOrEmpty:notificationId]) {
+                if (![self isBannerPerEachSessionAllowed]) {
+                    int appBannerPerEachSessionValue = [CPAppBannerModuleInstance getAppBannerPerEachSessionValue];
+                    [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping Banner %@ because: AppBannerPerEachSession limit reached (limit: %d)", banner.id, appBannerPerEachSessionValue]];
+                    return;
+                }
+                
+                if (![self isBannerPerDayAllowed]) {
+                    int appBannerPerDayValue = [CPAppBannerModuleInstance getAppBannerPerDayValue];
+                    [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping Banner %@ because: AppBannerPerDay limit reached (limit: %d)", banner.id, appBannerPerDayValue]];
+                    return;
+                }
             }
         }
 
@@ -1312,7 +1338,7 @@ NSInteger currentScreenIndex = 0;
             currentEventId = @"";
         }
 
-        [self presentAppBanner:appBannerViewController banner:banner];
+        [self presentAppBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     });
 }
 
@@ -1324,7 +1350,11 @@ NSInteger currentScreenIndex = 0;
     }
 }
 
-- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner {
+- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner force:(BOOL)force {
+    [self presentAppBanner:appBannerViewController banner:banner notificationId:nil force:force];
+}
+
+- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force{
     if ([CleverPush popupVisible] && !handleBannerDisplayed) {
         [activePendingBanners addObject:banner];
         return;
@@ -1345,6 +1375,10 @@ NSInteger currentScreenIndex = 0;
     if (handleBannerDisplayed) {
         handleBannerDisplayed(appBannerViewController);
     } else {
+        if (!force && [CPUtils isNullOrEmpty:notificationId]) {
+            [self incrementSessionBannerCount];
+            [self incrementDailyBannerCount];
+        }
         appBannerViewController.view.alpha = 0.0;
         [topController presentViewController:appBannerViewController animated:NO completion:^{
             [appBannerViewController finishSetup];
@@ -1545,6 +1579,83 @@ NSInteger currentScreenIndex = 0;
 
 +  (NSMutableDictionary*)getCurrentVoucherCodePlaceholder {
     return currentVoucherCodePlaceholder;
+}
+
+#pragma mark - Set app banner display session & day values
++ (void)setAppBannerPerEachSessionValue:(int)sessionValue {
+    appBannerPerEachSessionValue = sessionValue;
+}
+
++ (void)setAppBannerPerDayValue:(int)dayValue {
+    appBannerPerDayValue = dayValue;
+}
+
+#pragma mark - Get app banner display session & day values
++ (int)getAppBannerPerEachSessionValue {
+    return appBannerPerEachSessionValue;
+}
+
++ (int)getAppBannerPerDayValue {
+    return appBannerPerDayValue;
+}
+
+#pragma mark - Banner display count management
+- (BOOL)isBannerPerEachSessionAllowed {
+    int appBannerPerEachSessionValue = [CPAppBannerModuleInstance getAppBannerPerEachSessionValue];
+    if (appBannerPerEachSessionValue > 0) {
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+        if (sessionCount >= appBannerPerEachSessionValue) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (BOOL)isBannerPerDayAllowed {
+    int appBannerPerDayValue = [CPAppBannerModuleInstance getAppBannerPerDayValue];
+    if (appBannerPerDayValue > 0) {
+        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+        NSString* todayString = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd"];
+        NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
+        int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+        
+        if (savedDate && [savedDate isEqualToString:todayString]) {
+            if (dailyCount >= appBannerPerDayValue) {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
+- (void)resetSessionBannerCount {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setInteger:0 forKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    [userDefaults synchronize];
+}
+
+- (void)incrementSessionBannerCount {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    int newCount = sessionCount + 1;
+    [userDefaults setInteger:newCount forKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    [userDefaults synchronize];
+}
+
+- (void)incrementDailyBannerCount {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* todayString = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd"];
+    NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
+    int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+    
+    if (savedDate && [savedDate isEqualToString:todayString]) {
+        [userDefaults setInteger:(dailyCount + 1) forKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+    } else {
+        [userDefaults setObject:todayString forKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
+        [userDefaults setInteger:1 forKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+    }
+    [userDefaults synchronize];
 }
 
 #pragma mark - Handle app banners with deep link url
