@@ -1604,7 +1604,7 @@ int appBannerPerDayValue = 0;
     int appBannerPerEachSessionValue = [CPAppBannerModuleInstance getAppBannerPerEachSessionValue];
     if (appBannerPerEachSessionValue > 0) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-        int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+        int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_PER_SESSION_COUNT_KEY];
         if (sessionCount >= appBannerPerEachSessionValue) {
             return NO;
         }
@@ -1617,8 +1617,8 @@ int appBannerPerDayValue = 0;
     if (appBannerPerDayValue > 0) {
         NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
         NSString* todayString = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd"];
-        NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
-        int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+        NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_PER_DAY_DATE_KEY];
+        int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_PER_DAY_COUNT_KEY];
         
         if (savedDate && [savedDate isEqualToString:todayString]) {
             if (dailyCount >= appBannerPerDayValue) {
@@ -1631,29 +1631,29 @@ int appBannerPerDayValue = 0;
 
 - (void)resetSessionBannerCount {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setInteger:0 forKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    [userDefaults setInteger:0 forKey:CLEVERPUSH_APP_BANNER_PER_SESSION_COUNT_KEY];
     [userDefaults synchronize];
 }
 
 - (void)incrementSessionBannerCount {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    int sessionCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_PER_SESSION_COUNT_KEY];
     int newCount = sessionCount + 1;
-    [userDefaults setInteger:newCount forKey:CLEVERPUSH_APP_BANNER_SESSION_COUNT];
+    [userDefaults setInteger:newCount forKey:CLEVERPUSH_APP_BANNER_PER_SESSION_COUNT_KEY];
     [userDefaults synchronize];
 }
 
 - (void)incrementDailyBannerCount {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSString* todayString = [CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd"];
-    NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
-    int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+    NSString* savedDate = [userDefaults stringForKey:CLEVERPUSH_APP_BANNER_PER_DAY_DATE_KEY];
+    int dailyCount = (int)[userDefaults integerForKey:CLEVERPUSH_APP_BANNER_PER_DAY_COUNT_KEY];
     
     if (savedDate && [savedDate isEqualToString:todayString]) {
-        [userDefaults setInteger:(dailyCount + 1) forKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+        [userDefaults setInteger:(dailyCount + 1) forKey:CLEVERPUSH_APP_BANNER_PER_DAY_COUNT_KEY];
     } else {
-        [userDefaults setObject:todayString forKey:CLEVERPUSH_APP_BANNER_DAILY_DATE];
-        [userDefaults setInteger:1 forKey:CLEVERPUSH_APP_BANNER_DAILY_COUNT];
+        [userDefaults setObject:todayString forKey:CLEVERPUSH_APP_BANNER_PER_DAY_DATE_KEY];
+        [userDefaults setInteger:1 forKey:CLEVERPUSH_APP_BANNER_PER_DAY_COUNT_KEY];
     }
     [userDefaults synchronize];
 }
