@@ -90,11 +90,20 @@
 - (BOOL)isFromNotification;
 - (void)setBannersDisabled:(BOOL)value;
 - (BOOL)getBannersDisabled;
+- (BOOL)isBannerPerDayAllowed;
+- (BOOL)isBannerPerEachSessionAllowed;
+- (void)resetSessionBannerCount;
+- (void)incrementSessionBannerCount;
+- (void)incrementDailyBannerCount;
 + (void)setCurrentVoucherCodePlaceholder:(NSMutableDictionary*)voucherCode;
 + (NSMutableDictionary*)getCurrentVoucherCodePlaceholder;
 + (void)setBannersForDeepLink:(NSMutableArray*)appBanner;
 + (NSMutableArray*)getBannersForDeepLink;
 + (void)updateBannersForDeepLinkWithURL:(NSURL*)url;
 + (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (void)setAppBannerPerDayValue:(int)dayValue;
++ (void)setAppBannerPerEachSessionValue:(int)sessionValue;
++ (int)getAppBannerPerDayValue;
++ (int)getAppBannerPerEachSessionValue;
 
 @end

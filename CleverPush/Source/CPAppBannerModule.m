@@ -176,4 +176,21 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [CPAppBannerViewController preloadImagesForBanner:banner];
 }
 
+#pragma mark - Banner display limit methods
++ (void)setAppBannerPerDayValue:(int)dayValue {
+    [CPAppBannerModuleInstance setAppBannerPerDayValue:dayValue];
+}
+
++ (void)setAppBannerPerEachSessionValue:(int)sessionValue {
+    [CPAppBannerModuleInstance setAppBannerPerEachSessionValue:sessionValue];
+}
+
++ (int)getAppBannerPerDayValue {
+    return [CPAppBannerModuleInstance getAppBannerPerDayValue];
+}
+
++ (int)getAppBannerPerEachSessionValue {
+    return [CPAppBannerModuleInstance getAppBannerPerEachSessionValue];
+}
+
 @end

@@ -683,8 +683,12 @@ static id isNil(id object) {
 
 	[self clearBadge];
 
-    [CPAppBannerModule initSession:channelId afterInit:YES];
-
+    [self getChannelConfig:^(NSDictionary * _Nullable result) {
+        if (result != nil) {
+            [CPAppBannerModule initSession:channelId afterInit:YES];
+        }
+    }];
+    
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
         if (subscriptionId == nil) {
             if (autoResubscribe && notificationsEnabled) {
@@ -714,8 +718,12 @@ static id isNil(id object) {
         [self initAppReview];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
-            [CPAppBannerModule initSession:channelId afterInit:NO];
+            [self getChannelConfig:^(NSDictionary * _Nullable result) {
+                if (result != nil) {
+                    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
+                    [CPAppBannerModule initSession:channelId afterInit:NO];
+                }
+            }];
         });
     });
 }
@@ -4159,6 +4167,14 @@ static id isNil(id object) {
                 [self fireChannelConfigListeners];
             }];
             return;
+        }
+
+        if (channelConfig != nil && [channelConfig objectForKey:@"inAppBannerPerEachSessionValue"] != nil && ![[channelConfig objectForKey:@"inAppBannerPerEachSessionValue"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"inAppBannerPerEachSessionValue"] intValue]) {
+            [CPAppBannerModuleInstance setAppBannerPerEachSessionValue:[[channelConfig objectForKey:@"inAppBannerPerEachSessionValue"] intValue]];
+        }
+        
+        if (channelConfig != nil && [channelConfig objectForKey:@"inAppBannerPerDayValue"] != nil && ![[channelConfig objectForKey:@"inAppBannerPerDayValue"] isKindOfClass:[NSNull class]] && [[channelConfig objectForKey:@"inAppBannerPerDayValue"] intValue]) {
+            [CPAppBannerModuleInstance setAppBannerPerDayValue:[[channelConfig objectForKey:@"inAppBannerPerDayValue"] intValue]];
         }
 
         [self handleInitialization:YES error:nil];
