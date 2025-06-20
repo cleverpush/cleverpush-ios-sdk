@@ -1,3 +1,6 @@
+## 1.34.15 (20.06.2025)
+* implemented displaying banner functionality for each session and each day.
+
 ## 1.34.14 (17.06.2025)
 * Optimized `initFeatures` functions for preventing crashes regarding the UI thread.
 * Added OR Logic to In-App-Banner Targeting with Attributes.
