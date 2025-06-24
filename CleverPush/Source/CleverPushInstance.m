@@ -104,7 +104,6 @@ int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
 int localEventTrackingRetentionDays = 90;
-NSInteger subscriptionTopicsVersion = 0;
 
 static NSString* channelId;
 static NSString* lastNotificationReceivedId;
@@ -131,7 +130,6 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
-NSMutableArray* subscriptionTopics;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -446,7 +444,6 @@ static id isNil(id object) {
     pendingSubscribeConsentListeners = [[NSMutableArray alloc] init];
     autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
     subscriptionTags = [[NSMutableArray alloc] init];
-    subscriptionTopics = [[NSMutableArray alloc] init];
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -666,8 +663,9 @@ static id isNil(id object) {
     } else {
         topicsVersion += 1;
     }
-    subscriptionTopics = [topics mutableCopy];
-    subscriptionTopicsVersion = topicsVersion;
+    [userDefaults setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
+    [userDefaults setInteger:topicsVersion forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+    [userDefaults synchronize];
 }
 
 #pragma mark - reset 'CleverPush_APP_BANNER_VISIBLE' value of user default when application is going to terminate.
@@ -1579,12 +1577,12 @@ static id isNil(id object) {
           [dataDic setObject:[[[UIDevice currentDevice] identifierForVendor] UUIDString] forKey:@"deviceId"];
         }
 
-    NSMutableArray* topics = [[NSMutableArray alloc] init];
-    topics = [subscriptionTopics mutableCopy];
+    NSArray* topics = [self getSubscriptionTopics];
     if (topics != nil && [topics count] >= 0) {
         [dataDic setObject:topics forKey:@"topics"];
-        if (subscriptionTopicsVersion) {
-            [dataDic setObject:[NSNumber numberWithInteger:subscriptionTopicsVersion] forKey:@"topicsVersion"];
+        NSInteger topicsVersion = [userDefaults integerForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
+        if (topicsVersion) {
+            [dataDic setObject:[NSNumber numberWithInteger:topicsVersion] forKey:@"topicsVersion"];
         } else {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
@@ -1639,8 +1637,6 @@ static id isNil(id object) {
                 if ([results objectForKey:@"topicsVersion"] != nil) {
                     [userDefaults setInteger:[[results objectForKey:@"topicsVersion"] integerValue] forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
                 }
-                subscriptionTopics = nil;
-                subscriptionTopicsVersion = 0;
                 [userDefaults synchronize];
             }
 
@@ -1691,8 +1687,6 @@ static id isNil(id object) {
             }
         } onFailure:^(NSError* error) {
             [self setSubscriptionInProgress:false];
-            subscriptionTopics = nil;
-            subscriptionTopicsVersion = 0;
             if (failureBlock) {
                 failureBlock(error);
             }
@@ -2910,7 +2904,7 @@ static id isNil(id object) {
             }
             return;
         }
-
+        NSArray *originalTopics = [self getSubscriptionTopics];
         [topics addObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2924,13 +2918,30 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
 
+            __weak typeof(self) weakSelf = self;
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics onSuccess:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setSubscriptionTopics:topics onSuccess:^{
                     if (callback) {
                         callback(topicId);
                     }
-                } onFailure:failureBlock];
+                } onFailure:^(NSError *syncError) {
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) return;
+                    
+                    [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
+                    [CPLog error:@"Failed syncing subscription topics after add: %@", syncError];
+                    if (failureBlock) {
+                        failureBlock(syncError);
+                    }
+                }];
             } onFailure:^(NSError* error) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
                 [CPLog error:@"Failed adding subscription topic %@", error];
                 if (failureBlock) {
                     failureBlock(error);
@@ -2961,7 +2972,7 @@ static id isNil(id object) {
             }
             return;
         }
-
+        NSArray *originalTopics = [self getSubscriptionTopics];
         [topics removeObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -2975,13 +2986,30 @@ static id isNil(id object) {
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
 
+            __weak typeof(self) weakSelf = self;
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [self setSubscriptionTopics:topics onSuccess:^{
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setSubscriptionTopics:topics onSuccess:^{
                     if (callback) {
                         callback(topicId);
                     }
-                } onFailure:failureBlock];
+                } onFailure:^(NSError *syncError) {
+                    __strong typeof(weakSelf) strongSelf = weakSelf;
+                    if (!strongSelf) return;
+                    
+                    [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
+                    [CPLog error:@"Failed syncing subscription topics after remove: %@", syncError];
+                    if (failureBlock) {
+                        failureBlock(syncError);
+                    }
+                }];
             } onFailure:^(NSError* error) {
+                __strong typeof(weakSelf) strongSelf = weakSelf;
+                if (!strongSelf) return;
+                
+                [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
                 [CPLog error:@"Failed removing subscription topic %@", error];
                 if (failureBlock) {
                     failureBlock(error);
@@ -2993,9 +3021,18 @@ static id isNil(id object) {
 
 #pragma mark - Update/Set subscription topics which has been stored in NSUserDefaults by key "CleverPush_SUBSCRIPTION_TOPICS"
 - (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
+    NSArray *originalTopics = [self getSubscriptionTopics];
     [self setDefaultCheckedTopics:topics];
+    __weak typeof(self) weakSelf = self;
     [self ensureMainThreadSync:^{
-        [self makeSyncSubscriptionRequest:^(NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf makeSyncSubscriptionRequest:^(NSError *error) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) return;
+            
+            [strongSelf setDefaultCheckedTopics:[originalTopics mutableCopy]];
             if (failure) {
                 failure(error);
             }
