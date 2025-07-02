@@ -1,3 +1,6 @@
+## 1.34.16 (02.07.2025)
+* Add Contains Substring Relation Logic to In-App-Banner Targeting with Attributes
+
 ## 1.34.15 (20.06.2025)
 * implemented displaying banner functionality for each session and each day.
 
