@@ -669,8 +669,6 @@ int appBannerPerDayValue = 0;
                     } else {
                         return NO;
                     }
-                } else if ([attributeValue isKindOfClass:[NSArray class]]) {
-                    attributeValue = @"";
                 }
             }
 
