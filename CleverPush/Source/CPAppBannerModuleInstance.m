@@ -646,7 +646,17 @@ int appBannerPerDayValue = 0;
                 NSArray *availableValues = (NSArray *)attributeValue;
                 BOOL matchFound = NO;
                 for (NSString *arrayItem in availableValues) {
-                    if ([arrayItem isEqualToString:compareAttributeValue]) {
+                    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
+                        (![CPUtils isNullOrEmpty:compareAttributeValue] && [compareAttributeValue containsString:arrayItem])) {
+                        attributeValue = arrayItem;
+                        matchFound = YES;
+                        break;
+                    } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)] &&
+                               (![CPUtils isNullOrEmpty:arrayItem] && [arrayItem containsString:compareAttributeValue])) {
+                        attributeValue = arrayItem;
+                        matchFound = YES;
+                        break;
+                    } else if ([arrayItem isEqualToString:compareAttributeValue]) {
                         attributeValue = arrayItem;
                         matchFound = YES;
                         break;
@@ -659,7 +669,6 @@ int appBannerPerDayValue = 0;
                     } else {
                         return NO;
                     }
-                    
                 }
             }
 
@@ -667,7 +676,12 @@ int appBannerPerDayValue = 0;
                 ([CPUtils isNullOrEmpty:attributeValue] && banner.attributesLogic == CPAppBannerAttributeLogicTypeAnd)) {
                 return NO;
             }
-
+            
+            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
+                (![CPUtils isNullOrEmpty:compareAttributeValue] && ![compareAttributeValue containsString:attributeValue])) {
+                return NO;
+            }
+     
             BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
 
             if (attributeFilterAllowed && banner.attributesLogic == CPAppBannerAttributeLogicTypeOr) {
@@ -821,6 +835,10 @@ int appBannerPerDayValue = 0;
         if ([value rangeOfString:compareValue].location != NSNotFound) {
             allowed = NO;
         }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
+        if ([compareValue rangeOfString:value].location == NSNotFound) {
+            allowed = NO;
+        }
     }
     return allowed;
 }
@@ -861,6 +879,10 @@ int appBannerPerDayValue = 0;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
         if ([value rangeOfString:compareValue].location != NSNotFound) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
+        if ([compareValue rangeOfString:value].location == NSNotFound) {
             allowed = NO;
         }
     }
