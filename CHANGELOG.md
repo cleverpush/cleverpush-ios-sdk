@@ -1,3 +1,6 @@
+## 1.34.17 (07.07.2025)
+* Optimized `addSubscriptionTopic`, `removeSubscriptionTopic` and `setSubscriptionTopics` callbacks to ensure `getSubscriptionTopics` returns up-to-date data immediately after changes.
+
 ## 1.34.16 (02.07.2025)
 * Add Contains Substring Relation Logic to In-App-Banner Targeting with Attributes
 
