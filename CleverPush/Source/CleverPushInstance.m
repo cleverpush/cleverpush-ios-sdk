@@ -1298,18 +1298,21 @@ static id isNil(id object) {
                 }
 
                 if (!skipTopicsDialog) {
-                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                    [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
-                    [userDefaults synchronize];
-                    
-                    if (completion) {
-                        isTopicsDialogBeingShown = YES;
-                        handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
-                            completion(subscriptionId, nil);
-                        };
+                    NSArray* channelTopics = [channelConfig cleverPushArrayForKey:@"channelTopics"];
+                    if (channelTopics != nil && [channelTopics count] > 0) {
+                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                        [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
+                        [userDefaults synchronize];
+                        
+                        if (completion) {
+                            isTopicsDialogBeingShown = YES;
+                            handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
+                                completion(subscriptionId, nil);
+                            };
+                        }
+                        
+                        [self showPendingTopicsDialog];
                     }
-                    
-                    [self showPendingTopicsDialog];
                 }
             }
         }];
@@ -3711,6 +3714,16 @@ static id isNil(id object) {
 
             [self showTopicsDialog];
         });
+    } else {
+        if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+            [self getSubscriptionId:^(NSString *subscriptionId) {
+                if (subscriptionId) {
+                    handlePendingSubscriptionCallback(subscriptionId);
+                    isTopicsDialogBeingShown = NO;
+                    handlePendingSubscriptionCallback = nil;
+                }
+            }];
+        }
     }
 }
 
@@ -3732,6 +3745,16 @@ static id isNil(id object) {
         channelTopics = channelTopics_;
         if ([channelTopics count] == 0) {
             [CPLog info:@"showTopicsDialog: No topics found. Create some first in the CleverPush channel settings."];
+            
+            if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
+                [self getSubscriptionId:^(NSString *subscriptionId) {
+                    if (subscriptionId) {
+                        handlePendingSubscriptionCallback(subscriptionId);
+                        isTopicsDialogBeingShown = NO;
+                        handlePendingSubscriptionCallback = nil;
+                    }
+                }];
+            }
             return;
         }
         [self getChannelConfig:^(NSDictionary* channelConfig) {
