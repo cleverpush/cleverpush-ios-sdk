@@ -1,3 +1,6 @@
+## 1.34.18 (08.07.2025)
+* Optimized subscribed callback functionality for the subscription flow.
+
 ## 1.34.17 (07.07.2025)
 * Optimized `addSubscriptionTopic`, `removeSubscriptionTopic` and `setSubscriptionTopics` callbacks to ensure `getSubscriptionTopics` returns up-to-date data immediately after changes.
 
