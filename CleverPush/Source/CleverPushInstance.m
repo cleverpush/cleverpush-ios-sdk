@@ -4017,18 +4017,6 @@ static id isNil(id object) {
     } else {
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:count];
     }
-    
-    if (count == 0) {
-        [center getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification *> *notifications) {
-            if (notifications.count > 0) {
-                NSMutableArray *identifiers = [NSMutableArray arrayWithCapacity:notifications.count];
-                for (UNNotification *notification in notifications) {
-                    [identifiers addObject:notification.request.identifier];
-                }
-                [center removeDeliveredNotificationsWithIdentifiers:identifiers];
-            }
-        }];
-    }
 }
 
 - (NSString* _Nullable)getApiEndpoint {
