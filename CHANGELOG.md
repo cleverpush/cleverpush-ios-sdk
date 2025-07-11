@@ -1,3 +1,6 @@
+## 1.34.19 (11.07.2025)
+* Optimized `setBadgeCount` function for removing other notifications.
+
 ## 1.34.18 (08.07.2025)
 * Optimized subscribed callback functionality for the subscription flow.
 
