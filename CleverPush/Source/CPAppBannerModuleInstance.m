@@ -647,7 +647,7 @@ int appBannerPerDayValue = 0;
                 BOOL matchFound = NO;
                 for (NSString *arrayItem in availableValues) {
                     if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
-                        (![CPUtils isNullOrEmpty:compareAttributeValue] && [compareAttributeValue containsString:arrayItem])) {
+                        (![CPUtils isNullOrEmpty:compareAttributeValue] && [arrayItem containsString:compareAttributeValue])) {
                         attributeValue = arrayItem;
                         matchFound = YES;
                         break;
@@ -678,7 +678,7 @@ int appBannerPerDayValue = 0;
             }
             
             if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
-                (![CPUtils isNullOrEmpty:compareAttributeValue] && ![compareAttributeValue containsString:attributeValue])) {
+                (![CPUtils isNullOrEmpty:compareAttributeValue] && ![attributeValue containsString:compareAttributeValue])) {
                 return NO;
             }
      
@@ -836,7 +836,7 @@ int appBannerPerDayValue = 0;
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
-        if ([compareValue rangeOfString:value].location == NSNotFound) {
+        if ([value rangeOfString:compareValue].location == NSNotFound) {
             allowed = NO;
         }
     }
@@ -882,7 +882,7 @@ int appBannerPerDayValue = 0;
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
-        if ([compareValue rangeOfString:value].location == NSNotFound) {
+        if ([value rangeOfString:compareValue].location == NSNotFound) {
             allowed = NO;
         }
     }
