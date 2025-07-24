@@ -1,3 +1,6 @@
+## 1.34.20 (24.07.2025)
+* Fixed an issue where in-app banners with attribute filters were not triggering on iOS due to incorrect substring matching logic.
+
 ## 1.34.19 (11.07.2025)
 * Optimized `setBadgeCount` function for removing other notifications.
 
