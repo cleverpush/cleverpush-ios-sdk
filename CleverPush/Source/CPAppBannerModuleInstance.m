@@ -700,7 +700,8 @@ int appBannerPerDayValue = 0;
     
     if (allowed && banner.osTarget && [banner.osTarget count] > 0) {
         NSString* deviceOSVersion = [[UIDevice currentDevice] systemVersion];
-        BOOL osVersionAllowed = YES;
+        BOOL osVersionAllowed = NO;
+        BOOL hasMatchingPlatform = NO;
 
         for (NSDictionary *osTarget in banner.osTarget) {
             NSString *platform = [osTarget cleverPushStringForKey:@"platform"];
@@ -710,15 +711,16 @@ int appBannerPerDayValue = 0;
             NSString *to = [osTarget cleverPushStringForKey:@"to"];
             
             if ([platform isEqualToString:@"ios"]) {
+                hasMatchingPlatform = YES;
                 BOOL currentOSTargetAllowed = [self checkRelationAppVersionFilter:deviceOSVersion compareWith:target relation:operator isAllowed:TRUE compareWithFrom:from compareWithTo:to];
-                if (!currentOSTargetAllowed) {
-                    osVersionAllowed = NO;
+                if (currentOSTargetAllowed) {
+                    osVersionAllowed = YES;
                     break;
                 }
             }
         }
         
-        if (!osVersionAllowed) {
+        if (hasMatchingPlatform && !osVersionAllowed) {
             allowed = NO;
         }
     }
