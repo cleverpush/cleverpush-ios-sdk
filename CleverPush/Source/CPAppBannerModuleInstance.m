@@ -495,7 +495,7 @@ int appBannerPerDayValue = 0;
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if (![compareValue isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
+        if (![value isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
@@ -697,6 +697,32 @@ int appBannerPerDayValue = 0;
     if (allowed) {
         allowed = [self checkRelationAppVersionFilter:appVersion compareWith:banner.appVersionFilterValue relation:banner.appVersionFilterRelation isAllowed:TRUE compareWithFrom:banner.fromVersion compareWithTo:banner.toVersion];
     }
+    
+    if (allowed && banner.osTarget && [banner.osTarget count] > 0) {
+        NSString* deviceOSVersion = [[UIDevice currentDevice] systemVersion];
+        BOOL osVersionAllowed = YES;
+
+        for (NSDictionary *osTarget in banner.osTarget) {
+            NSString *platform = [osTarget cleverPushStringForKey:@"platform"];
+            NSString *operator = [osTarget cleverPushStringForKey:@"operator"];
+            NSString *target = [osTarget cleverPushStringForKey:@"target"];
+            NSString *from = [osTarget cleverPushStringForKey:@"from"];
+            NSString *to = [osTarget cleverPushStringForKey:@"to"];
+            
+            if ([platform isEqualToString:@"ios"]) {
+                BOOL currentOSTargetAllowed = [self checkRelationAppVersionFilter:deviceOSVersion compareWith:target relation:operator isAllowed:TRUE compareWithFrom:from compareWithTo:to];
+                if (!currentOSTargetAllowed) {
+                    osVersionAllowed = NO;
+                    break;
+                }
+            }
+        }
+        
+        if (!osVersionAllowed) {
+            allowed = NO;
+        }
+    }
+    
     return allowed;
 }
 
@@ -866,7 +892,7 @@ int appBannerPerDayValue = 0;
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
-        if (![value isEqualToVersion:compareValueFrom] && [value isEqualOrOlderThanVersion:compareValueFrom] && ![value isEqualToVersion:compareValueTo] && [value isEqualOrOlderThanVersion:compareValueTo]) {
+        if (![value isBetweenVersion:compareValueFrom andVersion:compareValueTo]) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {

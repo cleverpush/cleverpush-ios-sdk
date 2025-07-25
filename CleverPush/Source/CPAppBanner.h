@@ -47,6 +47,7 @@
 @property (nonatomic, strong) NSString *appVersionFilterValue;
 @property (nonatomic, strong) NSString *fromVersion;
 @property (nonatomic, strong) NSString *toVersion;
+@property (nonatomic, strong) NSArray *osTarget;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *bannerDescription;
 @property (nonatomic, strong) NSString *mediaUrl;
