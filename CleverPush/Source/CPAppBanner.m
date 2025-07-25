@@ -216,6 +216,10 @@
         if ([json objectForKey:@"attributes"] && [[json objectForKey:@"attributes"] isKindOfClass:[NSArray class]]) {
             self.attributes = [json objectForKey:@"attributes"];
         }
+        
+        if ([json objectForKey:@"osTarget"] && [[json objectForKey:@"osTarget"] isKindOfClass:[NSArray class]]) {
+            self.osTarget = [json objectForKey:@"osTarget"];
+        }
 
         if ([json cleverPushStringForKey:@"notificationPermission"] != nil && [[json cleverPushStringForKey:@"notificationPermission"] isEqual:@"withPermission"]) {
             self.notificationPermission = CPAppBannerNotificationWithPermission;
