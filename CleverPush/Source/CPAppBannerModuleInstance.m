@@ -549,11 +549,10 @@ int appBannerPerDayValue = 0;
     BOOL allowed = YES;
 
     if (banner.languages.count > 0) {
-        if ([CleverPush isSubscribed]) {
-            if (![CPUtils isNullOrEmpty:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
-                if (![banner.languages containsObject:[[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY]]) {
-                    allowed = NO;
-                }
+        NSString *currentLanguage = [[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY];
+        if ([CleverPush isSubscribed] && ![CPUtils isNullOrEmpty:currentLanguage]) {
+            if (![banner.languages containsObject:currentLanguage]) {
+                allowed = NO;
             }
         } else if ([NSLocale preferredLanguages].count > 0) {
             NSString *preferredLanguage = [[NSBundle mainBundle] preferredLocalizations].firstObject;
