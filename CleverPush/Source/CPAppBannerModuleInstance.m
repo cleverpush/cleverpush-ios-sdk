@@ -555,7 +555,8 @@ int appBannerPerDayValue = 0;
                 allowed = NO;
             }
         } else if ([NSLocale preferredLanguages].count > 0) {
-            NSString *preferredLanguage = [[NSBundle mainBundle] preferredLocalizations].firstObject;
+            NSString *preferredLanguage = [NSLocale preferredLanguages].firstObject;
+            preferredLanguage = [[preferredLanguage componentsSeparatedByString:@"-"] firstObject];
             if (![banner.languages containsObject:preferredLanguage]) {
                 allowed = NO;
             }
