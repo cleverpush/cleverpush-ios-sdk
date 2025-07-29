@@ -1,3 +1,8 @@
+## 1.34.21 (29.07.2025)
+* Added API call to track when a user clicks a notification in the InboxView.
+* implemented a feature of targeting iOS versions for the in-app banners.
+* Resolved the issue of app banner language targeting not working correctly.
+
 ## 1.34.20 (24.07.2025)
 * Fixed an issue where in-app banners with attribute filters were not triggering on iOS due to incorrect substring matching logic.
 
