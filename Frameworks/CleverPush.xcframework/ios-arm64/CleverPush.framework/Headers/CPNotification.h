@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Class Methods
 + (instancetype)initWithJson:(NSDictionary*)json;
 - (void)parseJson:(NSDictionary*)json;
+- (void)trackInboxClicked;
 NS_ASSUME_NONNULL_END
 
 @end

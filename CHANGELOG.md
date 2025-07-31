@@ -1,3 +1,6 @@
+## 1.34.22 (31.07.2025)
+* Optimized API call to track when a user clicks a notification in the InboxView.
+
 ## 1.34.21 (29.07.2025)
 * Added API call to track when a user clicks a notification in the InboxView.
 * implemented a feature of targeting iOS versions for the in-app banners.
