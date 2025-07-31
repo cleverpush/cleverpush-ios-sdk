@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSDate *expiresAt;
 #pragma mark - Class Methods
 + (instancetype)initWithJson:(NSDictionary*)json;
-+ (void)trackInboxClicked:(NSString*)notificationId;
 - (void)parseJson:(NSDictionary*)json;
+- (void)trackInboxClicked;
 NS_ASSUME_NONNULL_END
 
 @end

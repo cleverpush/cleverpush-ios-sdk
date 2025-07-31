@@ -217,7 +217,8 @@ CPNotificationClickBlock handleClick;
         [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
     }
     
-    [CPNotification trackInboxClicked:self.notifications[indexPath.row].id];
+    CPNotification *notification = self.notifications[indexPath.row];
+    [notification trackInboxClicked];
 }
 
 - (void)saveReadNotifications:(NSMutableArray *)readNotifications{

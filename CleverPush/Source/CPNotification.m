@@ -111,9 +111,9 @@
 }
 
 #pragma mark - Track notification clicked
-+ (void)trackInboxClicked:(NSString*)notificationId {
-    if (notificationId) {
-        [CleverPush trackInboxClicked:notificationId];
+- (void)trackInboxClicked {
+    if (self.id) {
+        [CleverPush trackInboxClicked:self.id];
     }
 }
 
