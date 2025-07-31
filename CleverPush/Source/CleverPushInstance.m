@@ -3143,6 +3143,26 @@ static id isNil(id object) {
     }
 }
 
+#pragma mark - Track inbox clicked
+- (void)trackInboxClicked:(NSString* _Nullable)notificationId {
+    if (![CPUtils isNullOrEmpty:notificationId]) {
+        NSString* path = [NSString stringWithFormat:@"/channel/%@/panel/clicked", [CleverPush channelId]];
+        NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:path];
+        
+        NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 channelId, @"channelId",
+                                 notificationId, @"notificationId",
+                                 nil];
+        
+        NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+        [request setHTTPBody:postData];
+        
+        [CleverPush enqueueRequest:request onSuccess:nil onFailure:^(NSError * _Nullable error) {
+            [CPLog debug:@"Failed sending notification click event %@", error];
+        }];
+    }
+}
+
 #pragma mark - Creating URL based on the topic dialogue and append the topicId's as a query parameter.
 - (NSString*)generateGetReceivedNotificationsPath:(int)limit skip:(int)skip {
     NSString*path = [NSString stringWithFormat:@"channel/%@/received-notifications?limit=%d&skip=%d&", channelId, limit, skip];

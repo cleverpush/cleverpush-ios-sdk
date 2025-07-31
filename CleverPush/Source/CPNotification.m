@@ -110,4 +110,11 @@
     }
 }
 
+#pragma mark - Track notification clicked
+- (void)trackInboxClicked {
+    if (self.id) {
+        [CleverPush trackInboxClicked:self.id];
+    }
+}
+
 @end

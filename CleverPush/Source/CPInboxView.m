@@ -217,20 +217,8 @@ CPNotificationClickBlock handleClick;
         [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
     }
     
-    NSString* path = [NSString stringWithFormat:@"/channel/%@/panel/clicked", [CleverPush channelId]];
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:path];
-
-    NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [CleverPush channelId], @"channelId",
-                             self.notifications[indexPath.row].id, @"notificationId",
-                             nil];
-
-    NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
-    [request setHTTPBody:postData];
-
-    [CleverPush enqueueRequest:request onSuccess:nil onFailure:^(NSError* error) {
-        [CPLog debug:@"Failed sending notification click event %@", error];
-    }];
+    CPNotification *notification = self.notifications[indexPath.row];
+    [notification trackInboxClicked];
 }
 
 - (void)saveReadNotifications:(NSMutableArray *)readNotifications{

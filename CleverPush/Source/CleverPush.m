@@ -841,6 +841,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setMaximumNotificationCount:limit];
 }
 
++ (void)trackInboxClicked:(NSString* _Nullable)notificationId {
+    [self.CPSharedInstance trackInboxClicked:notificationId];
+}
+
 #pragma mark - Singleton shared instance of the cleverpush.
 + (CleverPush*)sharedInstance {
     @synchronized(singleInstance) {
