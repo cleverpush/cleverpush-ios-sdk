@@ -15,6 +15,8 @@
 
 #pragma mark - Parse json and set the data to the object variables
 - (void)parseJson:(NSDictionary*)json {
+    self.read = NO;
+    
     if ([json objectForKey:@"_id"] != nil && ![[json objectForKey:@"_id"] isKindOfClass:[NSNull class]]) {
         self.id = [json objectForKey:@"_id"];
     }
@@ -115,6 +117,15 @@
     if (self.id) {
         [CleverPush trackInboxClicked:self.id];
     }
+}
+
+#pragma mark - Getters and Setters for read property
+- (void)setRead:(BOOL)read {
+    self.read = read;
+}
+
+- (BOOL)getRead {
+    return self.read;
 }
 
 @end
