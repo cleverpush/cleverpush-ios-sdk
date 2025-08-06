@@ -178,7 +178,7 @@ CPNotificationClickBlock handleClick;
         [cell.notificationDate setFont:[UIFont systemFontOfSize:(CGFloat)(10.0) weight:UIFontWeightSemibold]];
     }
 
-    if (![self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
+    if ([self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
         cell.backgroundColor = self.read_color;
     } else {
         cell.backgroundColor = self.unread_color;
@@ -222,13 +222,13 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)saveReadNotifications:(NSMutableArray *)readNotifications{
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults *defaults = [CPUtils getUserDefaultsAppGroup];
     [defaults setObject:readNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
     [defaults synchronize];
 }
 
 - (NSArray *)getReadNotifications {
-    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     NSArray* readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
     if (!readNotifications) {
         return [[NSArray alloc] init];
