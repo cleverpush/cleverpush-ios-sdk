@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Create Linear Issue
         id: createLinearIssue
-        uses: ctriolo/action-create-linear-issue@v1
+        uses: ctriolo/action-create-linear-issue@main
         with:
           linear-api-key: ${{ secrets.LINEAR_API_KEY }}
           linear-team-key: ${{ secrets.LINEAR_TEAM_KEY }}
