@@ -1,0 +1,39 @@
+name: Sync GitHub Issues to Linear
+
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  create-linear-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Linear Issue
+        id: createLinearIssue
+        uses: ctriolo/action-create-linear-issue@v1
+        with:
+          linear-api-key: ${{ secrets.LINEAR_API_KEY }}
+          linear-team-key: ${{ secrets.LINEAR_TEAM_KEY }}
+          linear-issue-title: ${{ github.event.issue.title }}
+          linear-issue-description: |
+            **GitHub Issue:** ${{ github.event.issue.html_url }}
+            **Created by:** @${{ github.event.issue.user.login }}
+            **Labels:** ${{ join(github.event.issue.labels.*.name, ', ') }}
+            
+            ---
+            
+            ${{ github.event.issue.body }}
+          linear-attachment-url: ${{ github.event.issue.html_url }}
+          linear-attachment-title: "GitHub Issue: ${{ github.event.issue.title }}"
+
+
+      - name: Add Linear identifier label to GitHub issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['linear:${{ steps.createLinearIssue.outputs.linear-issue-identifier }}']
+            });
