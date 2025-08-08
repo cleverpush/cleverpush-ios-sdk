@@ -125,7 +125,7 @@
 - (void)setRead:(BOOL)read {
     _read = read;
     
-    if (read && self.id) {
+    if (self.id) {
         [CleverPush setNotificationRead:self.id read:read];
     }
 }
