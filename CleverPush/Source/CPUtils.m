@@ -953,13 +953,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSArray<NSString *> *)fetchAssociatedDomains {
     NSMutableArray<NSString *> *domains = [NSMutableArray array];
     for (NSString *domain in [CleverPush getHandleUniversalLinksInAppForDomains]) {
-        NSString *trimmedDomain = domain;
+        if (domain != nil && ![domain isKindOfClass:[NSNull class]] && [domain isKindOfClass:[NSString class]]) {
+            NSString *trimmedDomain = domain;
 
-        if (![trimmedDomain hasPrefix:@"http://"] && ![trimmedDomain hasPrefix:@"https://"]) {
-            trimmedDomain = [NSString stringWithFormat:@"https://%@", trimmedDomain];
-        }
+            if (![trimmedDomain hasPrefix:@"http://"] && ![trimmedDomain hasPrefix:@"https://"]) {
+                trimmedDomain = [NSString stringWithFormat:@"https://%@", trimmedDomain];
+            }
 
-        if (trimmedDomain != nil && ![trimmedDomain isKindOfClass:[NSNull class]] && [trimmedDomain isKindOfClass:[NSString class]]) {
             [domains addObject:trimmedDomain];
         }
     }
