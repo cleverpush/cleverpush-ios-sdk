@@ -204,20 +204,31 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (![self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
-        [self.readNotifications addObject:self.notifications[indexPath.row].id];
-        [self saveReadNotifications:self.readNotifications];
-        [self.messageList reloadData];
-    }
-    if (handleClick) {
-        handleClick(self.notifications[indexPath.row]);
-    }
-
-    if (self.notifications[indexPath.row].inboxAppBanner != nil && ![self.notifications[indexPath.row].inboxAppBanner isKindOfClass:[NSNull class]] )  {
-        [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
+    CPNotification *notification = self.notifications[indexPath.row];
+    BOOL isCurrentlyRead = [self.readNotifications containsObject:notification.id];
+    
+    if (!isCurrentlyRead) {
+        if (![self.readNotifications containsObject:notification.id]) {
+            [CleverPush setNotificationRead:notification.id read:true];
+            [self.readNotifications addObject:notification.id];
+        }
+    } else {
+        if ([self.readNotifications containsObject:notification.id]) {
+            [CleverPush setNotificationRead:notification.id read:false];
+            [self.readNotifications removeObject:notification.id];
+        }
     }
     
-    CPNotification *notification = self.notifications[indexPath.row];
+    [self.messageList reloadData];
+    
+    if (handleClick) {
+        handleClick(notification);
+    }
+
+    if (notification.inboxAppBanner != nil && ![notification.inboxAppBanner isKindOfClass:[NSNull class]] )  {
+        [self showAppBanner:notification.inboxAppBanner notificationId:notification.id];
+    }
+    
     [notification trackInboxClicked];
 }
 

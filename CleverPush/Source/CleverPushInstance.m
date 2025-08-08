@@ -1370,6 +1370,55 @@ static id isNil(id object) {
     return [[NSUserDefaults standardUserDefaults] boolForKey:CLEVERPUSH_UNSUBSCRIBED_KEY];
 }
 
+#pragma mark - Notification Read Status Methods
+- (void)setNotificationRead:(NSString* _Nullable)notificationId read:(BOOL)read {
+    if (!notificationId) {
+        return;
+    }
+    
+    NSUserDefaults *userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if (!userDefaults) {
+        return;
+    }
+    
+    NSArray *readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
+    NSMutableArray *updatedReadNotifications;
+    
+    if (readNotifications && [readNotifications isKindOfClass:[NSArray class]]) {
+        updatedReadNotifications = [readNotifications mutableCopy];
+    } else {
+        updatedReadNotifications = [[NSMutableArray alloc] init];
+    }
+    
+    if (read) {
+        if (![updatedReadNotifications containsObject:notificationId]) {
+            [updatedReadNotifications addObject:notificationId];
+            [userDefaults setObject:updatedReadNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
+            [userDefaults synchronize];
+        }
+    } else {
+        if ([updatedReadNotifications containsObject:notificationId]) {
+            [updatedReadNotifications removeObject:notificationId];
+            [userDefaults setObject:updatedReadNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
+            [userDefaults synchronize];
+        }
+    }
+}
+
+- (BOOL)getNotificationRead:(NSString* _Nullable)notificationId {
+    NSUserDefaults *userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if (!userDefaults || !notificationId) {
+        return NO;
+    }
+    
+    NSArray *readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
+    if (readNotifications && [readNotifications isKindOfClass:[NSArray class]] && readNotifications.count > 0) {
+        return [readNotifications containsObject:notificationId];
+    } else {
+        return NO;
+    }
+}
+
 #pragma mark - Clear the previous channel data from the NSUserDefaults on a fresh login and session expired.
 - (void)clearSubscriptionData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
