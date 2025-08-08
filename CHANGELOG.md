@@ -1,3 +1,6 @@
+## 1.34.23 (08.08.2025)
+* Added setRead and getRead methods to the CPNotification class to manage the read state of notifications. This supports marking notifications as read or unread in the app.
+
 ## 1.34.22 (31.07.2025)
 * Optimized API call to track when a user clicks a notification in the InboxView.
 
