@@ -640,7 +640,10 @@ static id isNil(id object) {
             NSMutableArray* selectedTopicIds = [[NSMutableArray alloc] init];
             for (id channelTopic in channelTopics) {
                 if (channelTopic != nil && ([channelTopic objectForKey:@"defaultUnchecked"] == nil || ![[channelTopic objectForKey:@"defaultUnchecked"] boolValue])) {
-                    [selectedTopicIds addObject:[channelTopic objectForKey:@"_id"]];
+                    id topicId = [channelTopic objectForKey:@"_id"];
+                    if (topicId != nil && ![topicId isKindOfClass:[NSNull class]] && [topicId isKindOfClass:[NSString class]]) {
+                        [selectedTopicIds addObject:topicId];
+                    }
                 }
             }
             if ([selectedTopicIds count] > 0) {
@@ -1631,7 +1634,7 @@ static id isNil(id object) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 NSMutableArray*arrTopics = [[NSMutableArray alloc] init];
                 [[results objectForKey:@"topics"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL* _Nonnull stop) {
-                    if (![obj isKindOfClass:[NSNull class]]) {
+                    if (obj != nil && ![obj isKindOfClass:[NSNull class]] && [obj isKindOfClass:[NSString class]]) {
                         [arrTopics addObject:obj];
                     }
                 }];
@@ -2377,8 +2380,10 @@ static id isNil(id object) {
                     subscriptionTags = [[NSMutableArray alloc] init];
                 }
 
-                if (![subscriptionTags containsObject:tagId]) {
-                    [subscriptionTags addObject:tagId];
+                if (tagId != nil && ![tagId isKindOfClass:[NSNull class]] && [tagId isKindOfClass:[NSString class]]) {
+                    if (![subscriptionTags containsObject:tagId]) {
+                        [subscriptionTags addObject:tagId];
+                    }
                 }
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 [userDefaults setObject:subscriptionTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
@@ -2604,8 +2609,10 @@ static id isNil(id object) {
                     } else {
                         arrayValue = [arrayValue mutableCopy];
                     }
-                    if (![arrayValue containsString:value]) {
-                        [arrayValue addObject:value];
+                    if (value != nil && ![value isKindOfClass:[NSNull class]] && [value isKindOfClass:[NSString class]]) {
+                        if (![arrayValue containsString:value]) {
+                            [arrayValue addObject:value];
+                        }
                     }
 
                     [subscriptionAttributes setObject:arrayValue forKey:attributeId];
@@ -2908,7 +2915,9 @@ static id isNil(id object) {
             return;
         }
         NSArray *originalTopics = [self getSubscriptionTopics];
-        [topics addObject:topicId];
+        if (topicId != nil && ![topicId isKindOfClass:[NSNull class]] && [topicId isKindOfClass:[NSString class]]) {
+            [topics addObject:topicId];
+        }
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/add"];
@@ -3181,8 +3190,12 @@ static id isNil(id object) {
     NSMutableArray* subscriptionTopics = [self getSubscriptionTopics];
     NSMutableArray* dynamicQueryParameter = [NSMutableArray new];
     [subscriptionTopics enumerateObjectsUsingBlock: ^(id topic, NSUInteger index, BOOL*stop) {
-        NSString*queryParameter = [NSString stringWithFormat: @"topics[]=%@&", topic];
-        [dynamicQueryParameter addObject:queryParameter];
+        if (topic != nil && ![topic isKindOfClass:[NSNull class]]) {
+            NSString*queryParameter = [NSString stringWithFormat: @"topics[]=%@&", topic];
+            if (queryParameter != nil) {
+                [dynamicQueryParameter addObject:queryParameter];
+            }
+        }
     }];
     return dynamicQueryParameter;
 }
@@ -3201,9 +3214,11 @@ static id isNil(id object) {
     NSMutableArray* notificationIds = [NSMutableArray new];
     [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL*stop) {
         NSString* notificationId = [objNotification objectForKey:@"_id"];
-        if (![notificationIds containsObject:notificationId]) {
-            [notificationIds addObject:notificationId];
-            [resultNotifications addObject:objNotification];
+        if (notificationId != nil && ![notificationId isKindOfClass:[NSNull class]] && [notificationId isKindOfClass:[NSString class]]) {
+            if (![notificationIds containsObject:notificationId]) {
+                [notificationIds addObject:notificationId];
+                [resultNotifications addObject:objNotification];
+            }
         }
     }];
     return resultNotifications;
@@ -3215,9 +3230,11 @@ static id isNil(id object) {
     NSMutableArray* notificationIds = [NSMutableArray new];
     [notifications enumerateObjectsUsingBlock: ^(id objNotification, NSUInteger index, BOOL*stop) {
         CPNotification*notification = [CPNotification initWithJson:objNotification];
-        if (![notificationIds containsObject:notification.id]) {
-            [notificationIds addObject:notification.id];
-            [resultNotifications addObject:notification];
+        if (notification != nil && notification.id != nil && ![notification.id isKindOfClass:[NSNull class]] && [notification.id isKindOfClass:[NSString class]]) {
+            if (![notificationIds containsObject:notification.id]) {
+                [notificationIds addObject:notification.id];
+                [resultNotifications addObject:notification];
+            }
         }
     }];
     return resultNotifications;

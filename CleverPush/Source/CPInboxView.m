@@ -205,7 +205,10 @@ CPNotificationClickBlock handleClick;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (![self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
-        [self.readNotifications addObject:self.notifications[indexPath.row].id];
+        id notifId = self.notifications[indexPath.row].id;
+        if (notifId != nil && ![notifId isKindOfClass:[NSNull class]] && [notifId isKindOfClass:[NSString class]]) {
+            [self.readNotifications addObject:notifId];
+        }
         [self saveReadNotifications:self.readNotifications];
         [self.messageList reloadData];
     }
@@ -357,7 +360,9 @@ CPNotificationClickBlock handleClick;
                 NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
                 for (NSString *topic in action.topics) {
                     if (![topics containsObject:topic]) {
-                        [topics addObject:topic];
+                        if (topic != nil && ![topic isKindOfClass:[NSNull class]] && [topic isKindOfClass:[NSString class]]) {
+                            [topics addObject:topic];
+                        }
                     }
                 }
                 [CleverPush setSubscriptionTopics:topics];

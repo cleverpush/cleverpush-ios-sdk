@@ -140,9 +140,11 @@
         }
         
         if (![updatedReadNotifications containsObject:self.id]) {
-            [updatedReadNotifications addObject:self.id];
-            [userDefaults setObject:updatedReadNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
-            [userDefaults synchronize];
+            if (self.id != nil && ![self.id isKindOfClass:[NSNull class]] && [self.id isKindOfClass:[NSString class]]) {
+                [updatedReadNotifications addObject:self.id];
+                [userDefaults setObject:updatedReadNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
+                [userDefaults synchronize];
+            }
         }
     }
 }
