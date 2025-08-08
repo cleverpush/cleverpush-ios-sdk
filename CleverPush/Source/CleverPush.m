@@ -845,6 +845,15 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance trackInboxClicked:notificationId];
 }
 
+#pragma mark - Notification Read Status Methods
++ (void)setNotificationRead:(NSString* _Nullable)notificationId read:(BOOL)read {
+    [self.CPSharedInstance setNotificationRead:notificationId read:read];
+}
+
++ (BOOL)getNotificationRead:(NSString* _Nullable)notificationId {
+    return [self.CPSharedInstance getNotificationRead:notificationId];
+}
+
 #pragma mark - Singleton shared instance of the cleverpush.
 + (CleverPush*)sharedInstance {
     @synchronized(singleInstance) {

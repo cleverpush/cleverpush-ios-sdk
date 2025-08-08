@@ -2,6 +2,7 @@
 #import "CPUtils.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "CleverPushUserDefaults.h"
+#import "CleverPush.h"
 
 @implementation CPNotification
 #pragma mark - Initialise notifications by NSDictionary
@@ -125,41 +126,13 @@
     _read = read;
     
     if (read && self.id) {
-        NSUserDefaults *userDefaults = [CPUtils getUserDefaultsAppGroup];
-        if (!userDefaults) {
-            return;
-        }
-        
-        NSArray *readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
-        NSMutableArray *updatedReadNotifications;
-        
-        if (readNotifications && [readNotifications isKindOfClass:[NSArray class]]) {
-            updatedReadNotifications = [readNotifications mutableCopy];
-        } else {
-            updatedReadNotifications = [[NSMutableArray alloc] init];
-        }
-        
-        if (![updatedReadNotifications containsObject:self.id]) {
-            [updatedReadNotifications addObject:self.id];
-            [userDefaults setObject:updatedReadNotifications forKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
-            [userDefaults synchronize];
-        }
+        [CleverPush setNotificationRead:self.id read:read];
     }
 }
 
 - (BOOL)getRead {
-    NSUserDefaults *userDefaults = [CPUtils getUserDefaultsAppGroup];
-    if (!userDefaults) {
-        return _read;
-    }
-    
-    NSArray *readNotifications = [userDefaults arrayForKey:CLEVERPUSH_READ_NOTIFICATIONS_KEY];
-    if (readNotifications && [readNotifications isKindOfClass:[NSArray class]] && readNotifications.count > 0) {
-        if (self.id && [readNotifications containsObject:self.id]) {
-            return YES;
-        } else {
-            return _read;
-        }
+    if (self.id) {
+        return [CleverPush getNotificationRead:self.id];
     } else {
         return _read;
     }
