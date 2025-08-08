@@ -959,7 +959,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             trimmedDomain = [NSString stringWithFormat:@"https://%@", trimmedDomain];
         }
 
-        [domains addObject:trimmedDomain];
+        if (trimmedDomain != nil && ![trimmedDomain isKindOfClass:[NSNull class]] && [trimmedDomain isKindOfClass:[NSString class]]) {
+            [domains addObject:trimmedDomain];
+        }
     }
 
     return [domains copy];

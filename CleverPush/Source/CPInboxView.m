@@ -204,29 +204,20 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    CPNotification *notification = self.notifications[indexPath.row];
-    BOOL isCurrentlyRead = [self.readNotifications containsObject:notification.id];
-    
-    if (!isCurrentlyRead) {
-        if (![self.readNotifications containsObject:notification.id]) {
-            [CleverPush setNotificationRead:notification.id read:true];
-            [self.readNotifications addObject:notification.id];
+    if (![self.readNotifications containsObject:self.notifications[indexPath.row].id]) {
+        id notifId = self.notifications[indexPath.row].id;
+        if (notifId != nil && ![notifId isKindOfClass:[NSNull class]] && [notifId isKindOfClass:[NSString class]]) {
+            [self.readNotifications addObject:notifId];
         }
-    } else {
-        if ([self.readNotifications containsObject:notification.id]) {
-            [CleverPush setNotificationRead:notification.id read:false];
-            [self.readNotifications removeObject:notification.id];
-        }
+        [self saveReadNotifications:self.readNotifications];
+        [self.messageList reloadData];
     }
-    
-    [self.messageList reloadData];
-    
     if (handleClick) {
-        handleClick(notification);
+        handleClick(self.notifications[indexPath.row]);
     }
 
-    if (notification.inboxAppBanner != nil && ![notification.inboxAppBanner isKindOfClass:[NSNull class]] )  {
-        [self showAppBanner:notification.inboxAppBanner notificationId:notification.id];
+    if (self.notifications[indexPath.row].inboxAppBanner != nil && ![self.notifications[indexPath.row].inboxAppBanner isKindOfClass:[NSNull class]] )  {
+        [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
     }
     
     [notification trackInboxClicked];
@@ -368,7 +359,9 @@ CPNotificationClickBlock handleClick;
                 NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
                 for (NSString *topic in action.topics) {
                     if (![topics containsObject:topic]) {
-                        [topics addObject:topic];
+                        if (topic != nil && ![topic isKindOfClass:[NSNull class]] && [topic isKindOfClass:[NSString class]]) {
+                            [topics addObject:topic];
+                        }
                     }
                 }
                 [CleverPush setSubscriptionTopics:topics];
