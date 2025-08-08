@@ -153,7 +153,10 @@
         images = [self.items mutableCopy];
         NSMutableArray *attachmentIDs = [[NSMutableArray alloc]init];
         for(UNNotificationAttachment *attachment in attachments) {
-            [attachmentIDs addObject:attachment.identifier];
+            NSString *identifier = attachment.identifier;
+            if (identifier != nil && ![identifier isKindOfClass:[NSNull class]] && [identifier isKindOfClass:[NSString class]]) {
+                [attachmentIDs addObject:identifier];
+            }
         }
         [self.carouselItems enumerateObjectsUsingBlock:
          ^(NSDictionary *image, NSUInteger index, BOOL *stop) {

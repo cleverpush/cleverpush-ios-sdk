@@ -175,7 +175,9 @@ static CGFloat const CPConstraints = 30.0;
         NSString* topicId = [topic id];
         BOOL contains = [selectedTopics containsObject:topicId];
         if (switcher.on && !contains) {
-            [selectedTopics addObject:topicId];
+            if (topicId != nil && ![topicId isKindOfClass:[NSNull class]] && [topicId isKindOfClass:[NSString class]]) {
+                [selectedTopics addObject:topicId];
+            }
         } else if ((!switcher.on && contains) || (switcher.on && contains) || (!switcher.on && !contains)) {
             [self setDefaultState:topicId];
         }

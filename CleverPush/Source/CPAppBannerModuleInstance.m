@@ -169,14 +169,18 @@ int appBannerPerDayValue = 0;
 #pragma mark - update/set the NSUserDefaults of key CleverPush_SHOWN_APP_BANNERS
 - (void)setBannerIsShown:(CPAppBanner*)banner {
     NSMutableArray* shownAppBanners = [self shownAppBanners];
-    [shownAppBanners addObject:banner.id];
+    if (banner.id != nil && ![banner.id isKindOfClass:[NSNull class]] && [banner.id isKindOfClass:[NSString class]]) {
+        [shownAppBanners addObject:banner.id];
+    }
 
     if (banner.connectedBanners != nil) {
         for (NSString *connectedBannerId in banner.connectedBanners) {
             if ([shownAppBanners containsObject:connectedBannerId]) {
                 continue;
             }
-            [shownAppBanners addObject:connectedBannerId];
+            if (connectedBannerId != nil && ![connectedBannerId isKindOfClass:[NSNull class]] && [connectedBannerId isKindOfClass:[NSString class]]) {
+                [shownAppBanners addObject:connectedBannerId];
+            }
         }
     }
 
@@ -1291,7 +1295,9 @@ int appBannerPerDayValue = 0;
                 NSMutableArray *topics = [NSMutableArray arrayWithArray:[CleverPush getSubscriptionTopics]];
                 for (NSString *topic in action.topics) {
                     if (![topics containsObject:topic]) {
-                        [topics addObject:topic];
+                        if (topic != nil && ![topic isKindOfClass:[NSNull class]] && [topic isKindOfClass:[NSString class]]) {
+                            [topics addObject:topic];
+                        }
                     }
                 }
                 [CleverPush setSubscriptionTopics:topics];
@@ -1735,7 +1741,9 @@ int appBannerPerDayValue = 0;
     }
 
     if (!urlExists) {
-        [existingArray addObject:urlString];
+        if (urlString != nil && ![urlString isKindOfClass:[NSNull class]] && [urlString isKindOfClass:[NSString class]]) {
+            [existingArray addObject:urlString];
+        }
     }
 
     [CPAppBannerModuleInstance setBannersForDeepLink:existingArray];
@@ -1763,7 +1771,9 @@ int appBannerPerDayValue = 0;
         NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
         existingDict[@"appBanner"] = appBannerId;
     } else {
-        [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
+        if (notificationId != nil && appBannerId != nil) {
+            [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
+        }
     }
 
     [defaults setObject:existingArray forKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];

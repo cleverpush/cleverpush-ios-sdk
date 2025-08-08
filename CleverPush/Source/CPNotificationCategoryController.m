@@ -21,7 +21,9 @@
 - (void)saveCategoryId:(NSString *)categoryId {
     NSMutableArray<NSString *> *mutableExisting = [self.existingRegisteredCategoryIds mutableCopy];
     
-    [mutableExisting addObject:categoryId];
+    if (categoryId != nil && ![categoryId isKindOfClass:[NSNull class]] && [categoryId isKindOfClass:[NSString class]]) {
+        [mutableExisting addObject:categoryId];
+    }
     
     if (mutableExisting && mutableExisting.count > MAX_CATEGORIES_SIZE) {
         [self pruneCategories:mutableExisting];
@@ -48,7 +50,9 @@
     NSMutableSet<NSString *> *categoriesToRemove = [NSMutableSet new];
     
     for (int i = (int)currentCategories.count - MAX_CATEGORIES_SIZE; i >= 0; i--) {
-        [categoriesToRemove addObject:currentCategories[i]];
+        if (currentCategories[i] != nil && ![currentCategories[i] isKindOfClass:[NSNull class]]) {
+            [categoriesToRemove addObject:currentCategories[i]];
+        }
     }
     NSMutableSet<UNNotificationCategory*>* existingCategories = self.existingCategories;
     NSMutableSet<UNNotificationCategory *> *newCategories = [NSMutableSet new];

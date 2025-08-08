@@ -627,7 +627,10 @@ CPStoryCell *previousAnimatedCell;
     [self animateCellBorder:cell];
     CPStoriesController* storiesController = [[CPStoriesController alloc] init];
     if (![self.readStories containsObject:self.stories[indexPath.item].id]) {
-        [self.readStories addObject:self.stories[indexPath.item].id];
+        id storyId = self.stories[indexPath.item].id;
+        if (storyId != nil && ![storyId isKindOfClass:[NSNull class]] && [storyId isKindOfClass:[NSString class]]) {
+            [self.readStories addObject:storyId];
+        }
         self.stories[indexPath.item].opened = YES;
     }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -897,10 +900,14 @@ CPStoryCell *previousAnimatedCell;
           if (self.widget.groupStoryCategories) {
             NSArray *currentStoryIds = [storyIdString componentsSeparatedByString:@","];
             for (NSString *storyId in currentStoryIds) {
-              [storyIdArray addObject:storyId];
+              if (storyId != nil && ![storyId isKindOfClass:[NSNull class]] && [storyId isKindOfClass:[NSString class]]) {
+                  [storyIdArray addObject:storyId];
+              }
             }
           } else {
-            [storyIdArray addObject:storyIdString];
+            if (storyIdString != nil && ![storyIdString isKindOfClass:[NSNull class]] && [storyIdString isKindOfClass:[NSString class]]) {
+                [storyIdArray addObject:storyIdString];
+            }
           }
         }
       }
