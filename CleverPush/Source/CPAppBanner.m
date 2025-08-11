@@ -88,7 +88,9 @@
 
         if ([json objectForKey:@"languages"] != nil) {
             for (NSString *supportedLanguage in [json objectForKey:@"languages"]) {
-                [self.languages addObject:supportedLanguage];
+                if (supportedLanguage != nil && ![supportedLanguage isKindOfClass:[NSNull class]] && [supportedLanguage isKindOfClass:[NSString class]]) {
+                    [self.languages addObject:supportedLanguage];
+                }
             }
         }
 
@@ -99,7 +101,9 @@
             && [json objectForKey:@"connectedBanners"] != nil
         ) {
             for (NSString *connectedBanner in [json objectForKey:@"connectedBanners"]) {
-                [self.connectedBanners addObject:connectedBanner];
+                if (connectedBanner != nil && ![connectedBanner isKindOfClass:[NSNull class]] && [connectedBanner isKindOfClass:[NSString class]]) {
+                    [self.connectedBanners addObject:connectedBanner];
+                }
             }
         }
 

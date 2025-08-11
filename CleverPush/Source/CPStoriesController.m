@@ -135,7 +135,9 @@
                                self.widget.id,
                                hasMultiplePages ? [NSString stringWithFormat:@"&#page=page-%ld", (long)subStoryIndex] : @""];
 
-        [storyURLs addObject:customURL];
+        if (customURL != nil && ![customURL isKindOfClass:[NSNull class]] && [customURL isKindOfClass:[NSString class]]) {
+            [storyURLs addObject:customURL];
+        }
     }
 
     NSError *error;
@@ -191,10 +193,14 @@
                 if (self.widget.groupStoryCategories) {
                     NSArray *currentStoryIds = [storyId componentsSeparatedByString:@","];
                     for (NSString *storyId in currentStoryIds) {
-                        [readStoryIdArray addObject:storyId];
+                        if (storyId != nil && ![storyId isKindOfClass:[NSNull class]] && [storyId isKindOfClass:[NSString class]]) {
+                            [readStoryIdArray addObject:storyId];
+                        }
                     }
                 } else {
-                    [readStoryIdArray addObject:storyId];
+                    if (storyId != nil && ![storyId isKindOfClass:[NSNull class]] && [storyId isKindOfClass:[NSString class]]) {
+                        [readStoryIdArray addObject:storyId];
+                    }
                 }
             }
 
@@ -374,7 +380,10 @@
 
 - (void)currentItemIndexDidChange:(NSInteger)index {
     if (![self.readStories containsObject:self.stories[index].id]) {
-        [self.readStories addObject:self.stories[index].id];
+        id storyId = self.stories[index].id;
+        if (storyId != nil && ![storyId isKindOfClass:[NSNull class]] && [storyId isKindOfClass:[NSString class]]) {
+            [self.readStories addObject:storyId];
+        }
         self.stories[index].opened = YES;
     }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
