@@ -1,3 +1,7 @@
+## 1.34.24 (11.08.2025)
+* Optimized addObject to skip nil and NSNull values, ensuring only valid NSString objects are added and preventing potential crashes.
+* Added setNotificationRead and getNotificationRead methods and Optimized setRead and getRead to the CPNotification class to manage the read state of notifications.
+
 ## 1.34.23 (08.08.2025)
 * Added setRead and getRead methods to the CPNotification class to manage the read state of notifications. This supports marking notifications as read or unread in the app.
 
