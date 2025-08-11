@@ -219,7 +219,8 @@ CPNotificationClickBlock handleClick;
     if (self.notifications[indexPath.row].inboxAppBanner != nil && ![self.notifications[indexPath.row].inboxAppBanner isKindOfClass:[NSNull class]] )  {
         [self showAppBanner:self.notifications[indexPath.row].inboxAppBanner notificationId:self.notifications[indexPath.row].id];
     }
-    
+    CPNotification *notification = self.notifications[indexPath.row];
+    [notification setRead:YES];
     [notification trackInboxClicked];
 }
 
