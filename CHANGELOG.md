@@ -1,3 +1,7 @@
+## 1.34.25 (19.08.2025)
+* Resolved the issue of appBanners were not displaying with the deepLink.
+* Added support for syncing subscription tags from the backend to local.
+
 ## 1.34.24 (11.08.2025)
 * Optimized addObject to skip nil and NSNull values, ensuring only valid NSString objects are added and preventing potential crashes.
 * Added setNotificationRead and getNotificationRead methods and Optimized setRead and getRead to the CPNotification class to manage the read state of notifications.
