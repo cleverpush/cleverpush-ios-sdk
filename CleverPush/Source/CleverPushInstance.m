@@ -1695,6 +1695,18 @@ static id isNil(id object) {
                 [userDefaults synchronize];
             }
 
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableArray*arrTags = [[NSMutableArray alloc] init];
+                [[results objectForKey:@"tags"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL* _Nonnull stop) {
+                    if (obj != nil && ![obj isKindOfClass:[NSNull class]] && [obj isKindOfClass:[NSString class]]) {
+                        [arrTags addObject:obj];
+                    }
+                }];
+                
+                [userDefaults setObject:arrTags forKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
+                [userDefaults synchronize];
+            }
+            
             if ([results objectForKey:@"id"] != nil) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 if (!subscriptionId) {
