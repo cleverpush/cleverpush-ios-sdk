@@ -1695,6 +1695,7 @@ static id isNil(id object) {
                 [userDefaults synchronize];
             }
 
+            if ([results objectForKey:@"tags"] != nil) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
                 NSMutableArray*arrTags = [[NSMutableArray alloc] init];
                 [[results objectForKey:@"tags"] enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL* _Nonnull stop) {
