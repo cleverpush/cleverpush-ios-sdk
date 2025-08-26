@@ -3790,6 +3790,8 @@ static id isNil(id object) {
         @synchronized(self) {
             if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
                 pendingCallback = handlePendingSubscriptionCallback;
+                isTopicsDialogBeingShown = NO;
+                handlePendingSubscriptionCallback = nil;
             }
         }
         
@@ -3797,10 +3799,6 @@ static id isNil(id object) {
             [self getSubscriptionId:^(NSString *subscriptionId) {
                 if (subscriptionId) {
                     pendingCallback(subscriptionId);
-                    @synchronized(self) {
-                        isTopicsDialogBeingShown = NO;
-                        handlePendingSubscriptionCallback = nil;
-                    }
                 }
             }];
         }
@@ -3840,6 +3838,8 @@ static id isNil(id object) {
         @synchronized(self) {
             if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
                 pendingCallback = handlePendingSubscriptionCallback;
+                isTopicsDialogBeingShown = NO;
+                handlePendingSubscriptionCallback = nil;
             }
         }
         
@@ -3847,10 +3847,6 @@ static id isNil(id object) {
             [self getSubscriptionId:^(NSString *subscriptionId) {
                 if (subscriptionId) {
                     pendingCallback(subscriptionId);
-                }
-                @synchronized(self) {
-                    isTopicsDialogBeingShown = NO;
-                    handlePendingSubscriptionCallback = nil;
                 }
             }];
         }
@@ -3880,6 +3876,8 @@ static id isNil(id object) {
             @synchronized(self) {
                 if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
                     pendingCallback = handlePendingSubscriptionCallback;
+                    isTopicsDialogBeingShown = NO;
+                    handlePendingSubscriptionCallback = nil;
                 }
             }
             
@@ -3887,10 +3885,6 @@ static id isNil(id object) {
                 [self getSubscriptionId:^(NSString *subscriptionId) {
                     if (subscriptionId) {
                         pendingCallback(subscriptionId);
-                    }
-                    @synchronized(self) {
-                        isTopicsDialogBeingShown = NO;
-                        handlePendingSubscriptionCallback = nil;
                     }
                 }];
             }
@@ -3946,6 +3940,8 @@ static id isNil(id object) {
                                 @synchronized(self) {
                                     if (isTopicsDialogBeingShown && handlePendingSubscriptionCallback) {
                                         pendingCallback = handlePendingSubscriptionCallback;
+                                        isTopicsDialogBeingShown = NO;
+                                        handlePendingSubscriptionCallback = nil;
                                     }
                                 }
                                 
@@ -3953,10 +3949,6 @@ static id isNil(id object) {
                                     [self getSubscriptionId:^(NSString *subscriptionId) {
                                         if (subscriptionId) {
                                             pendingCallback(subscriptionId);
-                                        }
-                                        @synchronized(self) {
-                                            isTopicsDialogBeingShown = NO;
-                                            handlePendingSubscriptionCallback = nil;
                                         }
                                     }];
                                 }
