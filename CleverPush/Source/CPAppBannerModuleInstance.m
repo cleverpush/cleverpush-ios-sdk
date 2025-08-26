@@ -30,6 +30,8 @@ CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 
+
+static NSObject *callbackLock;
 BOOL initialized = NO;
 BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
@@ -47,6 +49,12 @@ NSInteger currentScreenIndex = 0;
 int appBannerPerEachSessionValue = 0;
 int appBannerPerDayValue = 0;
 
++ (void)initialize {
+    if (self == [CPAppBannerModuleInstance class]) {
+        callbackLock = [[NSObject alloc] init];
+    }
+}
+
 #pragma mark - Get sessions from NSUserDefaults
 - (long)getSessions {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
@@ -62,21 +70,21 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback {
-    @synchronized(self) {
+    @synchronized(callbackLock) {
         handleBannerOpened = callback;
     }
 }
 
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
-    @synchronized(self) {
+    @synchronized(callbackLock) {
         handleBannerShown = callback;
     }
 }
 
 #pragma mark - Callback while banner has been successfully ready to display
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
-    @synchronized(self) {
+    @synchronized(callbackLock) {
         handleBannerDisplayed = callback;
     }
 }
@@ -133,7 +141,9 @@ int appBannerPerDayValue = 0;
                     [self showBanner:banner force:force];
                 }
                 if (appBannerClosedCallback != nil) {
-                    handleBannerClosed = appBannerClosedCallback;
+                    @synchronized(callbackLock) {
+                        handleBannerClosed = appBannerClosedCallback;
+                    }
                 }
                 
                 break;
@@ -1268,11 +1278,15 @@ int appBannerPerDayValue = 0;
         __strong CPAppBannerActionBlock callbackBlock = ^(CPAppBannerAction* action) {
             NSString *voucherCode;
             
-            if (handleBannerOpened && action) {
+            CPAppBannerActionBlock openedCallback = nil;
+            @synchronized(callbackLock) {
+                openedCallback = handleBannerOpened;
+            }
+            if (openedCallback && action) {
                 if (action && action.url && ([action.url.absoluteString isEqualToString:@""] || [action.url.absoluteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0)) {
                     action.url = nil;
                 }
-                handleBannerOpened(action);
+                openedCallback(action);
             }
 
             voucherCode = [CPUtils valueForKey:banner.id inDictionary:[CPAppBannerModuleInstance getCurrentVoucherCodePlaceholder]];
@@ -1421,7 +1435,7 @@ int appBannerPerDayValue = 0;
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force{
     BOOL hasDisplayCallback = NO;
-    @synchronized(self) {
+    @synchronized(callbackLock) {
         hasDisplayCallback = (handleBannerDisplayed != nil);
     }
     
@@ -1436,15 +1450,19 @@ int appBannerPerDayValue = 0;
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
-    if (handleBannerClosed) {
-        appBannerViewController.handleBannerClosed = handleBannerClosed;
+    CPAppBannerClosedBlock closedCallback = nil;
+    @synchronized(callbackLock) {
+        closedCallback = handleBannerClosed;
+    }
+    if (closedCallback) {
+        appBannerViewController.handleBannerClosed = closedCallback;
     }
     
     [CPAppBannerViewController preloadImagesForBanner:banner];
     UIViewController* topController = [CleverPush topViewController];
     
     CPAppBannerDisplayBlock displayCallback = nil;
-    @synchronized(self) {
+    @synchronized(callbackLock) {
         displayCallback = handleBannerDisplayed;
     }
     
@@ -1475,8 +1493,12 @@ int appBannerPerDayValue = 0;
     }
     [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
 
-    if (handleBannerShown) {
-        handleBannerShown(banner);
+    CPAppBannerShownBlock shownCallback = nil;
+    @synchronized(callbackLock) {
+        shownCallback = handleBannerShown;
+    }
+    if (shownCallback) {
+        shownCallback(banner);
     }
 }
 
