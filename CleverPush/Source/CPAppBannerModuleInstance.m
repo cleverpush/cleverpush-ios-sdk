@@ -62,17 +62,23 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerOpenedCallback:(CPAppBannerActionBlock)callback {
-    handleBannerOpened = callback;
+    @synchronized(self) {
+        handleBannerOpened = callback;
+    }
 }
 
 #pragma mark - Call back while banner has been open-up successfully
 - (void)setBannerShownCallback:(CPAppBannerShownBlock)callback {
-    handleBannerShown = callback;
+    @synchronized(self) {
+        handleBannerShown = callback;
+    }
 }
 
 #pragma mark - Callback while banner has been successfully ready to display
 - (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock)callback {
-    handleBannerDisplayed = callback;
+    @synchronized(self) {
+        handleBannerDisplayed = callback;
+    }
 }
 
 #pragma mark - load the events
@@ -1414,7 +1420,12 @@ int appBannerPerDayValue = 0;
 }
 
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force{
-    if ([CleverPush popupVisible] && !handleBannerDisplayed) {
+    BOOL hasDisplayCallback = NO;
+    @synchronized(self) {
+        hasDisplayCallback = (handleBannerDisplayed != nil);
+    }
+    
+    if ([CleverPush popupVisible] && !hasDisplayCallback) {
         [activePendingBanners addObject:banner];
         return;
     }
@@ -1431,8 +1442,14 @@ int appBannerPerDayValue = 0;
     
     [CPAppBannerViewController preloadImagesForBanner:banner];
     UIViewController* topController = [CleverPush topViewController];
-    if (handleBannerDisplayed) {
-        handleBannerDisplayed(appBannerViewController);
+    
+    CPAppBannerDisplayBlock displayCallback = nil;
+    @synchronized(self) {
+        displayCallback = handleBannerDisplayed;
+    }
+    
+    if (displayCallback) {
+        displayCallback(appBannerViewController);
     } else {
         if (!force && [CPUtils isNullOrEmpty:notificationId]) {
             [self incrementSessionBannerCount];
