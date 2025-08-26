@@ -11,8 +11,10 @@
 static CPAppBannerModuleInstance* singletonInstance = nil;
 
 + (CPAppBannerModuleInstance *)moduleInstance {
-    if (singletonInstance == nil) {
-        singletonInstance = [[CPAppBannerModuleInstance alloc] init];
+    @synchronized(self) {
+        if (singletonInstance == nil) {
+            singletonInstance = [[CPAppBannerModuleInstance alloc] init];
+        }
     }
     return singletonInstance;
 }
