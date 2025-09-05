@@ -1263,6 +1263,9 @@ int appBannerPerDayValue = 0;
             NSString *voucherCode;
             
             if (handleBannerOpened && action) {
+                if (action && action.url && ([action.url.absoluteString isEqualToString:@""] || [action.url.absoluteString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0)) {
+                    action.url = nil;
+                }
                 handleBannerOpened(action);
             }
 
