@@ -262,6 +262,7 @@
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BC04CD2F2E71950800B33E2E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC6BC2622E718AA00089ABCF /* MessageUI.framework */; };
 		BC74F1CC2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
@@ -591,6 +592,8 @@
 		93EB0FAC28E40CD400B464A9 /* NSString+VersionComparator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+VersionComparator.h"; sourceTree = "<group>"; };
 		93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+VersionComparator.m"; sourceTree = "<group>"; };
 		93F417DD2B19C03900B908DB /* CPIabTcfMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPIabTcfMode.h; sourceTree = "<group>"; };
+		BC6BC2602E718A9C0089ABCF /* Messages.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Messages.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk/System/iOSSupport/System/Library/Frameworks/Messages.framework; sourceTree = DEVELOPER_DIR; };
+		BC6BC2622E718AA00089ABCF /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk/System/iOSSupport/System/Library/Frameworks/MessageUI.framework; sourceTree = DEVELOPER_DIR; };
 		BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerAttributeLogicType.h; sourceTree = "<group>"; };
 		CB1B65C42757763B0087AC49 /* CleverPushInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushInstance.h; sourceTree = "<group>"; };
 		CB1B65C52757763B0087AC49 /* CleverPushInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CleverPushInstance.m; sourceTree = "<group>"; };
@@ -693,6 +696,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC04CD2F2E71950800B33E2E /* MessageUI.framework in Frameworks */,
 				93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */,
 				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,
@@ -840,6 +844,8 @@
 		29C1BAF01E58B89500815CD6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BC6BC2622E718AA00089ABCF /* MessageUI.framework */,
+				BC6BC2602E718A9C0089ABCF /* Messages.framework */,
 				93D458342B3599D9000F4A80 /* MobileCoreServices.framework */,
 				93D458322B3598C4000F4A80 /* ImageIO.framework */,
 				93E5F10E2ADEAFA700D76057 /* libsqlite3.tbd */,

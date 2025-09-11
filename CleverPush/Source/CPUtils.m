@@ -716,6 +716,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.copyToClipboard = function copyToClipboard(text) {\
                window.webkit.messageHandlers.copyToClipboard.postMessage(text);\
            };\
+           window.CleverPush.handleLinkBySystem = function handleLinkBySystem(url) {\
+               window.webkit.messageHandlers.handleLinkBySystem.postMessage(url);\
+           };\
        </script>";
 }
 
@@ -743,7 +746,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
              @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
-             @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard"];
+             @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard", @"handleLinkBySystem"];
 }
 
 + (void)configureWebView:(WKWebView *)webView {
@@ -846,6 +849,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 }
             } else if ([message.name isEqualToString:@"copyToClipboard"]) {
                 [UIPasteboard generalPasteboard].string = [NSString stringWithFormat:@"%@", message.body];
+            } else if ([message.name isEqualToString:@"handleLinkBySystem"]) {
+                [self handleLinkBySystem:[NSString stringWithFormat:@"%@", message.body]];
             }
         }
     }
@@ -875,6 +880,29 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }
         });
     }];
+}
+
+#pragma mark -  Handle link by system using MFMailComposeViewController for emails.
++ (void)handleLinkBySystem:(NSString*)urlString {
+    if (urlString && urlString.length > 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([MFMailComposeViewController canSendMail]) {
+                MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
+                [mailComposer setToRecipients:@[urlString]];
+                mailComposer.mailComposeDelegate = (id<MFMailComposeViewControllerDelegate>)[CPUtils class];
+                UIViewController *topViewController = CleverPush.topViewController;
+                if (topViewController) {
+                    [topViewController presentViewController:mailComposer animated:YES completion:nil];
+                }
+            } else {
+                [CPLog debug:@"Mail services are not available. Please configure mail account in device settings."];
+            }
+        });
+    }
+}
+
++ (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
+    [controller dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Check string is nil, null or empty

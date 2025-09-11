@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
     s.platform                = :ios, '11.0'
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
     s.requires_arc            = true
-    s.frameworks              = ["SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices", "ImageIO", "MobileCoreServices"]
+    s.frameworks              = ["SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices", "ImageIO", "MobileCoreServices", "MessageUI"]
     s.default_subspec         = "CleverPush"
 
     s.subspec 'CleverPushExtension' do |ss|
