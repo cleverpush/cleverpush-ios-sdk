@@ -506,11 +506,23 @@ CPStoryCell *previousAnimatedCell;
     [cell.image setImageWithURL:imageURL];
 
     if (self.titleVisibility) {
+        CPStory *story = self.stories[indexPath.item];
+        NSString *titleText = @"";
+
         if (self.widget.groupStoryCategories) {
-            cell.name.text = self.stories[indexPath.item].content.subtitle;
+            if (story.content.subtitle != nil && story.content.subtitle.length > 0) {
+                titleText = story.content.subtitle;
+            } else if (story.content.title != nil && story.content.title.length > 0) {
+                titleText = story.content.title;
+            }
         } else {
-            cell.name.text = self.stories[indexPath.item].title;
+            if (story.title != nil && story.title.length > 0) {
+                titleText = story.title;
+            } else if (story.content.title != nil && story.content.title.length > 0) {
+                titleText = story.content.title;
+            }
         }
+        cell.name.text = titleText;
         cell.name.textColor = self.textColor;
         if (darkModeEnabled) {
             cell.name.textColor = self.textColorDarkMode;
