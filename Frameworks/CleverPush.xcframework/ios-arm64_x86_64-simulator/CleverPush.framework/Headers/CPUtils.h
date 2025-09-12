@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <SafariServices/SafariServices.h>
+#import <MessageUI/MessageUI.h>
 #import "CleverPush.h"
 
 @class CPAppBanner;
@@ -23,6 +24,8 @@
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
++ (void)handleLinkBySystem:(NSString*)urlString;
++ (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error;
 + (NSString*)deviceName;
 + (void)updateLastTimeAutomaticallyShowed;
 + (NSDate*)getLastTimeAutomaticallyShowed;

@@ -1,3 +1,8 @@
+## 1.34.26 (12.09.2025)
+* Resolved the issue if the story's title is missing, we now check content.title as a fallback (Same like Android).
+* Added a new JS method handleLinkBySystem for HTML App Banners to compose emails using native Mail app.
+* Changed the logic of set action.url to nil when it's an empty string before calling the setAppBannerOpenedCallback.
+
 ## 1.34.25 (19.08.2025)
 * Resolved the issue of appBanners were not displaying with the deepLink.
 * Added support for syncing subscription tags from the backend to local.
