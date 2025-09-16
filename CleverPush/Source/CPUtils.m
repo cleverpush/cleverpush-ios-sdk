@@ -887,11 +887,15 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if (urlString && urlString.length > 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSURL *url = [NSURL URLWithString:urlString];
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
-                if (!success) {
-                    [CPLog debug:@"Failed to open URL: %@", urlString];
-                }
-            }];
+            if (url) {
+                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+                    if (!success) {
+                        [CPLog debug:@"Failed to open URL: %@", urlString];
+                    }
+                }];
+            } else {
+                [CPLog debug:@"Invalid URL string, cannot create URL: %@", urlString];
+            }
         });
     }
 }
