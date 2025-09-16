@@ -262,7 +262,6 @@
 		93EB0FAE28E40CD400B464A9 /* NSString+VersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 93EB0FAD28E40CD400B464A9 /* NSString+VersionComparator.m */; };
 		93F417DE2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		93F417DF2B19C03900B908DB /* CPIabTcfMode.h in Headers */ = {isa = PBXBuildFile; fileRef = 93F417DD2B19C03900B908DB /* CPIabTcfMode.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BC04CD2F2E71950800B33E2E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC6BC2622E718AA00089ABCF /* MessageUI.framework */; };
 		BC74F1CC2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74F1CB2DF84FF300AD762E /* CPAppBannerAttributeLogicType.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		CB1B65CF27577B6E0087AC49 /* CleverPush.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 297B4DF51E589AFE00BAF990 /* CleverPush.framework */; };
@@ -696,7 +695,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC04CD2F2E71950800B33E2E /* MessageUI.framework in Frameworks */,
 				93E5F10F2ADEAFAB00D76057 /* libsqlite3.tbd in Frameworks */,
 				2917E92528E9F3B800CF6458 /* QuartzCore.framework in Frameworks */,
 				29E5DA0F2694DE0100A89CE3 /* SafariServices.framework in Frameworks */,

@@ -882,27 +882,22 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }];
 }
 
-#pragma mark -  Handle link by system using MFMailComposeViewController for emails.
+#pragma mark -  Handle link by system using URLs.
 + (void)handleLinkBySystem:(NSString*)urlString {
     if (urlString && urlString.length > 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([MFMailComposeViewController canSendMail]) {
-                MFMailComposeViewController *mailComposer = [[MFMailComposeViewController alloc] init];
-                [mailComposer setToRecipients:@[urlString]];
-                mailComposer.mailComposeDelegate = (id<MFMailComposeViewControllerDelegate>)[CPUtils class];
-                UIViewController *topViewController = CleverPush.topViewController;
-                if (topViewController) {
-                    [topViewController presentViewController:mailComposer animated:YES completion:nil];
-                }
+            NSURL *url = [NSURL URLWithString:urlString];
+            if (url) {
+                [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL success) {
+                    if (!success) {
+                        [CPLog debug:@"Failed to open URL: %@", urlString];
+                    }
+                }];
             } else {
-                [CPLog debug:@"Mail services are not available. Please configure mail account in device settings."];
+                [CPLog debug:@"Invalid URL string, cannot create URL: %@", urlString];
             }
         });
     }
-}
-
-+ (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error {
-    [controller dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Check string is nil, null or empty
