@@ -1,3 +1,6 @@
+## 1.34.27 (16.09.2025)
+* Enhanced the App-Banner JS method `handleLinkBySystem` to support multiple link types, including `mailto:`, `tel:`, `market/Play Store`, and standard `http/https` links.
+
 ## 1.34.26 (12.09.2025)
 * Resolved the issue if the story's title is missing, we now check content.title as a fallback (Same like Android).
 * Added a new JS method handleLinkBySystem for HTML App Banners to compose emails using native Mail app.
