@@ -1,3 +1,6 @@
+## 1.34.28 (19.09.2025)
+* Optimized app banner callback to prevent crashes on the main (UI) and background threads.
+
 ## 1.34.27 (16.09.2025)
 * Enhanced the App-Banner JS method `handleLinkBySystem` to support multiple link types, including `mailto:`, `tel:`, `market/Play Store`, and standard `http/https` links.
 
