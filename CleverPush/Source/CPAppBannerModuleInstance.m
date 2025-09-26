@@ -685,7 +685,12 @@ int appBannerPerDayValue = 0;
                 } else if ([attributeValueObj isKindOfClass:[NSArray class]]) {
                     NSArray *availableValues = (NSArray *)attributeValueObj;
                     for (NSString *arrayItem in availableValues) {
-                        if ([arrayItem isEqualToString:compareAttributeValue]) {
+                        if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
+                            if (arrayItem && [arrayItem containsString:compareAttributeValue]) {
+                                attributeValue = arrayItem;
+                                break;
+                            }
+                        } else if ([arrayItem isEqualToString:compareAttributeValue]) {
                             attributeValue = arrayItem;
                             break;
                         }
