@@ -637,15 +637,18 @@ int appBannerPerDayValue = 0;
         if (![CleverPush isSubscribed]) {
             return NO;
         }
-
+        
+        BOOL isAttributesLogicOr = (banner.attributesLogic == CPAppBannerAttributeLogicTypeOr);
+        
         for (NSDictionary *attribute in banner.attributes) {
             NSString *attributeId = [attribute cleverPushStringForKey:@"id"];
             NSString *compareAttributeValue = [attribute cleverPushStringForKey:@"value"];
             NSString *fromValue = [attribute cleverPushStringForKey:@"fromValue"];
             NSString *toValue = [attribute cleverPushStringForKey:@"toValue"];
-            NSString *attributeValue = (NSString*)[CleverPush getSubscriptionAttribute:attributeId];
+            id attributeValueObj = [CleverPush getSubscriptionAttribute:attributeId];
             NSString *relation = [attribute cleverPushStringForKey:@"relation"];
-
+            BOOL currentMatch = NO;
+            
             if ([CPUtils isNullOrEmpty:compareAttributeValue]) {
                 compareAttributeValue = @"";
             }
@@ -662,55 +665,59 @@ int appBannerPerDayValue = 0;
                 relation = @"equals";
             }
             
-            if ([attributeValue isKindOfClass:[NSArray class]]) {
-                NSArray *availableValues = (NSArray *)attributeValue;
-                BOOL matchFound = NO;
-                for (NSString *arrayItem in availableValues) {
-                    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
-                        (![CPUtils isNullOrEmpty:compareAttributeValue] && [arrayItem containsString:compareAttributeValue])) {
-                        attributeValue = arrayItem;
-                        matchFound = YES;
-                        break;
-                    } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)] &&
-                               (![CPUtils isNullOrEmpty:arrayItem] && [arrayItem containsString:compareAttributeValue])) {
-                        attributeValue = arrayItem;
-                        matchFound = YES;
-                        break;
-                    } else if ([arrayItem isEqualToString:compareAttributeValue]) {
-                        attributeValue = arrayItem;
-                        matchFound = YES;
-                        break;
+            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
+                if ([attributeValueObj isKindOfClass:[NSString class]]) {
+                    NSString *attributeValue = (NSString *)attributeValueObj;
+                    currentMatch = [attributeValue containsString:compareAttributeValue];
+                } else if ([attributeValueObj isKindOfClass:[NSArray class]]) {
+                    NSArray *availableValues = (NSArray *)attributeValueObj;
+                    for (NSString *arrayItem in availableValues) {
+                        if (arrayItem && [arrayItem containsString:compareAttributeValue]) {
+                            currentMatch = YES;
+                            break;
+                        }
                     }
                 }
-
-                if (!matchFound) {
-                    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)]) {
+            } else {
+                NSString *attributeValue = nil;
+                if ([attributeValueObj isKindOfClass:[NSString class]]) {
+                    attributeValue = (NSString *)attributeValueObj;
+                } else if ([attributeValueObj isKindOfClass:[NSArray class]]) {
+                    NSArray *availableValues = (NSArray *)attributeValueObj;
+                    for (NSString *arrayItem in availableValues) {
+                        if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContains)]) {
+                            if (arrayItem && [arrayItem containsString:compareAttributeValue]) {
+                                attributeValue = arrayItem;
+                                break;
+                            }
+                        } else if ([arrayItem isEqualToString:compareAttributeValue]) {
+                            attributeValue = arrayItem;
+                            break;
+                        }
+                    }
+                }
+                
+                if (attributeValue == nil) {
+                    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)] || isAttributesLogicOr) {
                         attributeValue = @"";
                     } else {
                         return NO;
                     }
                 }
-            }
-
-            if (![relation isEqualToString:filterRelationType(CPFilterRelationTypeNotContains)] &&
-                ([CPUtils isNullOrEmpty:attributeValue] && banner.attributesLogic == CPAppBannerAttributeLogicTypeAnd)) {
-                return NO;
+                
+                currentMatch = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:YES compareWithFrom:fromValue compareWithTo:toValue];
             }
             
-            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)] &&
-                (![CPUtils isNullOrEmpty:compareAttributeValue] && ![attributeValue containsString:compareAttributeValue])) {
+            if (isAttributesLogicOr && currentMatch) {
+                return YES;
+            }
+            
+            if (!isAttributesLogicOr && !currentMatch) {
                 return NO;
             }
-     
-            BOOL attributeFilterAllowed = [self checkRelationFilter:attributeValue compareWith:compareAttributeValue relation:relation isAllowed:allowed compareWithFrom:fromValue compareWithTo:toValue];
-
-            if (attributeFilterAllowed && banner.attributesLogic == CPAppBannerAttributeLogicTypeOr) {
-                break;
-            } else if (!attributeFilterAllowed) {
-                allowed = NO;
-                break;
-            }
         }
+        
+        return !isAttributesLogicOr;
     }
 
     NSString* appVersion = [[NSBundle mainBundle].infoDictionary valueForKey:@"CFBundleShortVersionString"];
