@@ -1,3 +1,6 @@
+## 1.34.29 (29.09.2025)
+* Fixed an issue of in-app banners with attribute filters were not triggering due to incorrect matching logic.
+
 ## 1.34.28 (19.09.2025)
 * Optimized app banner callback to prevent crashes on the main (UI) and background threads.
 
