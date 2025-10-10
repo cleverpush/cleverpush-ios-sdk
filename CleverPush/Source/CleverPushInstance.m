@@ -947,23 +947,35 @@ static id isNil(id object) {
 
 #pragma mark - API call and get the data of the specific Channel.
 - (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
+    NSDictionary* configToReturn = nil;
+    BOOL shouldReturn = NO;
+    
     @synchronized(self) {
         if (channelConfig) {
-            if (callback) {
-                callback(channelConfig);
+            configToReturn = channelConfig;
+            shouldReturn = YES;
+        } else {
+            if (!pendingChannelConfigListeners) {
+                pendingChannelConfigListeners = [NSMutableArray new];
             }
-            return;
-        }
-
-        if (!pendingChannelConfigListeners) {
-            pendingChannelConfigListeners = [NSMutableArray new];
-        }
         
-        [pendingChannelConfigListeners addObject:callback];
-        if (pendingChannelConfigRequest) {
-            return;
+            if (callback) {
+                [pendingChannelConfigListeners addObject:callback];
+            }
+            
+            if (pendingChannelConfigRequest) {
+                shouldReturn = YES;
+            } else {
+                pendingChannelConfigRequest = YES;
+            }
         }
-        pendingChannelConfigRequest = YES;
+    }
+    
+    if (shouldReturn) {
+        if (callback && configToReturn) {
+            callback(configToReturn);
+        }
+        return;
     }
 
     NSString *configPath = @"";
