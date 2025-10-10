@@ -1,3 +1,6 @@
+## 1.34.30 (10.10.2025)
+* Optimized `getChannelConfig` function for preventing crash and thread issues.
+
 ## 1.34.29 (29.09.2025)
 * Fixed an issue of in-app banners with attribute filters were not triggering due to incorrect matching logic.
 
