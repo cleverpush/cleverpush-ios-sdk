@@ -632,6 +632,10 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return self.pageControl.currentPage;
     }
     
+    if (self.data.screens.count == 0) {
+        return 0;
+    }
+    
     CGFloat centerX = scrollView.contentOffset.x + (pageWidth / 2.0);
     NSInteger page = (NSInteger)(centerX / pageWidth);
     
