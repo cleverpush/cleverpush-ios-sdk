@@ -804,13 +804,11 @@ int appBannerPerDayValue = 0;
             NSInteger frequency = banner.everyXDays;
             NSDate *nextDisplayDate = [self calculateNextDisplayDateFrom:lastDisplayedDate frequency:frequency];
             if ([currentDate compare:nextDisplayDate] != NSOrderedAscending) {
-                NSMutableDictionary *updatedBannerRecord = [bannerRecord mutableCopy];
-                updatedBannerRecord[@"date"] = nextDisplayDate;
                 for (NSUInteger i = 0; i < bannerRecords.count; i++) {
                     NSMutableDictionary *existingBannerRecord = bannerRecords[i];
                     if ([existingBannerRecord[@"id"] isEqualToString:bannerRecord[@"id"]]) {
                         NSMutableDictionary *updatedBannerRecord = [existingBannerRecord mutableCopy];
-                        updatedBannerRecord[@"date"] = nextDisplayDate;
+                        updatedBannerRecord[@"date"] = currentDate;
                         bannerRecords[i] = updatedBannerRecord;
                         break;
                     }
@@ -830,11 +828,11 @@ int appBannerPerDayValue = 0;
             [bannerRecords addObject:newBannerRecord];
             [[NSUserDefaults standardUserDefaults] setObject:bannerRecords forKey:CLEVERPUSH_BANNER_DISPLAY_INTERVAL_DATE_KEY];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            return NO;
+            return YES;
         }
     }
 
-    return NO;
+    return YES;
 }
 
 - (NSDate *)calculateNextDisplayDateFrom:(NSDate *)lastDisplayedDate frequency:(NSInteger)frequency {
