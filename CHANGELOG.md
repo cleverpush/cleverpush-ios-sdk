@@ -1,3 +1,6 @@
+## 1.34.31 (16.10.2025)
+* Optimized  `updateBannerFrequencyForBanner` function for displaying banner where frequency is every x days.
+
 ## 1.34.30 (10.10.2025)
 * Optimized `getChannelConfig` function for preventing crash and thread issues.
 
