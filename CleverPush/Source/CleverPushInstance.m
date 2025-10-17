@@ -1952,6 +1952,17 @@ static id isNil(id object) {
     BOOL hasValidDeepLink = hasValidUrl && shouldAutoHandleDeepLink;
     if (hasValidDeepLink) {
         [CPAppBannerModuleInstance updateBannersForDeepLinkWithURL:[NSURL URLWithString:[notification objectForKey:@"url"]]];
+        
+        NSURL *notificationURL = [NSURL URLWithString:[notification objectForKey:@"url"]];
+        if (notificationURL) {
+            NSString *deeplinkId = [CPUtils getQueryParameterFromURL:notificationURL forKey:@"deeplinkId"];
+            if (deeplinkId && ![CPUtils isNullOrEmpty:deeplinkId]) {
+                [userDefaults setObject:deeplinkId forKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+            } else {
+                [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+            }
+            [userDefaults synchronize];
+        }
     }
 
     if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]] && ![[notification objectForKey:@"appBanner"] isEqualToString:@""]) {
@@ -3410,6 +3421,11 @@ static id isNil(id object) {
                         if (secondsSinceLastClick <= 60 * 60) {
                             [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
                         }
+                    }
+                    
+                    NSString* lastDeeplinkId = [userDefaults stringForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+                    if (![CPUtils isNullOrEmpty:lastDeeplinkId]) {
+                        [dataDic setObject:lastDeeplinkId forKey:@"deeplinkId"];
                     }
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
