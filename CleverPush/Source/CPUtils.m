@@ -1054,4 +1054,172 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return sharedImageCache;
 }
 
+#pragma mark - Check if delta contains rich text formatting
++ (BOOL)deltaHasFormatting:(NSDictionary *)delta {
+    NSArray *ops = [delta objectForKey:@"ops"];
+    if (ops == nil || ![ops isKindOfClass:[NSArray class]]) {
+        return NO;
+    }
+    
+    for (id op in ops) {
+        if ([op isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *opDict = (NSDictionary *)op;
+            NSDictionary *attributes = [opDict objectForKey:@"attributes"];
+            
+            if (attributes != nil && 
+                [attributes isKindOfClass:[NSDictionary class]] && 
+                [attributes count] > 0) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+#pragma mark - Convert Quill Delta to HTML
++ (NSString *)htmlFromDelta:(NSDictionary *)delta {
+    if (!delta || ![delta isKindOfClass:[NSDictionary class]]) {
+        return @"";
+    }
+    
+    NSArray *ops = [delta objectForKey:@"ops"];
+    if (!ops || ![ops isKindOfClass:[NSArray class]] || ops.count == 0) {
+        return @"";
+    }
+    
+    NSMutableString *html = [NSMutableString string];
+    
+    for (NSDictionary *op in ops) {
+        if (![op isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        
+        NSString *insertText = [op objectForKey:@"insert"];
+        if (!insertText || ![insertText isKindOfClass:[NSString class]]) {
+            continue;
+        }
+        
+        NSDictionary *attributes = [op objectForKey:@"attributes"];
+        
+        BOOL isBold = NO;
+        BOOL isItalic = NO;
+        BOOL isUnderline = NO;
+        BOOL isStrike = NO;
+        
+        if (attributes && [attributes isKindOfClass:[NSDictionary class]]) {
+            isBold = [[attributes objectForKey:@"bold"] boolValue];
+            isItalic = [[attributes objectForKey:@"italic"] boolValue];
+            isUnderline = [[attributes objectForKey:@"underline"] boolValue];
+            isStrike = [[attributes objectForKey:@"strike"] boolValue];
+        }
+        
+        NSArray *lines = [insertText componentsSeparatedByString:@"\n"];
+        for (NSInteger i = 0; i < lines.count; i++) {
+            NSString *line = lines[i];
+            
+            if (line.length > 0) {
+                line = [line stringByReplacingOccurrencesOfString:@"&" withString:@"&amp;"];
+                line = [line stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"];
+                line = [line stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];
+                line = [line stringByReplacingOccurrencesOfString:@"\"" withString:@"&quot;"];
+            
+                if (isStrike) {
+                    line = [NSString stringWithFormat:@"<s>%@</s>", line];
+                }
+                if (isUnderline) {
+                    line = [NSString stringWithFormat:@"<u>%@</u>", line];
+                }
+                if (isItalic) {
+                    line = [NSString stringWithFormat:@"<i>%@</i>", line];
+                }
+                if (isBold) {
+                    line = [NSString stringWithFormat:@"<b>%@</b>", line];
+                }
+                
+                [html appendString:line];
+            }
+            
+            if (i < lines.count - 1) {
+                [html appendString:@"<br/>"];
+            }
+        }
+    }
+    
+    return html;
+}
+
+#pragma mark - Convert HTML string to NSAttributedString
++ (NSAttributedString *)attributedStringFromHTML:(NSString *)htmlString withFont:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    if (!htmlString || htmlString.length == 0) {
+        return [[NSAttributedString alloc] initWithString:@""];
+    }
+    
+    BOOL containsHTML = [htmlString rangeOfString:@"<"].location != NSNotFound && [htmlString rangeOfString:@">"].location != NSNotFound;
+    
+    if (!containsHTML) {
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = textAlignment;
+        
+        NSDictionary *attributes = @{
+            NSFontAttributeName: font ?: [UIFont systemFontOfSize:18.0],
+            NSForegroundColorAttributeName: textColor ?: [UIColor blackColor],
+            NSParagraphStyleAttributeName: paragraphStyle
+        };
+        return [[NSAttributedString alloc] initWithString:htmlString attributes:attributes];
+    }
+    
+    NSString *fontFamily = font.fontName ?: @"system-ui";
+    CGFloat fontSize = font.pointSize;
+    NSString *colorHex = [self hexStringFromColor:textColor];
+    
+    NSString *alignmentString = @"center";
+    switch (textAlignment) {
+        case NSTextAlignmentLeft:
+            alignmentString = @"left";
+            break;
+        case NSTextAlignmentRight:
+            alignmentString = @"right";
+            break;
+        case NSTextAlignmentCenter:
+            alignmentString = @"center";
+            break;
+        case NSTextAlignmentJustified:
+            alignmentString = @"justify";
+            break;
+        default:
+            alignmentString = @"left";
+            break;
+    }
+    
+    NSString *htmlWithStyle = [NSString stringWithFormat:@"<html><head><style>body{font-family:'%@';font-size:%.0fpx;color:%@;text-align:%@;margin:0;padding:0;}</style></head><body>%@</body></html>",
+                               fontFamily, fontSize, colorHex, alignmentString, htmlString];
+    
+    NSData *data = [htmlWithStyle dataUsingEncoding:NSUTF8StringEncoding];
+    
+    @try {
+        NSAttributedString *attributedString = [[NSAttributedString alloc] initWithData:data
+                                                                                 options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+                                                                                          NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)}
+                                                                      documentAttributes:nil
+                                                                                   error:nil];
+        
+        if (attributedString) {
+            NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithAttributedString:attributedString];
+            NSRange range = NSMakeRange(0, mutableAttributedString.length);
+            
+            NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+            paragraphStyle.alignment = textAlignment;
+            [mutableAttributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
+            
+            return mutableAttributedString;
+        }
+    } @catch (NSException *exception) {
+        [CPLog error:@"Error converting HTML to attributed string: %@", exception];
+    }
+    
+    
+    return [[NSAttributedString alloc] initWithString:htmlString];
+}
+
 @end

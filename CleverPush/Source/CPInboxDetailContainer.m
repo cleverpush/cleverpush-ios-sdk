@@ -146,7 +146,7 @@
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
         CPAppBannerTextBlock *block = (CPAppBannerTextBlock*) self.blocks[indexPath.row];
 
-        cell.txtCPBanner.text = block.text;
+        NSString *textContent = block.text;
         cell.txtCPBanner.numberOfLines = 0;
 
         UIColor *textColor;
@@ -155,31 +155,43 @@
         } else {
             textColor = [UIColor colorWithHexString:block.color];
         }
-        cell.txtCPBanner.textColor = textColor;
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
+        UIFont *font;
         if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:fontSize]];
+            font = [UIFont fontWithName:block.family size:fontSize];
         } else {
             if (block.family != nil) {
                 [CPLog error:@"Font Family not found for text block: %@", block.family];
             }
-            [cell.txtCPBanner setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
+            font = [UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold];
         }
+
+        NSTextAlignment textAlignment;
+        switch (block.alignment) {
+            case CPAppBannerAlignmentRight:
+                textAlignment = NSTextAlignmentRight;
+                break;
+            case CPAppBannerAlignmentLeft:
+                textAlignment = NSTextAlignmentLeft;
+                break;
+            case CPAppBannerAlignmentCenter:
+                textAlignment = NSTextAlignmentCenter;
+                break;
+            default:
+                textAlignment = NSTextAlignmentCenter;
+                break;
+        }
+
+
+        NSAttributedString *attributedText = [CPUtils attributedStringFromHTML:textContent
+                                                                       withFont:font
+                                                                      textColor:textColor
+                                                                  textAlignment:textAlignment];
+        cell.txtCPBanner.attributedText = attributedText;
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         cell.txtCPBanner.translatesAutoresizingMaskIntoConstraints = false;
-        switch (block.alignment) {
-            case CPAppBannerAlignmentRight:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentRight;
-                break;
-            case CPAppBannerAlignmentLeft:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentLeft;
-                break;
-            case CPAppBannerAlignmentCenter:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentCenter;
-                break;
-        }
         return cell;
     } else {
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];

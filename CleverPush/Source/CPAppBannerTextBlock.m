@@ -1,5 +1,6 @@
 #import "CPAppBannerTextBlock.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerTextBlock
 
@@ -10,7 +11,27 @@
         self.type = CPAppBannerBlockTypeText;
 
         self.text = @"";
-        if ([json cleverPushStringForKey:@"text"]) {
+        
+        id delta = [json objectForKey:@"delta"];
+        if (delta != nil &&
+            ![delta isKindOfClass:[NSNull class]] &&
+            [delta isKindOfClass:[NSDictionary class]] &&
+            [(NSDictionary *)delta count] > 0) {
+            NSDictionary *deltaDict = (NSDictionary *)delta;
+            
+            if ([CPUtils deltaHasFormatting:deltaDict]) {
+                NSString *htmlFromDelta = [CPUtils htmlFromDelta:deltaDict];
+                if (htmlFromDelta && htmlFromDelta.length > 0) {
+                    self.text = htmlFromDelta;
+                } else if ([json cleverPushStringForKey:@"text"]) {
+                    self.text = [json cleverPushStringForKey:@"text"];
+                }
+            } else {
+                if ([json cleverPushStringForKey:@"text"]) {
+                    self.text = [json cleverPushStringForKey:@"text"];
+                }
+            }
+        } else if ([json cleverPushStringForKey:@"text"]) {
             self.text = [json cleverPushStringForKey:@"text"];
         }
 
