@@ -52,6 +52,7 @@
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 + (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize;
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)htmlString withFont:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment;
++ (NSAttributedString *)attributedStringFromDelta:(NSDictionary *)delta withFont:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment;
 + (NSString *)htmlFromDelta:(NSDictionary *)delta;
 + (BOOL)deltaHasFormatting:(NSDictionary *)delta;
 + (NSCache *)sharedImageCache;

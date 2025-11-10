@@ -411,10 +411,37 @@
                 break;
         }
 
-        NSAttributedString *attributedText = [CPUtils attributedStringFromHTML:textContent
-                                                                       withFont:font
-                                                                      textColor:textColor
-                                                                  textAlignment:textAlignment];
+        NSAttributedString *attributedText;
+        if (block.delta != nil && [block.delta isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *deltaToUse = block.delta;
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                NSMutableDictionary *mutableDelta = [block.delta mutableCopy];
+                NSArray *ops = [mutableDelta objectForKey:@"ops"];
+                if (ops && [ops isKindOfClass:[NSArray class]]) {
+                    NSMutableArray *mutableOps = [NSMutableArray array];
+                    for (NSDictionary *op in ops) {
+                        NSMutableDictionary *mutableOp = [op mutableCopy];
+                        NSString *insertText = [mutableOp objectForKey:@"insert"];
+                        if (insertText && [insertText isKindOfClass:[NSString class]]) {
+                            NSString *replacedText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:insertText];
+                            [mutableOp setObject:replacedText forKey:@"insert"];
+                        }
+                        [mutableOps addObject:mutableOp];
+                    }
+                    [mutableDelta setObject:mutableOps forKey:@"ops"];
+                    deltaToUse = mutableDelta;
+                }
+            }
+            attributedText = [CPUtils attributedStringFromDelta:deltaToUse
+                                                       withFont:font
+                                                      textColor:textColor
+                                                  textAlignment:textAlignment];
+        } else {
+            attributedText = [CPUtils attributedStringFromHTML:textContent
+                                                       withFont:font
+                                                      textColor:textColor
+                                                  textAlignment:textAlignment];
+        }
         cell.txtCPBanner.attributedText = attributedText;
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];

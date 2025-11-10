@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSString *darkColor;
 @property (nonatomic, strong) NSString *family;
 @property (nonatomic) int size;
+@property (nonatomic, strong) NSDictionary *delta;
 
 #pragma mark - Class Methods
 - (id)initWithJson:(NSDictionary*)json;

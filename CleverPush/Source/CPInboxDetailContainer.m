@@ -183,11 +183,18 @@
                 break;
         }
 
-
-        NSAttributedString *attributedText = [CPUtils attributedStringFromHTML:textContent
-                                                                       withFont:font
-                                                                      textColor:textColor
-                                                                  textAlignment:textAlignment];
+        NSAttributedString *attributedText;
+        if (block.delta != nil && [block.delta isKindOfClass:[NSDictionary class]]) {
+            attributedText = [CPUtils attributedStringFromDelta:block.delta
+                                                       withFont:font
+                                                      textColor:textColor
+                                                  textAlignment:textAlignment];
+        } else {
+            attributedText = [CPUtils attributedStringFromHTML:textContent
+                                                       withFont:font
+                                                      textColor:textColor
+                                                  textAlignment:textAlignment];
+        }
         cell.txtCPBanner.attributedText = attributedText;
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];

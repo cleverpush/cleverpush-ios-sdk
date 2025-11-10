@@ -1149,6 +1149,92 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return html;
 }
 
+#pragma mark - Convert Delta directly to NSAttributedString (Android-like approach)
++ (NSAttributedString *)attributedStringFromDelta:(NSDictionary *)delta withFont:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    if (!delta || ![delta isKindOfClass:[NSDictionary class]]) {
+        return [[NSAttributedString alloc] initWithString:@""];
+    }
+    
+    NSArray *ops = [delta objectForKey:@"ops"];
+    if (!ops || ![ops isKindOfClass:[NSArray class]] || ops.count == 0) {
+        return [[NSAttributedString alloc] initWithString:@""];
+    }
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] init];
+    
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = textAlignment;
+    
+    UIFont *baseFont = font ?: [UIFont systemFontOfSize:18.0];
+    UIColor *baseColor = textColor ?: [UIColor blackColor];
+    
+    NSDictionary *baseAttributes = @{
+        NSFontAttributeName: baseFont,
+        NSForegroundColorAttributeName: baseColor,
+        NSParagraphStyleAttributeName: paragraphStyle
+    };
+    
+    for (NSDictionary *op in ops) {
+        if (![op isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        
+        NSString *insertText = [op objectForKey:@"insert"];
+        if (!insertText || ![insertText isKindOfClass:[NSString class]]) {
+            continue;
+        }
+        
+        NSUInteger start = attributedString.length;
+        NSAttributedString *plainSegment = [[NSAttributedString alloc] initWithString:insertText];
+        [attributedString appendAttributedString:plainSegment];
+        NSUInteger end = attributedString.length;
+        
+        // Only apply formatting if text was actually added AND attributes exist (matching Android's: end > start && op.getAttributes() != null)
+        NSDictionary *attributes = [op objectForKey:@"attributes"];
+        if (end > start && attributes != nil && [attributes isKindOfClass:[NSDictionary class]]) {
+            BOOL isBold = [[attributes objectForKey:@"bold"] boolValue];
+            BOOL isItalic = [[attributes objectForKey:@"italic"] boolValue];
+            BOOL isUnderline = [[attributes objectForKey:@"underline"] boolValue];
+            BOOL isStrike = [[attributes objectForKey:@"strike"] boolValue];
+            
+            UIFont *currentFont = baseFont;
+            if (isBold && isItalic) {
+                UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold | UIFontDescriptorTraitItalic];
+                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+            } else if (isBold) {
+                UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+            } else if (isItalic) {
+                UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+            }
+            
+            NSMutableDictionary *textAttributes = [baseAttributes mutableCopy];
+            [textAttributes setObject:currentFont forKey:NSFontAttributeName];
+            
+            if (isUnderline) {
+                [textAttributes setObject:@(NSUnderlineStyleSingle) forKey:NSUnderlineStyleAttributeName];
+            }
+            
+            if (isStrike) {
+                [textAttributes setObject:@(NSUnderlineStyleSingle) forKey:NSStrikethroughStyleAttributeName];
+            }
+            
+            // Replace the plain segment with formatted version
+            NSRange range = NSMakeRange(start, end - start);
+            NSAttributedString *formattedSegment = [[NSAttributedString alloc] initWithString:insertText attributes:textAttributes];
+            [attributedString replaceCharactersInRange:range withAttributedString:formattedSegment];
+        } else if (end > start) {
+            // Apply base attributes if text was added but no formatting attributes
+            NSRange range = NSMakeRange(start, end - start);
+            NSAttributedString *baseSegment = [[NSAttributedString alloc] initWithString:insertText attributes:baseAttributes];
+            [attributedString replaceCharactersInRange:range withAttributedString:baseSegment];
+        }
+    }
+    
+    return attributedString;
+}
+
 #pragma mark - Convert HTML string to NSAttributedString
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)htmlString withFont:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
     if (!htmlString || htmlString.length == 0) {

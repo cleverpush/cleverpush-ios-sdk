@@ -11,6 +11,7 @@
         self.type = CPAppBannerBlockTypeText;
 
         self.text = @"";
+        self.delta = nil;
         
         id delta = [json objectForKey:@"delta"];
         if (delta != nil &&
@@ -20,16 +21,11 @@
             NSDictionary *deltaDict = (NSDictionary *)delta;
             
             if ([CPUtils deltaHasFormatting:deltaDict]) {
-                NSString *htmlFromDelta = [CPUtils htmlFromDelta:deltaDict];
-                if (htmlFromDelta && htmlFromDelta.length > 0) {
-                    self.text = htmlFromDelta;
-                } else if ([json cleverPushStringForKey:@"text"]) {
-                    self.text = [json cleverPushStringForKey:@"text"];
-                }
-            } else {
-                if ([json cleverPushStringForKey:@"text"]) {
-                    self.text = [json cleverPushStringForKey:@"text"];
-                }
+                self.delta = deltaDict;
+            }
+        
+            if ([json cleverPushStringForKey:@"text"]) {
+                self.text = [json cleverPushStringForKey:@"text"];
             }
         } else if ([json cleverPushStringForKey:@"text"]) {
             self.text = [json cleverPushStringForKey:@"text"];
