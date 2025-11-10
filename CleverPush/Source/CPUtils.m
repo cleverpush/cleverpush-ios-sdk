@@ -1189,8 +1189,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         NSAttributedString *plainSegment = [[NSAttributedString alloc] initWithString:insertText];
         [attributedString appendAttributedString:plainSegment];
         NSUInteger end = attributedString.length;
-        
-        // Only apply formatting if text was actually added AND attributes exist (matching Android's: end > start && op.getAttributes() != null)
         NSDictionary *attributes = [op objectForKey:@"attributes"];
         if (end > start && attributes != nil && [attributes isKindOfClass:[NSDictionary class]]) {
             BOOL isBold = [[attributes objectForKey:@"bold"] boolValue];
@@ -1228,15 +1226,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             NSMutableDictionary *textAttributes = [baseAttributes mutableCopy];
             [textAttributes setObject:currentFont forKey:NSFontAttributeName];
             
-            // Apply inline color if specified in attributes (overrides base color)
-            NSString *inlineColorHex = [attributes objectForKey:@"color"];
-            if (inlineColorHex && [inlineColorHex isKindOfClass:[NSString class]] && inlineColorHex.length > 0) {
-                UIColor *inlineColor = [UIColor colorWithHexString:inlineColorHex];
-                if (inlineColor != nil) {
-                    [textAttributes setObject:inlineColor forKey:NSForegroundColorAttributeName];
-                }
-            }
-            
             if (isUnderline) {
                 [textAttributes setObject:@(NSUnderlineStyleSingle) forKey:NSUnderlineStyleAttributeName];
             }
@@ -1245,12 +1234,10 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                 [textAttributes setObject:@(NSUnderlineStyleSingle) forKey:NSStrikethroughStyleAttributeName];
             }
             
-            // Replace the plain segment with formatted version
             NSRange range = NSMakeRange(start, end - start);
             NSAttributedString *formattedSegment = [[NSAttributedString alloc] initWithString:insertText attributes:textAttributes];
             [attributedString replaceCharactersInRange:range withAttributedString:formattedSegment];
         } else if (end > start) {
-            // Apply base attributes if text was added but no formatting attributes
             NSRange range = NSMakeRange(start, end - start);
             NSAttributedString *baseSegment = [[NSAttributedString alloc] initWithString:insertText attributes:baseAttributes];
             [attributedString replaceCharactersInRange:range withAttributedString:baseSegment];

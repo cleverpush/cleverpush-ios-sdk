@@ -429,7 +429,6 @@
                             }
                             [mutableOps addObject:mutableOp];
                         } else {
-                            // Preserve non-dictionary ops (shouldn't happen in valid delta, but be safe)
                             [mutableOps addObject:op];
                         }
                     }
