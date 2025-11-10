@@ -420,16 +420,18 @@
                 if (ops && [ops isKindOfClass:[NSArray class]]) {
                     NSMutableArray *mutableOps = [NSMutableArray array];
                     for (id op in ops) {
-                        if (![op isKindOfClass:[NSDictionary class]]) {
-                            continue;
+                        if ([op isKindOfClass:[NSDictionary class]]) {
+                            NSMutableDictionary *mutableOp = [(NSDictionary *)op mutableCopy];
+                            NSString *insertText = [mutableOp objectForKey:@"insert"];
+                            if (insertText && [insertText isKindOfClass:[NSString class]]) {
+                                NSString *replacedText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:insertText];
+                                [mutableOp setObject:replacedText forKey:@"insert"];
+                            }
+                            [mutableOps addObject:mutableOp];
+                        } else {
+                            // Preserve non-dictionary ops (shouldn't happen in valid delta, but be safe)
+                            [mutableOps addObject:op];
                         }
-                        NSMutableDictionary *mutableOp = [(NSDictionary *)op mutableCopy];
-                        NSString *insertText = [mutableOp objectForKey:@"insert"];
-                        if (insertText && [insertText isKindOfClass:[NSString class]]) {
-                            NSString *replacedText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:insertText];
-                            [mutableOp setObject:replacedText forKey:@"insert"];
-                        }
-                        [mutableOps addObject:mutableOp];
                     }
                     [mutableDelta setObject:mutableOps forKey:@"ops"];
                     deltaToUse = mutableDelta;

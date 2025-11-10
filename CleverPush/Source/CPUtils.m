@@ -6,6 +6,7 @@
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
 #import "CPAppBannerViewController.h"
+#import "UIColor+HexString.h"
 
 static BOOL existanceOfNewTopic = NO;
 static BOOL topicsDialogShowWhenNewAdded = NO;
@@ -1226,6 +1227,15 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             
             NSMutableDictionary *textAttributes = [baseAttributes mutableCopy];
             [textAttributes setObject:currentFont forKey:NSFontAttributeName];
+            
+            // Apply inline color if specified in attributes (overrides base color)
+            NSString *inlineColorHex = [attributes objectForKey:@"color"];
+            if (inlineColorHex && [inlineColorHex isKindOfClass:[NSString class]] && inlineColorHex.length > 0) {
+                UIColor *inlineColor = [UIColor colorWithHexString:inlineColorHex];
+                if (inlineColor != nil) {
+                    [textAttributes setObject:inlineColor forKey:NSForegroundColorAttributeName];
+                }
+            }
             
             if (isUnderline) {
                 [textAttributes setObject:@(NSUnderlineStyleSingle) forKey:NSUnderlineStyleAttributeName];
