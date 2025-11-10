@@ -419,8 +419,11 @@
                 NSArray *ops = [mutableDelta objectForKey:@"ops"];
                 if (ops && [ops isKindOfClass:[NSArray class]]) {
                     NSMutableArray *mutableOps = [NSMutableArray array];
-                    for (NSDictionary *op in ops) {
-                        NSMutableDictionary *mutableOp = [op mutableCopy];
+                    for (id op in ops) {
+                        if (![op isKindOfClass:[NSDictionary class]]) {
+                            continue;
+                        }
+                        NSMutableDictionary *mutableOp = [(NSDictionary *)op mutableCopy];
                         NSString *insertText = [mutableOp objectForKey:@"insert"];
                         if (insertText && [insertText isKindOfClass:[NSString class]]) {
                             NSString *replacedText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:insertText];
