@@ -1200,13 +1200,28 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             UIFont *currentFont = baseFont;
             if (isBold && isItalic) {
                 UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold | UIFontDescriptorTraitItalic];
-                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                if (fontDescriptor != nil) {
+                    UIFont *font = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                    if (font != nil) {
+                        currentFont = font;
+                    }
+                }
             } else if (isBold) {
                 UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                if (fontDescriptor != nil) {
+                    UIFont *font = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                    if (font != nil) {
+                        currentFont = font;
+                    }
+                }
             } else if (isItalic) {
                 UIFontDescriptor *fontDescriptor = [baseFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-                currentFont = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                if (fontDescriptor != nil) {
+                    UIFont *font = [UIFont fontWithDescriptor:fontDescriptor size:baseFont.pointSize];
+                    if (font != nil) {
+                        currentFont = font;
+                    }
+                }
             }
             
             NSMutableDictionary *textAttributes = [baseAttributes mutableCopy];
@@ -1257,7 +1272,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     
     NSString *fontFamily = font.fontName ?: @"system-ui";
     CGFloat fontSize = font.pointSize;
-    NSString *colorHex = [self hexStringFromColor:textColor];
+    UIColor *safeColor = textColor ?: [UIColor blackColor];
+    NSString *colorHex = [self hexStringFromColor:safeColor];
     
     NSString *alignmentString = @"center";
     switch (textAlignment) {
