@@ -371,11 +371,7 @@
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
         CPAppBannerTextBlock *block = (CPAppBannerTextBlock*) self.blocks[indexPath.row];
 
-        cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
-        if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-            cell.txtCPBanner.text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
-        }
 
         UIColor *textColor;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
@@ -383,31 +379,63 @@
         } else {
             textColor = [UIColor colorWithHexString:block.color];
         }
-        cell.txtCPBanner.textColor = textColor;
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
+        UIFont *font;
         if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:fontSize]];
+            font = [UIFont fontWithName:block.family size:fontSize];
         } else {
             if (block.family != nil) {
                 [CPLog error:@"Font Family not found for text block: %@", block.family];
             }
-            [cell.txtCPBanner setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
+            font = [UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold];
+        }
+
+        NSTextAlignment textAlignment;
+        switch (block.alignment) {
+            case CPAppBannerAlignmentRight:
+                textAlignment = NSTextAlignmentRight;
+                break;
+            case CPAppBannerAlignmentLeft:
+                textAlignment = NSTextAlignmentLeft;
+                break;
+            case CPAppBannerAlignmentCenter:
+            default:
+                textAlignment = NSTextAlignmentCenter;
+                break;
+        }
+
+        cell.txtCPBanner.textAlignment = textAlignment;
+        cell.txtCPBanner.font = font;
+        cell.txtCPBanner.textColor = textColor;
+        
+        if (![CPUtils isNullOrEmpty:block.html]) {
+            NSString *htmlToRender = block.html;
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                htmlToRender = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.html];
+            }
+            
+            NSAttributedString *attributedString = [CPUtils attributedStringFromHTML:htmlToRender font:font textColor:textColor textAlignment:textAlignment];
+            if (attributedString != nil) {
+                cell.txtCPBanner.attributedText = attributedString;
+            } else {
+                NSString *fallbackText = block.text;
+                if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                    fallbackText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
+                }
+                cell.txtCPBanner.text = fallbackText;
+            }
+        } else {
+            NSString *text = block.text;
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
+            }
+            cell.txtCPBanner.text = text;
         }
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         cell.txtCPBanner.translatesAutoresizingMaskIntoConstraints = false;
-        switch (block.alignment) {
-            case CPAppBannerAlignmentRight:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentRight;
-                break;
-            case CPAppBannerAlignmentLeft:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentLeft;
-                break;
-            case CPAppBannerAlignmentCenter:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentCenter;
-                break;
-        }
+        
         return cell;
     } else {
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
