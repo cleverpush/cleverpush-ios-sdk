@@ -1,3 +1,7 @@
+## 1.34.32 (18.11.2025)
+* Resolved the issue of the carousel not displaying the current page properly after scrolling to another screen in in-app banners.
+* Implemented rich text decorations in app banner text fields: bold, italic, underline, and strikethrough.
+
 ## 1.34.31 (16.10.2025)
 * Optimized  `updateBannerFrequencyForBanner` function for displaying banner where frequency is every x days.
 
