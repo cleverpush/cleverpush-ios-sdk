@@ -568,34 +568,15 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
-                // Temporarily disable scrolling to prevent unwanted animations
-                BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
-                self.cardCollectionView.scrollEnabled = NO;
-                
-                // Update the page control first
+                self.index = i;
                 self.pageControl.currentPage = i;
                 [self pageControlCurrentIndex:i];
                 
-                if (self.data.carouselEnabled) {
-                    // Scroll with a smooth animation
-                    [UIView animateWithDuration:0.3 animations:^{
-                        [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-                        [self.cardCollectionView layoutIfNeeded];
-                    } completion:^(BOOL finished) {
-                        // Re-enable scrolling after animation completes
-                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-                    }];
-                } else {
-                    // For non-carousel mode, use a different approach
-                    [UIView animateWithDuration:0.3 animations:^{
-                        CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
-                        [self.cardCollectionView scrollRectToVisible:rect animated:NO];
-                        [self.cardCollectionView layoutIfNeeded];
-                    } completion:^(BOOL finished) {
-                        // Re-enable scrolling after animation completes
-                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-                    }];
-                }
+                [self.cardCollectionView scrollToItemAtIndexPath:nextItem 
+                                                 atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally 
+                                                         animated:YES];
+                
+                [self ensureCurrentPageIsProperlyDisplayed:i];
                 break;
             }
         }
@@ -609,25 +590,17 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 - (void)navigateToPreviousPage {
     NSInteger previousIndex = self.index - 1;
-    if (previousIndex >= 0) {
-        // Temporarily disable scrolling to prevent unwanted animations
-        BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
-        self.cardCollectionView.scrollEnabled = NO;
-        
-        // Update the page control first
+    if (previousIndex >= 0 && previousIndex < self.data.screens.count) {
+        self.index = previousIndex;
         self.pageControl.currentPage = previousIndex;
         [self pageControlCurrentIndex:previousIndex];
         
         NSIndexPath *previousItem = [NSIndexPath indexPathForItem:previousIndex inSection:0];
+        [self.cardCollectionView scrollToItemAtIndexPath:previousItem 
+                                         atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally 
+                                                 animated:YES];
         
-        // Scroll with a smooth animation
-        [UIView animateWithDuration:0.3 animations:^{
-            [self.cardCollectionView scrollToItemAtIndexPath:previousItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-            [self.cardCollectionView layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            // Re-enable scrolling after animation completes
-            self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-        }];
+        [self ensureCurrentPageIsProperlyDisplayed:previousIndex];
     }
 }
 
@@ -653,36 +626,51 @@ static CPAppBannerActionBlock appBannerActionCallback;
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl
+- (NSInteger)calculateCurrentPage:(UIScrollView *)scrollView {
+    CGFloat pageWidth = scrollView.frame.size.width;
+    if (pageWidth == 0) {
+        return self.pageControl.currentPage;
+    }
+    
+    if (self.data.screens.count == 0) {
+        return 0;
+    }
+    
+    CGFloat centerX = scrollView.contentOffset.x + (pageWidth / 2.0);
+    NSInteger page = (NSInteger)(centerX / pageWidth);
+    
+    if (page < 0) {
+        page = 0;
+    } else if (page >= self.data.screens.count) {
+        page = self.data.screens.count - 1;
+    }
+    
+    return page;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    NSInteger currentPage = [self calculateCurrentPage:scrollView];
+    if (currentPage != self.pageControl.currentPage && currentPage >= 0 && currentPage < self.data.screens.count) {
+        self.pageControl.currentPage = currentPage;
+    }
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    CGFloat pageWidth = self.cardCollectionView.frame.size.width;
-    float currentPage = self.cardCollectionView.contentOffset.x / pageWidth;
-    
-    NSInteger page = round(currentPage);
-    
-    // Only update if the page has actually changed
-    if (page != self.pageControl.currentPage) {
-        // Update page control and index
+    NSInteger page = [self calculateCurrentPage:scrollView];
+    if (page >= 0 && page < self.data.screens.count) {
         self.pageControl.currentPage = page;
         self.index = page;
         [self pageControlCurrentIndex:page];
-        
-        // Ensure the current page is fully visible and properly laid out
         [self ensureCurrentPageIsProperlyDisplayed:page];
     }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
-    CGFloat pageWidth = self.cardCollectionView.frame.size.width;
-    NSInteger page = round(scrollView.contentOffset.x / pageWidth);
-    
-    // Only update if the page has actually changed
-    if (page != self.pageControl.currentPage) {
-        // Update page control and index
+    NSInteger page = [self calculateCurrentPage:scrollView];
+    if (page >= 0 && page < self.data.screens.count) {
         self.pageControl.currentPage = page;
         self.index = page;
         [self pageControlCurrentIndex:page];
-        
-        // Ensure the current page is fully visible and properly laid out
         [self ensureCurrentPageIsProperlyDisplayed:page];
     }
 }
