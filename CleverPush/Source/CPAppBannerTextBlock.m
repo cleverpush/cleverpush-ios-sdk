@@ -14,6 +14,11 @@
             self.text = [json cleverPushStringForKey:@"text"];
         }
 
+        self.html = @"";
+        if ([json cleverPushStringForKey:@"html"] && ![[json cleverPushStringForKey:@"html"] isEqual:@""]) {
+            self.html = [json cleverPushStringForKey:@"html"];
+        }
+
         self.color = @"#000000";
         if ([json cleverPushStringForKey:@"color"] && ![[json cleverPushStringForKey:@"color"] isEqual:@""]) {
             self.color = [json cleverPushStringForKey:@"color"];

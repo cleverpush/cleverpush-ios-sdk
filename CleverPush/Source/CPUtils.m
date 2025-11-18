@@ -1054,4 +1054,62 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return sharedImageCache;
 }
 
+#pragma mark - Convert HTML to NSAttributedString
++ (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    NSString *colorHex = [CPUtils hexStringFromColor:textColor];
+    NSString *htmlString = [NSString stringWithFormat:
+        @"<style>body{font-family:'-apple-system';font-size:%.0fpx;color:%@;margin:0;padding:0;}</style>%@",
+        font.pointSize, colorHex, html];
+    
+    NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *options = @{
+        NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+        NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)
+    };
+    
+    NSError *error = nil;
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:data options:options documentAttributes:nil error:&error];
+    
+    if (error || attributedString.length == 0) {
+        return nil;
+    }
+    
+    [attributedString enumerateAttribute:NSFontAttributeName
+                                 inRange:NSMakeRange(0, attributedString.length)
+                                 options:0
+                              usingBlock:^(id value, NSRange range, BOOL *stop) {
+        UIFont *oldFont = (UIFont *)value;
+        UIFont *newFont = font;
+        
+        if (oldFont) {
+            UIFontDescriptorSymbolicTraits traits = oldFont.fontDescriptor.symbolicTraits;
+            if (traits & UIFontDescriptorTraitBold || traits & UIFontDescriptorTraitItalic) {
+                UIFontDescriptor *descriptor = [font.fontDescriptor fontDescriptorWithSymbolicTraits:traits];
+                if (descriptor) {
+                    newFont = [UIFont fontWithDescriptor:descriptor size:font.pointSize];
+                }
+            }
+        }
+        [attributedString addAttribute:NSFontAttributeName value:newFont range:range];
+    }];
+    
+    [attributedString addAttribute:NSForegroundColorAttributeName value:textColor range:NSMakeRange(0, attributedString.length)];
+    
+    [attributedString enumerateAttribute:NSParagraphStyleAttributeName
+                                 inRange:NSMakeRange(0, attributedString.length)
+                                 options:0
+                              usingBlock:^(id value, NSRange range, BOOL *stop) {
+        NSMutableParagraphStyle *paragraphStyle;
+        if (value) {
+            paragraphStyle = [value mutableCopy];
+        } else {
+            paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        }
+        paragraphStyle.alignment = textAlignment;
+        [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
+    }];
+    
+    return attributedString;
+}
+
 @end
