@@ -20,9 +20,6 @@
                     <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bML-n5-N5M">
                         <rect key="frame" x="359" y="12" width="53" height="30"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="51" id="r7v-cT-MeZ"/>
-                        </constraints>
                     </switch>
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="y6r-2E-dMa">
                         <rect key="frame" x="0.0" y="10" width="354" height="34"/>
