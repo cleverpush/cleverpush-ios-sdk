@@ -7,6 +7,8 @@
 
 static CGFloat const CPTopicHeight = 44;
 static CGFloat const CPTopicCellLeading = 5.0;
+static CGFloat const CPTopicSwitchTrailingDefault = 5.0;
+static CGFloat const CPTopicSwitchTrailingiOS26 = 10.0;
 static CGFloat const CPTopicHeightDivider = 2.0f;
 static CGFloat const CPConstraints = 30.0;
 
@@ -279,9 +281,14 @@ static CGFloat const CPConstraints = 30.0;
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, CPTopicHeight)];
     
+    CGFloat switchTrailing = CPTopicSwitchTrailingDefault;
+    if (@available(iOS 26.0, *)) {
+        switchTrailing = CPTopicSwitchTrailingiOS26;
+    }
+    
     UISwitch* deselectSwitch = [[UISwitch alloc] init];
     CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, switchSize.width, switchSize.height);
+    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + switchTrailing), (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, switchSize.width, switchSize.height);
     
     if ([CleverPush getNormalTintColor]) {
         deselectSwitch.onTintColor = [CleverPush getNormalTintColor];
@@ -300,7 +307,7 @@ static CGFloat const CPConstraints = 30.0;
     
     UILabel* deselectEverything = [[UILabel alloc] init];
     deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
-    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + CPTopicCellLeading), switchSize.height);
+    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + switchTrailing + CPTopicCellLeading), switchSize.height);
     [headerView addSubview:deselectEverything];
     
     return headerView;
