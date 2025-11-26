@@ -1,3 +1,7 @@
+## 1.34.33 (26.11.2025)
+* Resolved the crash issue while rotating the screens in app banner.
+* Resolved the UI issue with the UISwitch overlapping in iOS-26.
+
 ## 1.34.32 (18.11.2025)
 * Resolved the issue of the carousel not displaying the current page properly after scrolling to another screen in in-app banners.
 * Implemented rich text decorations in app banner text fields: bold, italic, underline, and strikethrough.
