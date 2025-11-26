@@ -522,16 +522,18 @@ static CPAppBannerActionBlock appBannerActionCallback;
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     }
 
-    [cell.tblCPBanner layoutIfNeeded];
-    [cell.tblCPBanner updateConstraintsIfNeeded];
-    [cell layoutIfNeeded];
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
-    [cell setNeedsLayout];
-    [cell layoutIfNeeded];
+    CPBannerCardContainer *bannerCell = (CPBannerCardContainer *)cell;
+    
+    if ([bannerCell respondsToSelector:@selector(updateTableViewContentInset)]) {
+        [bannerCell updateTableViewContentInset];
+    }
+    
+    [bannerCell setNeedsLayout];
+    [bannerCell layoutIfNeeded];
 }
 
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
@@ -684,10 +686,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (cell) {
             // Use performWithoutAnimation to prevent laggy updates
             [UIView performWithoutAnimation:^{
-                // Force the cell to update its layout
-                [cell.tblCPBanner reloadData];
-                
-                // Call methods if they are available
                 if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
                     [cell updateTableViewContentInset];
                 }

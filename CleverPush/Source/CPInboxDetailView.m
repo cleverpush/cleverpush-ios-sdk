@@ -158,15 +158,13 @@
     cell.changePage = self;
     cell.controller = self;
     [cell.tblCPBanner reloadData];
-    [cell setNeedsLayout];
-    [cell layoutIfNeeded];
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
-    [((CPInboxDetailContainer *)cell).tblCPBanner reloadData];
-    [cell setNeedsLayout];
-    [cell layoutIfNeeded];
+    CPInboxDetailContainer *detailCell = (CPInboxDetailContainer *)cell;
+    [detailCell setNeedsLayout];
+    [detailCell layoutIfNeeded];
 }
 
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
