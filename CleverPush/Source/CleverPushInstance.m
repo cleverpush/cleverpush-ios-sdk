@@ -1938,6 +1938,25 @@ static id isNil(id object) {
         }
     }
     
+    NSString *notificationDeeplinkId = nil;
+    NSString *notificationUrl = [notification objectForKey:@"url"];
+    
+    if (notificationUrl != nil && ![notificationUrl isKindOfClass:[NSNull class]] && [notificationUrl length] > 0) {
+        NSURL *notificationURL = [NSURL URLWithString:notificationUrl];
+        if (notificationURL) {
+            notificationDeeplinkId = [CPUtils getQueryParameterFromURL:notificationURL forKey:@"deeplinkId"];
+        }
+    }
+    
+    if (notificationDeeplinkId && ![CPUtils isNullOrEmpty:notificationDeeplinkId]) {
+        [userDefaults setObject:notificationDeeplinkId forKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+        [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+    } else {
+        [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+        [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+    }
+    [userDefaults synchronize];
+    
     BOOL hasValidUrl = notification != nil &&
                        [notification objectForKey:@"url"] != nil &&
                        ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
@@ -1952,17 +1971,6 @@ static id isNil(id object) {
     BOOL hasValidDeepLink = hasValidUrl && shouldAutoHandleDeepLink;
     if (hasValidDeepLink) {
         [CPAppBannerModuleInstance updateBannersForDeepLinkWithURL:[NSURL URLWithString:[notification objectForKey:@"url"]]];
-        
-        NSURL *notificationURL = [NSURL URLWithString:[notification objectForKey:@"url"]];
-        if (notificationURL) {
-            NSString *deeplinkId = [CPUtils getQueryParameterFromURL:notificationURL forKey:@"deeplinkId"];
-            if (deeplinkId && ![CPUtils isNullOrEmpty:deeplinkId]) {
-                [userDefaults setObject:deeplinkId forKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
-            } else {
-                [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
-            }
-            [userDefaults synchronize];
-        }
     }
 
     if (notification != nil && [notification objectForKey:@"appBanner"] != nil && ![[notification objectForKey:@"appBanner"] isKindOfClass:[NSNull class]] && ![[notification objectForKey:@"appBanner"] isEqualToString:@""]) {
@@ -3424,8 +3432,13 @@ static id isNil(id object) {
                     }
                     
                     NSString* lastDeeplinkId = [userDefaults stringForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
-                    if (![CPUtils isNullOrEmpty:lastDeeplinkId]) {
-                        [dataDic setObject:lastDeeplinkId forKey:@"deeplinkId"];
+                    NSDate* lastDeeplinkTimeStamp = [userDefaults objectForKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+                    
+                    if (![CPUtils isNullOrEmpty:lastDeeplinkId] && lastDeeplinkTimeStamp != nil && [lastDeeplinkTimeStamp isKindOfClass:[NSDate class]]) {
+                        NSTimeInterval secondsSinceLastDeeplinkClick = [[NSDate date] timeIntervalSinceDate:lastDeeplinkTimeStamp];
+                        if (secondsSinceLastDeeplinkClick <= 60 * 60) {
+                            [dataDic setObject:lastDeeplinkId forKey:@"deeplinkId"];
+                        }
                     }
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
