@@ -136,7 +136,11 @@ int appBannerPerDayValue = 0;
                     break;
                 }
                 if (![CPUtils isNullOrEmpty:notificationId]) {
-                    [self validatePushBannerTrigger:banner force:force notificationId:notificationId];
+                    if (banner.triggers.count > 0) {
+                        [self validatePushBannerTrigger:banner force:force notificationId:notificationId];
+                    } else {
+                        [self showBanner:banner force:force notificationId:notificationId];
+                    }
                 } else {
                     [self showBanner:banner force:force];
                 }
