@@ -1166,7 +1166,7 @@ int appBannerPerDayValue = 0;
                     NSMutableArray<CPAppBannerTriggerCondition *> *eventTriggers = [NSMutableArray array];
 
                     for (CPAppBannerTriggerCondition *triggerCondition in trigger.conditions) {
-                        if (triggerCondition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
+                        if (triggerCondition.type == CPAppBannerTriggerConditionTypeEvent) {
                             [eventTriggers addObject:triggerCondition];
                         }
                     }
