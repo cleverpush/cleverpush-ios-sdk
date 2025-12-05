@@ -1,3 +1,7 @@
+## 1.34.34 (05.12.2025)
+* Optimized TrackEvent functionality to prevent crashes.
+* Resolved an issue where the `AppBanner` trigger was not being checked when received through push.
+
 ## 1.34.33 (26.11.2025)
 * Resolved the crash issue while rotating the screens in app banner.
 * Resolved the UI issue with the UISwitch overlapping in iOS-26.
