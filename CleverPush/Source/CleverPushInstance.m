@@ -3421,20 +3421,17 @@ static id isNil(id object) {
                 }];
             }];
 
-            [CPAppBannerModule setCurrentEventId:eventId];
-            [CPAppBannerModule triggerEvent:eventId properties:properties];
             if ([properties count] > 0) {
                 for (NSString *key in properties) {
                     id value = [properties objectForKey:key];
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                        [databaseManager updateCountForEventWithId:eventId eventValue:[NSString stringWithFormat:@"%@", value] eventProperty:[NSString stringWithFormat:@"%@", key] updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
-                    });
+                    [databaseManager updateCountForEventWithId:eventId eventValue:[NSString stringWithFormat:@"%@", value] eventProperty:[NSString stringWithFormat:@"%@", key] updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
                 }
             } else {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [databaseManager updateCountForEventWithId:eventId eventValue:@"" eventProperty:@"" updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
-                });
+                [databaseManager updateCountForEventWithId:eventId eventValue:@"" eventProperty:@"" updatedDateTime:[CPUtils getCurrentTimestampWithFormat:@"yyyy-MM-dd HH:mm:ss"]];
             }
+            
+            [CPAppBannerModule setCurrentEventId:eventId];
+            [CPAppBannerModule triggerEvent:eventId properties:properties];
         }];
     });
 }

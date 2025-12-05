@@ -8,7 +8,6 @@
 
 static CPSQLiteManager *sharedInstance = nil;
 NSString *databaseTable = @"cleverpush_tracked_events";
-sqlite3 *database;
 
 + (CPSQLiteManager *)sharedManager {
     static dispatch_once_t onceToken;
@@ -55,6 +54,7 @@ sqlite3 *database;
     [_databaseLock lock];
     BOOL success = NO;
 
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         sqlite3_close(database);
         success = YES;
@@ -71,6 +71,7 @@ sqlite3 *database;
     [_databaseLock lock];
     BOOL tableExists = NO;
 
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT name FROM sqlite_master WHERE type='table' AND name='%@';", tableName];
         sqlite3_stmt *statement;
@@ -94,6 +95,7 @@ sqlite3 *database;
     BOOL success = YES;
 
     if (![self databaseTableExists:databaseTable]) {
+        sqlite3 *database = NULL;
         if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
             NSString *createTableSQL = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@ (id INTEGER PRIMARY KEY AUTOINCREMENT, bannerId TEXT, eventId TEXT, property TEXT, value TEXT, relation TEXT, count INTEGER DEFAULT 1, createdDateTime TEXT, updatedDateTime TEXT, fromValue TEXT, toValue TEXT, eventProperty TEXT, eventValue TEXT, eventRelation TEXT);", databaseTable];
             char *errMsg;
@@ -115,6 +117,7 @@ sqlite3 *database;
 #pragma mark - to update the database schema if needed
 - (void)updateDatabaseSchemaIfNeeded {
     [_databaseLock lock];
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSArray *newColumns = @[@"eventProperty", @"eventValue", @"eventRelation"];
         for (NSString *column in newColumns) {
@@ -177,6 +180,7 @@ sqlite3 *database;
     if (!eventValue) eventValue = @"";
     if (!eventRelation) eventRelation = @"";
 
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *selectSQL = [NSString stringWithFormat:
                                @"SELECT 1 FROM %@ WHERE bannerId = ? AND eventId = ? AND property = ? AND value = ? AND relation = ? AND eventProperty = ? AND eventValue = ? AND eventRelation = ? LIMIT 1;", databaseTable];
@@ -244,6 +248,7 @@ sqlite3 *database;
         return NO;
     }
 
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *updateSQL = [NSString stringWithFormat:
                                @"UPDATE %@ SET count = count + 1, updatedDateTime = ? "
@@ -282,6 +287,7 @@ sqlite3 *database;
         return recordArray;
     }
 
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSString *query = [NSString stringWithFormat:@"SELECT * FROM %@;", databaseTable];
         sqlite3_stmt *statement;
@@ -377,6 +383,10 @@ sqlite3 *database;
 
 #pragma mark - to delete the records from certain past days
 - (BOOL)deleteDataBasedOnRetentionDays:(NSInteger)days {
+    [_databaseLock lock];
+    BOOL success = NO;
+
+    sqlite3 *database = NULL;
     if (sqlite3_open([[self databasePath] UTF8String], &database) == SQLITE_OK) {
         NSTimeInterval timeInterval = [[NSDate date] timeIntervalSince1970] - (days * 24 * 60 * 60);
         NSDate *dateToDelete = [NSDate dateWithTimeIntervalSince1970:timeInterval];
@@ -384,14 +394,12 @@ sqlite3 *database;
         [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
         NSString *dateToDeleteString = [dateFormatter stringFromDate:dateToDelete];
         NSString *deleteSQL = [NSString stringWithFormat:@"DELETE FROM %@ WHERE createdDateTime <= ?;", databaseTable];
-        sqlite3_stmt *deleteStatement;
+        sqlite3_stmt *deleteStatement = NULL;
 
         if (sqlite3_prepare_v2(database, [deleteSQL UTF8String], -1, &deleteStatement, nil) == SQLITE_OK) {
             sqlite3_bind_text(deleteStatement, 1, [dateToDeleteString UTF8String], -1, SQLITE_STATIC);
             if (sqlite3_step(deleteStatement) == SQLITE_DONE) {
-                sqlite3_finalize(deleteStatement);
-                sqlite3_close(database);
-                return YES;
+                success = YES;
             } else {
                 [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to execute the delete statement: %s", sqlite3_errmsg(database)];
             }
@@ -399,13 +407,16 @@ sqlite3 *database;
             [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to prepare the delete statement: %s", sqlite3_errmsg(database)];
         }
 
-        sqlite3_finalize(deleteStatement);
+        if (deleteStatement != NULL) {
+            sqlite3_finalize(deleteStatement);
+        }
         sqlite3_close(database);
     } else {
         [CPLog debug:@"CPSQLiteManager: deleteDataBasedOnRetentionDays: Failed to open the database: %s", sqlite3_errmsg(database)];
     }
 
-    return NO;
+    [_databaseLock unlock];
+    return success;
 }
 
 @end
