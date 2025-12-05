@@ -136,7 +136,11 @@ int appBannerPerDayValue = 0;
                     break;
                 }
                 if (![CPUtils isNullOrEmpty:notificationId]) {
-                    [self showBanner:banner force:force notificationId:notificationId];
+                    if (banner.triggers.count > 0) {
+                        [self validatePushBannerTrigger:banner force:force notificationId:notificationId];
+                    } else {
+                        [self showBanner:banner force:force notificationId:notificationId];
+                    }
                 } else {
                     [self showBanner:banner force:force];
                 }
@@ -1132,6 +1136,107 @@ int appBannerPerDayValue = 0;
         if (!contains) {
             [activeBanners addObject:banner];
         }
+    }
+}
+
+#pragma mark - Validate push notification banner trigger.
+- (void)validatePushBannerTrigger:(CPAppBanner*)banner force:(BOOL)force notificationId:(NSString*)notificationId {
+    BOOL triggers = NO;
+    BOOL isTriggerCondition = NO;
+    BOOL isTargetEvent = NO;
+    BOOL targetEvents = YES;
+    int delaySeconds = 0;
+
+    if (banner.triggerType == CPAppBannerTriggerTypeConditions) {
+        isTriggerCondition = YES;
+        for (CPAppBannerTrigger *trigger in banner.triggers) {
+            BOOL triggerTrue = YES;
+            for (CPAppBannerTriggerCondition *condition in trigger.conditions) {
+                BOOL conditionTrue = YES;
+                if (condition.type == CPAppBannerTriggerConditionTypeDuration) {
+                    delaySeconds = condition.seconds;
+                } else if (condition.type == CPAppBannerTriggerConditionTypeSessions) {
+                    if (condition.relation != nil && [condition.relation isEqualToString:@"lt"]) {
+                        conditionTrue = sessions < condition.sessions;
+                    } else {
+                        conditionTrue = sessions > condition.sessions;
+                    }
+                } else if (condition.type == CPAppBannerTriggerConditionTypeEvent && condition.event != nil && events != nil) {
+                    NSUInteger eventConditionCount = 1;
+                    NSMutableArray<CPAppBannerTriggerCondition *> *eventTriggers = [NSMutableArray array];
+
+                    for (CPAppBannerTriggerCondition *triggerCondition in trigger.conditions) {
+                        if (triggerCondition.type == CPAppBannerTriggerConditionTypeEvent) {
+                            [eventTriggers addObject:triggerCondition];
+                        }
+                    }
+
+                    eventConditionCount = eventTriggers.count;
+                    BOOL isMultipleEvent = eventConditionCount > 1;
+
+                    conditionTrue = [self checkEventTriggerCondition:condition
+                                                      isMultipleEvent:isMultipleEvent
+                                                         eventTriggers:eventTriggers];
+                } else if (condition.type == CPAppBannerTriggerConditionTypeDeepLink) {
+                    conditionTrue = [self checkDeepLinkTriggerCondition:condition];
+                } else if (condition.type == CPAppBannerTriggerConditionTypeDaysSinceInitialization) {
+                    conditionTrue = [self checkDaysSinceInstallationTriggerCondition:condition];
+                } else {
+                    conditionTrue = NO;
+                }
+
+                if (!conditionTrue) {
+                    triggerTrue = NO;
+                    break;
+                }
+            }
+
+            if (triggerTrue) {
+                triggers = YES;
+                break;
+            }
+        }
+    }
+
+    if (banner.eventFilters && banner.eventFilters.count > 0) {
+        isTargetEvent = YES;
+        targetEvents = [self bannerTargetingWithEventFiltersAllowed:banner];
+    }
+
+    if (isTriggerCondition && isTargetEvent) {
+        if (!targetEvents || !triggers) {
+            [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping Notification Banner %@ because: Trigger and Target Event not satisfied", banner.id]];
+            return;
+        }
+    } else if (isTriggerCondition) {
+        if (!triggers) {
+            [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping Notification Banner %@ because: Trigger not satisfied", banner.id]];
+            return;
+        }
+    } else if (isTargetEvent) {
+        if (!targetEvents) {
+            [CPLog debug:@"%@", [NSString stringWithFormat:@"Skipping Notification Banner %@ because: Target Event not satisfied", banner.id]];
+            return;
+        }
+    }
+
+    NSDate *now = [NSDate date];
+    NSTimeInterval delay = 0;
+    if (banner.startAt != nil && [banner.startAt compare:now] == NSOrderedDescending) {
+        NSTimeInterval startAtDelay = [banner.startAt timeIntervalSinceDate:now];
+        delay = startAtDelay + delaySeconds;
+    } else {
+        delay = delaySeconds;
+    }
+
+    if (delay > 0) {
+        dispatch_time_t dispatchTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(NSEC_PER_SEC * delay));
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_after(dispatchTime, queue, ^(void) {
+            [self showBanner:banner force:force notificationId:notificationId];
+        });
+    } else {
+        [self showBanner:banner force:force notificationId:notificationId];
     }
 }
 
