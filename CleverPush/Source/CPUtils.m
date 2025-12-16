@@ -1127,7 +1127,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         endIndex--;
     }
     if (endIndex == 0) {
-        return nil;
+        return [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
     }
     if (endIndex < (NSInteger)attributedString.length) {
         return [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
