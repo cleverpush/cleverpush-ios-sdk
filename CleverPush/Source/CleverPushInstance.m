@@ -3518,12 +3518,40 @@ static id isNil(id object) {
 
 #pragma mark - check Tags
 - (void)checkTags:(NSString* _Nullable)urlStr params:(NSDictionary* _Nullable)params {
+    if (urlStr == nil || ![urlStr isKindOfClass:[NSString class]] || urlStr.length == 0) {
+        return;
+    }
+
     NSURL* url = [NSURL URLWithString:urlStr];
+    if (url == nil) {
+        return;
+    }
+
     NSString* pathname = [url path];
+    if (pathname == nil) {
+        pathname = @"";
+    }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
 
     [self getAvailableTags:^(NSArray*tags) {
+        if (![tags isKindOfClass:[NSArray class]] || tags.count == 0) {
+            return;
+        }
+
         for (CPChannelTag*tag in tags) {
+            if (![tag isKindOfClass:[CPChannelTag class]]) {
+                continue;
+            }
+
+            id tagIdObj = tag.id;
+            if (tagIdObj == nil || tagIdObj == (id)[NSNull null]) {
+                continue;
+            }
+
+            if (![tagIdObj isKindOfClass:[NSString class]] || [(NSString*)tagIdObj length] == 0) {
+                continue;
+            }
+
             [self autoAssignTagMatches:tag pathname:pathname params:params callback:^(BOOL tagMatches) {
                 if (tagMatches) {
                     [CPLog debug:@"checkTags: autoAssignTagMatches:YES %@", [tag name]];
@@ -3549,13 +3577,37 @@ static id isNil(id object) {
                     int visits = 0;
                     NSMutableDictionary* dailyVisits = [[NSMutableDictionary alloc] init];
                     if (autoAssignDays > 0 && dateAfter != nil) {
-                        dailyVisits = [userDefaults objectForKey:visitsStorageKey];
+                        id storedDailyVisits = [userDefaults objectForKey:visitsStorageKey];
+                        if ([storedDailyVisits isKindOfClass:[NSDictionary class]]) {
+                            dailyVisits = [storedDailyVisits mutableCopy];
+                        } else if ([storedDailyVisits isKindOfClass:[NSNumber class]]) {
+                            [dailyVisits setObject:storedDailyVisits forKey:dateKey];
+                            [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
+                        } else if (storedDailyVisits != nil) {
+                            [userDefaults removeObjectForKey:visitsStorageKey];
+                        }
 
-                        for (NSString* curDateKey in dailyVisits) {
+                        NSArray* visitKeys = [[dailyVisits allKeys] copy];
+                        for (id key in visitKeys) {
+                            if (![key isKindOfClass:[NSString class]] || [(NSString*)key length] == 0) {
+                                [dailyVisits removeObjectForKey:key];
+                                continue;
+                            }
+
+                            NSString* curDateKey = (NSString*)key;
                             NSDate*currDate = [dateFormatter dateFromString:curDateKey];
+                            if (currDate == nil) {
+                                [dailyVisits removeObjectForKey:curDateKey];
+                                continue;
+                            }
 
                             if ([currDate timeIntervalSinceDate:dateAfter] >= 0) {
-                                visits += [[dailyVisits objectForKey:curDateKey] integerValue];
+                                id storedVisitsValue = [dailyVisits objectForKey:curDateKey];
+                                if (storedVisitsValue != nil && ![storedVisitsValue isKindOfClass:[NSNull class]]) {
+                                    visits += [storedVisitsValue intValue];
+                                } else {
+                                    [dailyVisits removeObjectForKey:curDateKey];
+                                }
                             } else {
                                 [dailyVisits removeObjectForKey:curDateKey];
                             }
@@ -3570,13 +3622,37 @@ static id isNil(id object) {
                     int sessions = 0;
                     NSMutableDictionary* dailySessions = [[NSMutableDictionary alloc] init];
                     if (autoAssignDays > 0 && dateAfter != nil) {
-                        dailySessions = [userDefaults objectForKey:sessionsStorageKey];
+                        id storedDailySessions = [userDefaults objectForKey:sessionsStorageKey];
+                        if ([storedDailySessions isKindOfClass:[NSDictionary class]]) {
+                            dailySessions = [storedDailySessions mutableCopy];
+                        } else if ([storedDailySessions isKindOfClass:[NSNumber class]]) {
+                            [dailySessions setObject:storedDailySessions forKey:dateKey];
+                            [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
+                        } else if (storedDailySessions != nil) {
+                            [userDefaults removeObjectForKey:sessionsStorageKey];
+                        }
 
-                        for (NSString* curDateKey in dailySessions) {
+                        NSArray* sessionKeys = [[dailySessions allKeys] copy];
+                        for (id key in sessionKeys) {
+                            if (![key isKindOfClass:[NSString class]] || [(NSString*)key length] == 0) {
+                                [dailySessions removeObjectForKey:key];
+                                continue;
+                            }
+
+                            NSString* curDateKey = (NSString*)key;
                             NSDate*currDate = [dateFormatter dateFromString:curDateKey];
+                            if (currDate == nil) {
+                                [dailySessions removeObjectForKey:curDateKey];
+                                continue;
+                            }
 
                             if ([currDate timeIntervalSinceDate:dateAfter] >= 0) {
-                                sessions += [[dailySessions objectForKey:curDateKey] integerValue];
+                                id storedSessionsValue = [dailySessions objectForKey:curDateKey];
+                                if (storedSessionsValue != nil && ![storedSessionsValue isKindOfClass:[NSNull class]]) {
+                                    sessions += [storedSessionsValue intValue];
+                                } else {
+                                    [dailySessions removeObjectForKey:curDateKey];
+                                }
                             } else {
                                 [dailySessions removeObjectForKey:curDateKey];
                             }
@@ -3609,11 +3685,9 @@ static id isNil(id object) {
                                 [dailyVisits setObject:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
 
                                 [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
-                                [userDefaults synchronize];
                             } else {
                                 visits += 1;
                                 [userDefaults setInteger:visits forKey:visitsStorageKey];
-                                [userDefaults synchronize];
                             }
                         }
                     } else {
@@ -3628,7 +3702,6 @@ static id isNil(id object) {
                             [dailyVisits setObject:[NSNumber numberWithInt:dateVisits] forKey:dateKey];
 
                             [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
-                            [userDefaults synchronize];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
                                 int dateSessions = 0;
@@ -3643,22 +3716,20 @@ static id isNil(id object) {
                                 [autoAssignSessionsCounted setValue:false forKey:tagId];
 
                                 [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
-                                [userDefaults synchronize];
                             }
                         } else {
                             visits += 1;
                             [userDefaults setInteger:visits forKey:visitsStorageKey];
-                            [userDefaults synchronize];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
                                 sessions += 1;
-                                [userDefaults setInteger:visits forKey:sessionsStorageKey];
-                                [userDefaults synchronize];
-
+                                [userDefaults setInteger:sessions forKey:sessionsStorageKey];
                                 [autoAssignSessionsCounted setValue:false forKey:tagId];
                             }
                         }
                     }
+
+                    [userDefaults synchronize];
                 } else {
                     [CPLog debug:@"checkTags: autoAssignTagMatches:NO %@", [tag name]];
                 }
