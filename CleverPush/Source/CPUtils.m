@@ -1058,7 +1058,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
     NSString *colorHex = [CPUtils hexStringFromColor:textColor];
     NSString *htmlString = [NSString stringWithFormat:
-        @"<style>body{font-family:'-apple-system';font-size:%.0fpx;color:%@;margin:0;padding:0;}</style>%@",
+        @"<style>"
+         "html,body{margin:0;padding:0;}"
+         "body{font-family:'-apple-system';font-size:%.0fpx;color:%@;}"
+         "p,div,section,article,header,footer,blockquote,pre,h1,h2,h3,h4,h5,h6,ul,ol,li{margin:0;padding:0;}"
+         "ul,ol{padding-left:1.2em;}"
+         "</style>%@",
         font.pointSize, colorHex, html];
     
     NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
@@ -1106,9 +1111,27 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         }
         paragraphStyle.alignment = textAlignment;
+        paragraphStyle.paragraphSpacing = 0;
+        paragraphStyle.paragraphSpacingBefore = 0;
         [attributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
     }];
     
+    NSString *plainString = attributedString.string ?: @"";
+    NSCharacterSet *whitespaceAndNewlines = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSInteger endIndex = plainString.length;
+    while (endIndex > 0) {
+        unichar c = [plainString characterAtIndex:endIndex - 1];
+        if (![whitespaceAndNewlines characterIsMember:c]) {
+            break;
+        }
+        endIndex--;
+    }
+    if (endIndex == 0) {
+        return [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
+    }
+    if (endIndex < (NSInteger)attributedString.length) {
+        return [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
+    }
     return attributedString;
 }
 
