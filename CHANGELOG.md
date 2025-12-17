@@ -1,3 +1,6 @@
+## 1.34.35 (17.12.2025)
+* Optimize the HTML conversation function for reducing the space between two texts.
+
 ## 1.34.34 (05.12.2025)
 * Optimized TrackEvent functionality to prevent crashes.
 * Resolved an issue where the `AppBanner` trigger was not being checked when received through push.
