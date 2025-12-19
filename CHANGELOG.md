@@ -1,3 +1,6 @@
+## 1.34.36 (19.12.2025)
+* Fixed a rare crash related to tag auto-assign counters for existing users.
+
 ## 1.34.35 (17.12.2025)
 * Optimize the HTML conversation function for reducing the space between two texts.
 
