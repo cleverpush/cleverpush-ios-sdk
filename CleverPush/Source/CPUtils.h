@@ -49,6 +49,7 @@
 + (void)tryOpenURL:(NSURL *)url;
 + (BOOL)isValidURL:(NSURL *)url;
 + (NSURL *)removeQueryParametersFromURL:(NSURL *)url;
++ (NSString *)getQueryParameterFromURL:(NSURL *)url forKey:(NSString *)key;
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 + (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize;
 + (NSCache *)sharedImageCache;
