@@ -272,6 +272,7 @@
 		CB1B65DE27577BD10087AC49 /* CPTrackPageTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */; };
 		CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */; };
 		CB1B65E227577BEB0087AC49 /* CPStoryWidgetTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */; };
+		C0A11D102F3A4B5C6D7E8F92 /* CPInitMethodsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C0A11D0E2F3A4B5C6D7E8F90 /* CPInitMethodsTest.m */; };
 		CB1B65F327577C760087AC49 /* libOCMock.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65EF27577C760087AC49 /* libOCMock.a */; };
 		CB1B65F427577C760087AC49 /* TestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65F127577C760087AC49 /* TestUtils.m */; };
 		CB1B65F6275780150087AC49 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CB1B65F5275780150087AC49 /* XCTest.framework */; };
@@ -604,6 +605,7 @@
 		CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPTrackPageTest.m; sourceTree = "<group>"; };
 		CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerTest.m; sourceTree = "<group>"; };
 		CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPStoryWidgetTest.m; sourceTree = "<group>"; };
+		C0A11D0E2F3A4B5C6D7E8F90 /* CPInitMethodsTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPInitMethodsTest.m; sourceTree = "<group>"; };
 		CB1B65E527577C760087AC49 /* OCMockObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMockObject.h; sourceTree = "<group>"; };
 		CB1B65E627577C760087AC49 /* OCMMacroState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMMacroState.h; sourceTree = "<group>"; };
 		CB1B65E727577C760087AC49 /* OCMock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCMock.h; sourceTree = "<group>"; };
@@ -1088,6 +1090,7 @@
 				CB1B65D727577BA70087AC49 /* CPAttributesTests.m */,
 				CB1B65D927577BB60087AC49 /* CPTopicDialogueTest.m */,
 				CB1B65DB27577BC50087AC49 /* CPChannelConfigTest.m */,
+				C0A11D0E2F3A4B5C6D7E8F90 /* CPInitMethodsTest.m */,
 				CB1B65DD27577BD10087AC49 /* CPTrackPageTest.m */,
 				CB1B65DF27577BDB0087AC49 /* CPAppBannerTest.m */,
 				CB1B65E127577BEB0087AC49 /* CPStoryWidgetTest.m */,
@@ -1725,6 +1728,7 @@
 				935A5F1D2AE64FB7007A3F7F /* CPSQLiteManager.m in Sources */,
 				CB1B65DC27577BC50087AC49 /* CPChannelConfigTest.m in Sources */,
 				CB1B65D627577B960087AC49 /* CPTagsTest.m in Sources */,
+				C0A11D102F3A4B5C6D7E8F92 /* CPInitMethodsTest.m in Sources */,
 				93E5F0EB2ADE6BCD00D76057 /* CPAppBannerEventFilters.m in Sources */,
 				9310FD6E2A602D1F004B400B /* CPInboxDetailView.m in Sources */,
 				CB1B65E027577BDB0087AC49 /* CPAppBannerTest.m in Sources */,

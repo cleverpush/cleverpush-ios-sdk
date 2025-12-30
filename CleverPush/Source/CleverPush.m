@@ -873,6 +873,10 @@ static CleverPush* singleInstance = nil;
     if ([[processInfo processName] isEqualToString:@"IBDesignablesAgentCocoaTouch"] || [[processInfo processName] isEqualToString:@"IBDesignablesAgent-iOS"]) {
         return;
     }
+    
+    if (NSClassFromString(@"XCTest") != nil || getenv("XCTestConfigurationFilePath") != NULL) {
+        return;
+    }
 
     if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(@"8.0")) {
         return;
