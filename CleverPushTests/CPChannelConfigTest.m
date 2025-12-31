@@ -115,13 +115,19 @@
 - (void)testAutoclearBadge {
     OCMStub([self.cleverPush getAutoClearBadge]).andReturn(true);
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:true];
-    OCMVerify([self.cleverPush clearBadge:false]);
+    OCMVerify([self.cleverPush clearBadge]);
 }
 
 - (void)testSubscriptionIdIsNotNilAndNotificationNotEnableThanVerifyUnsubscribe {
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
-    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(false);
+    OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(BOOL enabled);
+        [invocation getArgument:&callback atIndex:2];
+        if (callback) {
+            callback(NO);
+        }
+    });
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     OCMVerify([self.cleverPush unsubscribe]);
 }
@@ -130,7 +136,13 @@
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush channelId]).andReturn(@"channelId");
     OCMStub([self.cleverPush shouldSync]).andReturn(true);
-    OCMStub([self.cleverPush areNotificationsEnabled]).andReturn(true);
+    OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]).andDo(^(NSInvocation *invocation) {
+        void (^callback)(BOOL enabled);
+        [invocation getArgument:&callback atIndex:2];
+        if (callback) {
+            callback(YES);
+        }
+    });
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"channelId" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     [_testUtilInstance performSelector:@selector(syncSubscription) withObject:self.cleverPush afterDelay:10.0f];
 }

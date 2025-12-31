@@ -134,7 +134,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testInitSession {
-    [self.appBanner initSession];
+    [self.appBanner initSession:@"channel_id" afterInit:NO];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];
@@ -161,7 +161,7 @@ dispatch_queue_t dispatchQueue = nil;
     [[self.appBanner verify] setPendingBannerListeners:[NSMutableArray new]];
     [[self.appBanner verify] setActiveBanners:[NSMutableArray new]];
     [[self.appBanner verify] setPendingBanners:[NSMutableArray new]];
-    [[self.appBanner verify] setEvents:[NSMutableDictionary new]];
+    [[self.appBanner verify] setEvents:[NSMutableArray new]];
     [[self.appBanner verify] loadBannersDisabled];
     [[self.appBanner verify] updateShowDraftsFlag:true];
     [[self.appBanner verify] updateInitialisedFlag:true];
@@ -223,7 +223,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testAndVerifyStartUpWithCreateAndScheduleBanners {
-    [self.appBanner initSession];
+    [self.appBanner initSession:@"channel_id" afterInit:NO];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];

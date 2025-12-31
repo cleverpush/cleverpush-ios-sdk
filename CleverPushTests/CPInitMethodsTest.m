@@ -2,7 +2,6 @@
 #import <XCTest/XCTest.h>
 #import <Foundation/Foundation.h>
 #import <OCMock/OCMock.h>
-#import <stdlib.h>
 
 #import "CleverPush.h"
 #import "CleverPushInstance.h"
@@ -23,10 +22,6 @@
 
 static NSString * const kCPSuccessChannelId = @"RHe2nXvQk9SZgdC4x";
 static NSString * const kCPFailureChannelId = @"__invalid_channel_id__";
-
-static BOOL CPShouldRunNetworkInitTests(void) {
-    return getenv("CP_RUN_NETWORK_TESTS") != NULL;
-}
 
 #pragma mark - CleverPush (class wrappers) forwarding tests
 
@@ -323,10 +318,6 @@ static BOOL CPShouldRunNetworkInitTests(void) {
 #pragma mark - Init success/failure integration tests (launchOptions + connectionOptions)
 
 - (void)testInitWithLaunchOptions_HandleInitialized_Success {
-    if (!CPShouldRunNetworkInitTests()) {
-        XCTSkip(@"Set CP_RUN_NETWORK_TESTS=1 to run init success/failure integration tests.");
-    }
-
     XCTestExpectation *exp = [self expectationWithDescription:@"init success callback"];
     
     [CleverPush initWithLaunchOptions:nil channelId:kCPSuccessChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
@@ -335,14 +326,10 @@ static BOOL CPShouldRunNetworkInitTests(void) {
         [exp fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+    [self waitForExpectationsWithTimeout:15.0 handler:nil];
 }
 
 - (void)testInitWithLaunchOptions_HandleInitialized_Failure {
-    if (!CPShouldRunNetworkInitTests()) {
-        XCTSkip(@"Set CP_RUN_NETWORK_TESTS=1 to run init success/failure integration tests.");
-    }
-
     XCTestExpectation *exp = [self expectationWithDescription:@"init failure callback"];
     
     [CleverPush initWithLaunchOptions:nil channelId:kCPFailureChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
@@ -351,13 +338,10 @@ static BOOL CPShouldRunNetworkInitTests(void) {
         [exp fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+    [self waitForExpectationsWithTimeout:15.0 handler:nil];
 }
 
 - (void)testInitWithConnectionOptions_HandleInitialized_Success {
-    if (!CPShouldRunNetworkInitTests()) {
-        XCTSkip(@"Set CP_RUN_NETWORK_TESTS=1 to run init success/failure integration tests.");
-    }
     if (@available(iOS 13.0, *)) {
         XCTestExpectation *exp = [self expectationWithDescription:@"init success callback (scene)"];
         
@@ -367,16 +351,13 @@ static BOOL CPShouldRunNetworkInitTests(void) {
             [exp fulfill];
         }];
 
-        [self waitForExpectationsWithTimeout:20.0 handler:nil];
+        [self waitForExpectationsWithTimeout:15.0 handler:nil];
     } else {
         XCTSkip(@"Requires iOS 13+");
     }
 }
 
 - (void)testInitWithConnectionOptions_HandleInitialized_Failure {
-    if (!CPShouldRunNetworkInitTests()) {
-        XCTSkip(@"Set CP_RUN_NETWORK_TESTS=1 to run init success/failure integration tests.");
-    }
     if (@available(iOS 13.0, *)) {
         XCTestExpectation *exp = [self expectationWithDescription:@"init failure callback (scene)"];
 
@@ -386,7 +367,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
             [exp fulfill];
         }];
 
-        [self waitForExpectationsWithTimeout:20.0 handler:nil];
+        [self waitForExpectationsWithTimeout:15.0 handler:nil];
     } else {
         XCTSkip(@"Requires iOS 13+");
     }

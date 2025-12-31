@@ -36,29 +36,29 @@
     self.defaults = OCMPartialMock(self.userDefault);
 }
 - (void)testGetAvailableAttributes {
-    NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
-    NSDictionary *finalResponseObject = responseObject;
+    NSMutableDictionary *attr = [@{ @"key": @"value" } mutableCopy];
+    NSMutableArray *finalResponseObject = [@[attr] mutableCopy];
     
     [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(NSDictionary *myFirstArgument);
+        void (^handler)(NSMutableArray * _Nullable myFirstArgument);
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray * _Nullable configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
 }
 
 - (void)testGetAvailableAttributesFromConfigWhenChannelConfigIsNull {
-    NSDictionary *finalResponseObject = [[NSDictionary alloc]init];
+    NSMutableArray *finalResponseObject = [NSMutableArray new];
     
     [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(NSDictionary *myFirstArgument);
+        void (^handler)(NSMutableArray * _Nullable myFirstArgument);
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray * _Nullable configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
@@ -72,7 +72,7 @@
         handler(finalResponseObject);
     }];
     [self.cleverPush getChannelConfig:^(NSDictionary *ChannelConfig) {
-        NSDictionary *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
+        NSMutableArray *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
         XCTAssert(mockResult.count == 0);
     }];
     
@@ -87,20 +87,20 @@
         handler(responseObject);
     }];
     [self.cleverPush getChannelConfig:^(NSDictionary *ChannelConfig) {
-        NSDictionary *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
+        NSMutableArray *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
         XCTAssert(mockResult.count == 0);
     }];
 }
 
 - (void)testGetAvailableAttributesFromConfigWhenThereIsException {
-    NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:nil,@"customAttributes", nil];
+    NSDictionary *responseObject = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNull null], @"customAttributes", nil];
     [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
         void (^handler)(NSDictionary *myFirstArgument);
         [invocation getArgument:&handler atIndex:2];
         handler(responseObject);
     }];
     [self.cleverPush getChannelConfig:^(NSDictionary *ChannelConfig) {
-        NSDictionary *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
+        NSMutableArray *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
         XCTAssert(mockResult.count == 0);
     }];
 }
@@ -117,7 +117,7 @@
         handler(responseObject);
     }];
     [self.cleverPush getChannelConfig:^(NSDictionary *ChannelConfig) {
-        NSDictionary *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
+        NSMutableArray *mockResult = [self.cleverPush getAvailableAttributesFromConfig:ChannelConfig];
         NSMutableArray *attributes = [[NSMutableArray alloc] init];
         for (id item in mockResult) {
             [attributes addObject:item];
