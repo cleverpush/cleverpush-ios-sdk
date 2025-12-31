@@ -39,11 +39,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
 
     NSDictionary *launchOptions = @{ @"k": @"v" };
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:NULL
-                                     autoRegister:YES]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES]);
 
     (void)[CleverPush initWithLaunchOptions:launchOptions channelId:@"cid"];
     OCMVerifyAll(instanceMock);
@@ -59,11 +55,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                        handleNotificationOpened:opened
-                                 handleSubscribed:NULL
-                                     autoRegister:NO]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationOpened:opened handleSubscribed:NULL autoRegister:NO]);
 
     (void)[CleverPush initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationOpened:opened autoRegister:NO];
     OCMVerifyAll(instanceMock);
@@ -80,17 +72,9 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     CPHandleNotificationReceivedBlock received = ^(CPNotificationReceivedResult * _Nullable result) {};
     CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
     
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                        channelId:@"cid"
-                       handleNotificationReceived:received
-                         handleNotificationOpened:opened
-                                 handleSubscribed:NULL
-                                     autoRegister:YES]);
-    
-    (void)[CleverPush initWithLaunchOptions:launchOptions
-                                  channelId:@"cid"
-                 handleNotificationReceived:received
-                   handleNotificationOpened:opened];
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:NULL autoRegister:YES]);
+
+    (void)[CleverPush initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:received handleNotificationOpened:opened];
     OCMVerifyAll(instanceMock);
 }
 
@@ -104,11 +88,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:subscribed
-                                     autoRegister:YES]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationOpened:NULL handleSubscribed:subscribed autoRegister:YES]);
 
     (void)[CleverPush initWithLaunchOptions:launchOptions channelId:@"cid" handleSubscribed:subscribed];
     OCMVerifyAll(instanceMock);
@@ -124,21 +104,9 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:NULL
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:NULL
-                                     autoRegister:NO
-                                handleInitialized:initialized]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:initialized]);
 
-    (void)[CleverPush initWithLaunchOptions:launchOptions
-                                 channelId:@"cid"
-                 handleNotificationReceived:NULL
-                   handleNotificationOpened:NULL
-                           handleSubscribed:NULL
-                               autoRegister:NO
-                          handleInitialized:initialized];
+    (void)[CleverPush initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:initialized];
     OCMVerifyAll(instanceMock);
 }
 
@@ -150,13 +118,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
 
     NSDictionary *launchOptions = @{ @"k": @"v" };
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:NULL
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:NULL
-                                     autoRegister:YES
-                                handleInitialized:NULL]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES handleInitialized:NULL]);
 
     (void)[instanceMock initWithLaunchOptions:launchOptions channelId:@"cid"];
     OCMVerifyAll(instanceMock);
@@ -169,13 +131,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:NULL
-                        handleNotificationOpened:opened
-                                 handleSubscribed:NULL
-                                     autoRegister:YES
-                                handleInitialized:NULL]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:opened handleSubscribed:NULL autoRegister:YES handleInitialized:NULL]);
 
     (void)[instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationOpened:opened];
     OCMVerifyAll(instanceMock);
@@ -189,19 +145,9 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     CPHandleNotificationReceivedBlock received = ^(CPNotificationReceivedResult * _Nullable result) {};
     CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:received
-                        handleNotificationOpened:opened
-                                 handleSubscribed:NULL
-                                     autoRegister:NO
-                                handleInitialized:NULL]);
-
-    (void)[instanceMock initWithLaunchOptions:launchOptions
-                                    channelId:@"cid"
-                    handleNotificationReceived:received
-                      handleNotificationOpened:opened
-                                  autoRegister:NO];
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:NULL autoRegister:NO handleInitialized:NULL]);
+    
+    (void)[instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:received handleNotificationOpened:opened autoRegister:NO];
     OCMVerifyAll(instanceMock);
 }
 
@@ -212,13 +158,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:NULL
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:subscribed
-                                     autoRegister:YES
-                                handleInitialized:NULL]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:subscribed autoRegister:YES handleInitialized:NULL]);
 
     (void)[instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleSubscribed:subscribed];
     OCMVerifyAll(instanceMock);
@@ -231,22 +171,75 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     NSDictionary *launchOptions = @{ @"k": @"v" };
     CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {};
 
-    OCMExpect([instanceMock initWithLaunchOptions:launchOptions
-                                       channelId:@"cid"
-                      handleNotificationReceived:NULL
-                        handleNotificationOpened:NULL
-                                 handleSubscribed:NULL
-                                     autoRegister:NO
-                                handleInitialized:initialized]);
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:initialized]);
 
-    (void)[instanceMock initWithLaunchOptions:launchOptions
-                                    channelId:@"cid"
-                    handleNotificationReceived:NULL
-                      handleNotificationOpened:NULL
-                              handleSubscribed:NULL
-                                  autoRegister:NO
-                             handleInitialized:initialized];
+    (void)[instanceMock initWithLaunchOptions:launchOptions channelId:@"cid" handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:initialized];
     OCMVerifyAll(instanceMock);
+}
+
+- (void)testInstanceInitWithLaunchOptions_AllOtherOverloadsForwardToCoreInitializer_ValidAndInvalidChannelId {
+    NSDictionary *launchOptions = @{ @"k": @"v" };
+    NSString *validCid = @"cid";
+    NSString *invalidCid = @"__invalid__";
+    
+    CPHandleNotificationReceivedBlock received = ^(CPNotificationReceivedResult * _Nullable result) {};
+    CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
+    CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
+    
+    
+    void (^assertCoreCall)(NSString *cid, BOOL autoRegister) = ^(NSString *cid, BOOL autoRegister) {
+        CleverPushInstance *instance = [CleverPushInstance new];
+        id m = OCMPartialMock(instance);
+        OCMExpect([m initWithLaunchOptions:launchOptions channelId:cid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:autoRegister handleInitialized:NULL]).andReturn(m);
+        
+        (void)[m initWithLaunchOptions:launchOptions channelId:cid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:autoRegister];
+        OCMVerifyAll(m);
+    };
+    
+    assertCoreCall(validCid, YES);
+    assertCoreCall(invalidCid, YES);
+    assertCoreCall(validCid, NO);
+    assertCoreCall(invalidCid, NO);
+}
+
+- (void)testInstanceInitWithConnectionOptions_AllOverloadsForwardToCoreInitializer_ValidAndInvalidChannelId {
+    if (@available(iOS 13.0, *)) {
+        NSString *validCid = @"cid";
+        NSString *invalidCid = @"__invalid__";
+        
+        CPHandleNotificationReceivedBlock received = ^(CPNotificationReceivedResult * _Nullable result) {};
+        CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
+        CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
+        
+        void (^assertCoreCall)(NSString *cid, BOOL autoRegister) = ^(NSString *cid, BOOL autoRegister) {
+            CleverPushInstance *instance = [CleverPushInstance new];
+            id m = OCMPartialMock(instance);
+            
+            OCMExpect([m initWithLaunchOptions:[OCMArg any] channelId:cid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:autoRegister handleInitialized:NULL]).andReturn(m);
+            
+            (void)[m initWithConnectionOptions:nil channelId:cid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:autoRegister];
+            OCMVerifyAll(m);
+        };
+        
+        assertCoreCall(validCid, YES);
+        assertCoreCall(invalidCid, YES);
+        assertCoreCall(validCid, NO);
+        assertCoreCall(invalidCid, NO);
+        
+        
+        {
+            CleverPushInstance *instance = [CleverPushInstance new];
+            id m = OCMPartialMock(instance);
+            CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {
+                (void)success;
+                (void)failureMessage;
+            };
+            OCMExpect([m initWithLaunchOptions:[OCMArg any] channelId:validCid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:YES handleInitialized:initialized]).andReturn(m);
+            
+            (void)[m initWithConnectionOptions:nil channelId:validCid handleNotificationReceived:received handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:YES handleInitialized:initialized];
+            OCMVerifyAll(m);
+        }
+    }
 }
 
 #pragma mark - Initialization callback success/failure tests (deterministic)
@@ -269,13 +262,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
         [expectation fulfill];
     };
 
-    (void)[instanceMock initWithLaunchOptions:nil
-                                    channelId:@"testChannelId"
-                    handleNotificationReceived:nil
-                      handleNotificationOpened:nil
-                              handleSubscribed:nil
-                                  autoRegister:NO
-                             handleInitialized:initialized];
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
 
     [instance handleInitialization:YES error:nil];
 
@@ -302,13 +289,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
         [expectation fulfill];
     };
 
-    (void)[instanceMock initWithLaunchOptions:nil
-                                    channelId:nil
-                    handleNotificationReceived:nil
-                      handleNotificationOpened:nil
-                              handleSubscribed:nil
-                                  autoRegister:NO
-                             handleInitialized:initialized];
+    (void)[instanceMock initWithLaunchOptions:nil channelId:nil handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
     
     [instance handleInitialization:NO error:expectedFailureMessage];
 
@@ -330,15 +311,9 @@ static BOOL CPShouldRunNetworkInitTests(void) {
         (void)failureMessage;
         callCount += 1;
     };
-
-    (void)[instanceMock initWithLaunchOptions:nil
-                                    channelId:@"testChannelId"
-                    handleNotificationReceived:nil
-                      handleNotificationOpened:nil
-                              handleSubscribed:nil
-                                  autoRegister:NO
-                             handleInitialized:initialized];
-
+    
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
+    
     [instance handleInitialization:YES error:nil];
     [instance handleInitialization:NO error:@"should be ignored"];
 
@@ -353,14 +328,8 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     }
 
     XCTestExpectation *exp = [self expectationWithDescription:@"init success callback"];
-
-    [CleverPush initWithLaunchOptions:nil
-                           channelId:kCPSuccessChannelId
-           handleNotificationReceived:NULL
-             handleNotificationOpened:NULL
-                     handleSubscribed:NULL
-                         autoRegister:NO
-                    handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+    
+    [CleverPush initWithLaunchOptions:nil channelId:kCPSuccessChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
         XCTAssertTrue(success);
         XCTAssertNil(failureMessage);
         [exp fulfill];
@@ -375,14 +344,8 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     }
 
     XCTestExpectation *exp = [self expectationWithDescription:@"init failure callback"];
-
-    [CleverPush initWithLaunchOptions:nil
-                           channelId:kCPFailureChannelId
-           handleNotificationReceived:NULL
-             handleNotificationOpened:NULL
-                     handleSubscribed:NULL
-                         autoRegister:NO
-                    handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+    
+    [CleverPush initWithLaunchOptions:nil channelId:kCPFailureChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
         XCTAssertFalse(success);
         XCTAssertNotNil(failureMessage);
         [exp fulfill];
@@ -397,14 +360,8 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     }
     if (@available(iOS 13.0, *)) {
         XCTestExpectation *exp = [self expectationWithDescription:@"init success callback (scene)"];
-
-        [CleverPush initWithConnectionOptions:nil
-                                    channelId:kCPSuccessChannelId
-                    handleNotificationReceived:NULL
-                      handleNotificationOpened:NULL
-                              handleSubscribed:NULL
-                                  autoRegister:NO
-                             handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+        
+        [CleverPush initWithConnectionOptions:nil channelId:kCPSuccessChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
             XCTAssertTrue(success);
             XCTAssertNil(failureMessage);
             [exp fulfill];
@@ -423,13 +380,7 @@ static BOOL CPShouldRunNetworkInitTests(void) {
     if (@available(iOS 13.0, *)) {
         XCTestExpectation *exp = [self expectationWithDescription:@"init failure callback (scene)"];
 
-        [CleverPush initWithConnectionOptions:nil
-                                    channelId:kCPFailureChannelId
-                    handleNotificationReceived:NULL
-                      handleNotificationOpened:NULL
-                              handleSubscribed:NULL
-                                  autoRegister:NO
-                             handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+        [CleverPush initWithConnectionOptions:nil channelId:kCPFailureChannelId handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
             XCTAssertFalse(success);
             XCTAssertNotNil(failureMessage);
             [exp fulfill];
@@ -442,5 +393,3 @@ static BOOL CPShouldRunNetworkInitTests(void) {
 }
 
 @end
-
-
