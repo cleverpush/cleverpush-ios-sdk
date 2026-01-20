@@ -3712,6 +3712,10 @@ static id isNil(id object) {
                             [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
+                                if (!hasSessionTimestamp) {
+                                    [autoAssignSessionsCounted setObject:@YES forKey:tagId];
+                                    return;
+                                }
                                 if (!isSameSession) {
                                     int dateSessions = 0;
                                     if ([dailySessions objectForKey:dateKey] == nil) {
@@ -3722,7 +3726,9 @@ static id isNil(id object) {
                                     dateSessions += 1;
                                     [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
 
-                                    [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    if (currentSessionMarker != nil) {
+                                        [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    }
                                     [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
                                 }
                                 [autoAssignSessionsCounted setObject:@YES forKey:tagId];
@@ -3732,10 +3738,16 @@ static id isNil(id object) {
                             [userDefaults setInteger:visits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
+                                if (!hasSessionTimestamp) {
+                                    [autoAssignSessionsCounted setObject:@YES forKey:tagId];
+                                    return;
+                                }
                                 if (!isSameSession) {
                                     sessions += 1;
                                     [userDefaults setInteger:sessions forKey:sessionsStorageKey];
-                                    [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    if (currentSessionMarker != nil) {
+                                        [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    }
                                 }
                                 [autoAssignSessionsCounted setObject:@YES forKey:tagId];
                             }
