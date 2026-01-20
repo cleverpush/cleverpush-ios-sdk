@@ -3561,9 +3561,10 @@ static id isNil(id object) {
                         autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
                     }
                     NSString* sessionMarkerKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessionMarker-%@", tagId];
-                    NSNumber* currentSessionMarker = @(sessionStartedTimestamp);
+                    BOOL hasSessionTimestamp = sessionStartedTimestamp > 0;
+                    NSNumber* currentSessionMarker = hasSessionTimestamp ? @(sessionStartedTimestamp) : nil;
                     NSNumber* storedSessionMarker = [userDefaults objectForKey:sessionMarkerKey];
-                    BOOL isSameSession = storedSessionMarker != nil && [storedSessionMarker isEqualToNumber:currentSessionMarker];
+                    BOOL isSameSession = hasSessionTimestamp && storedSessionMarker != nil && [storedSessionMarker isEqualToNumber:currentSessionMarker];
                     NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
                     NSString* sessionsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessions-%@", tagId];
 
