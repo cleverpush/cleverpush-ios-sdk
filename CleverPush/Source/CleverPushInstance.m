@@ -3557,6 +3557,13 @@ static id isNil(id object) {
                     [CPLog debug:@"checkTags: autoAssignTagMatches:YES %@", [tag name]];
 
                     NSString* tagId = tag.id;
+                    if (autoAssignSessionsCounted == nil) {
+                        autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
+                    }
+                    NSString* sessionMarkerKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessionMarker-%@", tagId];
+                    NSNumber* currentSessionMarker = @(sessionStartedTimestamp);
+                    NSNumber* storedSessionMarker = [userDefaults objectForKey:sessionMarkerKey];
+                    BOOL isSameSession = storedSessionMarker != nil && [storedSessionMarker isEqualToNumber:currentSessionMarker];
                     NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
                     NSString* sessionsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessions-%@", tagId];
 
@@ -3704,27 +3711,32 @@ static id isNil(id object) {
                             [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
-                                int dateSessions = 0;
-                                if ([dailySessions objectForKey:dateKey] == nil) {
-                                    [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
-                                } else {
-                                    dateSessions = [[dailySessions objectForKey:dateKey] intValue];
+                                if (!isSameSession) {
+                                    int dateSessions = 0;
+                                    if ([dailySessions objectForKey:dateKey] == nil) {
+                                        [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
+                                    } else {
+                                        dateSessions = [[dailySessions objectForKey:dateKey] intValue];
+                                    }
+                                    dateSessions += 1;
+                                    [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
+
+                                    [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
                                 }
-                                dateSessions += 1;
-                                [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
-
-                                [autoAssignSessionsCounted setValue:false forKey:tagId];
-
-                                [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
+                                [autoAssignSessionsCounted setObject:@YES forKey:tagId];
                             }
                         } else {
                             visits += 1;
                             [userDefaults setInteger:visits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
-                                sessions += 1;
-                                [userDefaults setInteger:sessions forKey:sessionsStorageKey];
-                                [autoAssignSessionsCounted setValue:false forKey:tagId];
+                                if (!isSameSession) {
+                                    sessions += 1;
+                                    [userDefaults setInteger:sessions forKey:sessionsStorageKey];
+                                    [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                }
+                                [autoAssignSessionsCounted setObject:@YES forKey:tagId];
                             }
                         }
                     }
