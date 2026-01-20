@@ -3714,9 +3714,7 @@ static id isNil(id object) {
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
                                 if (!hasSessionTimestamp) {
                                     [autoAssignSessionsCounted setObject:@YES forKey:tagId];
-                                    return;
-                                }
-                                if (!isSameSession) {
+                                } else if (!isSameSession) {
                                     int dateSessions = 0;
                                     if ([dailySessions objectForKey:dateKey] == nil) {
                                         [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
@@ -3740,9 +3738,7 @@ static id isNil(id object) {
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
                                 if (!hasSessionTimestamp) {
                                     [autoAssignSessionsCounted setObject:@YES forKey:tagId];
-                                    return;
-                                }
-                                if (!isSameSession) {
+                                } else if (!isSameSession) {
                                     sessions += 1;
                                     [userDefaults setInteger:sessions forKey:sessionsStorageKey];
                                     if (currentSessionMarker != nil) {
