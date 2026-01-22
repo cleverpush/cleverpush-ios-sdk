@@ -13,10 +13,13 @@ Pod::Spec.new do |s|
 
     s.subspec 'CleverPushExtension' do |ss|
         ss.ios.vendored_frameworks = "Frameworks/CleverPushExtension.xcframework"
+        ss.ios.preserve_paths = "Frameworks/CleverPushExtension.dSYMs/**/*"
     end
 
     s.subspec 'CleverPush' do |ss|
         ss.ios.vendored_frameworks = "Frameworks/CleverPush.xcframework"
         ss.ios.resource_bundle = { "CleverPushResources" => "CleverPush/Resources/*" }
+        ss.ios.preserve_paths = "Frameworks/CleverPush.dSYMs/**/*"
     end
 end
+
