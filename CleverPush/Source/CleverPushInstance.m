@@ -3164,6 +3164,14 @@ static id isNil(id object) {
     [self removeNotification:notificationId removeFromNotificationCenter:NO];
 }
 
+- (void)removeAllNotifications {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATIONS_KEY] != nil) {
+        [userDefaults removeObjectForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
+        [userDefaults synchronize];
+    }
+}
+
 - (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {
     NSString *notificationIdentifier = nil;
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
