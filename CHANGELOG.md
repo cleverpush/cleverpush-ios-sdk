@@ -1,3 +1,6 @@
+## 1.34.37 (02.02.2026)
+* Implemented a new method `removeAllNotifications` to remove notifications locally.
+
 ## 1.34.36 (19.12.2025)
 * Fixed a rare crash related to tag auto-assign counters for existing users.
 
