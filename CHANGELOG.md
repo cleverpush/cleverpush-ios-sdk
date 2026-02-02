@@ -1,3 +1,6 @@
+## 1.34.38 (02.02.2026)
+* Update build-frameworks.sh to generate and package dSYM files
+
 ## 1.34.37 (02.02.2026)
 * Implemented a new method `removeAllNotifications` to remove notifications locally.
 

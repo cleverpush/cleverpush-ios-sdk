@@ -1,0 +1,10 @@
+---
+triple:          'x86_64-apple-darwin'
+binary-path:     '/Users/cp-chirag/Library/Developer/Xcode/DerivedData/CleverPush-dgncwrsmpgurlrdquacxkfinkhsg/Build/Intermediates.noindex/ArchiveIntermediates/CleverPushExtension/InstallationBuildProductsLocation/Library/Frameworks/CleverPushExtension.framework/CleverPushExtension'
+relocations:
+  - { offset: 0x68ECD, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
+  - { offset: 0x68EDB, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
+  - { offset: 0x68F47, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension serviceExtensionTimeWillExpireRequest:withMutableNotificationContent:]', symObjAddr: 0x19, symBinAddr: 0x871, symSize: 0x19 }
+  - { offset: 0x6903F, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionString, symObjAddr: 0x0, symBinAddr: 0x890, symSize: 0x0 }
+  - { offset: 0x69074, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionNumber, symObjAddr: 0x38, symBinAddr: 0x8C8, symSize: 0x0 }
+...
