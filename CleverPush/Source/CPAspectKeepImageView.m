@@ -1,10 +1,12 @@
 #import "CPAspectKeepImageView.h"
 #import "CPLog.h"
+#import "CPUtils.h"
 
 #import <objc/runtime.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
 static char kCPSessionDataTaskKey;
+static char kCPImageURLKey;
 
 @implementation CPAspectKeepImageView
 {
@@ -76,6 +78,14 @@ static char kCPSessionDataTaskKey;
     return (NSURLSessionDataTask *)objc_getAssociatedObject(self, &kCPSessionDataTaskKey);
 }
 
+- (void)setCurrentImageURL:(NSString *)urlString {
+    objc_setAssociatedObject(self, &kCPImageURLKey, urlString, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (NSString *)currentImageURL {
+    return (NSString *)objc_getAssociatedObject(self, &kCPImageURLKey);
+}
+
 #pragma mark - set image with URL with callback
 - (void)setImageWithURL:(NSURL*)imageURL callback:(void(^)(BOOL))callback {
     if (self.dataTask) {
@@ -83,12 +93,24 @@ static char kCPSessionDataTaskKey;
     }
     
     if (imageURL) {
+        NSString *urlString = imageURL.absoluteString;
+        [self setCurrentImageURL:urlString];
         __weak typeof(self) weakSelf = self;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
+            if (![strongSelf.currentImageURL isEqualToString:urlString]) {
+                return;
+            }
             if (error) {
-                [CPLog error:@"Error while getting image %@", error];
-                callback(false);
+                if (error.code != NSURLErrorCancelled) {
+                } else {
+                    return;
+                }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (callback) {
+                        callback(false);
+                    }
+                });
             }
             else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
@@ -98,21 +120,34 @@ static char kCPSessionDataTaskKey;
                         dispatch_async(dispatch_get_main_queue(), ^{
                             strongSelf.image = image;
                             [strongSelf updateAspectConstraint];
-                            callback(true);
+                            [[CPUtils sharedImageCache] setObject:image forKey:imageURL.absoluteString];
+                            if (callback) {
+                                callback(true);
+                            }
                         });
                     } else {
-                        [CPLog error:@"Error creating image from data"];
-                        callback(false);
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (callback) {
+                                callback(false);
+                            }
+                        });
                     }
                 } else {
-                    [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
-                    callback(false);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if (callback) {
+                            callback(false);
+                        }
+                    });
                 }
             }
         }];
         [self.dataTask resume];
     } else {
-        callback(false);
+        if (callback) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(false);
+            });
+        }
     }
 }
 
@@ -123,11 +158,19 @@ static char kCPSessionDataTaskKey;
     }
     
     if (imageURL) {
+        NSString *urlString = imageURL.absoluteString;
+        [self setCurrentImageURL:urlString];
         __weak typeof(self) weakSelf = self;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
+            if (![strongSelf.currentImageURL isEqualToString:urlString]) {
+                return;
+            }
             if (error) {
-                [CPLog error:@"Error while getting image: %@", error];
+                if (error.code != NSURLErrorCancelled) {
+                } else {
+                    return;
+                }
             }
             else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
@@ -137,12 +180,11 @@ static char kCPSessionDataTaskKey;
                         dispatch_async(dispatch_get_main_queue(), ^{
                             strongSelf.image = image;
                             [strongSelf updateAspectConstraint];
+                            [[CPUtils sharedImageCache] setObject:image forKey:imageURL.absoluteString];
                         });
                     } else {
-                        [CPLog error:@"Error creating image from data"];
                     }
                 } else {
-                    [CPLog error:@"Error while getting image at URL %@ - HTTP %ld", imageURL, (long)httpResponse.statusCode];
                 }
             }
         }];
