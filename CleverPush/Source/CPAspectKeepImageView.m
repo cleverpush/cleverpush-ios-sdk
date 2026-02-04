@@ -86,6 +86,21 @@ static char kCPImageURLKey;
     return (NSString *)objc_getAssociatedObject(self, &kCPImageURLKey);
 }
 
+- (BOOL)applyCachedImageForURLString:(NSString *)urlString callback:(void(^)(BOOL))callback {
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    if (!cachedImage) {
+        return NO;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.image = cachedImage;
+        [self updateAspectConstraint];
+        if (callback) {
+            callback(true);
+        }
+    });
+    return YES;
+}
+
 #pragma mark - set image with URL with callback
 - (void)setImageWithURL:(NSURL*)imageURL callback:(void(^)(BOOL))callback {
     if (self.dataTask) {
@@ -95,6 +110,9 @@ static char kCPImageURLKey;
     if (imageURL) {
         NSString *urlString = imageURL.absoluteString;
         [self setCurrentImageURL:urlString];
+        if ([self applyCachedImageForURLString:urlString callback:callback]) {
+            return;
+        }
         __weak typeof(self) weakSelf = self;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
@@ -102,8 +120,7 @@ static char kCPImageURLKey;
                 return;
             }
             if (error) {
-                if (error.code != NSURLErrorCancelled) {
-                } else {
+                if (error.code == NSURLErrorCancelled) {
                     return;
                 }
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -111,8 +128,7 @@ static char kCPImageURLKey;
                         callback(false);
                     }
                 });
-            }
-            else {
+            } else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
                 if (httpResponse.statusCode == 200) {
                     UIImage *image = [strongSelf imageWithData:data];
@@ -160,6 +176,9 @@ static char kCPImageURLKey;
     if (imageURL) {
         NSString *urlString = imageURL.absoluteString;
         [self setCurrentImageURL:urlString];
+        if ([self applyCachedImageForURLString:urlString callback:nil]) {
+            return;
+        }
         __weak typeof(self) weakSelf = self;
         self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
@@ -167,12 +186,10 @@ static char kCPImageURLKey;
                 return;
             }
             if (error) {
-                if (error.code != NSURLErrorCancelled) {
-                } else {
+                if (error.code == NSURLErrorCancelled) {
                     return;
                 }
-            }
-            else {
+            } else {
                 NSHTTPURLResponse * httpResponse = (NSHTTPURLResponse *)response;
                 if (httpResponse.statusCode == 200) {
                     UIImage *image = [strongSelf imageWithData:data];
