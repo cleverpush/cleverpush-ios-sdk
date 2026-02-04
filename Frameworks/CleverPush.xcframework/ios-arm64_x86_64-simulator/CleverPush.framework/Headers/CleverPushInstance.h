@@ -230,6 +230,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (NSArray<NSString*>* _Nullable)getSubscriptionTags;
 - (NSArray<CPNotification*>* _Nullable)getNotifications;
 - (void)removeNotification:(NSString* _Nullable)notificationId;
+- (void)removeAllNotifications;
 - (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter;
 - (void)trackInboxClicked:(NSString* _Nullable)notificationId;
 - (void)setNotificationRead:(NSString* _Nullable)notificationId read:(BOOL)read;

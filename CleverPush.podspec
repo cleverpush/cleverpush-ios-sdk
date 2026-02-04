@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name                    = "CleverPush"
-    s.version                 = "1.34.36"
+    s.version                 = "1.34.38"
     s.summary                 = "CleverPush library for iOS."
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => "MIT (modified)", :file => "LICENSE" }
@@ -13,10 +13,13 @@ Pod::Spec.new do |s|
 
     s.subspec 'CleverPushExtension' do |ss|
         ss.ios.vendored_frameworks = "Frameworks/CleverPushExtension.xcframework"
+        ss.ios.preserve_paths = "Frameworks/CleverPushExtension.dSYMs/**/*"
     end
 
     s.subspec 'CleverPush' do |ss|
         ss.ios.vendored_frameworks = "Frameworks/CleverPush.xcframework"
         ss.ios.resource_bundle = { "CleverPushResources" => "CleverPush/Resources/*" }
+        ss.ios.preserve_paths = "Frameworks/CleverPush.dSYMs/**/*"
     end
 end
+
