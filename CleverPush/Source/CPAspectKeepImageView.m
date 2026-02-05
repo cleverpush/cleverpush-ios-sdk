@@ -92,6 +92,9 @@ static char kCPImageURLKey;
         return NO;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self.currentImageURL isEqualToString:urlString]) {
+            return;
+        }
         self.image = cachedImage;
         [self updateAspectConstraint];
         if (callback) {
