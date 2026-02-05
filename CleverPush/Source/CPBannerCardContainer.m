@@ -273,30 +273,21 @@
         }
 
         // Check cache first
-        UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:normalizedImageUrl];
-        if (cachedImage) {
-            cell.imgCPBanner.image = cachedImage;
-            [cell.activitydata stopAnimating];
+        BOOL hasCachedImage = ([[CPUtils sharedImageCache] objectForKey:normalizedImageUrl] != nil);
+        __weak typeof(self) weakSelf = self;
+        [cell.imgCPBanner setImageWithURL:url callback:^(BOOL callback) {
             [UIView performWithoutAnimation:^{
                 [cell setNeedsLayout];
                 [cell layoutIfNeeded];
+                [cell.activitydata stopAnimating];
             }];
-        } else {
-            __weak typeof(self) weakSelf = self;
-            [cell.imgCPBanner setImageWithURL:url callback:^(BOOL callback) {
-                [UIView performWithoutAnimation:^{
-                    [cell setNeedsLayout];
-                    [cell layoutIfNeeded];
-                    [cell.activitydata stopAnimating];
-                }];
-                if (callback) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakSelf.tblCPBanner beginUpdates];
-                        [weakSelf.tblCPBanner endUpdates];
-                    });
-                }
-            }];
-        }
+            if (callback && !hasCachedImage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.tblCPBanner beginUpdates];
+                    [weakSelf.tblCPBanner endUpdates];
+                });
+            }
+        }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];

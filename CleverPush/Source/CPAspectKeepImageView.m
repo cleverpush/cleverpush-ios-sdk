@@ -162,6 +162,11 @@ static char kCPImageURLKey;
         }];
         [self.dataTask resume];
     } else {
+        [self setCurrentImageURL:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.image = nil;
+            [self updateAspectConstraint];
+        });
         if (callback) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 callback(false);
@@ -209,6 +214,12 @@ static char kCPImageURLKey;
             }
         }];
         [self.dataTask resume];
+    } else {
+        [self setCurrentImageURL:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.image = nil;
+            [self updateAspectConstraint];
+        });
     }
     return;
 }
