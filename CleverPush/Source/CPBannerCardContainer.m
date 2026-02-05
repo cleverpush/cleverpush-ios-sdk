@@ -273,7 +273,17 @@
         }
 
         // Check cache first
-        BOOL hasCachedImage = ([[CPUtils sharedImageCache] objectForKey:normalizedImageUrl] != nil);
+        NSString *cacheKey = url.absoluteString;
+        UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
+        if (cachedImage) {
+            cell.imgCPBanner.image = cachedImage;
+            [cell.activitydata stopAnimating];
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+            }];
+        }
+        BOOL hasCachedImage = (cachedImage != nil);
         __weak typeof(self) weakSelf = self;
         [cell.imgCPBanner setImageWithURL:url callback:^(BOOL callback) {
             [UIView performWithoutAnimation:^{
