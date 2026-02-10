@@ -1406,7 +1406,7 @@ int appBannerPerDayValue = 0;
                 if (![CPUtils isNullOrEmpty:voucherCode]) {
                     action.url = [CPUtils replaceAndEncodeURL:action.url withReplacement:voucherCode];
                 }
-                [[UIApplication sharedApplication] openURL:action.url options:@{} completionHandler:nil];
+                [CPUtils tryOpenURL:action.url];
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
