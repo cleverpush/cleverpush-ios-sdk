@@ -341,7 +341,7 @@ CPNotificationClickBlock handleClick;
             }
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
-                [[UIApplication sharedApplication] openURL:action.url options:@{} completionHandler:nil];
+                [CPUtils tryOpenURL:action.url];
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
