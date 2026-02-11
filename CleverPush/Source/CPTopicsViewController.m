@@ -11,6 +11,10 @@ static CGFloat const CPTopicSwitchTrailingDefault = 5.0;
 static CGFloat const CPTopicSwitchTrailingiOS26 = 10.0;
 static CGFloat const CPTopicHeightDivider = 2.0f;
 static CGFloat const CPConstraints = 30.0;
+static CGFloat const CPTopicChildLeading = 20.0;
+static CGFloat const CPTopicHighlighterWidth = 15.0;
+static CGFloat const CPTopicStackSpacing = 5.0;
+static CGFloat const CPTopicMinimumTitleWidth = 80.0;
 
 @implementation CPTopicsViewController
 
@@ -349,7 +353,20 @@ static CGFloat const CPConstraints = 30.0;
         cell.operatableSwitch.onTintColor = [UIColor systemGreenColor];
     }
     if ([topic parentTopic]) {
-        float inset = CPConstraints;
+        CGFloat switchTrailing = CPTopicSwitchTrailingDefault;
+        if (@available(iOS 26.0, *)) {
+            switchTrailing = CPTopicSwitchTrailingiOS26;
+        }
+        UISwitch *sizingSwitch = [[UISwitch alloc] init];
+        CGFloat switchWidth = [sizingSwitch sizeThatFits:CGSizeZero].width;
+        CGFloat maxInset = tableView.bounds.size.width
+            - switchWidth
+            - switchTrailing
+            - CPTopicHighlighterWidth
+            - CPTopicStackSpacing
+            - CPTopicMinimumTitleWidth
+            - CPTopicStackSpacing;
+        CGFloat inset = MAX(CPTopicCellLeading, MIN(CPTopicChildLeading, maxInset));
         cell.leadingConstraints.constant = inset;
         cell.operatableSwitch.on = [self defaultTopicState:topic];
     } else {
@@ -371,6 +388,7 @@ static CGFloat const CPConstraints = 30.0;
         cell.topicHighlighter.hidden = YES;
     }
     [cell updateSeparatorWithTopicHighlighter];
+    cell.titleText.attributedText = nil;
     cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
