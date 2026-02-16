@@ -24,7 +24,7 @@
                     <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="y6r-2E-dMa">
                         <rect key="frame" x="0.0" y="10" width="354" height="34"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="●" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ROZ-mg-bAe">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="●" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="1" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ROZ-mg-bAe">
                                 <rect key="frame" x="0.0" y="0.0" width="15" height="34"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -34,9 +34,12 @@
                                 <color key="textColor" systemColor="systemBlueColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gdH-YZ-mUZ">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" text="Label" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gdH-YZ-mUZ">
                                 <rect key="frame" x="20" y="0.0" width="334" height="34"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="750" constant="60" id="iAw-t3-zMz"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -49,7 +52,7 @@
                     <constraint firstItem="bML-n5-N5M" firstAttribute="centerY" secondItem="fpB-qG-pgg" secondAttribute="centerY" id="QXK-HO-Jcj"/>
                     <constraint firstItem="y6r-2E-dMa" firstAttribute="top" secondItem="fpB-qG-pgg" secondAttribute="top" constant="10" id="SAk-xe-QVy"/>
                     <constraint firstAttribute="bottom" secondItem="y6r-2E-dMa" secondAttribute="bottom" constant="10" id="WGc-1S-JMR"/>
-                    <constraint firstItem="bML-n5-N5M" firstAttribute="leading" secondItem="y6r-2E-dMa" secondAttribute="trailing" constant="5" id="fRP-gc-a6h"/>
+                    <constraint firstItem="bML-n5-N5M" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="y6r-2E-dMa" secondAttribute="trailing" constant="5" id="fRP-gc-a6h"/>
                     <constraint firstItem="bML-n5-N5M" firstAttribute="top" relation="greaterThanOrEqual" secondItem="fpB-qG-pgg" secondAttribute="top" constant="12" id="nXz-d2-rg4"/>
                     <constraint firstItem="y6r-2E-dMa" firstAttribute="leading" secondItem="fpB-qG-pgg" secondAttribute="leading" id="tOv-LN-Pyd"/>
                 </constraints>

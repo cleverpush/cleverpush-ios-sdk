@@ -9,6 +9,13 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
+    self.titleText.numberOfLines = 0;
+    self.titleText.lineBreakMode = NSLineBreakByWordWrapping;
+    self.titleText.adjustsFontSizeToFitWidth = NO;
+    [self.titleText setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [self.titleText setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [self.topicHighlighter setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+    
     if (@available(iOS 26.0, *)) {
         for (NSLayoutConstraint *constraint in self.contentView.constraints) {
             if (constraint.firstItem == self.contentView &&
