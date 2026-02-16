@@ -1,3 +1,6 @@
+## 1.34.39 (16.02.2026)
+* Resolved the layout issue of topics dialogue.
+
 ## 1.34.38 (02.02.2026)
 * Update build-frameworks.sh to generate and package dSYM files
 
