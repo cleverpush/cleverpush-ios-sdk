@@ -1938,6 +1938,25 @@ static id isNil(id object) {
         }
     }
     
+    NSString *notificationDeeplinkId = nil;
+    NSString *notificationUrl = [notification objectForKey:@"url"];
+    
+    if (notificationUrl != nil && ![notificationUrl isKindOfClass:[NSNull class]] && [notificationUrl length] > 0) {
+        NSURL *notificationURL = [NSURL URLWithString:notificationUrl];
+        if (notificationURL) {
+            notificationDeeplinkId = [CPUtils getQueryParameterFromURL:notificationURL forKey:@"deeplinkId"];
+        }
+    }
+    
+    if (notificationDeeplinkId && ![CPUtils isNullOrEmpty:notificationDeeplinkId]) {
+        [userDefaults setObject:notificationDeeplinkId forKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+        [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+    } else {
+        [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+        [userDefaults removeObjectForKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+    }
+    [userDefaults synchronize];
+    
     BOOL hasValidUrl = notification != nil &&
                        [notification objectForKey:@"url"] != nil &&
                        ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
@@ -3417,6 +3436,16 @@ static id isNil(id object) {
                         NSTimeInterval secondsSinceLastClick = [[NSDate date] timeIntervalSinceDate:lastClickedNotificationTimeStamp];
                         if (secondsSinceLastClick <= 60 * 60) {
                             [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
+                        }
+                    }
+                    
+                    NSString* lastDeeplinkId = [userDefaults stringForKey:CLEVERPUSH_LAST_DEEPLINK_ID_KEY];
+                    NSDate* lastDeeplinkTimeStamp = [userDefaults objectForKey:CLEVERPUSH_LAST_DEEPLINK_TIME_KEY];
+                    
+                    if (![CPUtils isNullOrEmpty:lastDeeplinkId] && lastDeeplinkTimeStamp != nil && [lastDeeplinkTimeStamp isKindOfClass:[NSDate class]]) {
+                        NSTimeInterval secondsSinceLastDeeplinkClick = [[NSDate date] timeIntervalSinceDate:lastDeeplinkTimeStamp];
+                        if (secondsSinceLastDeeplinkClick <= 60 * 60) {
+                            [dataDic setObject:lastDeeplinkId forKey:@"deeplinkId"];
                         }
                     }
 

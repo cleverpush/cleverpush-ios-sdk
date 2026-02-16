@@ -1016,6 +1016,25 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return components.URL;
 }
 
++ (NSString *)getQueryParameterFromURL:(NSURL *)url forKey:(NSString *)key {
+    if (!url || !key) {
+        return nil;
+    }
+    
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    if (!components || !components.queryItems) {
+        return nil;
+    }
+    
+    for (NSURLQueryItem *queryItem in components.queryItems) {
+        if ([queryItem.name isEqualToString:key]) {
+            return queryItem.value;
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - Converts UISceneConnectionOptions to launch options.
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
     NSMutableDictionary *launchOptions = [NSMutableDictionary dictionary];
