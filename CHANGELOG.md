@@ -1,3 +1,8 @@
+## 1.34.40 (16.02.2026)
+* Fix iOS deep-link opening in app banner/inbox by replacing direct openURL calls with CPUtils.tryOpenURL.
+* Fixed imageview not displaying in app banner.
+* Resolved the issue where the session condition was not working as expected in the trackPageView function.
+
 ## 1.34.39 (16.02.2026)
 * Resolved the layout issue of topics dialogue.
 
