@@ -1,3 +1,17 @@
+## 1.34.40 (16.02.2026)
+* Fix iOS deep-link opening in app banner/inbox by replacing direct openURL calls with CPUtils.tryOpenURL.
+* Fixed imageview not displaying in app banner.
+* Resolved the issue where the session condition was not working as expected in the trackPageView function.
+
+## 1.34.39 (16.02.2026)
+* Resolved the layout issue of topics dialogue.
+
+## 1.34.38 (02.02.2026)
+* Update build-frameworks.sh to generate and package dSYM files
+
+## 1.34.37 (02.02.2026)
+* Implemented a new method `removeAllNotifications` to remove notifications locally.
+
 ## 1.34.36 (19.12.2025)
 * Fixed a rare crash related to tag auto-assign counters for existing users.
 

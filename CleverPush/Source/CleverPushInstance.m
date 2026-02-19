@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.36";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.40";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -3164,6 +3164,14 @@ static id isNil(id object) {
     [self removeNotification:notificationId removeFromNotificationCenter:NO];
 }
 
+- (void)removeAllNotifications {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults objectForKey:CLEVERPUSH_NOTIFICATIONS_KEY] != nil) {
+        [userDefaults removeObjectForKey:CLEVERPUSH_NOTIFICATIONS_KEY];
+        [userDefaults synchronize];
+    }
+}
+
 - (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {
     NSString *notificationIdentifier = nil;
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -3557,6 +3565,14 @@ static id isNil(id object) {
                     [CPLog debug:@"checkTags: autoAssignTagMatches:YES %@", [tag name]];
 
                     NSString* tagId = tag.id;
+                    if (autoAssignSessionsCounted == nil) {
+                        autoAssignSessionsCounted = [[NSMutableDictionary alloc] init];
+                    }
+                    NSString* sessionMarkerKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessionMarker-%@", tagId];
+                    BOOL hasSessionTimestamp = sessionStartedTimestamp > 0;
+                    NSNumber* currentSessionMarker = hasSessionTimestamp ? @(sessionStartedTimestamp) : nil;
+                    NSNumber* storedSessionMarker = [userDefaults objectForKey:sessionMarkerKey];
+                    BOOL isSameSession = hasSessionTimestamp && storedSessionMarker != nil && [storedSessionMarker isEqualToNumber:currentSessionMarker];
                     NSString* visitsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignVisits-%@", tagId];
                     NSString* sessionsStorageKey = [NSString stringWithFormat:@"CleverPush_TAG-autoAssignSessions-%@", tagId];
 
@@ -3704,27 +3720,40 @@ static id isNil(id object) {
                             [userDefaults setObject:dailyVisits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
-                                int dateSessions = 0;
-                                if ([dailySessions objectForKey:dateKey] == nil) {
-                                    [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
-                                } else {
-                                    dateSessions = [[dailySessions objectForKey:dateKey] intValue];
+                                if (!hasSessionTimestamp) {
+                                    [autoAssignSessionsCounted setObject:@YES forKey:tagId];
+                                } else if (!isSameSession) {
+                                    int dateSessions = 0;
+                                    if ([dailySessions objectForKey:dateKey] == nil) {
+                                        [dailySessions setObject:[NSNumber numberWithInt:0] forKey:dateKey];
+                                    } else {
+                                        dateSessions = [[dailySessions objectForKey:dateKey] intValue];
+                                    }
+                                    dateSessions += 1;
+                                    [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
+
+                                    if (currentSessionMarker != nil) {
+                                        [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    }
+                                    [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
                                 }
-                                dateSessions += 1;
-                                [dailySessions setObject:[NSNumber numberWithInt:dateSessions] forKey:dateKey];
-
-                                [autoAssignSessionsCounted setValue:false forKey:tagId];
-
-                                [userDefaults setObject:dailySessions forKey:sessionsStorageKey];
+                                [autoAssignSessionsCounted setObject:@YES forKey:tagId];
                             }
                         } else {
                             visits += 1;
                             [userDefaults setInteger:visits forKey:visitsStorageKey];
 
                             if ([autoAssignSessionsCounted objectForKey:tagId] == nil) {
-                                sessions += 1;
-                                [userDefaults setInteger:sessions forKey:sessionsStorageKey];
-                                [autoAssignSessionsCounted setValue:false forKey:tagId];
+                                if (!hasSessionTimestamp) {
+                                    [autoAssignSessionsCounted setObject:@YES forKey:tagId];
+                                } else if (!isSameSession) {
+                                    sessions += 1;
+                                    [userDefaults setInteger:sessions forKey:sessionsStorageKey];
+                                    if (currentSessionMarker != nil) {
+                                        [userDefaults setObject:currentSessionMarker forKey:sessionMarkerKey];
+                                    }
+                                }
+                                [autoAssignSessionsCounted setObject:@YES forKey:tagId];
                             }
                         }
                     }

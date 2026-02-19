@@ -62,15 +62,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPTopicDialogCell.nib</key>
 		<data>
-		o1Jd4dhFpMnzVBYIaTa40l/DzxY=
+		2VSUAMDCru/ySIuWWMB5m4BE/zk=
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		diwlnn7MOvRzf68jVEuuMsTsLbM=
+		2g1/diINGnnE/muvkuD+8o3l0mQ=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		hq0N6ALC0WgufPj5l1h49Lduzbc=
+		Swih3QEP/Ix2AmjHkRPvqVt1OZs=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -78,7 +78,7 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		fTpkvZgWFR99IlHnNP37/qmbn8M=
+		uiDKTV9tE78Z1TmTvpgj9Jk0W6U=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
@@ -106,7 +106,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		MOcZ7UAZDgL2N7K7MCmgkFlNSkY=
+		wZRmnHLmBsf1pnC0YkxnMhMnnXw=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -114,7 +114,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		HxT0WqGXfctvuYFtgiLY/c2qXdo=
+		aK0VL4jk1sApk9YlpuMaTx44xS8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -229,21 +229,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Y6o+dee4MzlQ0jWudyye3pL4InFhovDKMH7DRf4onDQ=
+			zpEybCPFBVXhCuM+xVqeUePix8X6tcHkDadAEHxXF0A=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			V5DqM+7XtVy3zgvx413DaurS2shRtb4rwS6TcJ65b9o=
+			SwGkt0zlLEe9Lv/VH7YNi3wOsbazPwWzE0prNYoqAgc=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			aiG/bv4oZ6SPl6fr2+GLeodh8ZsyDdMVDTHT5XzwpFA=
+			d2RRIGaQ2Z6wzD+eQG7eWE4RtL4dLC1Oxpze151VJN8=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -257,7 +257,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			RAPcX4z04Q/YL7pyDNKidLUQnhelkY3tNx/53t32nHI=
+			o/eCD3d1g3SwUbfrVVgWXHEGtVPvrnasSBIOpbM01A0=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
@@ -306,7 +306,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			R8562lD06bqKiYlngpWUhPZtPB4xDO6M3ImThyA1Zdc=
+			Lh966zUlyOhF/y1VqslwTeQOk044EvwIfcVN3GwzyWs=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>

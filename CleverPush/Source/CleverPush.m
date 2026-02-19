@@ -833,6 +833,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeNotification:notificationId];
 }
 
++ (void)removeAllNotifications {
+    [self.CPSharedInstance removeAllNotifications];
+}
+
 + (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {
     [self.CPSharedInstance removeNotification:notificationId removeFromNotificationCenter:removeFromCenter];
 }

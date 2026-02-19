@@ -73,13 +73,18 @@
     } else {
         frame.size.height = contentHeight;
     }
+    if (frame.size.height < 0) {
+        frame.size.height = 0;
+    }
     self.tblCPBanner.frame = frame;
-    self.tblCPBannerHeightConstraint.constant = frame.size.height;
+    CGFloat bannerHeight = MAX(0.0, frame.size.height);
+    self.tblCPBannerHeightConstraint.constant = bannerHeight;
     if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
-        self.tblCPBannerHeightConstraint.constant = frame.size.height - 20;
+        CGFloat adjustedHeight = bannerHeight - 20.0;
         if (self.data.closeButtonPositionStaticEnabled) {
-            self.tblCPBannerHeightConstraint.constant = frame.size.height - 40;
+            adjustedHeight = bannerHeight - 40.0;
         }
+        self.tblCPBannerHeightConstraint.constant = MAX(0.0, adjustedHeight);
     }
     [self updateTableViewContentInset];
 }
@@ -240,36 +245,59 @@
             imageUrl = block.imageUrl;
         }
 
-        if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
-            cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
-            [cell.activitydata startAnimating];
-            if (@available(iOS 13.0, *)) {
-                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
-            } else {
-                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
-            }
-
-            // Check cache first
-            UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:imageUrl];
-            if (cachedImage) {
-                cell.imgCPBanner.image = cachedImage;
-                [cell.activitydata stopAnimating];
-                [UIView performWithoutAnimation:^{
-                    [cell setNeedsLayout];
-                    [cell layoutIfNeeded];
-                }];
-            } else {
-                [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl] callback:^(BOOL callback) {
-                    if (callback) {
-                        [UIView performWithoutAnimation:^{
-                            [cell setNeedsLayout];
-                            [cell layoutIfNeeded];
-                            [cell.activitydata stopAnimating];
-                        }];
-                    }
-                }];
-            }
+        NSString *normalizedImageUrl = nil;
+        if ([imageUrl isKindOfClass:[NSString class]]) {
+            normalizedImageUrl = [imageUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         }
+
+        if (normalizedImageUrl.length == 0) {
+            cell.imgCPBanner.image = nil;
+            [cell.activitydata stopAnimating];
+            return cell;
+        }
+
+        NSURL *url = [NSURL URLWithString:normalizedImageUrl];
+        if (!url) {
+            cell.imgCPBanner.image = nil;
+            [cell.activitydata stopAnimating];
+            return cell;
+        }
+
+        cell.imgCPBanner.image = nil;
+        cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
+        [cell.activitydata startAnimating];
+        if (@available(iOS 13.0, *)) {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
+        } else {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        }
+
+        // Check cache first
+        NSString *cacheKey = url.absoluteString;
+        UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
+        if (cachedImage) {
+            cell.imgCPBanner.image = cachedImage;
+            [cell.activitydata stopAnimating];
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+            }];
+        }
+        BOOL hasCachedImage = (cachedImage != nil);
+        __weak typeof(self) weakSelf = self;
+        [cell.imgCPBanner setImageWithURL:url callback:^(BOOL callback) {
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+                [cell.activitydata stopAnimating];
+            }];
+            if (callback && !hasCachedImage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.tblCPBanner beginUpdates];
+                    [weakSelf.tblCPBanner endUpdates];
+                });
+            }
+        }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
