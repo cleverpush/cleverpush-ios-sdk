@@ -4537,6 +4537,10 @@ static id isNil(id object) {
     return handleUniversalLinksInApp;
 }
 
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    handleUrlFromSceneDelegate = handleFromSceneDelegate;
+}
+
 - (BOOL)getHandleUrlFromSceneDelegate {
     return handleUrlFromSceneDelegate;
 }

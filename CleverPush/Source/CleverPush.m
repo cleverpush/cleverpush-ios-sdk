@@ -807,6 +807,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getUnsubscribeStatus];
 }
 
++ (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    [self.CPSharedInstance setHandleUrlFromSceneDelegate:handleFromSceneDelegate];
+}
+
 + (BOOL)getHandleUrlFromSceneDelegate {
     return [self.CPSharedInstance getHandleUrlFromSceneDelegate];
 }
