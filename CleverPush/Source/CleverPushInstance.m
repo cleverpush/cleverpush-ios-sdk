@@ -194,8 +194,16 @@ static id isNil(id object) {
 
 - (void)setTrackingConsent:(BOOL)consent {
     BOOL previousTrackingConsent = hasTrackingConsent;
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    if (!previousTrackingConsent && [userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_KEY] != nil) {
+        previousTrackingConsent = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    }
+
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
+    [userDefaults setBool:hasTrackingConsent forKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    [userDefaults setBool:hasTrackingConsentCalled forKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY];
+    [userDefaults synchronize];
 
     if (!hasTrackingConsent && previousTrackingConsent) {
         [self removeSubscriptionTagsAndAttributes];
@@ -447,6 +455,14 @@ static id isNil(id object) {
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if ([userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_KEY] != nil) {
+        hasTrackingConsent = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    }
+    if ([userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY] != nil) {
+        hasTrackingConsentCalled = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY];
+    }
+    
     NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
 
     if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
