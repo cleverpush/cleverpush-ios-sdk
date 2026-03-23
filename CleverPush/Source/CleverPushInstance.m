@@ -2444,6 +2444,13 @@ static id isNil(id object) {
             [CPLog debug:@"CleverPushInstance: removeSubscriptionAttributeFromApi: There is no subscription for CleverPush SDK."];
             return;
         }
+        if (attributeId == nil || [attributeId isKindOfClass:[NSNull class]] || ![attributeId isKindOfClass:[NSString class]] || attributeId.length == 0) {
+            [CPLog error:@"CleverPushInstance: removeSubscriptionAttributeFromApi: attributeId is nil or invalid."];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Attribute ID is nil or empty"}]);
+            }
+            return;
+        }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/clear"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2456,10 +2463,8 @@ static id isNil(id object) {
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
                 NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
-                if (!subscriptionAttributes) {
-                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
-                }
+                NSDictionary* cachedAttributes = [userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                NSMutableDictionary* subscriptionAttributes = cachedAttributes ? [cachedAttributes mutableCopy] : [[NSMutableDictionary alloc] init];
                 [subscriptionAttributes removeObjectForKey:attributeId];
                 [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
                 [userDefaults synchronize];
