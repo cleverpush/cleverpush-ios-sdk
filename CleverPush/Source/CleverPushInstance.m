@@ -2418,6 +2418,65 @@ static id isNil(id object) {
     }];
 }
 
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self removeSubscriptionAttribute:attributeId callback:nil onFailure:nil];
+}
+
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self waitForTrackingConsent:^{
+        [self removeSubscriptionAttributeFromApi:attributeId callback:^(NSString* attributeKey) {
+            if (callback) {
+                callback(attributeKey);
+            }
+        } onFailure:failureBlock];
+    }];
+}
+
+- (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    for (NSString* attributeId in attributeIds) {
+        [self removeSubscriptionAttribute:attributeId];
+    }
+}
+
+- (void)removeSubscriptionAttributeFromApi:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: removeSubscriptionAttributeFromApi: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/clear"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
+                if (!subscriptionAttributes) {
+                    subscriptionAttributes = [[NSMutableDictionary alloc] init];
+                }
+                [subscriptionAttributes removeObjectForKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback(attributeId);
+                }
+            } onFailure:^(NSError *error) {
+                [CPLog error:@"Error removing subscription attribute: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
+}
+
 - (void)addSubscriptionTag:(NSString* _Nullable)tagId {
     [self addSubscriptionTag:tagId callback:nil];
 }
