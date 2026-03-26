@@ -33,7 +33,10 @@ static CleverPush* singleInstance = nil;
 #pragma mark - Singleton shared instance of the cleverpush.
 
 + (CleverPushInstance*)CPSharedInstance {
-    if (singletonInstance == nil) singletonInstance = [[CleverPushInstance alloc] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        singletonInstance = [[CleverPushInstance alloc] init];
+    });
     return singletonInstance;
 }
 
