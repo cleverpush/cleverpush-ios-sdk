@@ -1054,9 +1054,35 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return sharedImageCache;
 }
 
++ (NSCache *)sharedAttributedStringCache {
+    static NSCache *sharedAttributedStringCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedAttributedStringCache = [[NSCache alloc] init];
+        sharedAttributedStringCache.countLimit = 100;
+    });
+    return sharedAttributedStringCache;
+}
+
 #pragma mark - Convert HTML to NSAttributedString
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
     NSString *colorHex = [CPUtils hexStringFromColor:textColor];
+    NSString *cacheKey = [NSString stringWithFormat:@"%@|%@|%@|%.0f|%ld",
+                          html, colorHex, font.fontName, font.pointSize, (long)textAlignment];
+    NSCache *cache = [CPUtils sharedAttributedStringCache];
+    NSAttributedString *cached = [cache objectForKey:cacheKey];
+    if (cached != nil) {
+        return cached;
+    }
+    
+    if (![NSThread isMainThread]) {
+        __block NSAttributedString *result = nil;
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = [CPUtils attributedStringFromHTML:html font:font textColor:textColor textAlignment:textAlignment];
+        });
+        return result;
+    }
+
     NSString *htmlString = [NSString stringWithFormat:
         @"<style>"
          "html,body{margin:0;padding:0;}"
@@ -1126,13 +1152,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         }
         endIndex--;
     }
+
+    NSAttributedString *result;
     if (endIndex == 0) {
-        return [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
+        result = [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
+    } else if (endIndex < (NSInteger)attributedString.length) {
+        result = [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
+    } else {
+        result = attributedString;
     }
-    if (endIndex < (NSInteger)attributedString.length) {
-        return [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
-    }
-    return attributedString;
+
+    [cache setObject:result forKey:cacheKey];
+    return result;
 }
 
 @end
