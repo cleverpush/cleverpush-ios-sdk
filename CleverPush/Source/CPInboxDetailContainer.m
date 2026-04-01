@@ -12,6 +12,7 @@
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
 #import "CPLog.h"
+#import "CPUtils.h"
 #import "CPInboxDetailContainer.h"
 
 @implementation CPInboxDetailContainer
@@ -54,28 +55,49 @@
             imageUrl = block.imageUrl;
         }
 
-        if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
-            cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
-            [cell.activitydata startAnimating];
-            if (@available(iOS 13.0, *)) {
-                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleMedium;
-            } else {
-                cell.activitydata.activityIndicatorViewStyle =  UIActivityIndicatorViewStyleGray;
-            }
+        NSURL *url = [CPUtils normalizedImageURLFromString:imageUrl];
+        if (!url) {
+            cell.imgCPBanner.image = nil;
+            [cell.activitydata stopAnimating];
+            return cell;
+        }
 
-            [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl]callback:^(BOOL callback) {
-                if (callback) {
-                    [UIView performWithoutAnimation:^{
-                        [cell setNeedsLayout];
-                        [cell layoutIfNeeded];
-                        [tableView beginUpdates];
-                        [tableView endUpdates];
-                        [cell.activitydata stopAnimating];
-                    }];
-                }
+        NSString *cacheKey = [CPUtils imageCacheKeyForURLString:imageUrl];
+        UIImage *cachedImage = cacheKey.length > 0 ? [[CPUtils sharedImageCache] objectForKey:cacheKey] : nil;
+
+        cell.imgCPBanner.image = nil;
+        cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
+        [cell.activitydata startAnimating];
+        if (@available(iOS 13.0, *)) {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
+        } else {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        }
+
+        if (cachedImage) {
+            cell.imgCPBanner.image = cachedImage;
+            [cell.activitydata stopAnimating];
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
             }];
         }
-        return  cell;
+
+        BOOL hasCachedImage = (cachedImage != nil);
+        [cell.imgCPBanner setImageWithURL:url callback:^(BOOL success) {
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+                [cell.activitydata stopAnimating];
+            }];
+            if (success && !hasCachedImage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [tableView beginUpdates];
+                    [tableView endUpdates];
+                });
+            }
+        }];
+        return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
 

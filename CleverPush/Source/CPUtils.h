@@ -52,6 +52,9 @@
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 + (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize;
 + (NSCache *)sharedImageCache;
++ (NSURL *)normalizedImageURLFromString:(NSString *)urlString;
++ (NSString *)imageCacheKeyForURLString:(NSString *)urlString;
++ (UIImage *)decodedImageWithData:(NSData *)data;
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment;
 
 @end

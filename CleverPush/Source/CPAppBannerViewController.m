@@ -913,14 +913,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSMutableArray *imageURLsToPreload = [NSMutableArray array];
     
     if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.imageUrl]) {
+        NSString *bgKey = [CPUtils imageCacheKeyForURLString:self.data.background.imageUrl];
+        if (bgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:bgKey]) {
             if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && [self.data.background.imageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.imageUrl];
             }
         }
     }
     if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.darkImageUrl]) {
+        NSString *darkBgKey = [CPUtils imageCacheKeyForURLString:self.data.background.darkImageUrl];
+        if (darkBgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkBgKey]) {
             if (self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && [self.data.background.darkImageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.darkImageUrl];
             }
@@ -933,14 +935,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -987,14 +991,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    // Check if image is already cached
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1007,9 +1016,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();
@@ -1051,14 +1060,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -1089,13 +1100,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1108,9 +1125,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();

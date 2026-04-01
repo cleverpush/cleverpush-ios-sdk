@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <ImageIO/ImageIO.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
@@ -1052,6 +1053,56 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         sharedImageCache = [[NSCache alloc] init];
     });
     return sharedImageCache;
+}
+
++ (NSURL *)normalizedImageURLFromString:(NSString *)urlString {
+    if (![urlString isKindOfClass:[NSString class]]) {
+        return nil;
+    }
+    NSString *trimmed = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmed.length == 0) {
+        return nil;
+    }
+    NSURL *url = [NSURL URLWithString:trimmed];
+    if (url) {
+        return url;
+    }
+    NSURLComponents *components = [NSURLComponents componentsWithString:trimmed];
+    if (components.URL) {
+        return components.URL;
+    }
+    NSString *encoded = [trimmed stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    if (encoded.length == 0) {
+        return nil;
+    }
+    return [NSURL URLWithString:encoded];
+}
+
++ (NSString *)imageCacheKeyForURLString:(NSString *)urlString {
+    NSURL *url = [self normalizedImageURLFromString:urlString];
+    return url.absoluteString ?: @"";
+}
+
++ (UIImage *)decodedImageWithData:(NSData *)data {
+    if (data.length == 0) {
+        return nil;
+    }
+    UIImage *image = [UIImage imageWithData:data];
+    if (image) {
+        return image;
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    if (!source) {
+        return nil;
+    }
+    CGImageRef cgImage = CGImageSourceCreateImageAtIndex(source, 0, NULL);
+    CFRelease(source);
+    if (!cgImage) {
+        return nil;
+    }
+    UIImage *decoded = [UIImage imageWithCGImage:cgImage];
+    CGImageRelease(cgImage);
+    return decoded;
 }
 
 #pragma mark - Convert HTML to NSAttributedString
