@@ -353,6 +353,22 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId callback:^(NSString* callbackInner) {
+        if (callback) {
+            callback(callbackInner);
+        }
+    } onFailure:failureBlock];
+}
+
++ (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    [self.CPSharedInstance removeSubscriptionAttributes:attributeIds];
+}
+
 + (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token {
     [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
 }
