@@ -447,11 +447,28 @@ static id isNil(id object) {
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    NSDate *installationDate = nil;
 
-    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
-        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
-        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+    id rawInstallationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    if (rawInstallationDate != nil && rawInstallationDate != [NSNull null] && [rawInstallationDate isKindOfClass:[NSDate class]]) {
+        NSDate *candidate = (NSDate *)rawInstallationDate;
+        if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+            installationDate = candidate;
+        }
+    }
+
+    if (installationDate == nil) {
+        NSDate *subscriptionCreatedAt = nil;
+
+        id rawSubscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (rawSubscriptionCreatedAt != nil && rawSubscriptionCreatedAt != [NSNull null] && [rawSubscriptionCreatedAt isKindOfClass:[NSDate class]]) {
+            NSDate *candidate = (NSDate *)rawSubscriptionCreatedAt;
+            if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+                subscriptionCreatedAt = candidate;
+            }
+        }
+
+        if (subscriptionCreatedAt != nil) {
             [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
         } else {
             [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
@@ -4484,7 +4501,13 @@ static id isNil(id object) {
 
 - (BOOL)isChannelIdChanged:(NSString* _Nullable)channelId; {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([channelId isEqualToString:[userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY]]) {
+    NSString *storedChannelId = nil;
+    id rawStoredChannelId = [userDefaults objectForKey:CLEVERPUSH_CHANNEL_ID_KEY];
+    if (rawStoredChannelId != nil && rawStoredChannelId != [NSNull null] && [rawStoredChannelId isKindOfClass:[NSString class]] && [((NSString *)rawStoredChannelId) length] > 0) {
+        storedChannelId = (NSString *)rawStoredChannelId;
+    }
+
+    if (channelId != nil && channelId != (id)[NSNull null] && [channelId isKindOfClass:[NSString class]] && [channelId length] > 0 && [channelId isEqualToString:storedChannelId]) {
         return false;
     } else {
         return true;
