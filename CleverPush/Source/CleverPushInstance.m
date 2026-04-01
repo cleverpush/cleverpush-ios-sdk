@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.40";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.41";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -463,11 +463,27 @@ static id isNil(id object) {
         hasTrackingConsentCalled = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY];
     }
     
-    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    NSDate *installationDate = nil;
+    id rawInstallationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    if (rawInstallationDate != nil && rawInstallationDate != [NSNull null] && [rawInstallationDate isKindOfClass:[NSDate class]]) {
+        NSDate *candidate = (NSDate *)rawInstallationDate;
+        if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+            installationDate = candidate;
+        }
+    }
 
-    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
-        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
-        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+    if (installationDate == nil) {
+        NSDate *subscriptionCreatedAt = nil;
+
+        id rawSubscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (rawSubscriptionCreatedAt != nil && rawSubscriptionCreatedAt != [NSNull null] && [rawSubscriptionCreatedAt isKindOfClass:[NSDate class]]) {
+            NSDate *candidate = (NSDate *)rawSubscriptionCreatedAt;
+            if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+                subscriptionCreatedAt = candidate;
+            }
+        }
+
+        if (subscriptionCreatedAt != nil) {
             [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
         } else {
             [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
@@ -2426,6 +2442,70 @@ static id isNil(id object) {
                 }
             } onFailure:^(NSError* error) {
                 [CPLog error:@"Error removing subscription tag: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
+}
+
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self removeSubscriptionAttribute:attributeId callback:nil onFailure:nil];
+}
+
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self waitForTrackingConsent:^{
+        [self removeSubscriptionAttributeFromApi:attributeId callback:^(NSString* attributeKey) {
+            if (callback) {
+                callback(attributeKey);
+            }
+        } onFailure:failureBlock];
+    }];
+}
+
+- (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    for (NSString* attributeId in attributeIds) {
+        [self removeSubscriptionAttribute:attributeId];
+    }
+}
+
+- (void)removeSubscriptionAttributeFromApi:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: removeSubscriptionAttributeFromApi: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        if (attributeId == nil || [attributeId isKindOfClass:[NSNull class]] || ![attributeId isKindOfClass:[NSString class]] || attributeId.length == 0) {
+            [CPLog error:@"CleverPushInstance: removeSubscriptionAttributeFromApi: attributeId is nil or invalid."];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Attribute ID is nil or empty"}]);
+            }
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/clear"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSDictionary* cachedAttributes = [userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                NSMutableDictionary* subscriptionAttributes = cachedAttributes ? [cachedAttributes mutableCopy] : [[NSMutableDictionary alloc] init];
+                [subscriptionAttributes removeObjectForKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback(attributeId);
+                }
+            } onFailure:^(NSError *error) {
+                [CPLog error:@"Error removing subscription attribute: %@", error];
                 if (failureBlock) {
                     failureBlock(error);
                 }
@@ -4500,7 +4580,13 @@ static id isNil(id object) {
 
 - (BOOL)isChannelIdChanged:(NSString* _Nullable)channelId; {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([channelId isEqualToString:[userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY]]) {
+    NSString *storedChannelId = nil;
+    id rawStoredChannelId = [userDefaults objectForKey:CLEVERPUSH_CHANNEL_ID_KEY];
+    if (rawStoredChannelId != nil && rawStoredChannelId != [NSNull null] && [rawStoredChannelId isKindOfClass:[NSString class]] && [((NSString *)rawStoredChannelId) length] > 0) {
+        storedChannelId = (NSString *)rawStoredChannelId;
+    }
+
+    if (channelId != nil && channelId != (id)[NSNull null] && [channelId isKindOfClass:[NSString class]] && [channelId length] > 0 && [channelId isEqualToString:storedChannelId]) {
         return false;
     } else {
         return true;
@@ -4551,6 +4637,10 @@ static id isNil(id object) {
 
 - (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains {
     return handleUniversalLinksInApp;
+}
+
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    handleUrlFromSceneDelegate = handleFromSceneDelegate;
 }
 
 - (BOOL)getHandleUrlFromSceneDelegate {

@@ -32,6 +32,7 @@ CPAppBannerDisplayBlock handleBannerDisplayed;
 
 
 static NSObject *callbackLock;
+static NSObject *bannerRequestLock;
 BOOL initialized = NO;
 BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
@@ -52,6 +53,7 @@ int appBannerPerDayValue = 0;
 + (void)initialize {
     if (self == [CPAppBannerModuleInstance class]) {
         callbackLock = [[NSObject alloc] init];
+        bannerRequestLock = [[NSObject alloc] init];
     }
 }
 
@@ -233,23 +235,27 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Initialised a banner with channel
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification {
-    if ([self isInitialized]) {
-        return;
+    @synchronized(bannerRequestLock) {
+        if ([self isInitialized]) {
+            return;
+        }
+
+        [self setPendingBannerListeners:[NSMutableArray new]];
+        [self setActiveBanners:[NSMutableArray new]];
+        [self setPendingBanners:[NSMutableArray new]];
+        activePendingBanners = [NSMutableArray new];
+        [self setEvents:[NSMutableArray new]];
+        [self updateInitialisedFlag:YES];
+        [self setFromNotification:fromNotification];
+        [self setPendingBannerRequest:NO];
     }
 
     [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    [self setPendingBannerListeners:[NSMutableArray new]];
-    [self setActiveBanners:[NSMutableArray new]];
-    [self setPendingBanners:[NSMutableArray new]];
-    activePendingBanners = [NSMutableArray new];
-    [self setEvents:[NSMutableArray new]];
     [self loadBannersDisabled];
     [self updateShowDraftsFlag:showDraftsParam];
     [self setSessions:[self getSessions]];
-    [self updateInitialisedFlag:YES];
-    [self setFromNotification:fromNotification];
     [self resetSessionBannerCount];
     if (![self isFromNotification]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -267,12 +273,29 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    if (channelId == nil || ![channelId isKindOfClass:[NSString class]] || [channelId length] == 0) {
+        [CPLog error:@"Failed getting app banners because channel ID is nil or empty"];
+        return;
+    }
+
     if (notificationId == nil) {
-        [pendingBannerListeners addObject:callback];
-        if ([self getPendingBannerRequest]) {
+        BOOL shouldReturn = NO;
+        @synchronized(bannerRequestLock) {
+            if (pendingBannerListeners == nil) {
+                pendingBannerListeners = [NSMutableArray new];
+            }
+            if (callback != nil) {
+                [pendingBannerListeners addObject:[callback copy]];
+            }
+            if (pendingBannerRequest) {
+                shouldReturn = YES;
+            } else {
+                pendingBannerRequest = YES;
+            }
+        }
+        if (shouldReturn) {
             return;
         }
-        [self setPendingBannerRequest:YES];
     }
 
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
@@ -285,7 +308,26 @@ int appBannerPerDayValue = 0;
         bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
     }
 
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
+    CleverPushHTTPClient *httpClient = [CleverPushHTTPClient sharedClient];
+    if (httpClient == nil) {
+        [CPLog error:@"Failed getting app banners because HTTP client is nil"];
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
+        return;
+    }
+
+    NSMutableURLRequest* request = [httpClient requestWithMethod:HTTP_GET path:bannersPath];
+    if (request == nil) {
+        [CPLog error:@"Failed getting app banners because request creation failed"];
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
+        return;
+    }
+
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
         BOOL useGroupId = groupId != nil && ![groupId isEqualToString:@""];
@@ -323,17 +365,31 @@ int appBannerPerDayValue = 0;
             if (notificationId && callback) {
                 callback([self getListOfBanners]);
             } else {
-                for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingBannerListeners) {
+                NSArray *listeners = nil;
+                @synchronized(bannerRequestLock) {
+                    listeners = [pendingBannerListeners copy];
+                    pendingBannerRequest = NO;
+                    pendingBannerListeners = [NSMutableArray new];
+                }
+                for (void (^listener)(NSMutableArray<CPAppBanner*>*) in listeners) {
                     if (listener && [self getListOfBanners]) {
                         __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
                         callbackBlock([self getListOfBanners]);
                     }
                 }
             }
-            [self setPendingBannerRequest:NO];
-            [self setPendingBannerListeners:[NSMutableArray new]];
+            if (notificationId != nil) {
+                @synchronized(bannerRequestLock) {
+                    pendingBannerRequest = NO;
+                    pendingBannerListeners = [NSMutableArray new];
+                }
+            }
         }
     } onFailure:^(NSError* error) {
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
         [CPLog error:@"Failed getting app banners %@", error];
     }];
 }

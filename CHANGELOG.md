@@ -1,3 +1,6 @@
+## 1.34.41 (10.03.2026)
+* implemented a new method setHandleUrlFromSceneDelegate.
+
 ## 1.34.40 (16.02.2026)
 * Fix iOS deep-link opening in app banner/inbox by replacing direct openURL calls with CPUtils.tryOpenURL.
 * Fixed imageview not displaying in app banner.

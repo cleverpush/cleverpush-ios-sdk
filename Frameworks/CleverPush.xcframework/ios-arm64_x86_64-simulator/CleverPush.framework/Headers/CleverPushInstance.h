@@ -271,6 +271,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (BOOL)hasSubscriptionTopic:(NSString* _Nullable)topicId;
 - (BOOL)getDeselectValue;
 - (BOOL)getUnsubscribeStatus;
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate;
 - (BOOL)getHandleUrlFromSceneDelegate;
 - (void)setConfirmAlertShown;
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;
