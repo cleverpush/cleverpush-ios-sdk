@@ -675,6 +675,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
                window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
            };\
+           window.CleverPush.getSubscriptionContext = function getSubscriptionContext() {\
+               return new Promise(function(resolveSubscriptionContext) {\
+                   window.CleverPush._subscriptionContextResolver = resolveSubscriptionContext;\
+                   window.webkit.messageHandlers.getSubscriptionContext.postMessage(null);\
+               });\
+           };\
            window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
                window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
            };\
@@ -745,7 +751,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (NSArray<NSString *> *)scriptMessageNames {
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
-             @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
+             @"getSubscriptionContext", @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
              @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard", @"handleLinkBySystem"];
 }
@@ -785,6 +791,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
             [CleverPush showTopicsDialog];
+        } else if ([message.name isEqualToString:@"getSubscriptionContext"]) {
+            NSString *subscriptionId = [CleverPush getSubscriptionId];
+            NSString *channelId = [CleverPush channelId];
+            NSDictionary *subscriptionContext = @{
+                @"subscriptionId": subscriptionId ? subscriptionId : @"",
+                @"channelId": channelId ? channelId : @"",
+            };
+
+            NSError *error = nil;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:subscriptionContext options:0 error:&error];
+            NSString *jsonString = (jsonData && !error) ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : @"{}";
+
+            NSString *subscriptionContextCallback =
+                [NSString stringWithFormat:
+                 @"try { if (window.CleverPush && window.CleverPush._subscriptionContextResolver) { window.CleverPush._subscriptionContextResolver(%@); window.CleverPush._subscriptionContextResolver = null; } } catch (e) {}",
+                 jsonString];
+            [message.webView evaluateJavaScript:subscriptionContextCallback completionHandler:nil];
         }
 
         if (message.body != nil && ![message.body isKindOfClass:[NSNull class]]) {
