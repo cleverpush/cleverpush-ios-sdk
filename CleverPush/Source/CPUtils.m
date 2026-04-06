@@ -1086,6 +1086,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         sharedAttributedStringCache.countLimit = 100;
     });
     return sharedAttributedStringCache;
+}
+
 + (NSURL *)normalizedImageURLFromString:(NSString *)urlString {
     if (![urlString isKindOfClass:[NSString class]]) {
         return nil;
