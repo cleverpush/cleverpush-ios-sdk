@@ -1,3 +1,10 @@
+## 1.34.42 (02.04.2026)
+* Added `window.CleverPush.getSubscriptionContext()` from banner JS to get subscriptionId and channelId from the iOS SDK to JS.
+* Fixed issue of tracking-consent cleanup by restoring previous consent from persisted state in setTrackingConsent, ensuring tags/attributes are removed on early post-restart false calls in iOS.
+* Implemented removing single and multiple subscription attributes, including callback-based failure handling and local attribute state sync in iOS.
+* Optimize isChannelIdChanged function for preventing crash.
+* Resolved the issue of images are not displaying in the in-app banners.
+
 ## 1.34.41 (10.03.2026)
 * implemented a new method setHandleUrlFromSceneDelegate.
 

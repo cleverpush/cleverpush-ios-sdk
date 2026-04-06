@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <ImageIO/ImageIO.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
@@ -674,6 +675,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
                window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
            };\
+           window.CleverPush.getSubscriptionContext = function getSubscriptionContext() {\
+               return new Promise(function(resolveSubscriptionContext) {\
+                   window.CleverPush._subscriptionContextResolver = resolveSubscriptionContext;\
+                   window.webkit.messageHandlers.getSubscriptionContext.postMessage(null);\
+               });\
+           };\
            window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
                window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
            };\
@@ -744,7 +751,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (NSArray<NSString *> *)scriptMessageNames {
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
-             @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
+             @"getSubscriptionContext", @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
              @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard", @"handleLinkBySystem"];
 }
@@ -784,6 +791,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
             [CleverPush showTopicsDialog];
+        } else if ([message.name isEqualToString:@"getSubscriptionContext"]) {
+            NSString *subscriptionId = [CleverPush getSubscriptionId];
+            NSString *channelId = [CleverPush channelId];
+            NSDictionary *subscriptionContext = @{
+                @"subscriptionId": subscriptionId ? subscriptionId : @"",
+                @"channelId": channelId ? channelId : @"",
+            };
+
+            NSError *error = nil;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:subscriptionContext options:0 error:&error];
+            NSString *jsonString = (jsonData && !error) ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : @"{}";
+
+            NSString *subscriptionContextCallback =
+                [NSString stringWithFormat:
+                 @"try { if (window.CleverPush && window.CleverPush._subscriptionContextResolver) { window.CleverPush._subscriptionContextResolver(%@); window.CleverPush._subscriptionContextResolver = null; } } catch (e) {}",
+                 jsonString];
+            [message.webView evaluateJavaScript:subscriptionContextCallback completionHandler:nil];
         }
 
         if (message.body != nil && ![message.body isKindOfClass:[NSNull class]]) {
@@ -1062,6 +1086,54 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         sharedAttributedStringCache.countLimit = 100;
     });
     return sharedAttributedStringCache;
++ (NSURL *)normalizedImageURLFromString:(NSString *)urlString {
+    if (![urlString isKindOfClass:[NSString class]]) {
+        return nil;
+    }
+    NSString *trimmed = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmed.length == 0) {
+        return nil;
+    }
+    NSURL *url = [NSURL URLWithString:trimmed];
+    if (url) {
+        return url;
+    }
+    NSURLComponents *components = [NSURLComponents componentsWithString:trimmed];
+    if (components.URL) {
+        return components.URL;
+    }
+    NSString *encoded = [trimmed stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    if (encoded.length == 0) {
+        return nil;
+    }
+    return [NSURL URLWithString:encoded];
+}
+
++ (NSString *)imageCacheKeyForURLString:(NSString *)urlString {
+    NSURL *url = [self normalizedImageURLFromString:urlString];
+    return url.absoluteString ?: @"";
+}
+
++ (UIImage *)decodedImageWithData:(NSData *)data {
+    if (data.length == 0) {
+        return nil;
+    }
+    UIImage *image = [UIImage imageWithData:data];
+    if (image) {
+        return image;
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    if (!source) {
+        return nil;
+    }
+    CGImageRef cgImage = CGImageSourceCreateImageAtIndex(source, 0, NULL);
+    CFRelease(source);
+    if (!cgImage) {
+        return nil;
+    }
+    UIImage *decoded = [UIImage imageWithCGImage:cgImage];
+    CGImageRelease(cgImage);
+    return decoded;
 }
 
 #pragma mark - Convert HTML to NSAttributedString

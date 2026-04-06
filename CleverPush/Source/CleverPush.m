@@ -33,7 +33,10 @@ static CleverPush* singleInstance = nil;
 #pragma mark - Singleton shared instance of the cleverpush.
 
 + (CleverPushInstance*)CPSharedInstance {
-    if (singletonInstance == nil) singletonInstance = [[CleverPushInstance alloc] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        singletonInstance = [[CleverPushInstance alloc] init];
+    });
     return singletonInstance;
 }
 
@@ -348,6 +351,22 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
         callback(callbackInner);
     }];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId callback:^(NSString* callbackInner) {
+        if (callback) {
+            callback(callbackInner);
+        }
+    } onFailure:failureBlock];
+}
+
++ (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    [self.CPSharedInstance removeSubscriptionAttributes:attributeIds];
 }
 
 + (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token {

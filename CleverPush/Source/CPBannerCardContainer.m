@@ -12,6 +12,7 @@
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
 #import "CPLog.h"
+#import "CPUtils.h"
 
 @implementation CPBannerCardContainer
 @synthesize delegate;
@@ -245,18 +246,7 @@
             imageUrl = block.imageUrl;
         }
 
-        NSString *normalizedImageUrl = nil;
-        if ([imageUrl isKindOfClass:[NSString class]]) {
-            normalizedImageUrl = [imageUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        }
-
-        if (normalizedImageUrl.length == 0) {
-            cell.imgCPBanner.image = nil;
-            [cell.activitydata stopAnimating];
-            return cell;
-        }
-
-        NSURL *url = [NSURL URLWithString:normalizedImageUrl];
+        NSURL *url = [CPUtils normalizedImageURLFromString:imageUrl];
         if (!url) {
             cell.imgCPBanner.image = nil;
             [cell.activitydata stopAnimating];
@@ -272,8 +262,7 @@
             cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
         }
 
-        // Check cache first
-        NSString *cacheKey = url.absoluteString;
+        NSString *cacheKey = [CPUtils imageCacheKeyForURLString:imageUrl];
         UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
         if (cachedImage) {
             cell.imgCPBanner.image = cachedImage;
