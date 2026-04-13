@@ -1534,6 +1534,53 @@ static id isNil(id object) {
     }
 }
 
+- (void)markSubscriptionAsTest {
+    [self markSubscriptionAsTestOnSuccess:nil onFailure:nil];
+}
+
+- (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    if (channelId == nil) {
+        channelId = [self getChannelIdFromUserDefaults];
+    }
+    if (channelId == nil || [channelId length] == 0) {
+        [CPLog warn:@"markSubscriptionAsTest: Channel ID is null"];
+        if (failureBlock) {
+            failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is null or empty"}]);
+        }
+        return;
+    }
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId length] == 0) {
+            [CPLog warn:@"markSubscriptionAsTest: There is no subscriptionId"];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is null or empty"}]);
+            }
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/mark-as-test"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [CPLog debug:@"markSubscriptionAsTest: Successfully marked subscription as test"];
+                if (successBlock) {
+                    successBlock(results);
+                }
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"markSubscriptionAsTest: Failed to mark subscription as test. %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
+}
+
 #pragma mark - identify the channels being subscribed or not
 - (BOOL)isSubscribed {
     if (subscriptionId) {
