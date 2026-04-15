@@ -1991,20 +1991,24 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - get app banner ids from silent push
 - (void)showPendingSilentPushAppBannersIds:(NSString*)channelId {
-	NSMutableArray *appBanners = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-	if (appBanners != nil && appBanners.count > 0) {
-		NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
-
-		for (NSMutableDictionary *eventsObject in appBanners) {
-			[self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
-			[objectsToRemove addObject:eventsObject];
-		}
-
-		[appBanners removeObjectsInArray:objectsToRemove];
-
-		[[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-		[[NSUserDefaults standardUserDefaults] synchronize];
-	}
+    NSMutableArray *appBanners = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    if (appBanners == nil || appBanners.count == 0) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            return;
+        }
+        NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
+        for (NSMutableDictionary *eventsObject in appBanners) {
+            [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
+            [objectsToRemove addObject:eventsObject];
+        }
+        [appBanners removeObjectsInArray:objectsToRemove];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    });
 }
 
 #pragma mark - Get the value of pageControl from current index

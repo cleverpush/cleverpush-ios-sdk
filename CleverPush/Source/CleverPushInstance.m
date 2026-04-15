@@ -1919,6 +1919,8 @@ static id isNil(id object) {
     }
 
     if (!handleNotificationReceived) {
+        CPNotificationReceivedResult* pending = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
+        pendingDeliveryResult = pending;
         return;
     }
 
