@@ -181,7 +181,10 @@ static NSMutableSet<Class>* swizzledClasses;
 
 - (BOOL)cleverPushReceivedDidFinishLaunching:(UIApplication *)application
                                launchOptions:(NSDictionary *)launchOptions {
-    BOOL result = [self cleverPushReceivedDidFinishLaunching:application launchOptions:launchOptions];
+    BOOL result = YES;
+    if ([self respondsToSelector:@selector(cleverPushReceivedDidFinishLaunching:launchOptions:)]) {
+        result = [self cleverPushReceivedDidFinishLaunching:application launchOptions:launchOptions];
+    }
     NSDictionary *remoteNotif = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
     if (remoteNotif && [CleverPush channelId]) {
         [CleverPush handleSilentNotificationReceived:application
