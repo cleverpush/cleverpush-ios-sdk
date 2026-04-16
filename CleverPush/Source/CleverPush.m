@@ -244,6 +244,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance syncSubscription];
 }
 
++ (void)markSubscriptionAsTest {
+    [self.CPSharedInstance markSubscriptionAsTest];
+}
+
++ (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance markSubscriptionAsTestOnSuccess:successBlock onFailure:failureBlock];
+}
+
 + (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken {
     [self.CPSharedInstance didRegisterForRemoteNotifications:app deviceToken:inDeviceToken];
 }
