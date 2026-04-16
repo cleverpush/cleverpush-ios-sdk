@@ -273,8 +273,8 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
-    if (channelId == nil || ![channelId isKindOfClass:[NSString class]] || [channelId length] == 0) {
-        [CPLog error:@"Failed getting app banners because channel ID is nil or empty"];
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: getBanners: channelId is nil or empty, skipping API call"];
         return;
     }
 
@@ -1677,6 +1677,11 @@ int appBannerPerDayValue = 0;
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type withCustomData:(NSMutableDictionary*)customData {
     if (!trackingEnabled) {
         [CPLog debug:@"sendBannerEvent: not sending event because tracking has been disabled."];
+        return;
+    }
+
+    if ([CPUtils isNullOrEmpty:banner.channel]) {
+        [CPLog error:@"CleverPush: sendBannerEvent: channelId is nil or empty, skipping API call"];
         return;
     }
 

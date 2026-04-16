@@ -1188,6 +1188,10 @@ static id isNil(id object) {
 #pragma mark - channel subscription
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: setConfirmAlertShown: channelId is nil or empty, skipping API call"];
+            return;
+        }
         confirmAlertShown = YES;
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"channel/confirm-alert"]];
 
@@ -1508,6 +1512,10 @@ static id isNil(id object) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription:) object:nil];
 
     if (subscriptionId) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: unsubscribe: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -1713,6 +1721,12 @@ static id isNil(id object) {
 
     if (channelId == nil) {
         channelId = [self getChannelIdFromUserDefaults];
+    }
+
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: makeSyncSubscriptionRequest: channelId is nil or empty, skipping API call"];
+        [self setSubscriptionInProgress:false];
+        return;
     }
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
@@ -2136,6 +2150,10 @@ static id isNil(id object) {
 }
 
 - (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: setNotificationDelivered: channelId is nil or empty, skipping API call"];
+        return;
+    }
     NSString*notificationId = [notification valueForKey:@"_id"];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/delivered"];
@@ -2191,6 +2209,10 @@ static id isNil(id object) {
 }
 
 - (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: setNotificationClicked: channelId is nil or empty, skipping API call"];
+        return;
+    }
     [CPLog debug:@"setNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/clicked"];
@@ -2415,6 +2437,10 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionTagFromApi: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2484,6 +2510,10 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionAttributeFromApi: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/clear"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2548,6 +2578,10 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: addSubscriptionTagToApi: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2620,6 +2654,10 @@ static id isNil(id object) {
 
 - (void)stopCampaigns {
     if (subscriptionId != nil) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: stopCampaigns: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/stop-campaigns"];
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         channelId, @"channelId",
@@ -2642,6 +2680,10 @@ static id isNil(id object) {
 
 - (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     if (subscriptionId != nil) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: startLiveActivity: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         channelId, @"channelId",
@@ -2714,6 +2756,10 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: setSubscriptionAttributeObjectImplementation: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2766,6 +2812,10 @@ static id isNil(id object) {
             }
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: pushSubscriptionAttributeValue: channelId is nil or empty, skipping API call"];
+                    return;
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -2833,6 +2883,10 @@ static id isNil(id object) {
             }
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: pullSubscriptionAttributeValue: channelId is nil or empty, skipping API call"];
+                    return;
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -3103,6 +3157,10 @@ static id isNil(id object) {
         }
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: addSubscriptionTopic: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/add"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -3171,6 +3229,10 @@ static id isNil(id object) {
         [topics removeObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionTopic: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/remove"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -3305,6 +3367,13 @@ static id isNil(id object) {
 - (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback {
     NSMutableArray<CPNotification*>* notifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: getNotifications: channelId is nil or empty, skipping API call"];
+            if (callback) {
+                callback(notifications);
+            }
+            return;
+        }
         NSString*combinedURL = [self generateGetReceivedNotificationsPath:limit skip:skip];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray*remoteNotifications) {
             for (NSDictionary*remoteNotification in remoteNotifications) {
@@ -3346,6 +3415,10 @@ static id isNil(id object) {
 #pragma mark - Track inbox clicked
 - (void)trackInboxClicked:(NSString* _Nullable)notificationId {
     if (![CPUtils isNullOrEmpty:notificationId]) {
+        if ([CPUtils isNullOrEmpty:[CleverPush channelId]]) {
+            [CPLog error:@"CleverPush: trackInboxClicked: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSString* path = [NSString stringWithFormat:@"/channel/%@/panel/clicked", [CleverPush channelId]];
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:path];
         
@@ -3496,6 +3569,10 @@ static id isNil(id object) {
                         [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
                         return;
                     }
+                    if ([CPUtils isNullOrEmpty:channelId]) {
+                        [CPLog error:@"CleverPush: trackEvent: channelId is nil or empty, skipping API call"];
+                        return;
+                    }
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
                     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                     channelId, @"channelId",
@@ -3550,6 +3627,10 @@ static id isNil(id object) {
             [self getSubscriptionId:^(NSString* subscriptionId) {
                 if (subscriptionId == nil) {
                     [CPLog debug:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
+                    return;
+                }
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: triggerFollowUpEvent: channelId is nil or empty, skipping API call"];
                     return;
                 }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
@@ -3895,6 +3976,10 @@ static id isNil(id object) {
                     NSUserDefaults* groupUserDefaults = [CPUtils getUserDefaultsAppGroup];
                     NSString* lastNotificationId = [groupUserDefaults stringForKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
 
+                    if ([CPUtils isNullOrEmpty:channelId]) {
+                        [CPLog error:@"CleverPush: trackSessionStart: channelId is nil or empty, skipping API call"];
+                        return;
+                    }
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                              channelId, @"channelId",
@@ -3960,7 +4045,10 @@ static id isNil(id object) {
                     long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
                     long visits = MAX(sessionVisits, 0);
 
-                    if (channelId == nil || subscriptionId == nil || deviceToken == nil || sessionDuration < 0) {
+                    if ([CPUtils isNullOrEmpty:channelId] || subscriptionId == nil || deviceToken == nil || sessionDuration < 0) {
+                        if ([CPUtils isNullOrEmpty:channelId]) {
+                            [CPLog error:@"CleverPush: trackSessionEnd: channelId is nil or empty, skipping API call"];
+                        }
                         return;
                     }
 
