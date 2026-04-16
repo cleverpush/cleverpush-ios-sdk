@@ -1,3 +1,10 @@
+## 1.34.43 (16.04.2026)
+* Added functionality for preventing the API calls if there is no channelID.
+* Fixes issue of background colors by supporting 3- and 8-digit hex values.
+* Optimized uiapplicationdelegatecleverpush class for silent push notifications for flutter.
+* Added method markSubscriptionAsTest to mark subscription as test.
+* Fixed a rare crash related to html texts are displaying to the app-banners.
+
 ## 1.34.42 (02.04.2026)
 * Added `window.CleverPush.getSubscriptionContext()` from banner JS to get subscriptionId and channelId from the iOS SDK to JS.
 * Fixed issue of tracking-consent cleanup by restoring previous consent from persisted state in setTrackingConsent, ensuring tags/attributes are removed on early post-restart false calls in iOS.
