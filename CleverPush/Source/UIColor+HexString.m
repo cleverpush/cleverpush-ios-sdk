@@ -8,9 +8,10 @@
         return [UIColor blackColor];
     }
 
-    NSString *colorString = [[hexString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
-                              stringByReplacingOccurrencesOfString:@"#" withString:@""];
-    colorString = [[colorString stringByReplacingOccurrencesOfString:@" " withString:@""] uppercaseString];
+    NSString *colorString = [[hexString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];
+    if ([colorString hasPrefix:@"#"]) {
+        colorString = [colorString substringFromIndex:1];
+    }
 
     if (colorString.length == 0) {
         return [UIColor blackColor];
@@ -36,11 +37,11 @@
             green = [self colorComponentFrom: colorString start: 2 length: 2];
             blue  = [self colorComponentFrom: colorString start: 4 length: 2];
             break;
-        case 8: // #AARRGGBB
-            alpha = [self colorComponentFrom: colorString start: 0 length: 2];
-            red   = [self colorComponentFrom: colorString start: 2 length: 2];
-            green = [self colorComponentFrom: colorString start: 4 length: 2];
-            blue  = [self colorComponentFrom: colorString start: 6 length: 2];
+        case 8: // #RRGGBBAA
+            red   = [self colorComponentFrom: colorString start: 0 length: 2];
+            green = [self colorComponentFrom: colorString start: 2 length: 2];
+            blue  = [self colorComponentFrom: colorString start: 4 length: 2];
+            alpha = [self colorComponentFrom: colorString start: 6 length: 2];
             break;
         default:
             return [UIColor blackColor];
@@ -52,8 +53,11 @@
 + (CGFloat) colorComponentFrom: (NSString *) string start: (NSUInteger) start length: (NSUInteger) length {
     NSString *substring = [string substringWithRange: NSMakeRange(start, length)];
     NSString *fullHex = length == 2 ? substring : [NSString stringWithFormat: @"%@%@", substring, substring];
-    unsigned hexComponent;
-    [[NSScanner scannerWithString: fullHex] scanHexInt: &hexComponent];
+    unsigned hexComponent = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:fullHex];
+    if (![scanner scanHexInt:&hexComponent]) {
+        return 0.0f;
+    }
     return hexComponent / 255.0;
 }
 
