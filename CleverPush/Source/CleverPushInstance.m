@@ -2439,6 +2439,9 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             if ([CPUtils isNullOrEmpty:channelId]) {
                 [CPLog error:@"CleverPush: removeSubscriptionTagFromApi: channelId is nil or empty, skipping API call"];
+                if (callback) {
+                    callback(tagId);
+                }
                 return;
             }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
@@ -2580,6 +2583,9 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             if ([CPUtils isNullOrEmpty:channelId]) {
                 [CPLog error:@"CleverPush: addSubscriptionTagToApi: channelId is nil or empty, skipping API call"];
+                if (callback) {
+                    callback(tagId);
+                }
                 return;
             }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
