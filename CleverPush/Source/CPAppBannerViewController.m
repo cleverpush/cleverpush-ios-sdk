@@ -889,7 +889,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (self.handleBannerClosed) {
             self.handleBannerClosed();
         }
-        [self dismissViewControllerAnimated:NO completion:nil];
+        if (self.windowDismissBlock) {
+            self.windowDismissBlock();
+        } else {
+            [self dismissViewControllerAnimated:NO completion:nil];
+        }
         [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }

@@ -1,4 +1,5 @@
 #import "CPAppBannerModuleInstance.h"
+#import "CPAppBannerPassthroughView.h"
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
@@ -29,7 +30,7 @@ CPAppBannerShownBlock handleBannerShown;
 CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
-
+CPAppBannerPassthroughView *activeBannerOverlay;
 
 static NSObject *callbackLock;
 static NSObject *bannerRequestLock;
@@ -39,6 +40,7 @@ BOOL pendingBannerRequest = NO;
 BOOL bannersDisabled = NO;
 BOOL isFromNotification = NO;
 BOOL trackingEnabled = YES;
+BOOL appBannersNonBlocking = NO;
 
 long MIN_SESSION_LENGTH = 30 * 60;
 long MIN_SESSION_LENGTH_DEV = 30;
@@ -1613,8 +1615,6 @@ int appBannerPerDayValue = 0;
 
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     CPAppBannerClosedBlock closedCallback = nil;
@@ -1626,8 +1626,7 @@ int appBannerPerDayValue = 0;
     }
     
     [CPAppBannerViewController preloadImagesForBanner:banner];
-    UIViewController* topController = [CleverPush topViewController];
-    
+
     CPAppBannerDisplayBlock displayCallback = nil;
     @synchronized(callbackLock) {
         displayCallback = handleBannerDisplayed;
@@ -1635,22 +1634,10 @@ int appBannerPerDayValue = 0;
     
     if (displayCallback) {
         displayCallback(appBannerViewController);
+    } else if (appBannersNonBlocking) {
+        [self presentNonBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     } else {
-        if (!force && [CPUtils isNullOrEmpty:notificationId]) {
-            [self incrementSessionBannerCount];
-            [self incrementDailyBannerCount];
-        }
-        appBannerViewController.view.alpha = 0.0;
-        [topController presentViewController:appBannerViewController animated:NO completion:^{
-            [appBannerViewController finishSetup];
-            if (!appBannerViewController.isPreloading) {
-                [appBannerViewController.cardCollectionView reloadData];
-                [appBannerViewController setBackground];
-                [UIView animateWithDuration:0.3 animations:^{
-                    appBannerViewController.view.alpha = 1.0;
-                }];
-            }
-        }];
+        [self presentBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
@@ -1667,6 +1654,83 @@ int appBannerPerDayValue = 0;
     if (shownCallback) {
         shownCallback(banner);
     }
+}
+
+#pragma mark - Non-blocking banner presentation (child VC of top view controller)
+- (void)presentNonBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    if (!force && [CPUtils isNullOrEmpty:notificationId]) {
+        [self incrementSessionBannerCount];
+        [self incrementDailyBannerCount];
+    }
+    
+    UIViewController *hostVC = [CleverPush topViewController];
+    if (!hostVC) {
+        return;
+    }
+
+    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:hostVC.view.bounds];
+    overlay.backgroundColor = [UIColor clearColor];
+    overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    [hostVC addChildViewController:appBannerViewController];
+    appBannerViewController.view.frame = overlay.bounds;
+    appBannerViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    appBannerViewController.view.alpha = 0.0;
+    [overlay addSubview:appBannerViewController.view];
+    [appBannerViewController didMoveToParentViewController:hostVC];
+
+    [hostVC.view addSubview:overlay];
+    activeBannerOverlay = overlay;
+
+    [appBannerViewController finishSetup];
+    if (!appBannerViewController.isPreloading) {
+        [appBannerViewController.cardCollectionView reloadData];
+        [appBannerViewController setBackground];
+    }
+
+    appBannerViewController.view.backgroundColor = [UIColor clearColor];
+
+    if ([banner.contentType isEqualToString:@"html"]) {
+        overlay.bannerContainerView = appBannerViewController.webView;
+    } else {
+        overlay.bannerContainerView = appBannerViewController.bannerContainer;
+        overlay.closeButtonView = appBannerViewController.btnClose;
+    }
+    [UIView animateWithDuration:0.3 animations:^{
+        appBannerViewController.view.alpha = 1.0;
+    }];
+
+    __weak CPAppBannerPassthroughView *weakOverlay = overlay;
+    appBannerViewController.windowDismissBlock = ^{
+        [appBannerViewController willMoveToParentViewController:nil];
+        [weakOverlay removeFromSuperview];
+        [appBannerViewController removeFromParentViewController];
+        activeBannerOverlay = nil;
+    };
+}
+
+#pragma mark - Blocking banner presentation (default modal)
+- (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+
+    if (!force && [CPUtils isNullOrEmpty:notificationId]) {
+        [self incrementSessionBannerCount];
+        [self incrementDailyBannerCount];
+    }
+
+    UIViewController *topController = [CleverPush topViewController];
+    appBannerViewController.view.alpha = 0.0;
+    [topController presentViewController:appBannerViewController animated:NO completion:^{
+        [appBannerViewController finishSetup];
+        if (!appBannerViewController.isPreloading) {
+            [appBannerViewController.cardCollectionView reloadData];
+            [appBannerViewController setBackground];
+            [UIView animateWithDuration:0.3 animations:^{
+                appBannerViewController.view.alpha = 1.0;
+            }];
+        }
+    }];
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
@@ -1799,6 +1863,10 @@ int appBannerPerDayValue = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    appBannersNonBlocking = nonBlocking;
 }
 
 - (void)setCurrentEventId:(NSString*)eventId {

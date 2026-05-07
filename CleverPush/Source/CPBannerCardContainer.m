@@ -536,7 +536,15 @@
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
-            [CPUtils openSafari:action.url dismissViewController:self.controller];
+            if (((CPAppBannerViewController *)self.controller).windowDismissBlock) {
+                NSURL *url = action.url;
+                [self onDismiss];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [CPUtils openSafari:url];
+                });
+            } else {
+                [CPUtils openSafari:action.url dismissViewController:self.controller];
+            }
         } else {
             [CPUtils openSafari:action.url];
         }
@@ -580,14 +588,18 @@
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        if (self.handleBannerClosed) {
-            self.handleBannerClosed();
-        }
-        [self.controller dismissViewControllerAnimated:NO completion:nil];
-    });
+    if ([self.controller respondsToSelector:@selector(onDismiss)]) {
+        [self.controller onDismiss];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (self.handleBannerClosed) {
+                self.handleBannerClosed();
+            }
+            [self.controller dismissViewControllerAnimated:NO completion:nil];
+        });
+    }
 }
 
 #pragma mark - setting up the popup shadow
