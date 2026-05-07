@@ -1701,10 +1701,11 @@ int appBannerPerDayValue = 0;
     }];
 
     __weak CPAppBannerPassthroughView *weakOverlay = overlay;
+    __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
     appBannerViewController.windowDismissBlock = ^{
-        [appBannerViewController willMoveToParentViewController:nil];
+        [weakBannerVC willMoveToParentViewController:nil];
         [weakOverlay removeFromSuperview];
-        [appBannerViewController removeFromParentViewController];
+        [weakBannerVC removeFromParentViewController];
         activeBannerOverlay = nil;
     };
 }
