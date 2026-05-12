@@ -279,13 +279,6 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     if (translated != nil && [translated length] > 0) {
         return translated;
     }
-    NSString *region = [[[NSLocale currentLocale] objectForKey:NSLocaleCountryCode] lowercaseString];
-    if (region) {
-        translated = topic.nameTranslation[region];
-        if (translated != nil && [translated length] > 0) {
-            return translated;
-        }
-    }
     return topic.name ?: @"";
 }
 
