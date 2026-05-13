@@ -279,12 +279,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     }
     NSString *preferredLocale = [[NSLocale preferredLanguages] firstObject];
     if (preferredLocale) {
-        NSString *language;
-        if (preferredLocale.length >= 2) {
-            language = [preferredLocale substringToIndex:2];
-        } else {
-            language = preferredLocale;
-        }
+        NSString *language = [[preferredLocale componentsSeparatedByString:@"-"] firstObject];
         id translated = topic.nameTranslation[language];
         if ([translated isKindOfClass:[NSString class]] && [translated length] > 0) {
             return translated;
