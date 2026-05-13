@@ -272,14 +272,28 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
 #pragma mark - Resolve the localized display name for a topic based on device locale
 - (NSString *)resolveLocalizedDisplayName:(CPChannelTopic *)topic {
     if (!topic.nameTranslationEnabled || topic.nameTranslation == nil || [topic.nameTranslation count] == 0) {
-        return topic.name ?: @"";
+        if (topic.name) {
+            return topic.name;
+        }
+        return @"";
     }
-    NSString *language = [[[NSLocale preferredLanguages] firstObject] substringToIndex:2];
-    NSString *translated = topic.nameTranslation[language];
-    if (translated != nil && [translated length] > 0) {
-        return translated;
+    NSString *preferredLocale = [[NSLocale preferredLanguages] firstObject];
+    if (preferredLocale) {
+        NSString *language;
+        if (preferredLocale.length >= 2) {
+            language = [preferredLocale substringToIndex:2];
+        } else {
+            language = preferredLocale;
+        }
+        id translated = topic.nameTranslation[language];
+        if ([translated isKindOfClass:[NSString class]] && [translated length] > 0) {
+            return translated;
+        }
     }
-    return topic.name ?: @"";
+    if (topic.name) {
+        return topic.name;
+    }
+    return @"";
 }
 
 #pragma mark - Delegate & DataSource List of the subscription.
