@@ -1826,6 +1826,33 @@ static id isNil(id object) {
                 if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
                     oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
                 }
+                
+                id regeneratePushTokenRequestedAt = [results objectForKey:@"regeneratePushTokenRequestedAt"];
+                if (regeneratePushTokenRequestedAt != nil && ![regeneratePushTokenRequestedAt isKindOfClass:[NSNull class]]) {
+                    NSString *newRegenerateTimestamp = [NSString stringWithFormat:@"%@", regeneratePushTokenRequestedAt];
+                    NSString *storedRegenerateTimestamp = [userDefaults stringForKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
+                    
+                    BOOL timestampsAreDifferent = NO;
+                    if (storedRegenerateTimestamp == nil) {
+                        timestampsAreDifferent = YES;
+                    } else if (![newRegenerateTimestamp isEqualToString:storedRegenerateTimestamp]) {
+                        timestampsAreDifferent = YES;
+                    }
+                    
+                    if (timestampsAreDifferent) {
+                        [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: regeneratePushTokenRequestedAt changed, requesting fresh APNS token"];
+                        [userDefaults setObject:newRegenerateTimestamp forKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
+                        [userDefaults synchronize];
+                        deviceToken = nil;
+                        hasRequestedDeviceToken = NO;
+                        [self requestDeviceToken];
+                        [self getDeviceToken:^(NSString * _Nullable freshDeviceToken) {
+                            [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: received fresh APNS token, resyncing subscription"];
+                            [self syncSubscription];
+                        }];
+                    }
+                }
+                
                 BOOL isSubscriptionChanged = ![newSubscriptionId isEqualToString:oldSubscriptionId];
                 [CleverPush setSubscriptionChanged:isSubscriptionChanged];
 
