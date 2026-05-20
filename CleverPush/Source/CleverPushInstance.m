@@ -1841,12 +1841,16 @@ static id isNil(id object) {
                     
                     if (timestampsAreDifferent) {
                         [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: regeneratePushTokenRequestedAt changed, requesting fresh APNS token"];
-                        [userDefaults setObject:newRegenerateTimestamp forKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
-                        [userDefaults synchronize];
                         deviceToken = nil;
                         hasRequestedDeviceToken = NO;
                         [self requestDeviceToken];
                         [self getDeviceToken:^(NSString * _Nullable freshDeviceToken) {
+                            if ([CPUtils isNullOrEmpty:freshDeviceToken]) {
+                                return;
+                            }
+                            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                            [defaults setObject:newRegenerateTimestamp forKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
+                            [defaults synchronize];
                             [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: received fresh APNS token, resyncing subscription"];
                             [self syncSubscription];
                         }];
