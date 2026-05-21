@@ -1,3 +1,8 @@
+## 1.34.44 (21.05.2026)
+* implemented feature of regenerate APNS token on server-requested push token refresh via regeneratePushTokenRequestedAt timestamp comparison
+* Add topic name translation support with locale-based fallback.
+* implemented functionality of allow users to interact with app while in-app banner is visible.
+
 ## 1.34.43 (16.04.2026)
 * Added functionality for preventing the API calls if there is no channelID.
 * Fixes issue of background colors by supporting 3- and 8-digit hex values.

@@ -170,7 +170,7 @@
 		</data>
 		<key>Headers/CPChannelTopic.h</key>
 		<data>
-		4jG5UkFyWKCTkO7/QitEg9zDayM=
+		EaLITcD1LH/X6z7WBwYWGU0vwwk=
 		</data>
 		<key>Headers/CPChatView.h</key>
 		<data>
@@ -262,7 +262,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		hLHBjqkzxPVgaIEd3o6U0cFaqi4=
+		wrHhikP4EGb9Hp8YMihZfv7Z9JE=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -270,11 +270,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		Q8+kVaoXPD06Jx5pEwUmQM0Hr7g=
+		0MWr9M7JbMB7pMDv+IZtE5CQapc=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		UAH6TJCD3YbMSQjnZdfhKqFI8vU=
+		JmpVnhdi2dyDKhOgktCwqR6+ORQ=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -282,7 +282,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		OaWEsSkYvXZ0v2zRLubd5TCmnUY=
+		Adq/rlB9x8c4Gfej67gkuF4SGWg=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -586,7 +586,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zR2XcZUQDPMZjPfLhFpy4eqjnZXZzyeeWtobk8lnvC4=
+			DWbOFtJGN+yhum/rPQkabFObkA5zi1z+HDQE5YGUBPg=
 			</data>
 		</dict>
 		<key>Headers/CPChatView.h</key>
@@ -747,7 +747,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			4NvBFOlZ/DirVRnYzjrqAPPYDy5YBh9iOIxtGzEL7VE=
+			GAXMnwd0TEoVI+pg9QfjZIzWGPxXx2SRBbXyr6K6fJQ=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -761,14 +761,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			xgtZ6KjddpSJmuBtccquvInHGBFAz+inyARmvbGpLhE=
+			nWSKrm5AY6ngr8w8g7bL8EcLcrHUvGp1jUJ/2cfQ1Rg=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			5CU/iW5zLbdl5G8mM/URP88Wx9Kxv6pA6lowydQTwQQ=
+			zUneCRhXkOg/nNEJH0pMNFsXt0/ocEjyNHUK2+BkPO8=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>
