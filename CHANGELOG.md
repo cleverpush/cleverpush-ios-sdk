@@ -1,7 +1,10 @@
-## 1.34.44 (21.05.2026)
+## 1.34.45 (21.05.2026)
 * implemented feature of regenerate APNS token on server-requested push token refresh via regeneratePushTokenRequestedAt timestamp comparison
 * Add topic name translation support with locale-based fallback.
 * implemented functionality of allow users to interact with app while in-app banner is visible.
+
+## 1.34.44 (skipped)
+* Version skipped. See 1.34.45 for the actual release.
 
 ## 1.34.43 (16.04.2026)
 * Added functionality for preventing the API calls if there is no channelID.
