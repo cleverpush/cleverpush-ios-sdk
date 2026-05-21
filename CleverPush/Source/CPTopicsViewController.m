@@ -269,6 +269,28 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     return selectedState;
 }
 
+#pragma mark - Resolve the localized display name for a topic based on device locale
+- (NSString *)resolveLocalizedDisplayName:(CPChannelTopic *)topic {
+    if (!topic.nameTranslationEnabled || topic.nameTranslation == nil || [topic.nameTranslation count] == 0) {
+        if (topic.name) {
+            return topic.name;
+        }
+        return @"";
+    }
+    NSString *preferredLocale = [[NSLocale preferredLanguages] firstObject];
+    if (preferredLocale) {
+        NSString *language = [[preferredLocale componentsSeparatedByString:@"-"] firstObject];
+        id translated = topic.nameTranslation[language];
+        if ([translated isKindOfClass:[NSString class]] && [translated length] > 0) {
+            return translated;
+        }
+    }
+    if (topic.name) {
+        return topic.name;
+    }
+    return @"";
+}
+
 #pragma mark - Delegate & DataSource List of the subscription.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = 0;
@@ -389,7 +411,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     }
     [cell updateSeparatorWithTopicHighlighter];
     cell.titleText.attributedText = nil;
-    cell.titleText.text = [topic name];
+    cell.titleText.text = [self resolveLocalizedDisplayName:topic];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
