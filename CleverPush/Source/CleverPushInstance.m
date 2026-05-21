@@ -4603,6 +4603,10 @@ static id isNil(id object) {
     [CPAppBannerModule setTrackingEnabled:enabled];
 }
 
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    [CPAppBannerModule setAppBannersNonBlocking:nonBlocking];
+}
+
 - (BOOL)getAppBannerDraftsEnabled {
     return isShowDraft;
 }
