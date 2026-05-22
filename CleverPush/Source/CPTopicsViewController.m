@@ -102,7 +102,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
         topic.defaultUnchecked = YES;
     }
     hasTopics = YES;
-    if (self.topicsDialogShowUnsubscribe && !self.topicsDialogBulkActions) {
+    if (self.topicsDialogShowUnsubscribe) {
         [CleverPush updateDeselectFlag:YES];
     }
     [self reloadTableView];
