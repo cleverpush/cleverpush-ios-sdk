@@ -78,9 +78,39 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     hasTopics = NO;
 }
 
+#pragma mark - Select all topics (including sub-topics)
+- (void)selectAllTopics {
+    [selectedTopics removeAllObjects];
+    for (CPChannelTopic *topic in availableTopics) {
+        topic.defaultUnchecked = NO;
+        NSString *topicId = [topic id];
+        if (topicId && [topicId isKindOfClass:[NSString class]]) {
+            [selectedTopics addObject:topicId];
+        }
+    }
+    hasTopics = YES;
+    if (self.topicsDialogShowUnsubscribe) {
+        [CleverPush updateDeselectFlag:NO];
+    }
+    [self reloadTableView];
+}
+
+#pragma mark - Remove all topic selections (including sub-topics)
+- (void)removeAllTopics {
+    [selectedTopics removeAllObjects];
+    for (CPChannelTopic *topic in availableTopics) {
+        topic.defaultUnchecked = YES;
+    }
+    hasTopics = YES;
+    if (self.topicsDialogShowUnsubscribe) {
+        [CleverPush updateDeselectFlag:YES];
+    }
+    [self reloadTableView];
+}
+
 #pragma mark - Set the table header title
 - (void)tableHeaderTitle {
-    int labelPaddingBottom = 15;
+    int labelPaddingBottom = (self.topicsDialogBulkActions || self.topicsDialogShowUnsubscribe) ? 2 : 8;
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, CPConstraints)];
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
@@ -269,26 +299,27 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     return selectedState;
 }
 
-#pragma mark - Resolve the localized display name for a topic based on device locale
-- (NSString *)resolveLocalizedDisplayName:(CPChannelTopic *)topic {
-    if (!topic.nameTranslationEnabled || topic.nameTranslation == nil || [topic.nameTranslation count] == 0) {
-        if (topic.name) {
-            return topic.name;
-        }
-        return @"";
+#pragma mark - Returns YES if every available topic is currently selected
+- (BOOL)areAllTopicsSelected {
+    if ([availableTopics count] == 0) {
+        return NO;
     }
-    NSString *preferredLocale = [[NSLocale preferredLanguages] firstObject];
-    if (preferredLocale) {
-        NSString *language = [[preferredLocale componentsSeparatedByString:@"-"] firstObject];
-        id translated = topic.nameTranslation[language];
-        if ([translated isKindOfClass:[NSString class]] && [translated length] > 0) {
-            return translated;
+    for (CPChannelTopic *topic in availableTopics) {
+        if (![self topicState:topic]) {
+            return NO;
         }
     }
-    if (topic.name) {
-        return topic.name;
+    return YES;
+}
+
+#pragma mark - Returns YES if at least one available topic is currently selected
+- (BOOL)areAnyTopicsSelected {
+    for (CPChannelTopic *topic in availableTopics) {
+        if ([self topicState:topic]) {
+            return YES;
+        }
     }
-    return @"";
+    return NO;
 }
 
 #pragma mark - Delegate & DataSource List of the subscription.
@@ -305,37 +336,84 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, CPTopicHeight)];
-    
+    BOOL showUnsubscribe = self.topicsDialogShowUnsubscribe;
+    BOOL showBulkActions = self.topicsDialogBulkActions;
+
+    if (!showUnsubscribe && !showBulkActions) {
+        return nil;
+    }
+
+    CGFloat totalHeight = 0;
+    if (showUnsubscribe) totalHeight += CPTopicHeight;
+    if (showBulkActions) totalHeight += CPTopicHeight;
+
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.bounds.size.width, totalHeight)];
+    headerView.backgroundColor = UIColor.clearColor;
+
     CGFloat switchTrailing = CPTopicSwitchTrailingDefault;
     if (@available(iOS 26.0, *)) {
         switchTrailing = CPTopicSwitchTrailingiOS26;
     }
-    
-    UISwitch* deselectSwitch = [[UISwitch alloc] init];
-    CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
-    deselectSwitch.frame = CGRectMake(tableView.bounds.size.width - (switchSize.width + switchTrailing), (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, switchSize.width, switchSize.height);
-    
-    if ([CleverPush getNormalTintColor]) {
-        deselectSwitch.onTintColor = [CleverPush getNormalTintColor];
-    } else {
-        deselectSwitch.onTintColor = [UIColor systemGreenColor];
+
+    CGFloat yOffset = 0;
+
+    if (showUnsubscribe) {
+        UISwitch *deselectSwitch = [[UISwitch alloc] init];
+        CGSize switchSize = [deselectSwitch sizeThatFits:CGSizeZero];
+        deselectSwitch.frame = CGRectMake(
+            tableView.bounds.size.width - (switchSize.width + switchTrailing),
+            yOffset + (CPTopicHeight - switchSize.height) / CPTopicHeightDivider,
+            switchSize.width,
+            switchSize.height
+        );
+        deselectSwitch.onTintColor = [CleverPush getNormalTintColor] ?: [UIColor systemGreenColor];
+        [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
+        deselectSwitch.on = ([CleverPush getDeselectValue] == YES);
+        [headerView addSubview:deselectSwitch];
+
+        UILabel *deselectLabel = [[UILabel alloc] init];
+        deselectLabel.text = [CPTranslate translate:@"deselectEverything"];
+        deselectLabel.frame = CGRectMake(
+            CPTopicCellLeading,
+            yOffset + (CPTopicHeight - switchSize.height) / CPTopicHeightDivider,
+            tableView.bounds.size.width - (switchSize.width + switchTrailing + CPTopicCellLeading),
+            switchSize.height
+        );
+        [headerView addSubview:deselectLabel];
+
+        yOffset += CPTopicHeight;
     }
-    
-    [deselectSwitch addTarget:self action:@selector(deselectEverything:) forControlEvents:UIControlEventValueChanged];
-    [headerView addSubview:deselectSwitch];
-    
-    if ([CleverPush getDeselectValue] == YES) {
-        deselectSwitch.on = YES;
-    } else {
-        deselectSwitch.on = NO;
+
+    if (showBulkActions) {
+        UIColor *tintColor = [CleverPush getNormalTintColor] ?: [UIColor systemBlueColor];
+
+        UIButton *selectAllButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [selectAllButton setTitle:[CPTranslate translate:@"selectAll"] forState:UIControlStateNormal];
+        [selectAllButton setTitleColor:tintColor forState:UIControlStateNormal];
+        [selectAllButton setTitleColor:[UIColor systemGrayColor] forState:UIControlStateDisabled];
+        selectAllButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+        selectAllButton.titleEdgeInsets = UIEdgeInsetsMake(0, CPTopicCellLeading, 0, 0);
+        selectAllButton.enabled = ![self areAllTopicsSelected];
+        [selectAllButton addTarget:self action:@selector(selectAllTopics) forControlEvents:UIControlEventTouchUpInside];
+
+        UIButton *removeAllButton = [UIButton buttonWithType:UIButtonTypeSystem];
+        [removeAllButton setTitle:[CPTranslate translate:@"removeAll"] forState:UIControlStateNormal];
+        [removeAllButton setTitleColor:tintColor forState:UIControlStateNormal];
+        [removeAllButton setTitleColor:[UIColor systemGrayColor] forState:UIControlStateDisabled];
+        removeAllButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+        removeAllButton.titleEdgeInsets = UIEdgeInsetsMake(0, 0, 0, CPTopicCellLeading);
+        removeAllButton.enabled = [self areAnyTopicsSelected];
+        [removeAllButton addTarget:self action:@selector(removeAllTopics) forControlEvents:UIControlEventTouchUpInside];
+
+        UIStackView *bulkStack = [[UIStackView alloc] initWithArrangedSubviews:@[selectAllButton, removeAllButton]];
+        bulkStack.axis = UILayoutConstraintAxisHorizontal;
+        bulkStack.distribution = UIStackViewDistributionFillEqually;
+        bulkStack.alignment = UIStackViewAlignmentFill;
+        bulkStack.spacing = 0;
+        bulkStack.frame = CGRectMake(0, yOffset, tableView.bounds.size.width, CPTopicHeight);
+        [headerView addSubview:bulkStack];
     }
-    
-    UILabel* deselectEverything = [[UILabel alloc] init];
-    deselectEverything.text = [CPTranslate translate:@"deselectEverything"];
-    deselectEverything.frame = CGRectMake(CPTopicCellLeading, (CPTopicHeight - switchSize.height) / CPTopicHeightDivider, tableView.bounds.size.width - (switchSize.width + switchTrailing + CPTopicCellLeading), switchSize.height);
-    [headerView addSubview:deselectEverything];
-    
+
     return headerView;
 }
 
@@ -411,7 +489,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     }
     [cell updateSeparatorWithTopicHighlighter];
     cell.titleText.attributedText = nil;
-    cell.titleText.text = [self resolveLocalizedDisplayName:topic];
+    cell.titleText.text = [topic name];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
@@ -450,12 +528,24 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     return UITableViewAutomaticDimension;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section {
-    if (self.topicsDialogShowUnsubscribe == NO) {
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    if (!self.topicsDialogShowUnsubscribe && !self.topicsDialogBulkActions) {
         return 0;
-    } else {
-        return CPTopicHeight;
     }
+    CGFloat height = 0;
+    if (self.topicsDialogShowUnsubscribe) height += CPTopicHeight;
+    if (self.topicsDialogBulkActions) height += CPTopicHeight;
+    return height;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)section {
+    if (!self.topicsDialogShowUnsubscribe && !self.topicsDialogBulkActions) {
+        return 0;
+    }
+    CGFloat height = 0;
+    if (self.topicsDialogShowUnsubscribe) height += CPTopicHeight;
+    if (self.topicsDialogBulkActions) height += CPTopicHeight;
+    return height;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForFooterInSection:(NSInteger)section {

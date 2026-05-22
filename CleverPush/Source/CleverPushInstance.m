@@ -4271,11 +4271,20 @@ static id isNil(id object) {
         }
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             NSString* headerTitle = [CPTranslate translate:@"subscribedTopics"];
+            NSString* saveButtonTitle = [CPTranslate translate:@"save"];
+            BOOL topicsDialogBulkActions = ([channelConfig objectForKey:@"topicsDialogBulkActions"] != nil) &&
+                                                      ![[channelConfig objectForKey:@"topicsDialogBulkActions"] isKindOfClass:[NSNull class]] &&
+                                                      [[channelConfig objectForKey:@"topicsDialogBulkActions"] boolValue];
+            
 
             if (channelConfig != nil && [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
                 headerTitle = [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"];
             }
 
+            if (channelConfig != nil && ![CPUtils isNullOrEmpty:[channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsSaveText"]]) {
+                saveButtonTitle = [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsSaveText"];
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:NO];
@@ -4296,7 +4305,9 @@ static id isNil(id object) {
                     topicsController.topicsDialogShowWhenNewAdded = [[channelConfig objectForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
                 }
 
-                DWAlertAction*okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
+                topicsController.topicsDialogBulkActions = topicsDialogBulkActions;
+
+                DWAlertAction*okAction = [DWAlertAction actionWithTitle:saveButtonTitle style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
                     if (topicsController.topicsDialogShowUnsubscribe
                         && [self getDeselectValue] == YES) {
                         [self unsubscribe];

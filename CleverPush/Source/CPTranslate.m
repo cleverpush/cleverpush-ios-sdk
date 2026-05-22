@@ -14,13 +14,17 @@
                 @"deselectEverything": @"Deselect everything",
                 @"subscribedTopics": @"Subscribed Topics",
                 @"notificationsEmpty": @"No notifications available",
-                @"save": @"Save"
+                @"save": @"Save",
+                @"selectAll": @"Select All",
+                @"removeAll": @"Remove All"
         },
         @"de": @{
                 @"deselectEverything": @"Alles abwählen",
                 @"subscribedTopics": @"Abonnierte Themen",
                 @"notificationsEmpty": @"Keine Nachrichten verfügbar",
-                @"save": @"Speichern"
+                @"save": @"Speichern",
+                @"selectAll": @"Alle auswählen",
+                @"removeAll": @"Alle entfernen"
         },
     };
     
