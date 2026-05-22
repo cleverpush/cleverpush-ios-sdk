@@ -299,13 +299,25 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     return selectedState;
 }
 
+#pragma mark - Resolve the display name for a topic, respecting device-locale translation when configured
+- (NSString *)resolveLocalizedDisplayName:(CPChannelTopic *)topic {
+    if (topic.nameTranslationEnabled && topic.nameTranslation) {
+        NSString *languageCode = [[NSLocale preferredLanguages].firstObject componentsSeparatedByString:@"-"].firstObject;
+        NSString *translated = topic.nameTranslation[languageCode];
+        if (translated && [translated isKindOfClass:[NSString class]] && translated.length > 0) {
+            return translated;
+        }
+    }
+    return [topic name] ?: @"";
+}
+
 #pragma mark - Returns YES if every available topic is currently selected
 - (BOOL)areAllTopicsSelected {
     if ([availableTopics count] == 0) {
         return NO;
     }
     for (CPChannelTopic *topic in availableTopics) {
-        if (![self topicState:topic]) {
+        if (![self defaultTopicState:topic]) {
             return NO;
         }
     }
@@ -315,7 +327,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
 #pragma mark - Returns YES if at least one available topic is currently selected
 - (BOOL)areAnyTopicsSelected {
     for (CPChannelTopic *topic in availableTopics) {
-        if ([self topicState:topic]) {
+        if ([self defaultTopicState:topic]) {
             return YES;
         }
     }
@@ -489,7 +501,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     }
     [cell updateSeparatorWithTopicHighlighter];
     cell.titleText.attributedText = nil;
-    cell.titleText.text = [topic name];
+    cell.titleText.text = [self resolveLocalizedDisplayName:topic];
     cell.titleText.tag = 200;
     cell.titleText.backgroundColor = [UIColor clearColor];
     cell.accessibilityLabel = cell.titleText.text;
