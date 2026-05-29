@@ -1482,6 +1482,7 @@ static id isNil(id object) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
