@@ -475,6 +475,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setSubscriptionTopics:topics onSuccess:successBlock onFailure:failure];
 }
 
++ (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments {
+    [self.CPSharedInstance setPianoSegments:segments];
+}
+
 + (void)setBrandingColor:(UIColor* _Nullable)color {
     [self.CPSharedInstance setBrandingColor:color];
 }
@@ -747,6 +751,10 @@ static CleverPush* singleInstance = nil;
 
 + (NSMutableArray* _Nullable)getSubscriptionTopics {
     return [self.CPSharedInstance getSubscriptionTopics];
+}
+
++ (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments {
+    return [self.CPSharedInstance getSubscriptionPianoSegments];
 }
 
 + (NSObject* _Nullable)getSubscriptionAttribute:(NSString* _Nullable)attributeId {
