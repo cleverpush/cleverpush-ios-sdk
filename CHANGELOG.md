@@ -1,3 +1,7 @@
+## 1.34.46 (01.06.2026)
+* implemented setPianoSegments method to sync Piano segments.
+* implemented selectAll & removeAll buttons functionality for topicsDialogue.
+
 ## 1.34.45 (21.05.2026)
 * implemented feature of regenerate APNS token on server-requested push token refresh via regeneratePushTokenRequestedAt timestamp comparison
 * Add topic name translation support with locale-based fallback.
