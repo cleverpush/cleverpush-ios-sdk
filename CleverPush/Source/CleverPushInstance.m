@@ -1482,6 +1482,7 @@ static id isNil(id object) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
@@ -1742,6 +1743,11 @@ static id isNil(id object) {
         } else {
             [dataDic setObject:@"1" forKey:@"topicsVersion"];
         }
+    }
+
+    NSArray* pianoSegments = [self getSubscriptionPianoSegments];
+    if (pianoSegments != nil && [pianoSegments count] > 0) {
+        [dataDic setObject:pianoSegments forKey:@"pianoSegments"];
     }
 
     [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
@@ -3389,6 +3395,28 @@ static id isNil(id object) {
 
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics {
     [self setDefaultCheckedTopics:topics];
+    [self ensureMainThreadSync:^{
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+    }];
+}
+
+#pragma mark - Piano Segments
+- (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* pianoSegments = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    if (!pianoSegments) {
+        return [[NSArray alloc] init];
+    }
+    return pianoSegments;
+}
+
+- (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    if (segments != nil && [segments count] > 0) {
+        [userDefaults setObject:segments forKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    }
+    [userDefaults synchronize];
     [self ensureMainThreadSync:^{
         [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
     }];

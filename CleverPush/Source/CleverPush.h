@@ -146,6 +146,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)setTopicsChangedListener:(CPTopicsChangedBlock _Nullable)changedBlock;
 + (void)setSubscriptionTopics:(NSMutableArray* _Nullable)topics;
 + (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure;
++ (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments;
 + (void)setBrandingColor:(UIColor* _Nullable)color;
 + (void)setNormalTintColor:(UIColor* _Nullable)color;
 + (UIColor* _Nullable)getNormalTintColor;
@@ -217,6 +218,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (NSArray<NSString*>* _Nullable)getSeenStories;
 + (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains;
 + (NSMutableArray<NSString*>* _Nullable)getSubscriptionTopics;
++ (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments;
 + (void)setMaximumNotificationCount:(int)limit;
 
 + (NSObject* _Nullable)getSubscriptionAttribute:(NSString* _Nullable)attributeId;
