@@ -1220,6 +1220,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     };
     
     NSMutableAttributedString *attributedString = nil;
+    BOOL parserThrew = NO;
 
     @try {
         NSError *error = nil;
@@ -1230,11 +1231,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     } @catch (NSException *exception) {
         [CPLog error:@"[CPUtils] Caught HTML parser exception: %@", exception.reason];
         attributedString = nil;
+        parserThrew = YES;
     }
 
     if (attributedString.length == 0) {
         NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
-        return fallback.length > 0 ? fallback : nil;
+        if (fallback.length == 0) {
+            return nil;
+        }
+        if (!parserThrew) {
+            [cache setObject:fallback forKey:cacheKey];
+        }
+        return fallback;
     }
     
     [attributedString enumerateAttribute:NSFontAttributeName
