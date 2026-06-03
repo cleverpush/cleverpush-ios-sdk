@@ -1139,10 +1139,52 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 }
 
 #pragma mark - Convert HTML to NSAttributedString
++ (NSAttributedString *)plainAttributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    NSString *plain = html ?: @"";
+
+    @try {
+        plain = [plain stringByReplacingOccurrencesOfString:@"(?i)<\\s*br\\s*/?>"
+                                                 withString:@"\n"
+                                                    options:NSRegularExpressionSearch
+                                                      range:NSMakeRange(0, plain.length)];
+        plain = [plain stringByReplacingOccurrencesOfString:@"<[^>]+>"
+                                                 withString:@""
+                                                    options:NSRegularExpressionSearch
+                                                      range:NSMakeRange(0, plain.length)];
+    } @catch (NSException *exception) {
+        plain = html ?: @"";
+    }
+
+    plain = [plain stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&quot;" withString:@"\""];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&#39;" withString:@"'"];
+
+    NSMutableAttributedString *fallback = [[NSMutableAttributedString alloc] initWithString:plain];
+    if (fallback.length > 0) {
+        NSRange fullRange = NSMakeRange(0, fallback.length);
+        if (font) {
+            [fallback addAttribute:NSFontAttributeName value:font range:fullRange];
+        }
+        if (textColor) {
+            [fallback addAttribute:NSForegroundColorAttributeName value:textColor range:fullRange];
+        }
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = textAlignment;
+        paragraphStyle.paragraphSpacing = 0;
+        paragraphStyle.paragraphSpacingBefore = 0;
+        [fallback addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:fullRange];
+    }
+    return fallback;
+}
+
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    NSString *safeHTML = html ?: @"";
     NSString *colorHex = [CPUtils hexStringFromColor:textColor];
     NSString *cacheKey = [NSString stringWithFormat:@"%@|%@|%@|%.0f|%ld",
-                          html, colorHex, font.fontName, font.pointSize, (long)textAlignment];
+                          safeHTML, colorHex, font.fontName, font.pointSize, (long)textAlignment];
     NSCache *cache = [CPUtils sharedAttributedStringCache];
     NSAttributedString *cached = [cache objectForKey:cacheKey];
     if (cached != nil) {
@@ -1152,9 +1194,13 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if (![NSThread isMainThread]) {
         __block NSAttributedString *result = nil;
         dispatch_sync(dispatch_get_main_queue(), ^{
-            result = [CPUtils attributedStringFromHTML:html font:font textColor:textColor textAlignment:textAlignment];
+            result = [CPUtils attributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
         });
         return result;
+    }
+
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+        return [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
     }
 
     NSString *htmlString = [NSString stringWithFormat:
@@ -1164,7 +1210,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
          "p,div,section,article,header,footer,blockquote,pre,h1,h2,h3,h4,h5,h6,ul,ol,li{margin:0;padding:0;}"
          "ul,ol{padding-left:1.2em;}"
          "</style>%@",
-        font.pointSize, colorHex, html];
+        font.pointSize, colorHex, safeHTML];
     
     NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *options = @{
@@ -1172,11 +1218,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)
     };
     
-    NSError *error = nil;
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:data options:options documentAttributes:nil error:&error];
-    
-    if (error || attributedString.length == 0) {
-        return nil;
+    NSMutableAttributedString *attributedString = nil;
+
+    @try {
+        NSError *error = nil;
+        attributedString = [[NSMutableAttributedString alloc] initWithData:data options:options documentAttributes:nil error:&error];
+        if (error) {
+            attributedString = nil;
+        }
+    } @catch (NSException *exception) {
+        [CPLog error:@"[CPUtils] Caught HTML parser exception: %@", exception.reason];
+        attributedString = nil;
+    }
+
+    if (attributedString.length == 0) {
+        NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        [cache setObject:fallback forKey:cacheKey];
+        return fallback;
     }
     
     [attributedString enumerateAttribute:NSFontAttributeName
