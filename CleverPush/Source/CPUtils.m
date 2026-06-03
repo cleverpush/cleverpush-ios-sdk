@@ -1200,7 +1200,8 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }
 
     if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-        return [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        return fallback.length > 0 ? fallback : nil;
     }
 
     NSString *htmlString = [NSString stringWithFormat:
@@ -1233,6 +1234,9 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
     if (attributedString.length == 0) {
         NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        if (fallback.length == 0) {
+            return nil;
+        }
         [cache setObject:fallback forKey:cacheKey];
         return fallback;
     }
