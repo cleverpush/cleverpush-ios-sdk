@@ -1564,7 +1564,7 @@ static id isNil(id object) {
         channelId = [self getChannelIdFromUserDefaults];
     }
     if (channelId == nil || [channelId length] == 0) {
-        [CPLog warn:@"setSubscriptionTestStatus: Channel ID is null"];
+        [CPLog debug:@"setSubscriptionTestStatus: Channel ID is null"];
         if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is null or empty"}]);
         }
@@ -1572,7 +1572,7 @@ static id isNil(id object) {
     }
     [self getSubscriptionId:^(NSString*subscriptionId) {
         if (subscriptionId == nil || [subscriptionId length] == 0) {
-            [CPLog warn:@"setSubscriptionTestStatus: There is no subscriptionId"];
+            [CPLog debug:@"setSubscriptionTestStatus: There is no subscriptionId"];
             if (failureBlock) {
                 failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is null or empty"}]);
             }
