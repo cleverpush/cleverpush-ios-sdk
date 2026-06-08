@@ -727,7 +727,15 @@ int appBannerPerDayValue = 0;
                 relation = @"equals";
             }
             
-            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
+            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeExists)]) {
+                BOOL hasValue = ([attributeValueObj isKindOfClass:[NSString class]] && [(NSString *)attributeValueObj length] > 0)
+                             || ([attributeValueObj isKindOfClass:[NSArray class]] && [(NSArray *)attributeValueObj count] > 0);
+                currentMatch = hasValue;
+            } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotExists)]) {
+                BOOL hasValue = ([attributeValueObj isKindOfClass:[NSString class]] && [(NSString *)attributeValueObj length] > 0)
+                             || ([attributeValueObj isKindOfClass:[NSArray class]] && [(NSArray *)attributeValueObj count] > 0);
+                currentMatch = !hasValue;
+            } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
                 if ([attributeValueObj isKindOfClass:[NSString class]]) {
                     NSString *attributeValue = (NSString *)attributeValueObj;
                     currentMatch = [attributeValue containsString:compareAttributeValue];
