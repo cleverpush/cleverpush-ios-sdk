@@ -730,14 +730,14 @@ int appBannerPerDayValue = 0;
             if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeExists)]) {
                 NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
                 BOOL keyExists = NO;
-                if (subscriptionAttributes != nil) {
+                if (subscriptionAttributes != nil && attributeId != nil) {
                     keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
                 }
                 currentMatch = keyExists;
             } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotExists)]) {
                 NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
                 BOOL keyExists = NO;
-                if (subscriptionAttributes != nil) {
+                if (subscriptionAttributes != nil && attributeId != nil) {
                     keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
                 }
                 currentMatch = !keyExists;
