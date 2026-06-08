@@ -728,13 +728,19 @@ int appBannerPerDayValue = 0;
             }
             
             if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeExists)]) {
-                BOOL hasValue = ([attributeValueObj isKindOfClass:[NSString class]] && [(NSString *)attributeValueObj length] > 0)
-                             || ([attributeValueObj isKindOfClass:[NSArray class]] && [(NSArray *)attributeValueObj count] > 0);
-                currentMatch = hasValue;
+                NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+                BOOL keyExists = NO;
+                if (subscriptionAttributes != nil) {
+                    keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
+                }
+                currentMatch = keyExists;
             } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotExists)]) {
-                BOOL hasValue = ([attributeValueObj isKindOfClass:[NSString class]] && [(NSString *)attributeValueObj length] > 0)
-                             || ([attributeValueObj isKindOfClass:[NSArray class]] && [(NSArray *)attributeValueObj count] > 0);
-                currentMatch = !hasValue;
+                NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+                BOOL keyExists = NO;
+                if (subscriptionAttributes != nil) {
+                    keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
+                }
+                currentMatch = !keyExists;
             } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
                 if ([attributeValueObj isKindOfClass:[NSString class]]) {
                     NSString *attributeValue = (NSString *)attributeValueObj;
