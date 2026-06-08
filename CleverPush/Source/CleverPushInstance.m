@@ -1548,11 +1548,23 @@ static id isNil(id object) {
 }
 
 - (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionTestStatus:YES onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)unmarkSubscriptionAsTest {
+    [self unmarkSubscriptionAsTestOnSuccess:nil onFailure:nil];
+}
+
+- (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionTestStatus:NO onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionTestStatus:(BOOL)isTest onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     if (channelId == nil) {
         channelId = [self getChannelIdFromUserDefaults];
     }
     if (channelId == nil || [channelId length] == 0) {
-        [CPLog warn:@"markSubscriptionAsTest: Channel ID is null"];
+        [CPLog debug:@"setSubscriptionTestStatus: Channel ID is null"];
         if (failureBlock) {
             failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is null or empty"}]);
         }
@@ -1560,7 +1572,7 @@ static id isNil(id object) {
     }
     [self getSubscriptionId:^(NSString*subscriptionId) {
         if (subscriptionId == nil || [subscriptionId length] == 0) {
-            [CPLog warn:@"markSubscriptionAsTest: There is no subscriptionId"];
+            [CPLog debug:@"setSubscriptionTestStatus: There is no subscriptionId"];
             if (failureBlock) {
                 failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is null or empty"}]);
             }
@@ -1571,17 +1583,18 @@ static id isNil(id object) {
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
                                      subscriptionId, @"subscriptionId",
+                                     @(isTest), @"isTest",
                                      nil];
 
             NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
             [request setHTTPBody:postData];
             [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
-                [CPLog debug:@"markSubscriptionAsTest: Successfully marked subscription as test"];
+                [CPLog debug:@"setSubscriptionTestStatus: Successfully set subscription tester status to %@", isTest ? @"true" : @"false"];
                 if (successBlock) {
                     successBlock(results);
                 }
             } onFailure:^(NSError* error) {
-                [CPLog error:@"markSubscriptionAsTest: Failed to mark subscription as test. %@", error];
+                [CPLog error:@"setSubscriptionTestStatus: Failed to set subscription tester status. %@", error];
                 if (failureBlock) {
                     failureBlock(error);
                 }
