@@ -1,3 +1,8 @@
+## 1.34.47 (09.06.2026)
+* Optimized attributedStringFromHTML function for preventing crash.
+* Added unmarkSubscriptionAsTest method to unmark subscription as test.
+* Added a new Attribute condition type in Targeting for AppBanner: Exists/NotExists.
+
 ## 1.34.46 (01.06.2026)
 * implemented setPianoSegments method to sync Piano segments.
 * implemented selectAll & removeAll buttons functionality for topicsDialogue.

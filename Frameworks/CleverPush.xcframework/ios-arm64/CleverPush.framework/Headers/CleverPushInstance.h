@@ -132,6 +132,8 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock successBlock:(void(^)())successBlock;
 - (void)markSubscriptionAsTest;
 - (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
+- (void)unmarkSubscriptionAsTest;
+- (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken;
 - (void)handleDidFailRegisterForRemoteNotification:(NSError* _Nullable)err;
 - (void)handleNotificationOpened:(NSDictionary* _Nullable)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString* _Nullable)actionIdentifier;
