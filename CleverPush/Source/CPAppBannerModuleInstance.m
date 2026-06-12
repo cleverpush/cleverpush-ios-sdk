@@ -1696,6 +1696,15 @@ int appBannerPerDayValue = 0;
     [hostVC.view addSubview:overlay];
     activeBannerOverlay = overlay;
 
+    __weak CPAppBannerPassthroughView *weakOverlay = overlay;
+    __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
+
+    if ([banner.contentType isEqualToString:@"html"]) {
+        appBannerViewController.htmlTouchableRectsDidChangeBlock = ^(NSArray<NSValue *> *rects) {
+            weakOverlay.webViewTouchableRects = rects;
+        };
+    }
+
     [appBannerViewController finishSetup];
     if (!appBannerViewController.isPreloading) {
         [appBannerViewController.cardCollectionView reloadData];
@@ -1706,6 +1715,9 @@ int appBannerPerDayValue = 0;
 
     if ([banner.contentType isEqualToString:@"html"]) {
         overlay.bannerContainerView = appBannerViewController.webView;
+        overlay.closeButtonView = appBannerViewController.htmlCloseButton;
+        overlay.htmlTouchPassthroughEnabled = YES;
+        overlay.webViewTouchableRects = @[[NSValue valueWithCGRect:appBannerViewController.webView.bounds]];
     } else {
         overlay.bannerContainerView = appBannerViewController.bannerContainer;
         overlay.closeButtonView = appBannerViewController.btnClose;
@@ -1714,8 +1726,6 @@ int appBannerPerDayValue = 0;
         appBannerViewController.view.alpha = 1.0;
     }];
 
-    __weak CPAppBannerPassthroughView *weakOverlay = overlay;
-    __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
     appBannerViewController.windowDismissBlock = ^{
         [weakBannerVC willMoveToParentViewController:nil];
         [weakOverlay removeFromSuperview];
@@ -1882,6 +1892,10 @@ int appBannerPerDayValue = 0;
 
 - (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
     appBannersNonBlocking = nonBlocking;
+}
+
+- (BOOL)getAppBannersNonBlocking {
+    return appBannersNonBlocking;
 }
 
 - (void)setCurrentEventId:(NSString*)eventId {

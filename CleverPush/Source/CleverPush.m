@@ -232,6 +232,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAppBannersNonBlocking:nonBlocking];
 }
 
++ (BOOL)getAppBannersNonBlocking {
+    return [self.CPSharedInstance getAppBannersNonBlocking];
+}
+
 + (BOOL)popupVisible {
     return [self.CPSharedInstance popupVisible];
 }

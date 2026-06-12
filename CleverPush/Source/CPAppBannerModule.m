@@ -174,6 +174,10 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setAppBannersNonBlocking:nonBlocking];
 }
 
++ (BOOL)getAppBannersNonBlocking {
+    return [self.moduleInstance getAppBannersNonBlocking];
+}
+
 + (void)setCurrentEventId:(NSString*)eventId {
     [self.moduleInstance setCurrentEventId:eventId];
 }

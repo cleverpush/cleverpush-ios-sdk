@@ -66,6 +66,7 @@
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
 - (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
+- (BOOL)getAppBannersNonBlocking;
 - (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
