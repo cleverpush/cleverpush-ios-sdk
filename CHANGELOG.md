@@ -1,3 +1,6 @@
+## 1.34.48 (12.06.2026)
+* Resolved the issue of HTML buttons were not working when setAppBannersNonBlocking is true.
+
 ## 1.34.47 (09.06.2026)
 * Optimized attributedStringFromHTML function for preventing crash.
 * Added unmarkSubscriptionAsTest method to unmark subscription as test.
