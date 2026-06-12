@@ -4690,6 +4690,10 @@ static id isNil(id object) {
     [CPAppBannerModule setAppBannersNonBlocking:nonBlocking];
 }
 
+- (BOOL)getAppBannersNonBlocking {
+    return [CPAppBannerModule getAppBannersNonBlocking];
+}
+
 - (BOOL)getAppBannerDraftsEnabled {
     return isShowDraft;
 }

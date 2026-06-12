@@ -37,6 +37,7 @@
 @property (nonatomic, strong) NSString *voucherCode;
 @property (nonatomic, assign) BOOL isPreloading;
 @property (nonatomic, copy) void (^windowDismissBlock)(void);
+@property (nonatomic, copy, nullable) void (^htmlTouchableRectsDidChangeBlock)(NSArray<NSValue *> *rects);
 @property (nonatomic, strong) IBOutlet WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 @property (weak, nonatomic) IBOutlet UICollectionView *cardCollectionView;
