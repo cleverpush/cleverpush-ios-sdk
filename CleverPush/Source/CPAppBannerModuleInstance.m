@@ -955,11 +955,15 @@ int appBannerPerDayValue = 0;
             return YES;
         }
     } else if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
-        if (banner.stopAtRelativeDays > 0 && [banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
+        if ([banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
             NSDate *firstDisplayDate = [self getBannerFirstDisplayDate:banner.id];
             if ([firstDisplayDate isKindOfClass:[NSDate class]]) {
-                NSDate *expiryDate = [firstDisplayDate dateByAddingTimeInterval:(NSTimeInterval)banner.stopAtRelativeDays * 24 * 60 * 60];
-                if ([expiryDate compare:[NSDate date]] == NSOrderedAscending) {
+                NSInteger relativeDays = banner.stopAtRelativeDays > 0 ? banner.stopAtRelativeDays : 0;
+                NSCalendar *calendar = [NSCalendar currentCalendar];
+                NSDateComponents *components = [[NSDateComponents alloc] init];
+                [components setDay:relativeDays];
+                NSDate *expiryDate = [calendar dateByAddingComponents:components toDate:firstDisplayDate options:0];
+                if (expiryDate != nil && [expiryDate compare:[NSDate date]] == NSOrderedAscending) {
                     return NO;
                 }
             }
@@ -1755,6 +1759,9 @@ int appBannerPerDayValue = 0;
     
     if (displayCallback) {
         displayCallback(appBannerViewController);
+        if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+            [self setBannerFirstDisplayDate:banner];
+        }
     } else if (appBannersNonBlocking) {
         [self presentNonBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     } else {
@@ -1767,10 +1774,6 @@ int appBannerPerDayValue = 0;
         });
     }
     [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
-
-    if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
-        [self setBannerFirstDisplayDate:banner];
-    }
 
     CPAppBannerShownBlock shownCallback = nil;
     @synchronized(callbackLock) {
@@ -1843,6 +1846,10 @@ int appBannerPerDayValue = 0;
         [weakBannerVC removeFromParentViewController];
         activeBannerOverlay = nil;
     };
+
+    if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+        [self setBannerFirstDisplayDate:banner];
+    }
 }
 
 #pragma mark - Blocking banner presentation (default modal)
@@ -1856,6 +1863,9 @@ int appBannerPerDayValue = 0;
     }
 
     UIViewController *topController = [CleverPush topViewController];
+    if (!topController) {
+        return;
+    }
     appBannerViewController.view.alpha = 0.0;
     [topController presentViewController:appBannerViewController animated:NO completion:^{
         [appBannerViewController finishSetup];
@@ -1865,6 +1875,9 @@ int appBannerPerDayValue = 0;
             [UIView animateWithDuration:0.3 animations:^{
                 appBannerViewController.view.alpha = 1.0;
             }];
+        }
+        if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+            [self setBannerFirstDisplayDate:banner];
         }
     }];
 }
