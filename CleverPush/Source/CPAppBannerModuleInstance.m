@@ -212,6 +212,102 @@ int appBannerPerDayValue = 0;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+#pragma mark - Safely read the stored first display records (always returns a valid array)
+- (NSArray*)getStoredBannerFirstDisplayRecords {
+    id stored = [[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    if (![stored isKindOfClass:[NSArray class]]) {
+        return @[];
+    }
+    return (NSArray*)stored;
+}
+
+#pragma mark - Store the first display date for a banner (used for relative_to_delivery expiry)
+- (void)setBannerFirstDisplayDate:(CPAppBanner*)banner {
+    if (banner == nil || ![banner isKindOfClass:[CPAppBanner class]]) {
+        return;
+    }
+
+    NSString *bannerId = banner.id;
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return;
+    }
+
+    NSMutableArray *firstDisplayRecords = [[self getStoredBannerFirstDisplayRecords] mutableCopy];
+
+    for (id record in firstDisplayRecords) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            return;
+        }
+    }
+
+    NSMutableDictionary *newRecord = [NSMutableDictionary dictionary];
+    newRecord[@"id"] = bannerId;
+    newRecord[@"date"] = [NSDate date];
+    [firstDisplayRecords addObject:newRecord];
+
+    [[NSUserDefaults standardUserDefaults] setObject:firstDisplayRecords forKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Retrieve the first display date for a banner
+- (NSDate*)getBannerFirstDisplayDate:(NSString*)bannerId {
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return nil;
+    }
+
+    for (id record in [self getStoredBannerFirstDisplayRecords]) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            id date = record[@"date"];
+            if ([date isKindOfClass:[NSDate class]]) {
+                return (NSDate*)date;
+            }
+            return nil;
+        }
+    }
+    return nil;
+}
+
+#pragma mark - Clear the stored first display date for a specific banner
+- (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return;
+    }
+
+    NSArray *firstDisplayRecords = [self getStoredBannerFirstDisplayRecords];
+    if (firstDisplayRecords.count == 0) {
+        return;
+    }
+
+    NSMutableArray *updatedRecords = [NSMutableArray array];
+    for (id record in firstDisplayRecords) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            continue;
+        }
+        [updatedRecords addObject:record];
+    }
+
+    [[NSUserDefaults standardUserDefaults] setObject:updatedRecords forKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Clear the stored first display dates for all banners
+- (void)clearAllBannerDeliveryDates {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 #pragma mark - Initialised a session
 - (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
 	[self showPendingSilentPushAppBannersIds:channelId];
@@ -858,6 +954,17 @@ int appBannerPerDayValue = 0;
         } else {
             return YES;
         }
+    } else if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+        if (banner.stopAtRelativeDays > 0 && [banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
+            NSDate *firstDisplayDate = [self getBannerFirstDisplayDate:banner.id];
+            if ([firstDisplayDate isKindOfClass:[NSDate class]]) {
+                NSDate *expiryDate = [firstDisplayDate dateByAddingTimeInterval:(NSTimeInterval)banner.stopAtRelativeDays * 24 * 60 * 60];
+                if ([expiryDate compare:[NSDate date]] == NSOrderedAscending) {
+                    return NO;
+                }
+            }
+        }
+        return YES;
     } else {
         return YES;
     }
@@ -1660,6 +1767,10 @@ int appBannerPerDayValue = 0;
         });
     }
     [self sendBannerEvent:@"delivered" forBanner:banner forScreen:nil forButtonBlock:nil forImageBlock:nil blockType:nil];
+
+    if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+        [self setBannerFirstDisplayDate:banner];
+    }
 
     CPAppBannerShownBlock shownCallback = nil;
     @synchronized(callbackLock) {

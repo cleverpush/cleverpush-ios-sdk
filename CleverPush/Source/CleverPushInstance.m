@@ -4690,6 +4690,14 @@ static id isNil(id object) {
     [CPAppBannerModule setAppBannersNonBlocking:nonBlocking];
 }
 
+- (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    [CPAppBannerModule clearBannerDeliveryDate:bannerId];
+}
+
+- (void)clearAllBannerDeliveryDates {
+    [CPAppBannerModule clearAllBannerDeliveryDates];
+}
+
 - (BOOL)getAppBannerDraftsEnabled {
     return isShowDraft;
 }

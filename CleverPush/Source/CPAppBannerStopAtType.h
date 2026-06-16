@@ -2,5 +2,6 @@
 
 typedef NS_ENUM(NSInteger, CPAppBannerStopAtType) {
     CPAppBannerStopAtTypeForever,
-    CPAppBannerStopAtTypeSpecificTime
+    CPAppBannerStopAtTypeSpecificTime,
+    CPAppBannerStopAtTypeRelativeToDelivery
 };
