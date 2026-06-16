@@ -2,9 +2,9 @@
 triple:          'x86_64-apple-darwin'
 binary-path:     '/Users/cp-chirag/Library/Developer/Xcode/DerivedData/CleverPush-dgncwrsmpgurlrdquacxkfinkhsg/Build/Intermediates.noindex/ArchiveIntermediates/CleverPushExtension/InstallationBuildProductsLocation/Library/Frameworks/CleverPushExtension.framework/CleverPushExtension'
 relocations:
-  - { offset: 0x68DE6, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
-  - { offset: 0x68DF4, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
-  - { offset: 0x68E60, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension serviceExtensionTimeWillExpireRequest:withMutableNotificationContent:]', symObjAddr: 0x19, symBinAddr: 0x871, symSize: 0x19 }
-  - { offset: 0x68F58, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionString, symObjAddr: 0x0, symBinAddr: 0x890, symSize: 0x0 }
-  - { offset: 0x68F8D, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionNumber, symObjAddr: 0x38, symBinAddr: 0x8C8, symSize: 0x0 }
+  - { offset: 0x68DF2, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
+  - { offset: 0x68E00, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension didReceiveNotificationExtensionRequest:withMutableNotificationContent:]', symObjAddr: 0x0, symBinAddr: 0x858, symSize: 0x19 }
+  - { offset: 0x68E6C, size: 0x8, addend: 0x0, symName: '+[CleverPushExtension serviceExtensionTimeWillExpireRequest:withMutableNotificationContent:]', symObjAddr: 0x19, symBinAddr: 0x871, symSize: 0x19 }
+  - { offset: 0x68F64, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionString, symObjAddr: 0x0, symBinAddr: 0x890, symSize: 0x0 }
+  - { offset: 0x68F99, size: 0x8, addend: 0x0, symName: _CleverPushExtensionVersionNumber, symObjAddr: 0x38, symBinAddr: 0x8C8, symSize: 0x0 }
 ...

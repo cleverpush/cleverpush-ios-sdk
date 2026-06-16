@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.46";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.48";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -4696,6 +4696,8 @@ static id isNil(id object) {
 
 - (void)clearAllBannerDeliveryDates {
     [CPAppBannerModule clearAllBannerDeliveryDates];
+- (BOOL)getAppBannersNonBlocking {
+    return [CPAppBannerModule getAppBannersNonBlocking];
 }
 
 - (BOOL)getAppBannerDraftsEnabled {

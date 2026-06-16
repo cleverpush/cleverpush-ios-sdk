@@ -763,19 +763,36 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     webView.contentMode = UIViewContentModeScaleToFill;
 }
 
++ (CPAppBannerViewController *)appBannerViewControllerForWebView:(WKWebView *)webView {
+    UIResponder *responder = webView;
+    while (responder != nil) {
+        if ([responder isKindOfClass:[CPAppBannerViewController class]]) {
+            return (CPAppBannerViewController *)responder;
+        }
+        responder = responder.nextResponder;
+    }
+    return nil;
+}
+
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message withBanner:(CPAppBanner *)banner {
     [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
 
     if (message != nil && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
-            UIViewController *topController = [CleverPush topViewController];
-            if (topController) {
-                [CPLog debug:@"Dismissing controller: %@", topController];
-                [topController dismissViewControllerAnimated:YES completion:^{
-                    [CPLog debug:@"Controller dismissed"];
-                }];
+            CPAppBannerViewController *bannerVC = [self appBannerViewControllerForWebView:message.webView];
+            if ([CleverPush getAppBannersNonBlocking] && bannerVC != nil) {
+                [CPLog debug:@"Dismissing non-blocking banner via onDismiss: %@", bannerVC];
+                [bannerVC onDismiss];
             } else {
-                [CPLog debug:@"No controller to dismiss"];
+                UIViewController *topController = [CleverPush topViewController];
+                if (topController) {
+                    [CPLog debug:@"Dismissing controller: %@", topController];
+                    [topController dismissViewControllerAnimated:YES completion:^{
+                        [CPLog debug:@"Controller dismissed"];
+                    }];
+                } else {
+                    [CPLog debug:@"No controller to dismiss"];
+                }
             }
         } else if ([message.name isEqualToString:@"nextScreen"]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToNextPageNotification" object:nil];
@@ -860,7 +877,26 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
                 if (webUrl && webUrl.scheme && webUrl.host) {
-                    [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
+                    CPAppBannerViewController *bannerVC =
+                    [self appBannerViewControllerForWebView:message.webView];
+                    if ([CleverPush getAppBannersNonBlocking] && bannerVC != nil) {
+                        [bannerVC onDismiss];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            SFSafariViewController *safariController =
+                            [[SFSafariViewController alloc] initWithURL:webUrl];
+                            
+                            safariController.modalPresentationStyle =
+                            UIModalPresentationPageSheet;
+                            
+                            [CleverPush.topViewController
+                             presentViewController:safariController
+                             animated:YES
+                             completion:nil];
+                        });
+                    } else {
+                        [self openSafari:webUrl
+                   dismissViewController:CleverPush.topViewController];
+                    }
                 }
             } else if ([message.name isEqualToString:@"goToScreen"]) {
                 if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {

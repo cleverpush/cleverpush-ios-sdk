@@ -178,7 +178,7 @@
 		</data>
 		<key>Headers/CPFilterRelationType.h</key>
 		<data>
-		bN+XMaLQ7X4pGPcY4ZLyZegy5NQ=
+		Pwk4IzZvARr/e5K28aN46u2IEoY=
 		</data>
 		<key>Headers/CPIabTcfMode.h</key>
 		<data>
@@ -262,7 +262,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		Sr2T7ZaZZh4qHTsl4Vqkrve0xIw=
+		hnalg0zbwWTR9Q7RTvrirByFmLM=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -270,7 +270,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		iJI+8K67lvGt1PSPPC2wWPSbIrA=
+		EKkYjHa1HEHVZNg2j9d2i/c9pdc=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
@@ -282,7 +282,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		Adq/rlB9x8c4Gfej67gkuF4SGWg=
+		tIUhBZ6uSeDs8bdtcAUaiw5wd8Q=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -600,7 +600,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			rUaCt2B2dgq2Ci25drhBN7nkLFPN8PP4P2iNVy/hK0E=
+			/GQnkXLwsxYzdeRCyMSHYSsWEWLr4zdh0dD0nkCQE2Q=
 			</data>
 		</dict>
 		<key>Headers/CPIabTcfMode.h</key>
@@ -747,7 +747,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			x/4SgPxzB8DBtSd+/c6sJD+XDbpxUiwqyhG6++ZM7nw=
+			4e29USNiT/3Ki2YOULGLZN4noDwBfof4c7QnRQ42vuA=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -761,7 +761,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			AfcygbLtSatDbA+rB1PSEjATaRiBiURBm7fEA6PVt8w=
+			STQBgtWw3FewOIAf9/U/uDWP6TDsDlIwuy1akqNiloU=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>

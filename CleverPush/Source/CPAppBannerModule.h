@@ -43,6 +43,7 @@
 + (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
 + (void)clearBannerDeliveryDate:(NSString*)bannerId;
 + (void)clearAllBannerDeliveryDates;
++ (BOOL)getAppBannersNonBlocking;
 + (void)resetInitialization;
 + (void)setCurrentEventId:(NSString*)eventId;
 + (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)button forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type;
