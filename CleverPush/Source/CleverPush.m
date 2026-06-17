@@ -238,6 +238,8 @@ static CleverPush* singleInstance = nil;
 
 + (void)clearAllBannerDeliveryDates {
     [self.CPSharedInstance clearAllBannerDeliveryDates];
+}
+
 + (BOOL)getAppBannersNonBlocking {
     return [self.CPSharedInstance getAppBannersNonBlocking];
 }

@@ -4696,6 +4696,8 @@ static id isNil(id object) {
 
 - (void)clearAllBannerDeliveryDates {
     [CPAppBannerModule clearAllBannerDeliveryDates];
+}
+
 - (BOOL)getAppBannersNonBlocking {
     return [CPAppBannerModule getAppBannersNonBlocking];
 }
