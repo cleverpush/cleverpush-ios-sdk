@@ -955,13 +955,12 @@ int appBannerPerDayValue = 0;
             return YES;
         }
     } else if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
-        if ([banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
+        if (banner.stopAtRelativeDays > 0 && [banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
             NSDate *firstDisplayDate = [self getBannerFirstDisplayDate:banner.id];
             if ([firstDisplayDate isKindOfClass:[NSDate class]]) {
-                NSInteger relativeDays = banner.stopAtRelativeDays > 0 ? banner.stopAtRelativeDays : 0;
                 NSCalendar *calendar = [NSCalendar currentCalendar];
                 NSDateComponents *components = [[NSDateComponents alloc] init];
-                [components setDay:relativeDays];
+                [components setDay:banner.stopAtRelativeDays];
                 NSDate *expiryDate = [calendar dateByAddingComponents:components toDate:firstDisplayDate options:0];
                 if (expiryDate != nil && [expiryDate compare:[NSDate date]] == NSOrderedAscending) {
                     return NO;
