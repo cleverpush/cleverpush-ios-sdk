@@ -60,7 +60,7 @@
         }
 
         self.borderWidth = 0;
-        if ([json objectForKey:@"radius"]) {
+        if ([json objectForKey:@"borderWidth"]) {
             self.borderWidth = [[json cleverPushNumberForKey:@"borderWidth"] intValue];
         }
         
