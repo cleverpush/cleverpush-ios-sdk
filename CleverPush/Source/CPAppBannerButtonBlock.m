@@ -58,6 +58,21 @@
         if ([json objectForKey:@"id"]) {
             self.id = [json objectForKey:@"id"];
         }
+
+        self.borderWidth = 0;
+        if ([json objectForKey:@"radius"]) {
+            self.borderWidth = [[json cleverPushNumberForKey:@"borderWidth"] intValue];
+        }
+        
+        self.borderColor = @"";
+        if ([json cleverPushStringForKey:@"borderColor"]) {
+            self.borderColor = [json cleverPushStringForKey:@"borderColor"];
+        }
+
+        self.borderStyle = @"";
+        if ([json cleverPushStringForKey:@"borderStyle"]) {
+            self.borderStyle = [json cleverPushStringForKey:@"borderStyle"];
+        }
         
         NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];
         buttonBlockDic = [[json objectForKey:@"action"] mutableCopy];
