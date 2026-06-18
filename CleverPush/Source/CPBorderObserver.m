@@ -10,7 +10,7 @@ static const void *CPBorderObserverKey = &CPBorderObserverKey;
 @property (nonatomic, strong) CAShapeLayer *borderLayer;
 @property (nonatomic) CGFloat width;
 @property (nonatomic, strong) UIColor *color;
-@property (nonatomic, strong) NSString *style;
+@property (nonatomic, copy) NSString *style;
 @property (nonatomic) CGFloat cornerRadius;
 
 - (instancetype)initWithView:(UIView *)view;
