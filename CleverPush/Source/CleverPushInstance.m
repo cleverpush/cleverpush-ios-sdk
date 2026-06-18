@@ -4907,8 +4907,20 @@ static id isNil(id object) {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     if (![CPUtils isNullOrEmpty:request.identifier]) {
-        NSMutableDictionary* mutablePayload = [payload mutableCopy];
-        NSMutableDictionary* mutableNotification = [notification mutableCopy];
+        NSMutableDictionary* mutablePayload;
+        if (payload) {
+            mutablePayload = [payload mutableCopy];
+        } else {
+            mutablePayload = [[NSMutableDictionary alloc] init];
+        }
+
+        NSMutableDictionary* mutableNotification;
+        if (notification) {
+            mutableNotification = [notification mutableCopy];
+        } else {
+            mutableNotification = [[NSMutableDictionary alloc] init];
+        }
+
         [mutableNotification setObject:request.identifier forKey:@"notificationIdentifier"];
         [mutablePayload setObject:mutableNotification forKey:@"notification"];
         payload = [mutablePayload copy];
