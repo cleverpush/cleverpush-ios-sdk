@@ -1,3 +1,9 @@
+## 1.34.49 (25.06.2026)
+* Adds support for RelativeToDelivery expiration for app banners and introduces clearAllBannerDeliveryDates() and clearBannerDeliveryDate(String bannerId) to clear stored delivery data.
+* Add configurable border (width, color, solid/dashed/dotted style) to banner buttons
+* Optimize didReceiveNotificationExtensionRequest to safely handle nil notification objects and prevent crashes.
+* Fixed issue in iOS in-app banner being dismissed when a WebView link triggers openWebView().
+
 ## 1.34.48 (12.06.2026)
 * Resolved the issue of HTML buttons were not working when setAppBannersNonBlocking is true.
 

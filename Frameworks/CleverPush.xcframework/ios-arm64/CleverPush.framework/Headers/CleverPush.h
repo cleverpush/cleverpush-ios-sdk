@@ -91,6 +91,8 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)enableAppBanners;
 + (void)setAppBannerTrackingEnabled:(BOOL)enabled;
 + (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
++ (void)clearBannerDeliveryDate:(NSString* _Nonnull)bannerId;
++ (void)clearAllBannerDeliveryDates;
 + (BOOL)getAppBannersNonBlocking;
 + (BOOL)popupVisible;
 + (void)unsubscribe;

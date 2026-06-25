@@ -66,7 +66,7 @@
 		</data>
 		<key>Headers/CPAppBanner.h</key>
 		<data>
-		BwClWLx3hMsK7q2/ooHn09GZluw=
+		ZYb9vlBQ2S6jHwCX+DL3x0lLRLs=
 		</data>
 		<key>Headers/CPAppBannerAction.h</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>Headers/CPAppBannerButtonBlock.h</key>
 		<data>
-		DrGO84urOWRckr2InJGvwiA+Lq8=
+		Z9Hpx9zSDbtl4zxnA8BbXVZgA4A=
 		</data>
 		<key>Headers/CPAppBannerCarouselBlock.h</key>
 		<data>
@@ -130,7 +130,7 @@
 		</data>
 		<key>Headers/CPAppBannerStopAtType.h</key>
 		<data>
-		Gbd3qSp3YZ2dtotsz3NxikkfXx8=
+		EzMAyes0M0+r30DMOQsCDcqx5Y8=
 		</data>
 		<key>Headers/CPAppBannerSubscribedType.h</key>
 		<data>
@@ -262,7 +262,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		hnalg0zbwWTR9Q7RTvrirByFmLM=
+		re5NbNSd7nFFKtDaB4PGkLkz19k=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -270,11 +270,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		EKkYjHa1HEHVZNg2j9d2i/c9pdc=
+		ErTTiQ52g3WGSyT7OelAVS6WZeU=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		sEf0WRizXfOCScmBa1i0CiEg1hE=
+		EWPSXqJUNihqoaK0rmwRuPqNtn4=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -404,7 +404,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			7Kc8KV+KovGZsbNnFXpY7WuW10giR22zlmGvdyGfNIw=
+			jzJ/cNgnpPTPPfojktuch5tKbPISu9djq3uIVST5lDQ=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerAction.h</key>
@@ -453,7 +453,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			AgwAw6N4mnbks0y7SIU+V+lD/TxXKcPL1p3pd/B0H4s=
+			10xg/qGv4CYMkX7BQDVXr2MU/m3tTcYbvNuPcs/0bAE=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerCarouselBlock.h</key>
@@ -516,7 +516,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			0El7EiqMd2MllnhlR/ESkRH8AQORvozEfc+ZW3mZMpg=
+			F09xzIXRhP0Y+3xnmPwFsTx0OHLUl1pK7PF2Gvjt7PM=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerSubscribedType.h</key>
@@ -747,7 +747,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			4e29USNiT/3Ki2YOULGLZN4noDwBfof4c7QnRQ42vuA=
+			Zpc4kdlI/Uw3Hcb4QvnWcdB5eOVFYm9Jb2/pzV1k9hM=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -761,14 +761,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			STQBgtWw3FewOIAf9/U/uDWP6TDsDlIwuy1akqNiloU=
+			wn9kiVd6vhYfhiCDYMSLFd24tmOW7dOp8e3zxq9eH5M=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			VsXL/ZRsn2Z81Mq+op+mgDI8m8LaWziiETbY1lwmBOc=
+			HjM5tNgiTpv8ml9BkvMsi7VegRUtMr9AMPQ+/nfSZwQ=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

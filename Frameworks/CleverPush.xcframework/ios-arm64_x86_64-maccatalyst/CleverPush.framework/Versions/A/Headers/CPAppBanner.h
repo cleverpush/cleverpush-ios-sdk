@@ -53,6 +53,7 @@
 @property (nonatomic, strong) NSString *mediaUrl;
 @property (nonatomic, strong) NSDate *startAt;
 @property (nonatomic, strong) NSDate *stopAt;
+@property (nonatomic) int stopAtRelativeDays;
 @property (nonatomic, strong) NSArray *tags;
 @property (nonatomic, strong) NSArray *topics;
 @property (nonatomic, strong) NSArray *excludeTags;
