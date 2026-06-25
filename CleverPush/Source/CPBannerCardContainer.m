@@ -13,6 +13,7 @@
 #import "CPAppBannerCarouselBlock.h"
 #import "CPLog.h"
 #import "CPUtils.h"
+#import "CPBorderObserver.h"
 
 @implementation CPBannerCardContainer
 @synthesize delegate;
@@ -349,6 +350,20 @@
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
+
+        CGFloat borderWidth = (CGFloat)block.borderWidth * 0.6;
+        UIColor *borderColor;
+        if (block.borderColor != nil && ![block.borderColor isEqualToString:@""]) {
+            borderColor = [UIColor colorWithHexString:block.borderColor];
+        } else {
+            borderColor = [UIColor whiteColor];
+        }
+        [CPBorderObserver applyBorderToView:cell.btnCPBanner
+                                      width:borderWidth
+                                      color:borderColor
+                                      style:block.borderStyle
+                               cornerRadius:cell.btnCPBanner.layer.cornerRadius];
+
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         cell.btnCPBanner.titleLabel.numberOfLines = 0;
         cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
