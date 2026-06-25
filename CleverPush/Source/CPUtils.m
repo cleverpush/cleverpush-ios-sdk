@@ -877,26 +877,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
                 if (webUrl && webUrl.scheme && webUrl.host) {
-                    CPAppBannerViewController *bannerVC =
-                    [self appBannerViewControllerForWebView:message.webView];
-                    if ([CleverPush getAppBannersNonBlocking] && bannerVC != nil) {
-                        [bannerVC onDismiss];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            SFSafariViewController *safariController =
-                            [[SFSafariViewController alloc] initWithURL:webUrl];
-                            
-                            safariController.modalPresentationStyle =
-                            UIModalPresentationPageSheet;
-                            
-                            [CleverPush.topViewController
-                             presentViewController:safariController
-                             animated:YES
-                             completion:nil];
-                        });
-                    } else {
-                        [self openSafari:webUrl
-                   dismissViewController:CleverPush.topViewController];
-                    }
+                    [self openSafari:webUrl];
                 }
             } else if ([message.name isEqualToString:@"goToScreen"]) {
                 if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {
