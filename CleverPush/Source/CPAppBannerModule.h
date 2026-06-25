@@ -41,6 +41,8 @@
 + (void)enableBanners;
 + (void)setTrackingEnabled:(BOOL)enabled;
 + (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
++ (void)clearBannerDeliveryDate:(NSString*)bannerId;
++ (void)clearAllBannerDeliveryDates;
 + (BOOL)getAppBannersNonBlocking;
 + (void)resetInitialization;
 + (void)setCurrentEventId:(NSString*)eventId;

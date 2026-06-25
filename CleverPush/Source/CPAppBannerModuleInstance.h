@@ -66,6 +66,11 @@
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
 - (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
+- (NSArray*)getStoredBannerFirstDisplayRecords;
+- (void)setBannerFirstDisplayDate:(CPAppBanner*)banner;
+- (NSDate*)getBannerFirstDisplayDate:(NSString*)bannerId;
+- (void)clearBannerDeliveryDate:(NSString*)bannerId;
+- (void)clearAllBannerDeliveryDates;
 - (BOOL)getAppBannersNonBlocking;
 - (void)setCurrentEventId:(NSString*)eventId;
 

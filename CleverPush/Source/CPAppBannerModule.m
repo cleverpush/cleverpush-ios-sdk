@@ -174,6 +174,14 @@ static CPAppBannerModuleInstance* singletonInstance = nil;
     [self.moduleInstance setAppBannersNonBlocking:nonBlocking];
 }
 
++ (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    [self.moduleInstance clearBannerDeliveryDate:bannerId];
+}
+
++ (void)clearAllBannerDeliveryDates {
+    [self.moduleInstance clearAllBannerDeliveryDates];
+}
+
 + (BOOL)getAppBannersNonBlocking {
     return [self.moduleInstance getAppBannersNonBlocking];
 }
