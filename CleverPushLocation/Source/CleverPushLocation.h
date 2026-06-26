@@ -5,5 +5,6 @@
 
 + (void)init;
 + (void)requestLocationPermission;
++ (void)trackBeaconEvent:(NSDictionary *)beacon;
 
 @end

@@ -11,6 +11,7 @@ NSTimer *geoFenceTimer;
 double geoFenceTimerDelay;
 bool geoFenceTimeoutCompleted;
 NSMutableArray *delayedGeoFences;
+NSMutableArray *beacons;
 NSString* geoFenceEnterState = @"enter";
 NSString* geoFenceExitState = @"exit";
 double geoFenceTimerInterval = 1.0;
@@ -23,12 +24,13 @@ double geoFenceTimerInterval = 1.0;
             }
             [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
                 dispatch_async(dispatch_get_main_queue(), ^{
+                    if (!locationManager) {
+                        locationManager = [CLLocationManager new];
+                    }
+                    locationManager.delegate = (id)self;
+                    
                     NSArray* geoFencesDict = [channelConfig cleverPushArrayForKey:@"geoFences"];
                     if (channelConfig != nil && geoFencesDict != nil && [geoFencesDict count] > 0) {
-                        if (!locationManager) {
-                            locationManager = [CLLocationManager new];
-                        }
-                        locationManager.delegate = (id)self;
                         [geoFenceTimer invalidate];
                         geoFenceTimerDelay = 0;
                         geoFenceTimeoutCompleted = false;
@@ -53,6 +55,47 @@ double geoFenceTimerInterval = 1.0;
                                 }
                             }
                         }
+                    }
+                    
+                    NSArray* beaconsDict = [channelConfig cleverPushArrayForKey:@"beacons"];
+                    beacons = [[NSMutableArray alloc] init];
+                    if (@available(iOS 13.0, *)) {
+                        if (channelConfig != nil && beaconsDict != nil && [beaconsDict count] > 0) {
+                            for (NSDictionary *beacon in beaconsDict) {
+                                if (beacon == nil) continue;
+
+                                NSString *uuidString = [beacon objectForKey:@"uuid"];
+                                NSString *beaconId   = [beacon valueForKey:@"_id"];
+                                if (!uuidString || !beaconId) continue;
+
+                                NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
+                                if (!uuid) continue;
+
+                                NSNumber *majorValue = [beacon objectForKey:@"major"];
+                                NSNumber *minorValue = [beacon objectForKey:@"minor"];
+
+                                CLBeaconRegion *region = nil;
+                                if (majorValue && minorValue) {
+                                    region = [[CLBeaconRegion alloc] initWithUUID:uuid major:[majorValue unsignedShortValue] minor:[minorValue unsignedShortValue] identifier:beaconId];
+                                } else if (majorValue) {
+                                    region = [[CLBeaconRegion alloc] initWithUUID:uuid major:[majorValue unsignedShortValue] identifier:beaconId];
+                                } else {
+                                    region = [[CLBeaconRegion alloc] initWithUUID:uuid identifier:beaconId];
+                                }
+
+                                if (region == nil) continue;
+
+                                region.notifyOnEntry = YES;
+                                region.notifyOnExit = YES;
+                                region.notifyEntryStateOnDisplay = YES;
+
+                                [beacons addObject:beacon];
+                                [locationManager startMonitoringForRegion:region];
+                                [CPLog info:@"CleverPushLocation: Started monitoring beacon %@ (UUID: %@)", beaconId, uuidString];
+                            }
+                        }
+                    } else {
+                        [CPLog info:@"CleverPushLocation: Beacon monitoring requires iOS 13.0 or later."];
                     }
                 });
             }];
@@ -97,6 +140,49 @@ double geoFenceTimerInterval = 1.0;
     });
 }
 
+#pragma mark - Track beacon
++ (void)trackBeaconEvent:(NSDictionary *)beacon {
+    NSString *eventName = [beacon objectForKey:@"eventName"];
+    if (!eventName) {
+        [CPLog error:@"CleverPushLocation: trackBeaconEvent: eventName is nil"];
+        return;
+    }
+    [CPLog info:@"CleverPushLocation: trackBeaconEvent - eventName: %@", eventName];
+    [CleverPush trackEvent:eventName];
+}
+
+#pragma mark - Beacon matching
++ (NSDictionary *)findMatchingBeaconForRegion:(CLBeaconRegion *)beaconRegion {
+    if (beaconRegion == nil || beacons.count == 0) return nil;
+
+    if (@available(iOS 13.0, *)) {
+        NSString *detectedUUID = beaconRegion.UUID.UUIDString;
+        [CPLog info:@"CleverPushLocation: findMatchingBeacon - detected uuid: %@, major: %@, minor: %@",
+         detectedUUID, beaconRegion.major, beaconRegion.minor];
+
+        for (NSDictionary *storedBeacon in beacons) {
+            NSString *storedUUID  = [storedBeacon objectForKey:@"uuid"];
+            NSNumber *storedMajor = [storedBeacon objectForKey:@"major"];
+            NSNumber *storedMinor = [storedBeacon objectForKey:@"minor"];
+
+            BOOL uuidMatch  = [storedUUID caseInsensitiveCompare:detectedUUID] == NSOrderedSame;
+            BOOL majorMatch = storedMajor ? ([storedMajor unsignedShortValue] == [beaconRegion.major unsignedShortValue]) : YES;
+            BOOL minorMatch = storedMinor ? ([storedMinor unsignedShortValue] == [beaconRegion.minor unsignedShortValue]) : YES;
+
+            [CPLog info:@"CleverPushLocation: Comparing - storedUUID: %@, uuidMatch: %d, majorMatch: %d, minorMatch: %d",
+             storedUUID, uuidMatch, majorMatch, minorMatch];
+
+            if (uuidMatch && majorMatch && minorMatch) {
+                [CPLog info:@"CleverPushLocation: Beacon matched - %@", [storedBeacon objectForKey:@"_id"]];
+                return storedBeacon;
+            }
+        }
+
+        [CPLog info:@"CleverPushLocation: No matching beacon found for uuid: %@", detectedUUID];
+    }
+    return nil;
+}
+
 #pragma mark - Location delegates
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     [CPLog info:@"LocationManager: didChangeAuthorizationStatus %d", status];
@@ -116,33 +202,59 @@ double geoFenceTimerInterval = 1.0;
 }
 
 + (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
-    [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-    if (geoFenceTimeoutCompleted  == false) {
-        [geoFenceTimer invalidate];
-        geoFenceTimerDelay = 0;
-        geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
-                                                         target:self
-                                                       selector:@selector(geoFenceHandleTimer:)
-                                                       userInfo:nil
-                                                        repeats:YES];
+    if ([region isKindOfClass:[CLBeaconRegion class]]) {
+        CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
+        if (@available(iOS 13.0, *)) {
+            [CPLog info:@"LocationManager: Entered Beacon region - uuid: %@", beaconRegion.UUID.UUIDString];
+            NSDictionary *matchedBeacon = [self findMatchingBeaconForRegion:beaconRegion];
+            if (matchedBeacon) {
+                [self trackBeaconEvent:matchedBeacon];
+            }
+        }
     } else {
-        [self trackGeoFence:[region identifier] withState:geoFenceEnterState];
+        [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
+        if (geoFenceTimeoutCompleted == false) {
+            [geoFenceTimer invalidate];
+            geoFenceTimerDelay = 0;
+            geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
+                                                             target:self
+                                                           selector:@selector(geoFenceHandleTimer:)
+                                                           userInfo:nil
+                                                            repeats:YES];
+        } else {
+            [self trackGeoFence:[region identifier] withState:geoFenceEnterState];
+        }
     }
 }
 
 + (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
-    [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-    if (geoFenceTimeoutCompleted == false) {
-        [geoFenceTimer invalidate];
-        geoFenceTimerDelay = 0;
-        geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
-                                                         target:self
-                                                       selector:@selector(geoFenceHandleTimer:)
-                                                       userInfo:nil
-                                                        repeats:YES];
+    if ([region isKindOfClass:[CLBeaconRegion class]]) {
+        CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
+        if (@available(iOS 13.0, *)) {
+            [CPLog info:@"LocationManager: Exited Beacon region - uuid: %@", beaconRegion.UUID.UUIDString];
+            NSDictionary *matchedBeacon = [self findMatchingBeaconForRegion:beaconRegion];
+            if (matchedBeacon) {
+                [self trackBeaconEvent:matchedBeacon];
+            }
+        }
     } else {
-        [self trackGeoFence:[region identifier] withState:geoFenceExitState];
+        [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
+        if (geoFenceTimeoutCompleted == false) {
+            [geoFenceTimer invalidate];
+            geoFenceTimerDelay = 0;
+            geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
+                                                             target:self
+                                                           selector:@selector(geoFenceHandleTimer:)
+                                                           userInfo:nil
+                                                            repeats:YES];
+        } else {
+            [self trackGeoFence:[region identifier] withState:geoFenceExitState];
+        }
     }
+}
+
++ (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error {
+    [CPLog error:@"LocationManager: monitoringDidFailForRegion %@ error: %@", [region identifier], error.localizedDescription];
 }
 
 + (void)geoFenceHandleTimer:(NSTimer *)timer {
