@@ -56,7 +56,27 @@ double geoFenceTimerInterval = 1.0;
                             }
                         }
                     }
-                    
+                });
+            }];
+        }];
+    });
+}
+
+#pragma mark - Beacon monitoring
+
++ (void)initBeacons {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^(void) {
+        [CleverPush getSubscriptionId:^(NSString* subscriptionId) {
+            if (subscriptionId == nil) {
+                [CPLog debug:@"CleverPushLocation: initBeacons: There is no subscription for CleverPush SDK."];
+            }
+            [CleverPush getChannelConfig:^(NSDictionary* channelConfig) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (!locationManager) {
+                        locationManager = [CLLocationManager new];
+                    }
+                    locationManager.delegate = (id)self;
+
                     for (CLRegion *monitoredRegion in locationManager.monitoredRegions) {
                         if ([monitoredRegion isKindOfClass:[CLBeaconRegion class]]) {
                             [locationManager stopMonitoringForRegion:monitoredRegion];
@@ -93,8 +113,8 @@ double geoFenceTimerInterval = 1.0;
                                 if (region == nil) continue;
 
                                 region.notifyOnEntry = YES;
-                                region.notifyOnExit = YES;
-                                region.notifyEntryStateOnDisplay = YES;
+                                region.notifyOnExit = NO;
+                                region.notifyEntryStateOnDisplay = NO;
 
                                 [beacons addObject:beacon];
                                 [locationManager startMonitoringForRegion:region];
@@ -189,7 +209,7 @@ double geoFenceTimerInterval = 1.0;
 + (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
     [CPLog info:@"LocationManager: didDetermineState %@ - %@",
      [region identifier], state == CLRegionStateInside ? @"Inside" : @"Outside"];
-    if (state == CLRegionStateInside) {
+    if (state == CLRegionStateInside && ![region isKindOfClass:[CLBeaconRegion class]]) {
         [self locationManager:manager didEnterRegion:region];
     } else if (state == CLRegionStateOutside && ![region isKindOfClass:[CLBeaconRegion class]]) {
         [self locationManager:manager didExitRegion:region];
@@ -198,9 +218,10 @@ double geoFenceTimerInterval = 1.0;
 
 + (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     if ([region isKindOfClass:[CLBeaconRegion class]]) {
-        CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
         if (@available(iOS 13.0, *)) {
-            [CPLog info:@"LocationManager: Entered Beacon region - uuid: %@", beaconRegion.UUID.UUIDString];
+            CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
+            [CPLog info:@"LocationManager: Entered Beacon region - identifier: %@, uuid: %@",
+             beaconRegion.identifier, beaconRegion.UUID.UUIDString];
             NSDictionary *matchedBeacon = [self findMatchingBeaconForRegion:beaconRegion];
             if (matchedBeacon) {
                 [self trackBeaconEvent:matchedBeacon];
