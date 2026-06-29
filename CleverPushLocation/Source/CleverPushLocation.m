@@ -57,6 +57,13 @@ double geoFenceTimerInterval = 1.0;
                         }
                     }
                     
+                    for (CLRegion *monitoredRegion in locationManager.monitoredRegions) {
+                        if ([monitoredRegion isKindOfClass:[CLBeaconRegion class]]) {
+                            [locationManager stopMonitoringForRegion:monitoredRegion];
+                            [CPLog info:@"CleverPushLocation: Stopped stale beacon region %@", monitoredRegion.identifier];
+                        }
+                    }
+
                     NSArray* beaconsDict = [channelConfig cleverPushArrayForKey:@"beacons"];
                     beacons = [[NSMutableArray alloc] init];
                     if (@available(iOS 13.0, *)) {
@@ -155,31 +162,18 @@ double geoFenceTimerInterval = 1.0;
 + (NSDictionary *)findMatchingBeaconForRegion:(CLBeaconRegion *)beaconRegion {
     if (beaconRegion == nil || beacons.count == 0) return nil;
 
-    if (@available(iOS 13.0, *)) {
-        NSString *detectedUUID = beaconRegion.UUID.UUIDString;
-        [CPLog info:@"CleverPushLocation: findMatchingBeacon - detected uuid: %@, major: %@, minor: %@",
-         detectedUUID, beaconRegion.major, beaconRegion.minor];
+    NSString *regionIdentifier = beaconRegion.identifier;
+    [CPLog info:@"CleverPushLocation: findMatchingBeacon - identifier: %@", regionIdentifier];
 
-        for (NSDictionary *storedBeacon in beacons) {
-            NSString *storedUUID  = [storedBeacon objectForKey:@"uuid"];
-            NSNumber *storedMajor = [storedBeacon objectForKey:@"major"];
-            NSNumber *storedMinor = [storedBeacon objectForKey:@"minor"];
-
-            BOOL uuidMatch  = [storedUUID caseInsensitiveCompare:detectedUUID] == NSOrderedSame;
-            BOOL majorMatch = storedMajor ? ([storedMajor unsignedShortValue] == [beaconRegion.major unsignedShortValue]) : YES;
-            BOOL minorMatch = storedMinor ? ([storedMinor unsignedShortValue] == [beaconRegion.minor unsignedShortValue]) : YES;
-
-            [CPLog info:@"CleverPushLocation: Comparing - storedUUID: %@, uuidMatch: %d, majorMatch: %d, minorMatch: %d",
-             storedUUID, uuidMatch, majorMatch, minorMatch];
-
-            if (uuidMatch && majorMatch && minorMatch) {
-                [CPLog info:@"CleverPushLocation: Beacon matched - %@", [storedBeacon objectForKey:@"_id"]];
-                return storedBeacon;
-            }
+    for (NSDictionary *storedBeacon in beacons) {
+        NSString *beaconId = [storedBeacon valueForKey:@"_id"];
+        if ([beaconId isEqualToString:regionIdentifier]) {
+            [CPLog info:@"CleverPushLocation: Beacon matched - %@", beaconId];
+            return storedBeacon;
         }
-
-        [CPLog info:@"CleverPushLocation: No matching beacon found for uuid: %@", detectedUUID];
     }
+
+    [CPLog info:@"CleverPushLocation: No matching beacon found for identifier: %@", regionIdentifier];
     return nil;
 }
 
@@ -193,10 +187,11 @@ double geoFenceTimerInterval = 1.0;
 }
 
 + (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
-    [CPLog info:@"LocationManager: LocationManager didDetermineState %@", [region identifier]];
+    [CPLog info:@"LocationManager: didDetermineState %@ - %@",
+     [region identifier], state == CLRegionStateInside ? @"Inside" : @"Outside"];
     if (state == CLRegionStateInside) {
         [self locationManager:manager didEnterRegion:region];
-    }  else if (state == CLRegionStateOutside) {
+    } else if (state == CLRegionStateOutside && ![region isKindOfClass:[CLBeaconRegion class]]) {
         [self locationManager:manager didExitRegion:region];
     }
 }
@@ -229,13 +224,10 @@ double geoFenceTimerInterval = 1.0;
 
 + (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
     if ([region isKindOfClass:[CLBeaconRegion class]]) {
-        CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
         if (@available(iOS 13.0, *)) {
-            [CPLog info:@"LocationManager: Exited Beacon region - uuid: %@", beaconRegion.UUID.UUIDString];
-            NSDictionary *matchedBeacon = [self findMatchingBeaconForRegion:beaconRegion];
-            if (matchedBeacon) {
-                [self trackBeaconEvent:matchedBeacon];
-            }
+            CLBeaconRegion *beaconRegion = (CLBeaconRegion *)region;
+            [CPLog info:@"LocationManager: Exited Beacon region - identifier: %@, uuid: %@",
+             beaconRegion.identifier, beaconRegion.UUID.UUIDString];
         }
     } else {
         [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
