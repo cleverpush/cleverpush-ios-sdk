@@ -36,11 +36,13 @@ static BOOL beaconDebugScanAll = NO;
                     }
                     locationManager.delegate = (id)self;
                     
-                    for (CLRegion *monitoredRegion in locationManager.monitoredRegions) {
-                        if ([monitoredRegion isKindOfClass:[CLCircularRegion class]]) {
-                            [locationManager stopMonitoringForRegion:monitoredRegion];
-                            [CPLog info:@"CleverPushLocation: Stopped stale geo-fence region %@", monitoredRegion.identifier];
-                        }
+                    NSArray *staleGeoFenceRegions = [locationManager.monitoredRegions.allObjects filteredArrayUsingPredicate:
+                        [NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *b) {
+                            return [obj isKindOfClass:[CLCircularRegion class]];
+                        }]];
+                    for (CLRegion *monitoredRegion in staleGeoFenceRegions) {
+                        [locationManager stopMonitoringForRegion:monitoredRegion];
+                        [CPLog info:@"CleverPushLocation: Stopped stale geo-fence region %@", monitoredRegion.identifier];
                     }
 
                     NSArray* geoFencesDict = [channelConfig cleverPushArrayForKey:@"geoFences"];
@@ -91,11 +93,13 @@ static BOOL beaconDebugScanAll = NO;
                     }
                     locationManager.delegate = (id)self;
 
-                    for (CLRegion *monitoredRegion in locationManager.monitoredRegions) {
-                        if ([monitoredRegion isKindOfClass:[CLBeaconRegion class]]) {
-                            [locationManager stopMonitoringForRegion:monitoredRegion];
-                            [CPLog info:@"CleverPushLocation: Stopped stale beacon region %@", monitoredRegion.identifier];
-                        }
+                    NSArray *staleBeaconRegions = [locationManager.monitoredRegions.allObjects filteredArrayUsingPredicate:
+                        [NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *b) {
+                            return [obj isKindOfClass:[CLBeaconRegion class]];
+                        }]];
+                    for (CLRegion *monitoredRegion in staleBeaconRegions) {
+                        [locationManager stopMonitoringForRegion:monitoredRegion];
+                        [CPLog info:@"CleverPushLocation: Stopped stale beacon region %@", monitoredRegion.identifier];
                     }
 
                     beacons = [[NSMutableArray alloc] init];
@@ -114,8 +118,10 @@ static BOOL beaconDebugScanAll = NO;
                                 NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
                                 if (!uuid) continue;
 
-                                NSNumber *majorValue = [beacon objectForKey:@"major"];
-                                NSNumber *minorValue = [beacon objectForKey:@"minor"];
+                                id rawMajor = [beacon objectForKey:@"major"];
+                                id rawMinor = [beacon objectForKey:@"minor"];
+                                NSNumber *majorValue = [rawMajor isKindOfClass:[NSNumber class]] ? rawMajor : nil;
+                                NSNumber *minorValue = [rawMinor isKindOfClass:[NSNumber class]] ? rawMinor : nil;
 
                                 CLBeaconRegion *region = nil;
                                 if (majorValue && minorValue) {
