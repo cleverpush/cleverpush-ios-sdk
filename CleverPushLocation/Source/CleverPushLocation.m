@@ -261,6 +261,16 @@ static BOOL beaconDebugScanAll = NO;
     return nil;
 }
 
++ (BOOL)geoFenceRegionHasDelay:(CLRegion *)region {
+    for (NSDictionary *geoFence in delayedGeoFences) {
+        CLRegion *r = [geoFence objectForKey:@"region"];
+        if ([[r identifier] isEqualToString:[region identifier]]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 #pragma mark - Location delegates
 
 + (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
@@ -306,7 +316,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false && [delayedGeoFences count] > 0) {
+        if (geoFenceTimeoutCompleted == false && [self geoFenceRegionHasDelay:region]) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
@@ -335,7 +345,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false && [delayedGeoFences count] > 0) {
+        if (geoFenceTimeoutCompleted == false && [self geoFenceRegionHasDelay:region]) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
@@ -354,17 +364,22 @@ static BOOL beaconDebugScanAll = NO;
 }
 
 + (void)geoFenceHandleTimer:(NSTimer *)timer {
+    NSMutableDictionary *expiredGeoFence = nil;
+    CLRegion *expiredRegion = nil;
     for (NSMutableDictionary *geoFence in delayedGeoFences) {
         if ([geoFence objectForKey:@"delay"] != nil) {
             double delayValue = [[geoFence objectForKey:@"delay"] doubleValue];
-            CLRegion *regionValue = [geoFence objectForKey:@"region"];
             if (geoFenceTimerDelay >= delayValue) {
                 geoFenceTimeoutCompleted = true;
-                [delayedGeoFences removeObject:geoFence];
-                [locationManager startMonitoringForRegion:regionValue];
+                expiredGeoFence = geoFence;
+                expiredRegion = [geoFence objectForKey:@"region"];
                 break;
             }
         }
+    }
+    if (expiredGeoFence) {
+        [delayedGeoFences removeObject:expiredGeoFence];
+        [locationManager startMonitoringForRegion:expiredRegion];
     }
     geoFenceTimerDelay += 1;
 }
