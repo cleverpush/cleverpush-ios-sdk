@@ -9,6 +9,7 @@
 CLLocationManager* locationManager;
 NSTimer *geoFenceTimer;
 double geoFenceTimerDelay;
+bool geoFenceTimeoutCompleted;
 NSMutableArray *delayedGeoFences;
 NSMutableArray *beacons;
 NSString* geoFenceEnterState = @"enter";
@@ -19,8 +20,6 @@ static NSMutableDictionary *beaconLastFiredDate = nil;
 static CPBeaconDetectedHandler beaconDetectedHandler = nil;
 static NSTimeInterval beaconEventIntervalSec = 0;
 static BOOL beaconDebugScanAll = NO;
-static NSMutableSet *cleverPushGeoFenceIdentifiers = nil;
-static NSMutableSet *cleverPushBeaconIdentifiers = nil;
 
 #pragma mark - Geo-fence monitoring
 
@@ -37,22 +36,16 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
                     }
                     locationManager.delegate = (id)self;
                     
-                    if (!cleverPushGeoFenceIdentifiers) {
-                        cleverPushGeoFenceIdentifiers = [[NSMutableSet alloc] init];
+                    for (CLRegion *monitoredRegion in locationManager.monitoredRegions.allObjects) {
+                        if ([monitoredRegion isKindOfClass:[CLCircularRegion class]]) {
+                            [locationManager stopMonitoringForRegion:monitoredRegion];
+                            [CPLog info:@"CleverPushLocation: Stopped stale geo-fence region %@", monitoredRegion.identifier];
+                        }
                     }
-                    NSArray *staleGeoFenceRegions = [locationManager.monitoredRegions.allObjects filteredArrayUsingPredicate:
-                        [NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *b) {
-                            return [obj isKindOfClass:[CLCircularRegion class]]
-                                && [cleverPushGeoFenceIdentifiers containsObject:[(CLRegion *)obj identifier]];
-                        }]];
-                    for (CLRegion *monitoredRegion in staleGeoFenceRegions) {
-                        [locationManager stopMonitoringForRegion:monitoredRegion];
-                        [CPLog info:@"CleverPushLocation: Stopped stale geo-fence region %@", monitoredRegion.identifier];
-                    }
-                    [cleverPushGeoFenceIdentifiers removeAllObjects];
 
                     [geoFenceTimer invalidate];
                     geoFenceTimerDelay = 0;
+                    geoFenceTimeoutCompleted = false;
                     [delayedGeoFences removeAllObjects];
                     delayedGeoFences = [[NSMutableArray alloc] init];
 
@@ -60,11 +53,10 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
                     if (channelConfig != nil && geoFencesDict != nil && [geoFencesDict count] > 0) {
                         for (NSDictionary *geoFence in geoFencesDict) {
                             if (geoFence != nil) {
-                                NSString *geoFenceId = [geoFence valueForKey:@"_id"];
                                 CLLocationCoordinate2D center = CLLocationCoordinate2DMake([[geoFence objectForKey:@"latitude"] doubleValue], [[geoFence objectForKey:@"longitude"] doubleValue]);
                                 CLRegion *region = [[CLCircularRegion alloc]initWithCenter:center
                                                                                     radius:[[geoFence objectForKey:@"radius"] longValue]
-                                                                                identifier:geoFenceId];
+                                                                                identifier:[geoFence valueForKey:@"_id"]];
                                 
                                 if ([geoFence objectForKey:@"delay"]) {
                                     double delayValue = [[geoFence objectForKey:@"delay"]doubleValue];
@@ -74,7 +66,6 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
                                                                     nil];
                                     [delayedGeoFences addObject:dataDic];
                                 }
-                                [cleverPushGeoFenceIdentifiers addObject:geoFenceId];
                                 [locationManager startMonitoringForRegion:region];
                             }
                         }
@@ -100,19 +91,12 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
                     }
                     locationManager.delegate = (id)self;
 
-                    if (!cleverPushBeaconIdentifiers) {
-                        cleverPushBeaconIdentifiers = [[NSMutableSet alloc] init];
+                    for (CLRegion *monitoredRegion in locationManager.monitoredRegions.allObjects) {
+                        if ([monitoredRegion isKindOfClass:[CLBeaconRegion class]]) {
+                            [locationManager stopMonitoringForRegion:monitoredRegion];
+                            [CPLog info:@"CleverPushLocation: Stopped stale beacon region %@", monitoredRegion.identifier];
+                        }
                     }
-                    NSArray *staleBeaconRegions = [locationManager.monitoredRegions.allObjects filteredArrayUsingPredicate:
-                        [NSPredicate predicateWithBlock:^BOOL(id obj, NSDictionary *b) {
-                            return [obj isKindOfClass:[CLBeaconRegion class]]
-                                && [cleverPushBeaconIdentifiers containsObject:[(CLRegion *)obj identifier]];
-                        }]];
-                    for (CLRegion *monitoredRegion in staleBeaconRegions) {
-                        [locationManager stopMonitoringForRegion:monitoredRegion];
-                        [CPLog info:@"CleverPushLocation: Stopped stale beacon region %@", monitoredRegion.identifier];
-                    }
-                    [cleverPushBeaconIdentifiers removeAllObjects];
 
                     beacons = [[NSMutableArray alloc] init];
                     beaconLastFiredDate = [[NSMutableDictionary alloc] init];
@@ -150,7 +134,6 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
                                 region.notifyEntryStateOnDisplay = NO;
 
                                 [beacons addObject:beacon];
-                                [cleverPushBeaconIdentifiers addObject:beaconId];
                                 [locationManager startMonitoringForRegion:region];
                                 [CPLog info:@"CleverPushLocation: Started monitoring beacon %@ (UUID: %@)", beaconId, uuidString];
                             }
@@ -214,6 +197,7 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
             if (delayedGeoFences.count == 0) {
                 [geoFenceTimer invalidate];
                 geoFenceTimerDelay = 0;
+                geoFenceTimeoutCompleted = false;
             }
         } onFailure:nil];
     });
@@ -249,10 +233,9 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
     [CPLog info:@"CleverPushLocation: trackBeaconEvent - beaconId: %@, eventName: %@", beaconId, eventName];
     [CleverPush trackEvent:eventName];
 
-    CPBeaconDetectedHandler handler = beaconDetectedHandler;
-    if (handler) {
+    if (beaconDetectedHandler) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            handler(beacon);
+            beaconDetectedHandler(beacon);
         });
     }
 }
@@ -277,16 +260,6 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
         [CPLog info:@"[BeaconDebug] No config match for identifier: %@", regionIdentifier];
     }
     return nil;
-}
-
-+ (BOOL)geoFenceRegionHasDelay:(CLRegion *)region {
-    for (NSDictionary *geoFence in delayedGeoFences) {
-        CLRegion *r = [geoFence objectForKey:@"region"];
-        if ([[r identifier] isEqualToString:[region identifier]]) {
-            return YES;
-        }
-    }
-    return NO;
 }
 
 #pragma mark - Location delegates
@@ -334,13 +307,7 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
         }
     } else {
         [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-        if ([self geoFenceRegionHasDelay:region]) {
-            for (NSMutableDictionary *gf in delayedGeoFences) {
-                if ([[[gf objectForKey:@"region"] identifier] isEqualToString:[region identifier]]) {
-                    [gf setObject:geoFenceEnterState forKey:@"pendingState"];
-                    break;
-                }
-            }
+        if (geoFenceTimeoutCompleted == false) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
@@ -369,13 +336,7 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
         }
     } else {
         [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-        if ([self geoFenceRegionHasDelay:region]) {
-            for (NSMutableDictionary *gf in delayedGeoFences) {
-                if ([[[gf objectForKey:@"region"] identifier] isEqualToString:[region identifier]]) {
-                    [gf setObject:geoFenceExitState forKey:@"pendingState"];
-                    break;
-                }
-            }
+        if (geoFenceTimeoutCompleted == false) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
@@ -394,26 +355,16 @@ static NSMutableSet *cleverPushBeaconIdentifiers = nil;
 }
 
 + (void)geoFenceHandleTimer:(NSTimer *)timer {
-    NSMutableDictionary *expiredGeoFence = nil;
-    CLRegion *expiredRegion = nil;
-    NSString *pendingState = nil;
     for (NSMutableDictionary *geoFence in delayedGeoFences) {
         if ([geoFence objectForKey:@"delay"] != nil) {
             double delayValue = [[geoFence objectForKey:@"delay"] doubleValue];
+            CLRegion *regionValue = [geoFence objectForKey:@"region"];
             if (geoFenceTimerDelay >= delayValue) {
-                expiredGeoFence = geoFence;
-                expiredRegion = [geoFence objectForKey:@"region"];
-                pendingState = [geoFence objectForKey:@"pendingState"];
+                geoFenceTimeoutCompleted = true;
+                [delayedGeoFences removeObject:geoFence];
+                [locationManager startMonitoringForRegion:regionValue];
                 break;
             }
-        }
-    }
-    if (expiredGeoFence) {
-        [delayedGeoFences removeObject:expiredGeoFence];
-        if (pendingState) {
-            [self trackGeoFence:[expiredRegion identifier] withState:pendingState];
-        } else {
-            [CPLog error:@"CleverPushLocation: geoFenceHandleTimer - no pendingState recorded for %@", [expiredRegion identifier]];
         }
     }
     geoFenceTimerDelay += 1;
