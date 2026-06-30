@@ -335,7 +335,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false) {
+        if (geoFenceTimeoutCompleted == false && [delayedGeoFences count] > 0) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
