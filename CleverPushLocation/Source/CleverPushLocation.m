@@ -316,7 +316,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false && [self geoFenceRegionHasDelay:region]) {
+        if ([self geoFenceRegionHasDelay:region]) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
@@ -345,7 +345,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Exited Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false && [self geoFenceRegionHasDelay:region]) {
+        if ([self geoFenceRegionHasDelay:region]) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
