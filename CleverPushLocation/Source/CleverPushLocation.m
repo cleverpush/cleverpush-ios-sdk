@@ -65,8 +65,8 @@ static BOOL beaconDebugScanAll = NO;
                                                                     region, @"region",
                                                                     nil];
                                     [delayedGeoFences addObject:dataDic];
-                                    [locationManager startMonitoringForRegion:region];
                                 }
+                                [locationManager startMonitoringForRegion:region];
                             }
                         }
                     }
@@ -231,9 +231,10 @@ static BOOL beaconDebugScanAll = NO;
     [CPLog info:@"CleverPushLocation: trackBeaconEvent - beaconId: %@, eventName: %@", beaconId, eventName];
     [CleverPush trackEvent:eventName];
 
-    if (beaconDetectedHandler) {
+    CPBeaconDetectedHandler handler = beaconDetectedHandler;
+    if (handler) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            beaconDetectedHandler(beacon);
+            handler(beacon);
         });
     }
 }
@@ -305,7 +306,7 @@ static BOOL beaconDebugScanAll = NO;
         }
     } else {
         [CPLog info:@"LocationManager: Entered Geo Fence %@", [region identifier]];
-        if (geoFenceTimeoutCompleted == false) {
+        if (geoFenceTimeoutCompleted == false && [delayedGeoFences count] > 0) {
             [geoFenceTimer invalidate];
             geoFenceTimerDelay = 0;
             geoFenceTimer = [NSTimer scheduledTimerWithTimeInterval:geoFenceTimerInterval
