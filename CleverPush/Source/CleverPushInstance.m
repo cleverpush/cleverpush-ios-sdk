@@ -2109,7 +2109,9 @@ static id isNil(id object) {
             [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
         }
 
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        id bypassValue = [notification objectForKey:@"bypassConditions"];
+        BOOL bypassConditions = bypassValue != nil && ![bypassValue isKindOfClass:[NSNull class]] && [bypassValue boolValue];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId force:bypassConditions];
     }
 
     payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
@@ -2156,13 +2158,15 @@ static id isNil(id object) {
 
     NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
-
+    id bypassValue = [notification objectForKey:@"bypassConditions"];
+    BOOL bypassConditions = bypassValue != nil && ![bypassValue isKindOfClass:[NSNull class]] && [bypassValue boolValue];
+    
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
       BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
       if (isActive) {
-        [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId force:bypassConditions];
       } else {
-        [CPAppBannerModuleInstance addSilentPushAppBannersId:appBanner notificationId:notificationId];
+        [CPAppBannerModuleInstance addSilentPushAppBannersId:appBanner notificationId:notificationId bypassConditions:bypassConditions];
       }
     }
 }
@@ -4660,6 +4664,12 @@ static id isNil(id object) {
     BOOL fromNotification = notificationId != nil;
     [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO appBannerClosedCallback:appBannerClosedCallback];
+}
+
+- (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId force:(BOOL)force {
+    BOOL fromNotification = notificationId != nil;
+    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:nil];
 }
 
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {

@@ -108,6 +108,7 @@
 + (NSMutableArray*)getBannersForDeepLink;
 + (void)updateBannersForDeepLinkWithURL:(NSURL*)url;
 + (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId bypassConditions:(BOOL)bypassConditions;
 + (void)setAppBannerPerDayValue:(int)dayValue;
 + (void)setAppBannerPerEachSessionValue:(int)sessionValue;
 + (int)getAppBannerPerDayValue;

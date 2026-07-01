@@ -140,7 +140,7 @@ int appBannerPerDayValue = 0;
                     break;
                 }
                 if (![CPUtils isNullOrEmpty:notificationId]) {
-                    if (banner.triggers.count > 0) {
+                    if (!force && banner.triggers.count > 0) {
                         [self validatePushBannerTrigger:banner force:force notificationId:notificationId];
                     } else {
                         [self showBanner:banner force:force notificationId:notificationId];
@@ -2185,14 +2185,17 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - set app banner ids from silent push
 + (void)addSilentPushAppBannersId:(NSString *)appBannerId notificationId:(NSString *)notificationId {
+    [self addSilentPushAppBannersId:appBannerId notificationId:notificationId bypassConditions:NO];
+}
+
++ (void)addSilentPushAppBannersId:(NSString *)appBannerId notificationId:(NSString *)notificationId bypassConditions:(BOOL)bypassConditions {
     if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
         [CPLog debug:@"CPAppBannerModuleInstance: addSilentPushAppBannersId: appBannerId or notification ID is blank, null, or empty."];
         return;
     }
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *existingArray = [[NSMutableArray alloc] init];
-    existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    NSMutableArray *existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
 
     if (!existingArray) {
         existingArray = [[NSMutableArray alloc] init];
@@ -2202,11 +2205,20 @@ int appBannerPerDayValue = 0;
     NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
 
     if (filteredArray != nil && filteredArray.count > 0) {
-        NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
-        existingDict[@"appBanner"] = appBannerId;
+        NSUInteger index = [existingArray indexOfObject:filteredArray.firstObject];
+        if (index != NSNotFound) {
+            NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
+            existingDict[@"appBanner"] = appBannerId;
+            existingDict[@"bypassConditions"] = @(bypassConditions);
+            [existingArray replaceObjectAtIndex:index withObject:existingDict];
+        }
     } else {
         if (notificationId != nil && appBannerId != nil) {
-            [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
+            [existingArray addObject:@{
+                @"notificationId": notificationId,
+                @"appBanner": appBannerId,
+                @"bypassConditions": @(bypassConditions)
+            }];
         }
     }
 
@@ -2227,7 +2239,8 @@ int appBannerPerDayValue = 0;
         }
         NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
         for (NSMutableDictionary *eventsObject in appBanners) {
-            [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
+            BOOL storedBypassConditions = [[eventsObject objectForKey:@"bypassConditions"] boolValue];
+            [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:storedBypassConditions];
             [objectsToRemove addObject:eventsObject];
         }
         [appBanners removeObjectsInArray:objectsToRemove];
