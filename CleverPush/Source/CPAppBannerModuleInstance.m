@@ -2205,9 +2205,13 @@ int appBannerPerDayValue = 0;
     NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
 
     if (filteredArray != nil && filteredArray.count > 0) {
-        NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
-        existingDict[@"appBanner"] = appBannerId;
-        existingDict[@"bypassConditions"] = @(bypassConditions);
+        NSUInteger index = [existingArray indexOfObject:filteredArray.firstObject];
+        if (index != NSNotFound) {
+            NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
+            existingDict[@"appBanner"] = appBannerId;
+            existingDict[@"bypassConditions"] = @(bypassConditions);
+            [existingArray replaceObjectAtIndex:index withObject:existingDict];
+        }
     } else {
         if (notificationId != nil && appBannerId != nil) {
             [existingArray addObject:@{
