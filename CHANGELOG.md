@@ -1,3 +1,8 @@
+## 1.34.50 (02.07.2026)
+* Added iBeacon monitoring (iOS 13+) with automatic event tracking on beacon entry via the new initBeacons method, which registers CLBeaconRegions from the channel config.
+* Added onBeaconDetected callback for matched beacon entries, setBeaconEventInterval to throttle re-triggers per session, and setBeaconDebugScanAll for verbose diagnostic logging.
+* Added support for bypassConditions on banners attached to push notifications. When a push has an attached banner and bypassConditions is true, the banner's targeting/frequency conditions are skipped so it is shown directly (supported for both opened and silent pushes).
+
 ## 1.34.49 (25.06.2026)
 * Adds support for RelativeToDelivery expiration for app banners and introduces clearAllBannerDeliveryDates() and clearBannerDeliveryDate(String bannerId) to clear stored delivery data.
 * Add configurable border (width, color, solid/dashed/dotted style) to banner buttons
