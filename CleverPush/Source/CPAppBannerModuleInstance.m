@@ -31,6 +31,7 @@ CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 CPAppBannerPassthroughView *activeBannerOverlay;
+CPAppBannerViewController *activeNonBlockingBannerController;
 
 static NSObject *callbackLock;
 static NSObject *bannerRequestLock;
@@ -1800,24 +1801,27 @@ int appBannerPerDayValue = 0;
         return;
     }
 
-    UIView *overlayHostView = hostVC.view;
-    if (alertOnTop && hostVC.view.window != nil) {
-        overlayHostView = hostVC.view.window;
-    }
+    BOOL attachToWindow = (alertOnTop && hostVC.view.window != nil);
+    UIView *overlayHostView = attachToWindow ? hostVC.view.window : hostVC.view;
 
     CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:overlayHostView.bounds];
     overlay.backgroundColor = [UIColor clearColor];
     overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    [hostVC addChildViewController:appBannerViewController];
+    if (!attachToWindow) {
+        [hostVC addChildViewController:appBannerViewController];
+    }
     appBannerViewController.view.frame = overlay.bounds;
     appBannerViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     appBannerViewController.view.alpha = 0.0;
     [overlay addSubview:appBannerViewController.view];
-    [appBannerViewController didMoveToParentViewController:hostVC];
+    if (!attachToWindow) {
+        [appBannerViewController didMoveToParentViewController:hostVC];
+    }
 
     [overlayHostView addSubview:overlay];
     activeBannerOverlay = overlay;
+    activeNonBlockingBannerController = appBannerViewController;
 
     __weak CPAppBannerPassthroughView *weakOverlay = overlay;
     __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
@@ -1850,10 +1854,15 @@ int appBannerPerDayValue = 0;
     }];
 
     appBannerViewController.windowDismissBlock = ^{
-        [weakBannerVC willMoveToParentViewController:nil];
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC willMoveToParentViewController:nil];
+        }
         [weakOverlay removeFromSuperview];
-        [weakBannerVC removeFromParentViewController];
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC removeFromParentViewController];
+        }
         activeBannerOverlay = nil;
+        activeNonBlockingBannerController = nil;
     };
 
     if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
