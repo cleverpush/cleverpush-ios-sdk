@@ -31,6 +31,7 @@ CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 CPAppBannerPassthroughView *activeBannerOverlay;
+CPAppBannerViewController *activeNonBlockingBannerController;
 
 static NSObject *callbackLock;
 static NSObject *bannerRequestLock;
@@ -1820,7 +1821,8 @@ int appBannerPerDayValue = 0;
 
     [overlayHostView addSubview:overlay];
     activeBannerOverlay = overlay;
-    
+    activeNonBlockingBannerController = appBannerViewController;
+
     __weak CPAppBannerPassthroughView *weakOverlay = overlay;
     __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
 
@@ -1860,6 +1862,7 @@ int appBannerPerDayValue = 0;
             [weakBannerVC removeFromParentViewController];
         }
         activeBannerOverlay = nil;
+        activeNonBlockingBannerController = nil;
     };
 
     if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
