@@ -1791,6 +1791,9 @@ int appBannerPerDayValue = 0;
     }
     
     UIViewController *hostVC = [CleverPush topViewController];
+    while ([hostVC isKindOfClass:[UIAlertController class]] && hostVC.presentingViewController) {
+        hostVC = hostVC.presentingViewController;
+    }
     if (!hostVC) {
         return;
     }
@@ -1853,9 +1856,6 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Blocking banner presentation (default modal)
 - (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-
     if (!force && [CPUtils isNullOrEmpty:notificationId]) {
         [self incrementSessionBannerCount];
         [self incrementDailyBannerCount];
@@ -1865,6 +1865,14 @@ int appBannerPerDayValue = 0;
     if (!topController) {
         return;
     }
+
+    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
+    if ([topController isKindOfClass:[UIAlertController class]]
+        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
+        presentationStyle = UIModalPresentationOverFullScreen;
+    }
+    [appBannerViewController setModalPresentationStyle:presentationStyle];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.view.alpha = 0.0;
     [topController presentViewController:appBannerViewController animated:NO completion:^{
         [appBannerViewController finishSetup];

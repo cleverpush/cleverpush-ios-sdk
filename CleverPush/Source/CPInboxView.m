@@ -255,11 +255,18 @@ CPNotificationClickBlock handleClick;
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
+
+    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
+    if ([topController isKindOfClass:[UIAlertController class]]
+        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
+        presentationStyle = UIModalPresentationOverFullScreen;
+    }
+    [appBannerViewController setModalPresentationStyle:presentationStyle];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
