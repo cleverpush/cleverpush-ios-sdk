@@ -259,12 +259,7 @@ CPNotificationClickBlock handleClick;
 
     UIViewController* topController = [CleverPush topViewController];
 
-    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
-    if ([topController isKindOfClass:[UIAlertController class]]
-        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
-        presentationStyle = UIModalPresentationOverFullScreen;
-    }
-    [appBannerViewController setModalPresentationStyle:presentationStyle];
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
 
     [topController presentViewController:appBannerViewController animated:YES completion:nil];

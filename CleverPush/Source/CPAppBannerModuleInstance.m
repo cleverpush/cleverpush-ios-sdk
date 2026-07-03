@@ -1791,14 +1791,21 @@ int appBannerPerDayValue = 0;
     }
     
     UIViewController *hostVC = [CleverPush topViewController];
+    BOOL alertOnTop = NO;
     while ([hostVC isKindOfClass:[UIAlertController class]] && hostVC.presentingViewController) {
+        alertOnTop = YES;
         hostVC = hostVC.presentingViewController;
     }
     if (!hostVC) {
         return;
     }
 
-    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:hostVC.view.bounds];
+    UIView *overlayHostView = hostVC.view;
+    if (alertOnTop && hostVC.view.window != nil) {
+        overlayHostView = hostVC.view.window;
+    }
+
+    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:overlayHostView.bounds];
     overlay.backgroundColor = [UIColor clearColor];
     overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
@@ -1809,7 +1816,7 @@ int appBannerPerDayValue = 0;
     [overlay addSubview:appBannerViewController.view];
     [appBannerViewController didMoveToParentViewController:hostVC];
 
-    [hostVC.view addSubview:overlay];
+    [overlayHostView addSubview:overlay];
     activeBannerOverlay = overlay;
 
     __weak CPAppBannerPassthroughView *weakOverlay = overlay;
@@ -1866,12 +1873,7 @@ int appBannerPerDayValue = 0;
         return;
     }
 
-    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
-    if ([topController isKindOfClass:[UIAlertController class]]
-        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
-        presentationStyle = UIModalPresentationOverFullScreen;
-    }
-    [appBannerViewController setModalPresentationStyle:presentationStyle];
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.view.alpha = 0.0;
     [topController presentViewController:appBannerViewController animated:NO completion:^{
