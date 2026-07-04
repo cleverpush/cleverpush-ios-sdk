@@ -1677,8 +1677,6 @@ int appBannerPerDayValue = 0;
         };
         [appBannerViewController setActionCallback:callbackBlock];
 
-        [self setBannerIsShown:banner];
-
         BOOL shouldUpdateBanners = [CPUtils isNullOrEmpty:currentEventId] || banner.frequency != CPAppBannerFrequencyEveryTrigger;
 
         if (shouldUpdateBanners) {
@@ -1722,6 +1720,10 @@ int appBannerPerDayValue = 0;
     }
 }
 
+- (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner {
+    [self presentAppBanner:appBannerViewController banner:banner notificationId:nil force:NO];
+}
+
 - (void)presentAppBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner force:(BOOL)force {
     [self presentAppBanner:appBannerViewController banner:banner notificationId:nil force:force];
 }
@@ -1756,16 +1758,32 @@ int appBannerPerDayValue = 0;
         displayCallback = handleBannerDisplayed;
     }
     
+    BOOL presented = NO;
     if (displayCallback) {
         displayCallback(appBannerViewController);
+        presented = YES;
         if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
             [self setBannerFirstDisplayDate:banner];
         }
     } else if (appBannersNonBlocking) {
-        [self presentNonBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
+        presented = [self presentNonBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     } else {
-        [self presentBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
+        presented = [self presentBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     }
+
+    if (!presented) {
+        // Presentation bailed (e.g. no top view controller available yet). Reset the visible
+        // flag so subsequent banners are not queued forever, keep the banner unmarked so
+        // frequency "once" banners are not consumed without ever being displayed, and give
+        // any queued banners a chance to present.
+        [CPLog error:@"presentAppBanner: banner %@ could not be presented because no top view controller was found", banner.id];
+        [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self showNextActivePendingBanner:banner];
+        return;
+    }
+
+    [self setBannerIsShown:banner];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC * (long)banner.dismissTimeout), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -1784,15 +1802,15 @@ int appBannerPerDayValue = 0;
 }
 
 #pragma mark - Non-blocking banner presentation (child VC of top view controller)
-- (void)presentNonBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+- (BOOL)presentNonBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    UIViewController *hostVC = [CleverPush topViewController];
+    if (!hostVC) {
+        return NO;
+    }
+
     if (!force && [CPUtils isNullOrEmpty:notificationId]) {
         [self incrementSessionBannerCount];
         [self incrementDailyBannerCount];
-    }
-    
-    UIViewController *hostVC = [CleverPush topViewController];
-    if (!hostVC) {
-        return;
     }
 
     CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:hostVC.view.bounds];
@@ -1849,10 +1867,16 @@ int appBannerPerDayValue = 0;
     if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
         [self setBannerFirstDisplayDate:banner];
     }
+    return YES;
 }
 
 #pragma mark - Blocking banner presentation (default modal)
-- (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+- (BOOL)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    UIViewController *topController = [CleverPush topViewController];
+    if (!topController) {
+        return NO;
+    }
+
     [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
 
@@ -1861,10 +1885,6 @@ int appBannerPerDayValue = 0;
         [self incrementDailyBannerCount];
     }
 
-    UIViewController *topController = [CleverPush topViewController];
-    if (!topController) {
-        return;
-    }
     appBannerViewController.view.alpha = 0.0;
     [topController presentViewController:appBannerViewController animated:NO completion:^{
         [appBannerViewController finishSetup];
@@ -1879,6 +1899,7 @@ int appBannerPerDayValue = 0;
             [self setBannerFirstDisplayDate:banner];
         }
     }];
+    return YES;
 }
 
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")

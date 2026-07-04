@@ -253,13 +253,18 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
+    UIViewController* topController = [CleverPush topViewController];
+    if (!topController) {
+        [CPLog error:@"CPInboxView: presentAppBanner: banner %@ could not be presented because no top view controller was found", banner.id];
+        return;
+    }
+
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
-    UIViewController* topController = [CleverPush topViewController];
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {

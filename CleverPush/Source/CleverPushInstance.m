@@ -556,9 +556,13 @@ static id isNil(id object) {
 - (UIViewController* _Nullable)topViewController {
     if ([CleverPush getCustomTopViewController] != nil) {
         return [CleverPush getCustomTopViewController];
-    } else {
-        return [self topViewControllerWithRootViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
     }
+
+    UIViewController* rootViewController = [self keyWindow].rootViewController;
+    if (!rootViewController) {
+        return nil;
+    }
+    return [self topViewControllerWithRootViewController:rootViewController];
 }
 
 - (UIViewController*)topViewControllerWithRootViewController:(UIViewController*)viewController {
@@ -4482,15 +4486,40 @@ static id isNil(id object) {
 }
 
 - (UIWindow*)keyWindow {
-    UIWindow*foundWindow = nil;
-    NSArray*windows = [[UIApplication sharedApplication] windows];
-    for (UIWindow*window in windows) {
-        if (window.isKeyWindow) {
-            foundWindow = window;
-            break;
+    UIWindow* fallbackWindow = nil;
+
+    // Scene-based lookup first: UIApplication.keyWindow is deprecated and frequently nil in
+    // SwiftUI / scene-lifecycle apps, which caused banners to fail presenting silently.
+    if (@available(iOS 13.0, *)) {
+        for (UIScene* scene in [UIApplication sharedApplication].connectedScenes) {
+            if (![scene isKindOfClass:[UIWindowScene class]]) {
+                continue;
+            }
+            if (scene.activationState != UISceneActivationStateForegroundActive
+                && scene.activationState != UISceneActivationStateForegroundInactive) {
+                continue;
+            }
+            for (UIWindow* window in ((UIWindowScene*)scene).windows) {
+                if (window.isKeyWindow) {
+                    return window;
+                }
+                if (!fallbackWindow && !window.isHidden && window.rootViewController != nil) {
+                    fallbackWindow = window;
+                }
+            }
         }
     }
-    return foundWindow;
+
+    NSArray* windows = [[UIApplication sharedApplication] windows];
+    for (UIWindow* window in windows) {
+        if (window.isKeyWindow) {
+            return window;
+        }
+        if (!fallbackWindow && !window.isHidden && window.rootViewController != nil) {
+            fallbackWindow = window;
+        }
+    }
+    return fallbackWindow;
 }
 
 #pragma mark - variable updates and callbacks
