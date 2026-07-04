@@ -430,11 +430,12 @@ int appBannerPerDayValue = 0;
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
         BOOL useGroupId = groupId != nil && ![groupId isEqualToString:@""];
 
+        NSArray *rawBanners = [result cleverPushArrayForKey:@"banners"];
         if (useGroupId) {
             NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", groupId]], [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains 'published'"]]]];
-            jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
+            jsonBanners = [[rawBanners filteredArrayUsingPredicate:predicate] mutableCopy];
         } else {
-            jsonBanners = [[result objectForKey:@"banners"] mutableCopy];
+            jsonBanners = [rawBanners mutableCopy];
         }
         
         if (jsonBanners != nil) {
@@ -482,6 +483,12 @@ int appBannerPerDayValue = 0;
                     pendingBannerListeners = [NSMutableArray new];
                 }
             }
+        } else {
+            @synchronized(bannerRequestLock) {
+                pendingBannerRequest = NO;
+                pendingBannerListeners = [NSMutableArray new];
+            }
+            [CPLog error:@"Failed getting app banners because the response did not contain a banners array"];
         }
     } onFailure:^(NSError* error) {
         @synchronized(bannerRequestLock) {
