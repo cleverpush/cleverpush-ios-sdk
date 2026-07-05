@@ -1043,7 +1043,7 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
 - (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
-    return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
+    return [self checkRelationFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed];
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
@@ -1061,6 +1061,13 @@ int appBannerPerDayValue = 0;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeLessThan)]) {
         if (!CHECK_FILTER_LESS_THAN(value, compareValue)) {
+            allowed = NO;
+        }
+    } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        if ([CPUtils isNullOrEmpty:compareValueFrom] || [CPUtils isNullOrEmpty:compareValueTo]) {
+            // "between" without both bounds is a misconfiguration - skip the filter
+        } else if (!CHECK_FILTER_GREATER_THAN_OR_EQUAL_TO(value, compareValueFrom)
+                   || !CHECK_FILTER_LESS_THAN_OR_EQUAL_TO(value, compareValueTo)) {
             allowed = NO;
         }
     } else if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeNotEqual)]) {
@@ -1085,12 +1092,20 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
 - (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo {
-    return [self checkRelationAppVersionFilter:value compareWith:compareValue compareWithFrom:compareValue compareWithTo:compareValue relation:relation isAllowed:allowed];
+    return [self checkRelationAppVersionFilter:value compareWith:compareValue compareWithFrom:compareValueFrom compareWithTo:compareValueTo relation:relation isAllowed:allowed];
 }
 
 #pragma mark - check the banner triggering allowed as per selected version match with app version or not.
 - (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo relation:(NSString*)relation isAllowed:(BOOL)allowed {
-    if (relation == nil || compareValue == nil) {
+    if (relation == nil) {
+        return allowed;
+    }
+    if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeBetween)]) {
+        // "between" is configured via from/to and may not carry a single compare value
+        if ([CPUtils isNullOrEmpty:compareValueFrom] || [CPUtils isNullOrEmpty:compareValueTo]) {
+            return allowed;
+        }
+    } else if (compareValue == nil) {
         return allowed;
     }
     if (allowed && [relation isEqualToString:filterRelationType(CPFilterRelationTypeEquals)]) {

@@ -3,10 +3,16 @@
 #import "CPAppBannerViewController.h"
 #import "CPAppBannerModule.h"
 #import "CPAppBannerModuleInstance.h"
+#import "NSString+VersionComparator.h"
 #import "TestUtils.h"
 
 #import <OCMock/OCMock.h>
 @import XCTest;
+
+@interface CPAppBannerModuleInstance (CPRelationFilterTests)
+- (BOOL)checkRelationFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo;
+- (BOOL)checkRelationAppVersionFilter:(NSString*)value compareWith:(NSString*)compareValue relation:(NSString*)relation isAllowed:(BOOL)allowed compareWithFrom:(NSString*)compareValueFrom compareWithTo:(NSString*)compareValueTo;
+@end
 @interface CPAppBannerTest : XCTestCase
 @property (nonatomic) CPAppBannerViewController *bannerTestController;
 @property (nonatomic, retain) CleverPushInstance *testableInstance;
@@ -134,7 +140,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testInitSession {
-    [self.appBanner initSession];
+    [self.appBanner initSession:@"channel_id" afterInit:NO];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];
@@ -223,7 +229,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testAndVerifyStartUpWithCreateAndScheduleBanners {
-    [self.appBanner initSession];
+    [self.appBanner initSession:@"channel_id" afterInit:NO];
     XCTAssertEqual([self.appBanner getListOfBanners].count, 0);
     XCTAssertEqual([self.appBanner getPendingBannerListeners].count, 0);
     [[self.appBanner verify] saveSessions];
@@ -329,6 +335,70 @@ dispatch_queue_t dispatchQueue = nil;
     [self measureBlock:^{
         // Put the code you want to measure the time of here.
     }];
+}
+
+#pragma mark - CP-12081 between OS-version / app-version targeting
+
+- (void)testIsBetweenVersionComparesSegmentWise {
+    XCTAssertTrue([@"17.5.1" isBetweenVersion:@"16.0" andVersion:@"18.0"]);
+    XCTAssertFalse([@"15.9" isBetweenVersion:@"16.0" andVersion:@"18.0"]);
+    XCTAssertFalse([@"18.0.1" isBetweenVersion:@"16.0" andVersion:@"18.0"]);
+    // bounds are inclusive
+    XCTAssertTrue([@"16.0" isBetweenVersion:@"16.0" andVersion:@"18.0"]);
+    XCTAssertTrue([@"18.0" isBetweenVersion:@"16.0" andVersion:@"18.0"]);
+    // minor segments must not be truncated (integerValue would treat 17.5 as 17)
+    XCTAssertFalse([@"17.5" isBetweenVersion:@"17.0" andVersion:@"17.4"]);
+    XCTAssertTrue([@"17.5" isBetweenVersion:@"17.5" andVersion:@"17.5"]);
+}
+
+- (void)testCheckRelationAppVersionFilterBetweenInsideRange {
+    BOOL allowed = [self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"16.0" compareWithTo:@"18.0"];
+    XCTAssertTrue(allowed);
+}
+
+- (void)testCheckRelationAppVersionFilterBetweenOutsideRange {
+    BOOL allowed = [self.bannerInstance checkRelationAppVersionFilter:@"15.2" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"16.0" compareWithTo:@"18.0"];
+    XCTAssertFalse(allowed);
+}
+
+- (void)testCheckRelationAppVersionFilterBetweenWithNilTargetStillEvaluatesBounds {
+    // osTarget "between" entries carry from/to but often no single target value
+    BOOL allowed = [self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:nil relation:@"between" isAllowed:YES compareWithFrom:@"16.0" compareWithTo:@"18.0"];
+    XCTAssertTrue(allowed);
+    BOOL notAllowed = [self.bannerInstance checkRelationAppVersionFilter:@"19.0" compareWith:nil relation:@"between" isAllowed:YES compareWithFrom:@"16.0" compareWithTo:@"18.0"];
+    XCTAssertFalse(notAllowed);
+}
+
+- (void)testCheckRelationAppVersionFilterBetweenWithMissingBoundsSkipsFilter {
+    BOOL allowed = [self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"" compareWithTo:@""];
+    XCTAssertTrue(allowed);
+}
+
+- (void)testCheckRelationAppVersionFilterNonBetweenRelationsUnchanged {
+    XCTAssertTrue([self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"17.5.1" relation:@"equals" isAllowed:YES compareWithFrom:nil compareWithTo:nil]);
+    XCTAssertFalse([self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"17.5.2" relation:@"equals" isAllowed:YES compareWithFrom:nil compareWithTo:nil]);
+    XCTAssertTrue([self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"16.0" relation:@"greaterThan" isAllowed:YES compareWithFrom:nil compareWithTo:nil]);
+    XCTAssertTrue([self.bannerInstance checkRelationAppVersionFilter:@"17.5.1" compareWith:@"18.0" relation:@"lessThan" isAllowed:YES compareWithFrom:nil compareWithTo:nil]);
+}
+
+- (void)testCheckRelationFilterBetweenInsideAndOutsideRange {
+    // regression: attribute "between" had no branch at all and always passed
+    XCTAssertTrue([self.bannerInstance checkRelationFilter:@"25" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"18" compareWithTo:@"30"]);
+    XCTAssertFalse([self.bannerInstance checkRelationFilter:@"31" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"18" compareWithTo:@"30"]);
+    XCTAssertFalse([self.bannerInstance checkRelationFilter:@"17" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"18" compareWithTo:@"30"]);
+    // bounds are inclusive
+    XCTAssertTrue([self.bannerInstance checkRelationFilter:@"18" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"18" compareWithTo:@"30"]);
+    XCTAssertTrue([self.bannerInstance checkRelationFilter:@"30" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"18" compareWithTo:@"30"]);
+}
+
+- (void)testCheckRelationFilterBetweenWithMissingBoundsSkipsFilter {
+    XCTAssertTrue([self.bannerInstance checkRelationFilter:@"25" compareWith:@"" relation:@"between" isAllowed:YES compareWithFrom:@"" compareWithTo:@""]);
+}
+
+- (void)testCheckRelationFilterEventTriggerStyleCallUnchanged {
+    // event triggers pass the compare value as from/to on purpose; equals must behave as before
+    XCTAssertTrue([self.bannerInstance checkRelationFilter:@"value" compareWith:@"value" relation:@"equals" isAllowed:YES compareWithFrom:@"value" compareWithTo:@"value"]);
+    XCTAssertFalse([self.bannerInstance checkRelationFilter:@"other" compareWith:@"value" relation:@"equals" isAllowed:YES compareWithFrom:@"value" compareWithTo:@"value"]);
 }
 
 @end

@@ -36,29 +36,29 @@
     self.defaults = OCMPartialMock(self.userDefault);
 }
 - (void)testGetAvailableAttributes {
-    NSDictionary *responseObject = [[NSDictionary alloc]initWithObjectsAndKeys:@"value",@"key", nil];
-    NSDictionary *finalResponseObject = responseObject;
+    NSMutableArray *responseObject = [[NSMutableArray alloc]initWithObjects:@"value", nil];
+    NSMutableArray *finalResponseObject = responseObject;
     
     [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(NSDictionary *myFirstArgument);
+        void (^ __unsafe_unretained handler)(NSMutableArray *myFirstArgument);
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);
 }
 
 - (void)testGetAvailableAttributesFromConfigWhenChannelConfigIsNull {
-    NSDictionary *finalResponseObject = [[NSDictionary alloc]init];
+    NSMutableArray *finalResponseObject = [[NSMutableArray alloc]init];
     
     [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(NSDictionary *myFirstArgument);
+        void (^ __unsafe_unretained handler)(NSMutableArray *myFirstArgument);
         [invocation getArgument:&handler atIndex:2];
         handler(finalResponseObject);
     }];
-    [self.cleverPush getAvailableAttributes:^(NSDictionary *configAttributes) {
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *configAttributes) {
         XCTAssertEqual(configAttributes, finalResponseObject);
     }];
     OCMVerify([self.cleverPush getAvailableAttributes:[OCMArg any]]);

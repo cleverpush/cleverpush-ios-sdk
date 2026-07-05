@@ -48,10 +48,7 @@ static NSString *versionSeparator = @".";
 }
 
 - (BOOL)isBetweenVersion:(NSString *)lowerVersion andVersion:(NSString *)upperVersion {
-    NSInteger versionToCheckInt = [self integerValue];
-    NSInteger lowerVersionInt = [lowerVersion integerValue];
-    NSInteger upperVersionInt = [upperVersion integerValue];
-    return (versionToCheckInt >= lowerVersionInt) && (versionToCheckInt <= upperVersionInt);
+    return [self isEqualOrNewerThanVersion:lowerVersion] && [self isEqualOrOlderThanVersion:upperVersion];
 }
 
 @end
