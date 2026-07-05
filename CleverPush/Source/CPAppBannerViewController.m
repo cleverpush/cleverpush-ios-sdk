@@ -341,6 +341,29 @@ static CPAppBannerActionBlock appBannerActionCallback;
     }
 }
 
+- (void)updateHTMLBannerLayoutForHostBounds:(CGRect)bounds {
+    if (![self.data.contentType isEqualToString:@"html"] || self.webView == nil) {
+        return;
+    }
+    if (bounds.size.width <= 0 || bounds.size.height <= 0) {
+        return;
+    }
+
+    self.webBannerHeight.constant = bounds.size.height;
+    if (self.webBannerWidth) {
+        self.webBannerWidth.constant = bounds.size.width;
+    }
+    [self.view layoutIfNeeded];
+
+    if (self.data.closeButtonEnabled && self.htmlCloseButton) {
+        [self updateCloseButtonForSize:bounds.size];
+    }
+
+    if ([CleverPush getAppBannersNonBlocking]) {
+        [self updateHTMLBannerTouchableRects];
+    }
+}
+
 #pragma mark - Update the UI while the device detects rotation.
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     if ([self.data.contentType isEqualToString:@"html"]) {
@@ -767,7 +790,12 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
     config.userContentController = userController;
 
-    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.width, [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height) configuration:config];
+    UIWindow *hostWindow = [CPUtils cleverPushKeyWindow];
+    CGRect hostBounds = [CPUtils bannerHostBoundsForWindow:hostWindow];
+    CGFloat bannerWidth = hostBounds.size.width;
+    CGFloat bannerHeight = hostBounds.size.height;
+
+    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, bannerWidth, bannerHeight) configuration:config];
     self.webView.scrollView.scrollEnabled = true;
     self.webView.navigationDelegate = self;
     self.webView.backgroundColor = [UIColor clearColor];
@@ -775,19 +803,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
     [CPUtils configureWebView:self.webView];
     [self setActionCallback:self.actionCallback];
 
-    self.webBannerHeight.constant = [UIApplication sharedApplication].keyWindow.rootViewController.view.frame.size.height;
+    self.webBannerHeight.constant = bannerHeight;
 
     if (self.data.closeButtonEnabled) {
         UIColor *backgroundColor;
         self.htmlCloseButton = [[UIButton alloc] init];
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        CGRect frame = window.rootViewController.view.frame;
-        CGFloat width = frame.size.width;
-        CGFloat height = frame.size.height;
-        CGFloat topPadding = 0;
+        CGFloat width = bannerWidth;
+        CGFloat height = bannerHeight;
+        CGFloat topPadding = hostWindow ? hostWindow.safeAreaInsets.top : 0;
         CGFloat spacing = 10;
 
-        topPadding = window.safeAreaInsets.top;
         self.htmlCloseButton = [[UIButton alloc] initWithFrame:(CGRectMake(width - 40 - spacing, topPadding + spacing, 40, 40))];
         if (self.data.closeButtonPositionStaticEnabled) {
             self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, topPadding + 40 + spacing, width, height) configuration:config];

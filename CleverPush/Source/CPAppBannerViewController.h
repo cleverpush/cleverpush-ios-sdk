@@ -60,6 +60,7 @@
 #pragma mark - Class Methods
 - (void)initWithBanner:(CPAppBanner*)banner;
 - (void)initWithHTMLBanner:(CPAppBanner*)banner;
+- (void)updateHTMLBannerLayoutForHostBounds:(CGRect)bounds;
 - (void)setActionCallback:(CPAppBannerActionBlock)callback;
 - (void)actionCallback:(CPAppBannerAction*)action;
 - (void)onDismiss;

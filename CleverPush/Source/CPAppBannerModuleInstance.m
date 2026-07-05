@@ -31,6 +31,7 @@ CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 CPAppBannerPassthroughView *activeBannerOverlay;
+UIWindow *activeBannerWindow;
 
 static NSObject *callbackLock;
 static NSObject *bannerRequestLock;
@@ -1784,13 +1785,64 @@ int appBannerPerDayValue = 0;
 }
 
 #pragma mark - Non-blocking banner presentation (child VC of top view controller)
+- (UIWindow *)ensureAppBannerPresentationWindow {
+    if (activeBannerWindow != nil) {
+        return activeBannerWindow;
+    }
+
+    if (@available(iOS 13.0, *)) {
+        UIWindowScene *scene = nil;
+        for (UIScene *connectedScene in UIApplication.sharedApplication.connectedScenes) {
+            if ([connectedScene isKindOfClass:[UIWindowScene class]] && connectedScene.activationState == UISceneActivationStateForegroundActive) {
+                scene = (UIWindowScene *)connectedScene;
+                break;
+            }
+        }
+        if (scene == nil) {
+            scene = (UIWindowScene *)[UIApplication.sharedApplication.connectedScenes anyObject];
+        }
+        if (scene != nil) {
+            activeBannerWindow = [[UIWindow alloc] initWithWindowScene:scene];
+        }
+    }
+
+    if (activeBannerWindow == nil) {
+        activeBannerWindow = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+    }
+
+    activeBannerWindow.frame = UIScreen.mainScreen.bounds;
+    activeBannerWindow.windowLevel = UIWindowLevelAlert + 1;
+    activeBannerWindow.backgroundColor = [UIColor clearColor];
+
+    UIViewController *rootViewController = [[UIViewController alloc] init];
+    rootViewController.view.backgroundColor = [UIColor clearColor];
+    activeBannerWindow.rootViewController = rootViewController;
+    activeBannerWindow.hidden = NO;
+
+    return activeBannerWindow;
+}
+
+- (void)teardownAppBannerPresentationWindow {
+    if (activeBannerOverlay != nil) {
+        [activeBannerOverlay removeFromSuperview];
+        activeBannerOverlay = nil;
+    }
+
+    if (activeBannerWindow != nil) {
+        activeBannerWindow.hidden = YES;
+        activeBannerWindow.rootViewController = nil;
+        activeBannerWindow = nil;
+    }
+}
+
 - (void)presentNonBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
     if (!force && [CPUtils isNullOrEmpty:notificationId]) {
         [self incrementSessionBannerCount];
         [self incrementDailyBannerCount];
     }
-    
-    UIViewController *hostVC = [CleverPush topViewController];
+
+    UIWindow *bannerWindow = [self ensureAppBannerPresentationWindow];
+    UIViewController *hostVC = bannerWindow.rootViewController;
     if (!hostVC) {
         return;
     }
@@ -1839,11 +1891,15 @@ int appBannerPerDayValue = 0;
         appBannerViewController.view.alpha = 1.0;
     }];
 
+    if ([banner.contentType isEqualToString:@"html"]) {
+        [appBannerViewController updateHTMLBannerLayoutForHostBounds:overlay.bounds];
+    }
+
     appBannerViewController.windowDismissBlock = ^{
         [weakBannerVC willMoveToParentViewController:nil];
         [weakOverlay removeFromSuperview];
         [weakBannerVC removeFromParentViewController];
-        activeBannerOverlay = nil;
+        [self teardownAppBannerPresentationWindow];
     };
 
     if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
@@ -1853,7 +1909,7 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Blocking banner presentation (default modal)
 - (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
+    [appBannerViewController setModalPresentationStyle:UIModalPresentationOverFullScreen];
     [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
 
     if (!force && [CPUtils isNullOrEmpty:notificationId]) {
@@ -1861,16 +1917,28 @@ int appBannerPerDayValue = 0;
         [self incrementDailyBannerCount];
     }
 
-    UIViewController *topController = [CleverPush topViewController];
-    if (!topController) {
+    UIWindow *bannerWindow = [self ensureAppBannerPresentationWindow];
+    UIViewController *hostVC = bannerWindow.rootViewController;
+    if (!hostVC) {
         return;
     }
+
+    __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
     appBannerViewController.view.alpha = 0.0;
-    [topController presentViewController:appBannerViewController animated:NO completion:^{
+    appBannerViewController.windowDismissBlock = ^{
+        [weakBannerVC dismissViewControllerAnimated:NO completion:^{
+            [self teardownAppBannerPresentationWindow];
+        }];
+    };
+
+    [hostVC presentViewController:appBannerViewController animated:NO completion:^{
         [appBannerViewController finishSetup];
         if (!appBannerViewController.isPreloading) {
             [appBannerViewController.cardCollectionView reloadData];
             [appBannerViewController setBackground];
+            if ([banner.contentType isEqualToString:@"html"]) {
+                [appBannerViewController updateHTMLBannerLayoutForHostBounds:bannerWindow.bounds];
+            }
             [UIView animateWithDuration:0.3 animations:^{
                 appBannerViewController.view.alpha = 1.0;
             }];

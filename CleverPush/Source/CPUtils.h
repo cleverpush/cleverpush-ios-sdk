@@ -22,6 +22,8 @@
 + (BOOL)isEmpty:(id)thing;
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
++ (UIWindow *)cleverPushKeyWindow;
++ (CGRect)bannerHostBoundsForWindow:(UIWindow *)window;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
 + (void)handleLinkBySystem:(NSString*)urlString;
 + (NSString*)deviceName;
