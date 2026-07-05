@@ -716,11 +716,13 @@ static id isNil(id object) {
 
 	[self clearBadge];
 
-    [self getChannelConfig:^(NSDictionary * _Nullable result) {
-        if (result != nil) {
-            [CPAppBannerModule initSession:channelId afterInit:YES];
-        }
-    }];
+    NSString *sessionChannelId = channelId;
+    if ([CPUtils isNullOrEmpty:sessionChannelId]) {
+        sessionChannelId = [self getChannelIdFromUserDefaults];
+    }
+    if (![CPUtils isNullOrEmpty:sessionChannelId]) {
+        [CPAppBannerModule initSession:sessionChannelId afterInit:YES];
+    }
     
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
         if (subscriptionId == nil) {
@@ -751,12 +753,14 @@ static id isNil(id object) {
         [self initAppReview];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self getChannelConfig:^(NSDictionary * _Nullable result) {
-                if (result != nil) {
-                    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:NO];
-                    [CPAppBannerModule initSession:channelId afterInit:NO];
-                }
-            }];
+            NSString *bannerChannelId = channelId;
+            if ([CPUtils isNullOrEmpty:bannerChannelId]) {
+                bannerChannelId = [self getChannelIdFromUserDefaults];
+            }
+            if (![CPUtils isNullOrEmpty:bannerChannelId]) {
+                [CPAppBannerModule initBannersWithChannel:bannerChannelId showDrafts:isShowDraft fromNotification:NO];
+                [CPAppBannerModule initSession:bannerChannelId afterInit:NO];
+            }
         });
     });
 }
