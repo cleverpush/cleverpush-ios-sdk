@@ -44,6 +44,13 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (self.data.type == CPAppBannerTypeFull) {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+        [self updateTableViewContentInset];
+        return;
+    }
+
     CGRect frame = self.tblCPBanner.frame;
     CGFloat maxHeight = [CPUtils frameHeightWithoutSafeArea] - 50;
     CGFloat contentHeight = self.tblCPBanner.contentSize.height;
@@ -666,6 +673,16 @@
         if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
             self.tblviewTopBannerConstraint.constant = 25;
         }
+    }
+
+    if (self.data.type == CPAppBannerTypeFull) {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityDefaultLow;
+        UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+        self.topViewBannerConstraint.constant = window.safeAreaInsets.top;
+        self.btnCloseTrailingConstraint.constant = self.btnCloseTopConstraint.constant;
+    } else {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityRequired;
+        self.topViewBannerConstraint.constant = 0;
     }
 }
 
