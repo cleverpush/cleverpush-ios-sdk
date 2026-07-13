@@ -677,12 +677,17 @@
 
     if (self.data.type == CPAppBannerTypeFull) {
         self.tblCPBannerHeightConstraint.priority = UILayoutPriorityDefaultLow;
-        UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
-        self.topViewBannerConstraint.constant = window.safeAreaInsets.top;
+        if (self.data.marginEnabled) {
+            self.topViewBannerConstraint.constant = 0;
+        } else {
+            UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+            self.topViewBannerConstraint.constant = window.safeAreaInsets.top;
+        }
         self.btnCloseTrailingConstraint.constant = self.btnCloseTopConstraint.constant;
     } else {
         self.tblCPBannerHeightConstraint.priority = UILayoutPriorityRequired;
         self.topViewBannerConstraint.constant = 0;
+        self.btnCloseTrailingConstraint.constant = 10;
     }
 }
 
