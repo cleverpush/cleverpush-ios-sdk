@@ -25,8 +25,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imgviewBackground;
 @property (weak, nonatomic) IBOutlet UIView *viewBannerCardContainer;
 @property (weak, nonatomic) IBOutlet UIButton *btnClose;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnCloseTopConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *btnCloseTrailingConstraint;
 @property (nonatomic, strong) NSMutableArray<CPAppBannerBlock*> *blocks;
 @property (strong, nonatomic) CPAppBanner *data;
 @property (nonatomic, copy) CPAppBannerActionBlock actionCallback;

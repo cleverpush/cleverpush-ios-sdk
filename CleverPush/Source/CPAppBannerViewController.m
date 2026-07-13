@@ -521,8 +521,8 @@ static CPAppBannerActionBlock appBannerActionCallback;
     } else if (self.data.type == CPAppBannerTypeBottom) {
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     } else {
-        cell.topViewBannerConstraint.priority = UILayoutPriorityRequired;
-        cell.bottomViewBannerConstraint.priority = UILayoutPriorityRequired;
+        cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+        cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     }
 
     return cell;

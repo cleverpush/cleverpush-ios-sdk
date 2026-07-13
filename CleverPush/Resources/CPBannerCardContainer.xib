@@ -81,8 +81,6 @@
             <connections>
                 <outlet property="bottomViewBannerConstraint" destination="bLb-xk-yLO" id="Uat-HR-inB"/>
                 <outlet property="btnClose" destination="41j-f6-kVw" id="v4p-JA-fg8"/>
-                <outlet property="btnCloseTopConstraint" destination="E6c-Tc-pl3" id="lPn-4M-hAa"/>
-                <outlet property="btnCloseTrailingConstraint" destination="Uo8-1I-STK" id="wRc-6r-eZq"/>
                 <outlet property="centerViewBannerConstraint" destination="GXx-8c-hP5" id="ed4-b9-lZH"/>
                 <outlet property="imgviewBackground" destination="ldd-wZ-7My" id="BeE-rd-8l0"/>
                 <outlet property="pageControl" destination="Xx7-kH-pxc" id="vHX-jN-yhV"/>
