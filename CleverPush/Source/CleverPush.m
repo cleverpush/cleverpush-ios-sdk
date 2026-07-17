@@ -543,6 +543,10 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setIncrementBadge:increment];
 }
 
++ (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
+    [self.CPSharedInstance setGroupNotificationSoundMode:mode];
+}
+
 + (void)setShowNotificationsInForeground:(BOOL)show {
     [self.CPSharedInstance setShowNotificationsInForeground:show];
 }
@@ -795,6 +799,10 @@ static CleverPush* singleInstance = nil;
 
 + (CPIabTcfMode)getIabTcfMode {
     return [self.CPSharedInstance getIabTcfMode];
+}
+
++ (CPGroupNotificationSoundMode)getGroupNotificationSoundMode {
+    return [self.CPSharedInstance getGroupNotificationSoundMode];
 }
 
 + (UIViewController* _Nullable)getCustomTopViewController {
