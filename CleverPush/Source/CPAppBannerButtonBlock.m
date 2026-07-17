@@ -1,5 +1,6 @@
 #import "CPAppBannerButtonBlock.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerButtonBlock
 #pragma mark - wrapping the data of the Banner Button Block in to CPAppBannerButtonBlock NSObject
@@ -26,6 +27,11 @@
 
         if ([json cleverPushStringForKey:@"family"] && ![[json cleverPushStringForKey:@"family"] isEqual:@""]) {
             self.family = [json cleverPushStringForKey:@"family"];
+        }
+
+        NSString *fontFamilyIos = [json cleverPushStringForKey:@"fontFamilyIos"];
+        if (![CPUtils isNullOrEmpty:fontFamilyIos]) {
+            self.fontFamilyIos = fontFamilyIos;
         }
 
         if ([json cleverPushStringForKey:@"background"] && ![[json cleverPushStringForKey:@"background"] isEqual:@""]) {

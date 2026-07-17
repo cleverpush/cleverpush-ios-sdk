@@ -1,5 +1,6 @@
 #import "CPAppBannerTextBlock.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerTextBlock
 
@@ -29,6 +30,11 @@
 
         if ([json cleverPushStringForKey:@"family"] && ![[json cleverPushStringForKey:@"family"] isEqual:@""]) {
             self.family = [json cleverPushStringForKey:@"family"];
+        }
+
+        NSString *fontFamilyIos = [json cleverPushStringForKey:@"fontFamilyIos"];
+        if (![CPUtils isNullOrEmpty:fontFamilyIos]) {
+            self.fontFamilyIos = fontFamilyIos;
         }
 
         self.size = 18;

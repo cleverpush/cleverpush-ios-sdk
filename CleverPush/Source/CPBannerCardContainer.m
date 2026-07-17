@@ -317,11 +317,12 @@
         [cell.btnCPBanner setTitleColor:titleColor forState:UIControlStateNormal];
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:fontSize]];
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:resolvedFamily size:fontSize]];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for button block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for button block: %@", block.fontFamilyIos ?: block.family];
             }
             [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
         }
@@ -421,11 +422,12 @@
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         UIFont *font;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            font = [UIFont fontWithName:block.family size:fontSize];
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            font = [UIFont fontWithName:resolvedFamily size:fontSize];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for text block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for text block: %@", block.fontFamilyIos ?: block.family];
             }
             font = [UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold];
         }

@@ -269,6 +269,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return [UIFont fontWithName:fontFamily size:18.0f] != nil;
 }
 
+#pragma mark -  Resolve the font family to use, preferring the platform-specific one over the legacy shared one.
++ (NSString *)resolvedFontFamilyWithPlatformFamily:(NSString *)platformFontFamily fallbackFamily:(NSString *)fallbackFontFamily {
+    if ([self fontFamilyExists:platformFontFamily]) {
+        return platformFontFamily;
+    }
+
+    if ([self fontFamilyExists:fallbackFontFamily]) {
+        return fallbackFontFamily;
+    }
+
+    return nil;
+}
+
 #pragma mark -  Check the empty.
 + (BOOL)isEmpty:(id)thing {
     return thing == nil
