@@ -4938,25 +4938,34 @@ static id isNil(id object) {
         return;
     }
 
+    NSString* threadIdentifier = replacementContent.threadIdentifier;
+    if ([CPUtils isNullOrEmpty:threadIdentifier]) {
+        return;
+    }
+
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL groupAlreadyDisplayed = NO;
     [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>* notifications) {
-        BOOL groupAlreadyDisplayed = NO;
         for (UNNotification* delivered in notifications) {
-            if ([CPUtils isNullOrEmpty:replacementContent.threadIdentifier]
-                || [delivered.request.content.threadIdentifier isEqualToString:replacementContent.threadIdentifier]) {
+            if ([delivered.request.content.threadIdentifier isEqualToString:threadIdentifier]) {
                 groupAlreadyDisplayed = YES;
                 break;
             }
         }
-        if (groupAlreadyDisplayed) {
-            [CPLog info:@"silenceSoundForGroupedNotification - group already displayed, removing sound"];
-            replacementContent.sound = nil;
-        } else {
-            [CPLog info:@"silenceSoundForGroupedNotification - no group displayed, keeping sound"];
-        }
         dispatch_semaphore_signal(semaphore);
     }];
-    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)));
+
+    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC))) != 0) {
+        [CPLog info:@"silenceSoundForGroupedNotification - timed out fetching delivered notifications, keeping sound"];
+        return;
+    }
+
+    if (groupAlreadyDisplayed) {
+        [CPLog info:@"silenceSoundForGroupedNotification - group already displayed, removing sound"];
+        replacementContent.sound = nil;
+    } else {
+        [CPLog info:@"silenceSoundForGroupedNotification - no group displayed, keeping sound"];
+    }
 }
 
 #pragma mark - recieved notifications from the Extension.
