@@ -1,3 +1,9 @@
+## 1.34.51 (17.07.2026)
+* Resolved the issue of broken app banner layout when presented while a UIAlertController is visible.
+* Extend the notificationId attribution window for /subscription/conversion from 60 minutes to 24 hours.
+* Added platform-specific font support for In-App Banners.
+* Resolved the close button UI Positing issue in appBanners.
+
 ## 1.34.50 (02.07.2026)
 * Added iBeacon monitoring (iOS 13+) with automatic event tracking on beacon entry via the new initBeacons method, which registers CLBeaconRegions from the channel config.
 * Added onBeaconDetected callback for matched beacon entries, setBeaconEventInterval to throttle re-triggers per session, and setBeaconDebugScanAll for verbose diagnostic logging.

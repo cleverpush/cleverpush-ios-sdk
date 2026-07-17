@@ -19,10 +19,12 @@
 + (NSDate*)getLastTopicCheckedTime;
 + (NSString *)hexStringFromColor:(UIColor *)color;
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
++ (NSString *)resolvedFontFamilyWithPlatformFamily:(NSString*)platformFontFamily fallbackFamily:(NSString*)fallbackFontFamily;
 + (BOOL)isEmpty:(id)thing;
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
++ (UIModalPresentationStyle)appBannerPresentationStyleForPresenter:(UIViewController*)presenter;
 + (void)handleLinkBySystem:(NSString*)urlString;
 + (NSString*)deviceName;
 + (void)updateLastTimeAutomaticallyShowed;

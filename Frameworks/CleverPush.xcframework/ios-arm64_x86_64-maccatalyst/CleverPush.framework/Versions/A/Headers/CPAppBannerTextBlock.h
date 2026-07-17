@@ -15,6 +15,7 @@
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic, strong) NSString *darkColor;
 @property (nonatomic, strong) NSString *family;
+@property (nonatomic, strong) NSString *fontFamilyIos;
 @property (nonatomic) int size;
 
 #pragma mark - Class Methods
