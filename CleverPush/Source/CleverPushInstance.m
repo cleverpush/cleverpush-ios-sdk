@@ -3717,9 +3717,15 @@ static id isNil(id object) {
                     NSString* lastClickedNotificationId = [userDefaults stringForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_ID_KEY];
                     NSDate* lastClickedNotificationTimeStamp = [userDefaults objectForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_TIME_KEY];
 
-                    if (![CPUtils isNullOrEmpty:lastClickedNotificationId] && lastClickedNotificationTimeStamp != nil && [lastClickedNotificationTimeStamp isKindOfClass:[NSDate class]]) {
+                    static const NSTimeInterval kNotificationClickValidityInterval = 24 * 60 * 60;
+                    
+                    if (![CPUtils isNullOrEmpty:lastClickedNotificationId] &&
+                        lastClickedNotificationTimeStamp != nil &&
+                        [lastClickedNotificationTimeStamp isKindOfClass:[NSDate class]]) {
+                        
                         NSTimeInterval secondsSinceLastClick = [[NSDate date] timeIntervalSinceDate:lastClickedNotificationTimeStamp];
-                        if (secondsSinceLastClick <= 60 * 60) {
+                        
+                        if (secondsSinceLastClick <= kNotificationClickValidityInterval) {
                             [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
                         }
                     }
