@@ -31,6 +31,7 @@ CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
 CPAppBannerPassthroughView *activeBannerOverlay;
+CPAppBannerViewController *activeNonBlockingBannerController;
 
 static NSObject *callbackLock;
 static NSObject *bannerRequestLock;
@@ -1791,23 +1792,36 @@ int appBannerPerDayValue = 0;
     }
     
     UIViewController *hostVC = [CleverPush topViewController];
+    BOOL alertOnTop = NO;
+    while ([hostVC isKindOfClass:[UIAlertController class]] && hostVC.presentingViewController) {
+        alertOnTop = YES;
+        hostVC = hostVC.presentingViewController;
+    }
     if (!hostVC) {
         return;
     }
 
-    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:hostVC.view.bounds];
+    BOOL attachToWindow = (alertOnTop && hostVC.view.window != nil);
+    UIView *overlayHostView = attachToWindow ? hostVC.view.window : hostVC.view;
+
+    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:overlayHostView.bounds];
     overlay.backgroundColor = [UIColor clearColor];
     overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    [hostVC addChildViewController:appBannerViewController];
+    if (!attachToWindow) {
+        [hostVC addChildViewController:appBannerViewController];
+    }
     appBannerViewController.view.frame = overlay.bounds;
     appBannerViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     appBannerViewController.view.alpha = 0.0;
     [overlay addSubview:appBannerViewController.view];
-    [appBannerViewController didMoveToParentViewController:hostVC];
+    if (!attachToWindow) {
+        [appBannerViewController didMoveToParentViewController:hostVC];
+    }
 
-    [hostVC.view addSubview:overlay];
+    [overlayHostView addSubview:overlay];
     activeBannerOverlay = overlay;
+    activeNonBlockingBannerController = appBannerViewController;
 
     __weak CPAppBannerPassthroughView *weakOverlay = overlay;
     __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
@@ -1840,10 +1854,15 @@ int appBannerPerDayValue = 0;
     }];
 
     appBannerViewController.windowDismissBlock = ^{
-        [weakBannerVC willMoveToParentViewController:nil];
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC willMoveToParentViewController:nil];
+        }
         [weakOverlay removeFromSuperview];
-        [weakBannerVC removeFromParentViewController];
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC removeFromParentViewController];
+        }
         activeBannerOverlay = nil;
+        activeNonBlockingBannerController = nil;
     };
 
     if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
@@ -1853,9 +1872,6 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Blocking banner presentation (default modal)
 - (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
-
     if (!force && [CPUtils isNullOrEmpty:notificationId]) {
         [self incrementSessionBannerCount];
         [self incrementDailyBannerCount];
@@ -1865,6 +1881,9 @@ int appBannerPerDayValue = 0;
     if (!topController) {
         return;
     }
+
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.view.alpha = 0.0;
     [topController presentViewController:appBannerViewController animated:NO completion:^{
         [appBannerViewController finishSetup];

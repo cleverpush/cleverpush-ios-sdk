@@ -330,6 +330,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     }];
 }
 
+#pragma mark - Resolve the app banner presentation style for a given presenter.
++ (UIModalPresentationStyle)appBannerPresentationStyleForPresenter:(UIViewController*)presenter {
+    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
+    if ([presenter isKindOfClass:[UIAlertController class]]
+        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
+        return UIModalPresentationOverFullScreen;
+    }
+    return presentationStyle;
+}
+
 #pragma mark -  get the device name based on their model names.
 + (NSString*)deviceName {
     struct utsname systemInfo;

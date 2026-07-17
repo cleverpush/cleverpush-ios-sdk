@@ -24,6 +24,7 @@
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
++ (UIModalPresentationStyle)appBannerPresentationStyleForPresenter:(UIViewController*)presenter;
 + (void)handleLinkBySystem:(NSString*)urlString;
 + (NSString*)deviceName;
 + (void)updateLastTimeAutomaticallyShowed;
