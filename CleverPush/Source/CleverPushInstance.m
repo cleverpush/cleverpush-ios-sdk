@@ -4465,6 +4465,13 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
+#pragma mark - Grouped notifications sound mode
+- (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    [userDefaults setInteger:mode forKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
+    [userDefaults synchronize];
+}
+
 #pragma mark - Show notifications in foreground
 - (void)setShowNotificationsInForeground:(BOOL)show {
     showNotificationsInForeground = show;
@@ -4610,6 +4617,11 @@ static id isNil(id object) {
 
 - (CPIabTcfMode)getIabTcfMode {
     return currentIabTcfMode;
+}
+
+- (CPGroupNotificationSoundMode)getGroupNotificationSoundMode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    return (CPGroupNotificationSoundMode) [userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
 }
 
 - (UIViewController* _Nullable)getCustomTopViewController {
@@ -4918,6 +4930,47 @@ static id isNil(id object) {
     [CPLog setLogListener:listener];
 }
 
+#pragma mark - Silence the sound when the notification's group is already displayed
+- (void)silenceSoundForGroupedNotification:(UNMutableNotificationContent* _Nullable)replacementContent {
+    if (!replacementContent) {
+        return;
+    }
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY] != CPGroupNotificationSoundModeFirstInGroupOnly) {
+        return;
+    }
+
+    NSString* threadIdentifier = replacementContent.threadIdentifier;
+    if ([CPUtils isNullOrEmpty:threadIdentifier]) {
+        return;
+    }
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL groupAlreadyDisplayed = NO;
+    [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>* notifications) {
+        for (UNNotification* delivered in notifications) {
+            if ([delivered.request.content.threadIdentifier isEqualToString:threadIdentifier]) {
+                groupAlreadyDisplayed = YES;
+                break;
+            }
+        }
+        dispatch_semaphore_signal(semaphore);
+    }];
+
+    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC))) != 0) {
+        [CPLog info:@"silenceSoundForGroupedNotification - timed out fetching delivered notifications, keeping sound"];
+        return;
+    }
+
+    if (groupAlreadyDisplayed) {
+        [CPLog info:@"silenceSoundForGroupedNotification - group already displayed, removing sound"];
+        replacementContent.sound = nil;
+    } else {
+        [CPLog info:@"silenceSoundForGroupedNotification - no group displayed, keeping sound"];
+    }
+}
+
 #pragma mark - recieved notifications from the Extension.
 - (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent {
     [CPLog debug:@"didReceiveNotificationExtensionRequest"];
@@ -4954,6 +5007,9 @@ static id isNil(id object) {
 
     // badge count
     [self updateBadge:replacementContent];
+
+    // grouped notifications sound
+    [self silenceSoundForGroupedNotification:replacementContent];
 
     // rich notifications
     if (notification != nil) {
