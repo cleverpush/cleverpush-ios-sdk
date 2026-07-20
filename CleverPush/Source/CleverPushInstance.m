@@ -82,7 +82,6 @@ static BOOL autoResubscribe = NO;
 static BOOL isShowDraft = NO;
 static BOOL isSubscriptionChanged = NO;
 static BOOL incrementBadge = NO;
-static CPGroupNotificationSoundMode groupNotificationSoundMode = CPGroupNotificationSoundModeAllNotifications;
 static BOOL showNotificationsInForeground = YES;
 static BOOL isDisplayAlertEnabledForNotifications = YES;
 static BOOL isSoundEnabledForNotifications = YES;
@@ -4462,8 +4461,6 @@ static id isNil(id object) {
 
 #pragma mark - Grouped notifications sound mode
 - (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
-    groupNotificationSoundMode = mode;
-
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
     [userDefaults setInteger:mode forKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
     [userDefaults synchronize];
