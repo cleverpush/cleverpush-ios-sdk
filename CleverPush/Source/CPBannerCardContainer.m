@@ -12,6 +12,8 @@
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
 #import "CPLog.h"
+#import "CPUtils.h"
+#import "CPBorderObserver.h"
 
 @implementation CPBannerCardContainer
 @synthesize delegate;
@@ -42,6 +44,13 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (self.data.type == CPAppBannerTypeFull) {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+        [self updateTableViewContentInset];
+        return;
+    }
+
     CGRect frame = self.tblCPBanner.frame;
     CGFloat maxHeight = [CPUtils frameHeightWithoutSafeArea] - 50;
     CGFloat contentHeight = self.tblCPBanner.contentSize.height;
@@ -73,13 +82,18 @@
     } else {
         frame.size.height = contentHeight;
     }
+    if (frame.size.height < 0) {
+        frame.size.height = 0;
+    }
     self.tblCPBanner.frame = frame;
-    self.tblCPBannerHeightConstraint.constant = frame.size.height;
+    CGFloat bannerHeight = MAX(0.0, frame.size.height);
+    self.tblCPBannerHeightConstraint.constant = bannerHeight;
     if (self.data.carouselEnabled || self.data.closeButtonEnabled) {
-        self.tblCPBannerHeightConstraint.constant = frame.size.height - 20;
+        CGFloat adjustedHeight = bannerHeight - 20.0;
         if (self.data.closeButtonPositionStaticEnabled) {
-            self.tblCPBannerHeightConstraint.constant = frame.size.height - 40;
+            adjustedHeight = bannerHeight - 40.0;
         }
+        self.tblCPBannerHeightConstraint.constant = MAX(0.0, adjustedHeight);
     }
     [self updateTableViewContentInset];
 }
@@ -240,36 +254,47 @@
             imageUrl = block.imageUrl;
         }
 
-        if (imageUrl != nil && ![imageUrl isKindOfClass:[NSNull class]]) {
-            cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
-            [cell.activitydata startAnimating];
-            if (@available(iOS 13.0, *)) {
-                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
-            } else {
-                cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
-            }
-
-            // Check cache first
-            UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:imageUrl];
-            if (cachedImage) {
-                cell.imgCPBanner.image = cachedImage;
-                [cell.activitydata stopAnimating];
-                [UIView performWithoutAnimation:^{
-                    [cell setNeedsLayout];
-                    [cell layoutIfNeeded];
-                }];
-            } else {
-                [cell.imgCPBanner setImageWithURL:[NSURL URLWithString:imageUrl] callback:^(BOOL callback) {
-                    if (callback) {
-                        [UIView performWithoutAnimation:^{
-                            [cell setNeedsLayout];
-                            [cell layoutIfNeeded];
-                            [cell.activitydata stopAnimating];
-                        }];
-                    }
-                }];
-            }
+        NSURL *url = [CPUtils normalizedImageURLFromString:imageUrl];
+        if (!url) {
+            cell.imgCPBanner.image = nil;
+            [cell.activitydata stopAnimating];
+            return cell;
         }
+
+        cell.imgCPBanner.image = nil;
+        cell.activitydata.transform = CGAffineTransformMakeScale(1, 1);
+        [cell.activitydata startAnimating];
+        if (@available(iOS 13.0, *)) {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
+        } else {
+            cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        }
+
+        NSString *cacheKey = [CPUtils imageCacheKeyForURLString:imageUrl];
+        UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
+        if (cachedImage) {
+            cell.imgCPBanner.image = cachedImage;
+            [cell.activitydata stopAnimating];
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+            }];
+        }
+        BOOL hasCachedImage = (cachedImage != nil);
+        __weak typeof(self) weakSelf = self;
+        [cell.imgCPBanner setImageWithURL:url callback:^(BOOL callback) {
+            [UIView performWithoutAnimation:^{
+                [cell setNeedsLayout];
+                [cell layoutIfNeeded];
+                [cell.activitydata stopAnimating];
+            }];
+            if (callback && !hasCachedImage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.tblCPBanner beginUpdates];
+                    [weakSelf.tblCPBanner endUpdates];
+                });
+            }
+        }];
         return cell;
     } else if (self.blocks[indexPath.row].type == CPAppBannerBlockTypeButton) {
         CPButtonBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPButtonBlockCell" forIndexPath:indexPath];
@@ -292,11 +317,12 @@
         [cell.btnCPBanner setTitleColor:titleColor forState:UIControlStateNormal];
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:fontSize]];
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:resolvedFamily size:fontSize]];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for button block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for button block: %@", block.fontFamilyIos ?: block.family];
             }
             [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
         }
@@ -332,6 +358,20 @@
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
+
+        CGFloat borderWidth = (CGFloat)block.borderWidth * 0.6;
+        UIColor *borderColor;
+        if (block.borderColor != nil && ![block.borderColor isEqualToString:@""]) {
+            borderColor = [UIColor colorWithHexString:block.borderColor];
+        } else {
+            borderColor = [UIColor whiteColor];
+        }
+        [CPBorderObserver applyBorderToView:cell.btnCPBanner
+                                      width:borderWidth
+                                      color:borderColor
+                                      style:block.borderStyle
+                               cornerRadius:cell.btnCPBanner.layer.cornerRadius];
+
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         cell.btnCPBanner.titleLabel.numberOfLines = 0;
         cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -371,11 +411,7 @@
         CPTextBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPTextBlockCell" forIndexPath:indexPath];
         CPAppBannerTextBlock *block = (CPAppBannerTextBlock*) self.blocks[indexPath.row];
 
-        cell.txtCPBanner.text = block.text;
         cell.txtCPBanner.numberOfLines = 0;
-        if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
-            cell.txtCPBanner.text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
-        }
 
         UIColor *textColor;
         if ([self.data darkModeEnabled:self.tblCPBanner.traitCollection] && block.darkColor != nil) {
@@ -383,31 +419,64 @@
         } else {
             textColor = [UIColor colorWithHexString:block.color];
         }
-        cell.txtCPBanner.textColor = textColor;
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.txtCPBanner setFont:[UIFont fontWithName:block.family size:fontSize]];
+        UIFont *font;
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            font = [UIFont fontWithName:resolvedFamily size:fontSize];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for text block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for text block: %@", block.fontFamilyIos ?: block.family];
             }
-            [cell.txtCPBanner setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
+            font = [UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold];
+        }
+
+        NSTextAlignment textAlignment;
+        switch (block.alignment) {
+            case CPAppBannerAlignmentRight:
+                textAlignment = NSTextAlignmentRight;
+                break;
+            case CPAppBannerAlignmentLeft:
+                textAlignment = NSTextAlignmentLeft;
+                break;
+            case CPAppBannerAlignmentCenter:
+            default:
+                textAlignment = NSTextAlignmentCenter;
+                break;
+        }
+
+        cell.txtCPBanner.textAlignment = textAlignment;
+        cell.txtCPBanner.font = font;
+        cell.txtCPBanner.textColor = textColor;
+        
+        if (![CPUtils isNullOrEmpty:block.html]) {
+            NSString *htmlToRender = block.html;
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                htmlToRender = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.html];
+            }
+            
+            NSAttributedString *attributedString = [CPUtils attributedStringFromHTML:htmlToRender font:font textColor:textColor textAlignment:textAlignment];
+            if (attributedString != nil) {
+                cell.txtCPBanner.attributedText = attributedString;
+            } else {
+                NSString *fallbackText = block.text;
+                if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                    fallbackText = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
+                }
+                cell.txtCPBanner.text = fallbackText;
+            }
+        } else {
+            NSString *text = block.text;
+            if (self.voucherCode != nil && ![self.voucherCode isKindOfClass:[NSNull class]] && ![self.voucherCode isEqualToString:@""]) {
+                text = [CPUtils replaceString:@"{voucherCode}" withReplacement:self.voucherCode inString:block.text];
+            }
+            cell.txtCPBanner.text = text;
         }
 
         [cell.txtCPBanner setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
         cell.txtCPBanner.translatesAutoresizingMaskIntoConstraints = false;
-        switch (block.alignment) {
-            case CPAppBannerAlignmentRight:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentRight;
-                break;
-            case CPAppBannerAlignmentLeft:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentLeft;
-                break;
-            case CPAppBannerAlignmentCenter:
-                cell.txtCPBanner.textAlignment = NSTextAlignmentCenter;
-                break;
-        }
+        
         return cell;
     } else {
         CPHTMLBlockCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CPHTMLBlockCell" forIndexPath:indexPath];
@@ -491,7 +560,15 @@
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
-            [CPUtils openSafari:action.url dismissViewController:self.controller];
+            if (((CPAppBannerViewController *)self.controller).windowDismissBlock) {
+                NSURL *url = action.url;
+                [self onDismiss];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [CPUtils openSafari:url];
+                });
+            } else {
+                [CPUtils openSafari:action.url dismissViewController:self.controller];
+            }
         } else {
             [CPUtils openSafari:action.url];
         }
@@ -503,7 +580,6 @@
         }
     } else if (action.dismiss) {
         [self onDismiss];
-        [CPAppBannerModule showNextActivePendingBanner:self.data];
     } else {
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
@@ -535,14 +611,18 @@
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        if (self.handleBannerClosed) {
-            self.handleBannerClosed();
-        }
-        [self.controller dismissViewControllerAnimated:NO completion:nil];
-    });
+    if ([self.controller respondsToSelector:@selector(onDismiss)]) {
+        [self.controller onDismiss];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (self.handleBannerClosed) {
+                self.handleBannerClosed();
+            }
+            [self.controller dismissViewControllerAnimated:NO completion:nil];
+        });
+    }
 }
 
 #pragma mark - setting up the popup shadow
@@ -595,6 +675,21 @@
         if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
             self.tblviewTopBannerConstraint.constant = 25;
         }
+    }
+
+    if (self.data.type == CPAppBannerTypeFull) {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityDefaultLow;
+        if (self.data.marginEnabled) {
+            self.topViewBannerConstraint.constant = 0;
+        } else {
+            UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+            self.topViewBannerConstraint.constant = window.safeAreaInsets.top;
+        }
+        self.btnCloseTrailingConstraint.constant = self.btnCloseTopConstraint.constant;
+    } else {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityRequired;
+        self.topViewBannerConstraint.constant = 0;
+        self.btnCloseTrailingConstraint.constant = 10;
     }
 }
 

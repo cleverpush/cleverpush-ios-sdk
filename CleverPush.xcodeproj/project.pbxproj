@@ -32,6 +32,10 @@
 		2905218B276B8BC600D81148 /* CleverPushInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65C52757763B0087AC49 /* CleverPushInstance.m */; };
 		2905218C276B8C6500D81148 /* CPAppBannerModuleInstance.h in Headers */ = {isa = PBXBuildFile; fileRef = CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */; };
 		2905218D276B8C6700D81148 /* CPAppBannerModuleInstance.m in Sources */ = {isa = PBXBuildFile; fileRef = CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */; };
+
+		AA00002100000000000000AA /* CPAppBannerPassthroughView.h in Headers */ = {isa = PBXBuildFile; fileRef = AA00002000000000000000AA /* CPAppBannerPassthroughView.h */; };
+		AA00002200000000000000AA /* CPAppBannerPassthroughView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA00002300000000000000AA /* CPAppBannerPassthroughView.m */; };
+		AA00002400000000000000AA /* CPAppBannerPassthroughView.m in Sources */ = {isa = PBXBuildFile; fileRef = AA00002300000000000000AA /* CPAppBannerPassthroughView.m */; };
 		2906A0992585546F0078FD61 /* CPAppBannerModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 2986766F2572CC340002E9F1 /* CPAppBannerModule.h */; };
 		2906A1022585575D0078FD61 /* CPAppBanner.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676B52572CFE50002E9F1 /* CPAppBanner.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */ = {isa = PBXBuildFile; fileRef = 298676CA2572CFFF0002E9F1 /* CPAppBannerDismissType.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -50,6 +54,9 @@
 		2906A2C625857E680078FD61 /* CPUIBlockButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2906A2C525857E680078FD61 /* CPUIBlockButton.m */; };
 		2906A2C725857E680078FD61 /* CPUIBlockButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 2906A2C525857E680078FD61 /* CPUIBlockButton.m */; };
 		2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 2906A2D025857E900078FD61 /* CPUIBlockButton.h */; };
+		CB000000000000000000A003 /* CPBorderObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = CB000000000000000000A001 /* CPBorderObserver.m */; };
+		CB000000000000000000A004 /* CPBorderObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = CB000000000000000000A001 /* CPBorderObserver.m */; };
+		CB000000000000000000A005 /* CPBorderObserver.h in Headers */ = {isa = PBXBuildFile; fileRef = CB000000000000000000A002 /* CPBorderObserver.h */; };
 		2907D0F5286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */ = {isa = PBXBuildFile; fileRef = 2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */; };
 		2907D0F6286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m in Sources */ = {isa = PBXBuildFile; fileRef = 2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */; };
 		2907D0F8286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h in Headers */ = {isa = PBXBuildFile; fileRef = 2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */; };
@@ -242,6 +249,7 @@
 		93D458332B3598C4000F4A80 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458322B3598C4000F4A80 /* ImageIO.framework */; };
 		93D458352B3599D9000F4A80 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93D458342B3599D9000F4A80 /* MobileCoreServices.framework */; };
 		93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */; };
+
 		93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */; };
 		93DACB1E2959651900177B08 /* CPImageBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */; };
 		93DACB1F2959651900177B08 /* CPHTMLBlockCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CB73FF86272C3E060099B648 /* CPHTMLBlockCell.xib */; };
@@ -428,6 +436,8 @@
 		290187F527C1020200535617 /* CleverPushUserDefaults.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CleverPushUserDefaults.h; sourceTree = "<group>"; };
 		2906A2C525857E680078FD61 /* CPUIBlockButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPUIBlockButton.m; sourceTree = "<group>"; };
 		2906A2D025857E900078FD61 /* CPUIBlockButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPUIBlockButton.h; sourceTree = "<group>"; };
+		CB000000000000000000A001 /* CPBorderObserver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPBorderObserver.m; sourceTree = "<group>"; };
+		CB000000000000000000A002 /* CPBorderObserver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPBorderObserver.h; sourceTree = "<group>"; };
 		2907D0F4286E13BB00C7C4E0 /* NSMutableArray+ContainsString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+ContainsString.m"; sourceTree = "<group>"; };
 		2907D0F7286E13EE00C7C4E0 /* NSMutableArray+ContainsString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+ContainsString.h"; sourceTree = "<group>"; };
 		2913D82C25141324002BA52C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.16.sdk/System/iOSSupport/System/Library/Frameworks/WebKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -621,6 +631,9 @@
 		CB1B65F9275780260087AC49 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerModuleInstance.h; sourceTree = "<group>"; };
 		CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerModuleInstance.m; sourceTree = "<group>"; };
+
+		AA00002000000000000000AA /* CPAppBannerPassthroughView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerPassthroughView.h; sourceTree = "<group>"; };
+		AA00002300000000000000AA /* CPAppBannerPassthroughView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerPassthroughView.m; sourceTree = "<group>"; };
 		CB73FF82272C3D850099B648 /* CPBannerCardContainer.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPBannerCardContainer.xib; sourceTree = "<group>"; };
 		CB73FF83272C3D920099B648 /* CPButtonBlockCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPButtonBlockCell.xib; sourceTree = "<group>"; };
 		CB73FF86272C3E060099B648 /* CPHTMLBlockCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPHTMLBlockCell.xib; sourceTree = "<group>"; };
@@ -641,6 +654,7 @@
 		CB73FFA7272C44610099B648 /* CPAppBannerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPAppBannerViewController.h; sourceTree = "<group>"; };
 		CB73FFA8272C44610099B648 /* CPAppBannerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerViewController.m; sourceTree = "<group>"; };
 		CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CPAppBannerViewController.xib; sourceTree = "<group>"; };
+
 		CB79117B2667558F00253F9F /* CPAppBannerHTMLBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPAppBannerHTMLBlock.h; sourceTree = "<group>"; };
 		CB79117C2667558F00253F9F /* CPAppBannerHTMLBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CPAppBannerHTMLBlock.m; sourceTree = "<group>"; };
 		CB8129ED267B6F3B002B8A3D /* CPWKWebView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPWKWebView.h; sourceTree = "<group>"; };
@@ -875,6 +889,7 @@
 			isa = PBXGroup;
 			children = (
 				CB73FFAC272C44720099B648 /* CPAppBannerViewController.xib */,
+
 				CB73FF88272C3E200099B648 /* CPTextBlockCell.xib */,
 				CB73FF87272C3E150099B648 /* CPImageBlockCell.xib */,
 				CB73FF86272C3E060099B648 /* CPHTMLBlockCell.xib */,
@@ -935,6 +950,9 @@
 				298676702572CC400002E9F1 /* CPAppBannerModule.m */,
 				CB1B65FB2757815C0087AC49 /* CPAppBannerModuleInstance.h */,
 				CB1B65FC2757815C0087AC49 /* CPAppBannerModuleInstance.m */,
+
+				AA00002000000000000000AA /* CPAppBannerPassthroughView.h */,
+				AA00002300000000000000AA /* CPAppBannerPassthroughView.m */,
 				93DBD4182C37C65A001CB7ED /* CPAppBannerNotificationPermission.h */,
 				298676E02572D0340002E9F1 /* CPAppBannerStatus.h */,
 				298676E12572D0400002E9F1 /* CPAppBannerStopAtType.h */,
@@ -982,6 +1000,8 @@
 				29D9052B25698B7F002D6F9E /* CPTranslate.m */,
 				2906A2D025857E900078FD61 /* CPUIBlockButton.h */,
 				2906A2C525857E680078FD61 /* CPUIBlockButton.m */,
+				CB000000000000000000A002 /* CPBorderObserver.h */,
+				CB000000000000000000A001 /* CPBorderObserver.m */,
 				298F4FC225002DA400F086D3 /* CPUtils.h */,
 				298F4FC025002D6700F086D3 /* CPUtils.m */,
 				CB88F8FE262FE91E0037787E /* CPWKWebKitView.h */,
@@ -1239,12 +1259,15 @@
 				CBA989A22679D61F003DE995 /* CPStoriesController.h in Headers */,
 				935A5F172AE64FB7007A3F7F /* CPSQLiteManager.h in Headers */,
 				2906A2D125857E910078FD61 /* CPUIBlockButton.h in Headers */,
+				CB000000000000000000A005 /* CPBorderObserver.h in Headers */,
 				2906A10B258557610078FD61 /* CPAppBannerDismissType.h in Headers */,
 				9310FD682A602D1F004B400B /* CPInboxDetailView.h in Headers */,
 				29AD0C5C26682A92009E10D0 /* CPAppBannerHTMLBlock.h in Headers */,
 				CBA989B32679D664003DE995 /* CPWidgetPosition.h in Headers */,
 				2906A16D258557C20078FD61 /* CPAppBannerImageBlock.h in Headers */,
 				2905218C276B8C6500D81148 /* CPAppBannerModuleInstance.h in Headers */,
+
+				AA00002100000000000000AA /* CPAppBannerPassthroughView.h in Headers */,
 				93C8FA3E2C5B924F00300B69 /* CPStoryWidgetCloseButtonPosition.h in Headers */,
 				290187F627C1020200535617 /* CleverPushUserDefaults.h in Headers */,
 			);
@@ -1465,6 +1488,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93DACB1C2959651900177B08 /* CPAppBannerViewController.xib in Resources */,
+
 				937390BB2BAD87A000ADFA78 /* PrivacyInfo.xcprivacy in Resources */,
 				93DACB1D2959651900177B08 /* CPTextBlockCell.xib in Resources */,
 				939E9C702CE76E5500DE7293 /* CPStoryPlayerHtmlContent.html in Resources */,
@@ -1556,6 +1580,8 @@
 				CBA989A52679D628003DE995 /* CPWidgetModule.m in Sources */,
 				291FCECA252B65E200F5185E /* DWAlertPresentationController.m in Sources */,
 				2905218D276B8C6700D81148 /* CPAppBannerModuleInstance.m in Sources */,
+
+				AA00002200000000000000AA /* CPAppBannerPassthroughView.m in Sources */,
 				298F4FC525002F1F00F086D3 /* CPUtils.m in Sources */,
 				297B4E291E58A16600BAF990 /* CleverPushHTTPClient.m in Sources */,
 				CB73FF92272C3E8A0099B648 /* CPButtonBlockCell.m in Sources */,
@@ -1598,6 +1624,7 @@
 				29DC4AC4218208730051F6E9 /* UIApplicationDelegate+CleverPush.m in Sources */,
 				29BB7E2128F5A19F0022426E /* NSString+VersionComparator.m in Sources */,
 				2906A2C625857E680078FD61 /* CPUIBlockButton.m in Sources */,
+				CB000000000000000000A003 /* CPBorderObserver.m in Sources */,
 				297810C52573E44B0083D1A6 /* CPAppBannerBackground.m in Sources */,
 				297810CE2573E44D0083D1A6 /* CPAppBannerButtonBlock.m in Sources */,
 				29DB578623D4D61F0040E823 /* CPNotificationCategoryController.m in Sources */,
@@ -1649,6 +1676,8 @@
 				296A134325BE128700A2BEED /* CPSubscription.m in Sources */,
 				296A136225BE16CF00A2BEED /* CPChannelTag.m in Sources */,
 				CB1B65FD2757815C0087AC49 /* CPAppBannerModuleInstance.m in Sources */,
+
+				AA00002400000000000000AA /* CPAppBannerPassthroughView.m in Sources */,
 				296068902574452B002159D0 /* CPAspectKeepImageView.m in Sources */,
 				29D22E71252C8E7500977567 /* CPIntrinsicTableView.m in Sources */,
 				CB73FF95272C3E970099B648 /* CPHTMLBlockCell.m in Sources */,
@@ -1682,6 +1711,7 @@
 				291FCD282525DC2800F5185E /* DWActionsStackView.m in Sources */,
 				298676712572CC400002E9F1 /* CPAppBannerModule.m in Sources */,
 				2906A2C725857E680078FD61 /* CPUIBlockButton.m in Sources */,
+				CB000000000000000000A004 /* CPBorderObserver.m in Sources */,
 				CB1B65C62757763B0087AC49 /* CleverPushInstance.m in Sources */,
 				296D0AD7257460E800531EFF /* UIControl+CPBlockActions.m in Sources */,
 				29DB95F823FC33D6008FC985 /* CleverPushHTTPClient.m in Sources */,
@@ -2169,7 +2199,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -2225,7 +2255,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = KWJDGZUQ72;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

@@ -255,11 +255,13 @@ CPNotificationClickBlock handleClick;
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
+
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
@@ -341,7 +343,7 @@ CPNotificationClickBlock handleClick;
             }
 
             if (action && [action.type isEqualToString:@"url"] && action.url != nil && action.openBySystem) {
-                [[UIApplication sharedApplication] openURL:action.url options:@{} completionHandler:nil];
+                [CPUtils tryOpenURL:action.url];
             }
 
             if (action && [action.type isEqualToString:@"subscribe"]) {
@@ -432,6 +434,11 @@ CPNotificationClickBlock handleClick;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: CPInboxView getBanners: channelId is nil or empty, skipping API call"];
+        return;
+    }
+
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
 
     if ([CleverPush isDevelopmentModeEnabled]) {
@@ -462,7 +469,10 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
-
+    if ([CPUtils isNullOrEmpty:banner.channel]) {
+        [CPLog error:@"CleverPush: CPInboxView sendBannerEvent: channelId is nil or empty, skipping API call"];
+        return;
+    }
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
 

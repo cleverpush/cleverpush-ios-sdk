@@ -1,5 +1,6 @@
 #import "CPAppBannerButtonBlock.h"
 #import "NSDictionary+SafeExpectations.h"
+#import "CPUtils.h"
 
 @implementation CPAppBannerButtonBlock
 #pragma mark - wrapping the data of the Banner Button Block in to CPAppBannerButtonBlock NSObject
@@ -26,6 +27,11 @@
 
         if ([json cleverPushStringForKey:@"family"] && ![[json cleverPushStringForKey:@"family"] isEqual:@""]) {
             self.family = [json cleverPushStringForKey:@"family"];
+        }
+
+        NSString *fontFamilyIos = [json cleverPushStringForKey:@"fontFamilyIos"];
+        if (![CPUtils isNullOrEmpty:fontFamilyIos]) {
+            self.fontFamilyIos = fontFamilyIos;
         }
 
         if ([json cleverPushStringForKey:@"background"] && ![[json cleverPushStringForKey:@"background"] isEqual:@""]) {
@@ -57,6 +63,21 @@
         self.id = @"";
         if ([json objectForKey:@"id"]) {
             self.id = [json objectForKey:@"id"];
+        }
+
+        self.borderWidth = 0;
+        if ([json objectForKey:@"borderWidth"]) {
+            self.borderWidth = [[json cleverPushNumberForKey:@"borderWidth"] intValue];
+        }
+        
+        self.borderColor = @"";
+        if ([json cleverPushStringForKey:@"borderColor"]) {
+            self.borderColor = [json cleverPushStringForKey:@"borderColor"];
+        }
+
+        self.borderStyle = @"";
+        if ([json cleverPushStringForKey:@"borderStyle"]) {
+            self.borderStyle = [json cleverPushStringForKey:@"borderStyle"];
         }
         
         NSMutableDictionary *buttonBlockDic = [[NSMutableDictionary alloc] init];

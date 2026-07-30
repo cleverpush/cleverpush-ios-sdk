@@ -19,10 +19,12 @@
 + (NSDate*)getLastTopicCheckedTime;
 + (NSString *)hexStringFromColor:(UIColor *)color;
 + (BOOL)fontFamilyExists:(NSString*)fontFamily;
++ (NSString *)resolvedFontFamilyWithPlatformFamily:(NSString*)platformFontFamily fallbackFamily:(NSString*)fallbackFontFamily;
 + (BOOL)isEmpty:(id)thing;
 + (void)openSafari:(NSURL*)URL;
 + (CGFloat)frameHeightWithoutSafeArea;
 + (void)openSafari:(NSURL*)URL dismissViewController:(UIViewController*)controller;
++ (UIModalPresentationStyle)appBannerPresentationStyleForPresenter:(UIViewController*)presenter;
 + (void)handleLinkBySystem:(NSString*)urlString;
 + (NSString*)deviceName;
 + (void)updateLastTimeAutomaticallyShowed;
@@ -52,10 +54,10 @@
 + (NSString *)getQueryParameterFromURL:(NSURL *)url forKey:(NSString *)key;
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions* )connectionOptions  API_AVAILABLE(ios(13.0));
 + (UIImage *)resizedImageNamed:(NSString *)imageName withSize:(CGSize)newSize;
-
-/**
- * Returns a shared NSCache instance for caching images across the app
- */
 + (NSCache *)sharedImageCache;
++ (NSURL *)normalizedImageURLFromString:(NSString *)urlString;
++ (NSString *)imageCacheKeyForURLString:(NSString *)urlString;
++ (UIImage *)decodedImageWithData:(NSData *)data;
++ (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment;
 
 @end

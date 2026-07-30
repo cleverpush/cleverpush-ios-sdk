@@ -32,6 +32,60 @@ static NSMutableSet<Class>* swizzledClasses;
     return delegateClass;
 }
 
++ (BOOL)classDefinesSelector:(SEL)sel directlyOnClass:(Class)cls {
+    unsigned int count = 0;
+    Method *methods = class_copyMethodList(cls, &count);
+    BOOL found = NO;
+    for (unsigned int i = 0; i < count; i++) {
+        if (method_getName(methods[i]) == sel) {
+            found = YES;
+            break;
+        }
+    }
+    free(methods);
+    return found;
+}
+
++ (void)injectSilentNotificationHandlerInto:(Class)delegateClass {
+    SEL targetSel = @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:);
+    SEL cpSel     = @selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:);
+    Class cpClass = [CleverPushAppDelegate class];
+
+    if ([CleverPushAppDelegate classDefinesSelector:targetSel directlyOnClass:delegateClass]) {
+        injectSelector(delegateClass, targetSel, cpClass, cpSel);
+        return;
+    }
+
+    Method inheritedMeth = class_getInstanceMethod(delegateClass, targetSel);
+    if (inheritedMeth) {
+        class_addMethod(delegateClass,
+                        targetSel,
+                        method_getImplementation(inheritedMeth),
+                        method_getTypeEncoding(inheritedMeth));
+    }
+    injectSelector(delegateClass, targetSel, cpClass, cpSel);
+}
+
++ (void)injectLaunchOptionsHandlerInto:(Class)delegateClass {
+    SEL targetSel = @selector(application:didFinishLaunchingWithOptions:);
+    SEL cpSel     = @selector(cleverPushReceivedDidFinishLaunching:launchOptions:);
+    Class cpClass = [CleverPushAppDelegate class];
+
+    if ([CleverPushAppDelegate classDefinesSelector:targetSel directlyOnClass:delegateClass]) {
+        injectSelector(delegateClass, targetSel, cpClass, cpSel);
+        return;
+    }
+
+    Method inheritedMeth = class_getInstanceMethod(delegateClass, targetSel);
+    if (inheritedMeth) {
+        class_addMethod(delegateClass,
+                        targetSel,
+                        method_getImplementation(inheritedMeth),
+                        method_getTypeEncoding(inheritedMeth));
+    }
+    injectSelector(delegateClass, targetSel, cpClass, cpSel);
+}
+
 - (void)setCleverPushDelegate:(id<UIApplicationDelegate>)delegate {
     if (swizzledClasses == nil) {
         swizzledClasses = [NSMutableSet new];
@@ -47,7 +101,8 @@ static NSMutableSet<Class>* swizzledClasses;
     Class newClass = [CleverPushAppDelegate class];
     delegateClass = [delegate class];
 
-    injectSelector(delegateClass, @selector(application:didReceiveRemoteNotification:fetchCompletionHandler:), newClass, @selector(cleverPushReceivedSilentRemoteNotification:UserInfo:fetchCompletionHandler:));
+    [CleverPushAppDelegate injectSilentNotificationHandlerInto:delegateClass];
+    [CleverPushAppDelegate injectLaunchOptionsHandlerInto:delegateClass];
 
     [CleverPushAppDelegate injectPreiOS10MethodsPhase1];
 
@@ -122,6 +177,21 @@ static NSMutableSet<Class>* swizzledClasses;
     if ([self respondsToSelector:@selector(cleverPushReceivedRemoteNotification:userInfo:)]) {
         [self cleverPushReceivedRemoteNotification:application userInfo:userInfo];
     }
+}
+
+- (BOOL)cleverPushReceivedDidFinishLaunching:(UIApplication *)application
+                               launchOptions:(NSDictionary *)launchOptions {
+    BOOL result = YES;
+    if ([self respondsToSelector:@selector(cleverPushReceivedDidFinishLaunching:launchOptions:)]) {
+        result = [self cleverPushReceivedDidFinishLaunching:application launchOptions:launchOptions];
+    }
+    NSDictionary *remoteNotif = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (remoteNotif && [CleverPush channelId]) {
+        [CleverPush handleSilentNotificationReceived:application
+                                            UserInfo:remoteNotif
+                                   completionHandler:nil];
+    }
+    return result;
 }
 
 - (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {

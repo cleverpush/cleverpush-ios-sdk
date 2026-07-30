@@ -15,9 +15,13 @@
 @property (nonatomic, strong) NSString *background;
 @property (nonatomic, strong) NSString *darkBackground;
 @property (nonatomic, strong) NSString *family;
+@property (nonatomic, strong) NSString *fontFamilyIos;
 @property (nonatomic, strong) NSString *id;
+@property (nonatomic, strong) NSString *borderColor;
+@property (nonatomic, strong) NSString *borderStyle;
 @property (nonatomic) int size;
 @property (nonatomic) int radius;
+@property (nonatomic) int borderWidth;
 @property (assign) BOOL isButtonClicked;
 
 #pragma mark - Class Methods

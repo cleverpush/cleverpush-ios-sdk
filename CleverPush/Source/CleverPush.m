@@ -33,7 +33,10 @@ static CleverPush* singleInstance = nil;
 #pragma mark - Singleton shared instance of the cleverpush.
 
 + (CleverPushInstance*)CPSharedInstance {
-    if (singletonInstance == nil) singletonInstance = [[CleverPushInstance alloc] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        singletonInstance = [[CleverPushInstance alloc] init];
+    });
     return singletonInstance;
 }
 
@@ -225,6 +228,22 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAppBannerTrackingEnabled:enabled];
 }
 
++ (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    [self.CPSharedInstance setAppBannersNonBlocking:nonBlocking];
+}
+
++ (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    [self.CPSharedInstance clearBannerDeliveryDate:bannerId];
+}
+
++ (void)clearAllBannerDeliveryDates {
+    [self.CPSharedInstance clearAllBannerDeliveryDates];
+}
+
++ (BOOL)getAppBannersNonBlocking {
+    return [self.CPSharedInstance getAppBannersNonBlocking];
+}
+
 + (BOOL)popupVisible {
     return [self.CPSharedInstance popupVisible];
 }
@@ -239,6 +258,22 @@ static CleverPush* singleInstance = nil;
 
 + (void)syncSubscription {
     [self.CPSharedInstance syncSubscription];
+}
+
++ (void)markSubscriptionAsTest {
+    [self.CPSharedInstance markSubscriptionAsTest];
+}
+
++ (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance markSubscriptionAsTestOnSuccess:successBlock onFailure:failureBlock];
+}
+
++ (void)unmarkSubscriptionAsTest {
+    [self.CPSharedInstance unmarkSubscriptionAsTest];
+}
+
++ (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance unmarkSubscriptionAsTestOnSuccess:successBlock onFailure:failureBlock];
 }
 
 + (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken {
@@ -350,6 +385,22 @@ static CleverPush* singleInstance = nil;
     }];
 }
 
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId callback:^(NSString* callbackInner) {
+        if (callback) {
+            callback(callbackInner);
+        }
+    } onFailure:failureBlock];
+}
+
++ (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    [self.CPSharedInstance removeSubscriptionAttributes:attributeIds];
+}
+
 + (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token {
     [self.CPSharedInstance startLiveActivity:activityId pushToken:token];
 }
@@ -442,6 +493,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
     [self.CPSharedInstance setSubscriptionTopics:topics onSuccess:successBlock onFailure:failure];
+}
+
++ (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments {
+    [self.CPSharedInstance setPianoSegments:segments];
 }
 
 + (void)setBrandingColor:(UIColor* _Nullable)color {
@@ -718,6 +773,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getSubscriptionTopics];
 }
 
++ (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments {
+    return [self.CPSharedInstance getSubscriptionPianoSegments];
+}
+
 + (NSObject* _Nullable)getSubscriptionAttribute:(NSString* _Nullable)attributeId {
     return [self.CPSharedInstance getSubscriptionAttribute:attributeId];
 }
@@ -807,6 +866,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getUnsubscribeStatus];
 }
 
++ (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    [self.CPSharedInstance setHandleUrlFromSceneDelegate:handleFromSceneDelegate];
+}
+
 + (BOOL)getHandleUrlFromSceneDelegate {
     return [self.CPSharedInstance getHandleUrlFromSceneDelegate];
 }
@@ -831,6 +894,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeNotification:(NSString* _Nullable)notificationId {
     [self.CPSharedInstance removeNotification:notificationId];
+}
+
++ (void)removeAllNotifications {
+    [self.CPSharedInstance removeAllNotifications];
 }
 
 + (void)removeNotification:(NSString* _Nullable)notificationId removeFromNotificationCenter:(BOOL)removeFromCenter {

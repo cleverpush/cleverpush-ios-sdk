@@ -11,9 +11,11 @@
 #pragma mark - Class Variables
 @property (nonatomic) CPAppBannerAlignment alignment;
 @property (nonatomic, strong) NSString *text;
+@property (nonatomic, strong) NSString *html;
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic, strong) NSString *darkColor;
 @property (nonatomic, strong) NSString *family;
+@property (nonatomic, strong) NSString *fontFamilyIos;
 @property (nonatomic) int size;
 
 #pragma mark - Class Methods

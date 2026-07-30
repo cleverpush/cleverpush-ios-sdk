@@ -17,6 +17,7 @@
 @property (nonatomic, assign) BOOL topicsDialogShowUnsubscribe;
 @property (nonatomic, weak) id<ManageHeight> delegate;
 @property (nonatomic, assign) BOOL topicsDialogShowWhenNewAdded;
+@property (nonatomic, assign) BOOL topicsDialogBulkActions;
 
 #pragma mark - Class Methods
 - (id)initWithAvailableTopics:(NSArray*)topics selectedTopics:(NSArray*)userTopics hasSubscriptionTopics:(BOOL)hasTopics;

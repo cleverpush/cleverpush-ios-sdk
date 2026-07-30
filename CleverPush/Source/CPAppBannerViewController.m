@@ -360,6 +360,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
         } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
             [self.view setNeedsLayout];
             [self.view layoutIfNeeded];
+            if ([CleverPush getAppBannersNonBlocking]) {
+                [self updateHTMLBannerTouchableRects];
+            }
         }];
     } else {
         CGFloat currentWidth = [UIScreen mainScreen].bounds.size.width;
@@ -518,20 +521,22 @@ static CPAppBannerActionBlock appBannerActionCallback;
     } else if (self.data.type == CPAppBannerTypeBottom) {
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     } else {
-        cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
-        cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+        cell.topViewBannerConstraint.priority = UILayoutPriorityRequired;
+        cell.bottomViewBannerConstraint.priority = UILayoutPriorityRequired;
     }
 
-    [cell.tblCPBanner layoutIfNeeded];
-    [cell.tblCPBanner updateConstraintsIfNeeded];
-    [cell layoutIfNeeded];
     return cell;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
-    [((CPBannerCardContainer *)cell).tblCPBanner reloadData];
-    [cell setNeedsLayout];
-    [cell layoutIfNeeded];
+    CPBannerCardContainer *bannerCell = (CPBannerCardContainer *)cell;
+    
+    if ([bannerCell respondsToSelector:@selector(updateTableViewContentInset)]) {
+        [bannerCell updateTableViewContentInset];
+    }
+    
+    [bannerCell setNeedsLayout];
+    [bannerCell layoutIfNeeded];
 }
 
 #pragma mark - custom delegate when tapped on a button and it's action has been set to navigate on a next screen
@@ -568,34 +573,15 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if ([item.id isEqualToString:value]) {
             NSIndexPath *nextItem = [NSIndexPath indexPathForItem:i inSection:0];
             if (nextItem.row < self.data.screens.count) {
-                // Temporarily disable scrolling to prevent unwanted animations
-                BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
-                self.cardCollectionView.scrollEnabled = NO;
-                
-                // Update the page control first
+                self.index = i;
                 self.pageControl.currentPage = i;
                 [self pageControlCurrentIndex:i];
                 
-                if (self.data.carouselEnabled) {
-                    // Scroll with a smooth animation
-                    [UIView animateWithDuration:0.3 animations:^{
-                        [self.cardCollectionView scrollToItemAtIndexPath:nextItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-                        [self.cardCollectionView layoutIfNeeded];
-                    } completion:^(BOOL finished) {
-                        // Re-enable scrolling after animation completes
-                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-                    }];
-                } else {
-                    // For non-carousel mode, use a different approach
-                    [UIView animateWithDuration:0.3 animations:^{
-                        CGRect rect = [self.cardCollectionView layoutAttributesForItemAtIndexPath:nextItem].frame;
-                        [self.cardCollectionView scrollRectToVisible:rect animated:NO];
-                        [self.cardCollectionView layoutIfNeeded];
-                    } completion:^(BOOL finished) {
-                        // Re-enable scrolling after animation completes
-                        self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-                    }];
-                }
+                [self.cardCollectionView scrollToItemAtIndexPath:nextItem 
+                                                 atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally 
+                                                         animated:YES];
+                
+                [self ensureCurrentPageIsProperlyDisplayed:i];
                 break;
             }
         }
@@ -609,25 +595,17 @@ static CPAppBannerActionBlock appBannerActionCallback;
 
 - (void)navigateToPreviousPage {
     NSInteger previousIndex = self.index - 1;
-    if (previousIndex >= 0) {
-        // Temporarily disable scrolling to prevent unwanted animations
-        BOOL originalScrollEnabled = self.cardCollectionView.scrollEnabled;
-        self.cardCollectionView.scrollEnabled = NO;
-        
-        // Update the page control first
+    if (previousIndex >= 0 && previousIndex < self.data.screens.count) {
+        self.index = previousIndex;
         self.pageControl.currentPage = previousIndex;
         [self pageControlCurrentIndex:previousIndex];
         
         NSIndexPath *previousItem = [NSIndexPath indexPathForItem:previousIndex inSection:0];
+        [self.cardCollectionView scrollToItemAtIndexPath:previousItem 
+                                         atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally 
+                                                 animated:YES];
         
-        // Scroll with a smooth animation
-        [UIView animateWithDuration:0.3 animations:^{
-            [self.cardCollectionView scrollToItemAtIndexPath:previousItem atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-            [self.cardCollectionView layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            // Re-enable scrolling after animation completes
-            self.cardCollectionView.scrollEnabled = originalScrollEnabled;
-        }];
+        [self ensureCurrentPageIsProperlyDisplayed:previousIndex];
     }
 }
 
@@ -653,36 +631,51 @@ static CPAppBannerActionBlock appBannerActionCallback;
 }
 
 #pragma mark - UIScrollViewDelegate for UIPageControl
+- (NSInteger)calculateCurrentPage:(UIScrollView *)scrollView {
+    CGFloat pageWidth = scrollView.frame.size.width;
+    if (pageWidth == 0) {
+        return self.pageControl.currentPage;
+    }
+    
+    if (self.data.screens.count == 0) {
+        return 0;
+    }
+    
+    CGFloat centerX = scrollView.contentOffset.x + (pageWidth / 2.0);
+    NSInteger page = (NSInteger)(centerX / pageWidth);
+    
+    if (page < 0) {
+        page = 0;
+    } else if (page >= self.data.screens.count) {
+        page = self.data.screens.count - 1;
+    }
+    
+    return page;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    NSInteger currentPage = [self calculateCurrentPage:scrollView];
+    if (currentPage != self.pageControl.currentPage && currentPage >= 0 && currentPage < self.data.screens.count) {
+        self.pageControl.currentPage = currentPage;
+    }
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    CGFloat pageWidth = self.cardCollectionView.frame.size.width;
-    float currentPage = self.cardCollectionView.contentOffset.x / pageWidth;
-    
-    NSInteger page = round(currentPage);
-    
-    // Only update if the page has actually changed
-    if (page != self.pageControl.currentPage) {
-        // Update page control and index
+    NSInteger page = [self calculateCurrentPage:scrollView];
+    if (page >= 0 && page < self.data.screens.count) {
         self.pageControl.currentPage = page;
         self.index = page;
         [self pageControlCurrentIndex:page];
-        
-        // Ensure the current page is fully visible and properly laid out
         [self ensureCurrentPageIsProperlyDisplayed:page];
     }
 }
 
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
-    CGFloat pageWidth = self.cardCollectionView.frame.size.width;
-    NSInteger page = round(scrollView.contentOffset.x / pageWidth);
-    
-    // Only update if the page has actually changed
-    if (page != self.pageControl.currentPage) {
-        // Update page control and index
+    NSInteger page = [self calculateCurrentPage:scrollView];
+    if (page >= 0 && page < self.data.screens.count) {
         self.pageControl.currentPage = page;
         self.index = page;
         [self pageControlCurrentIndex:page];
-        
-        // Ensure the current page is fully visible and properly laid out
         [self ensureCurrentPageIsProperlyDisplayed:page];
     }
 }
@@ -696,10 +689,6 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (cell) {
             // Use performWithoutAnimation to prevent laggy updates
             [UIView performWithoutAnimation:^{
-                // Force the cell to update its layout
-                [cell.tblCPBanner reloadData];
-                
-                // Call methods if they are available
                 if ([cell respondsToSelector:@selector(updateTableViewContentInset)]) {
                     [cell updateTableViewContentInset];
                 }
@@ -835,7 +824,138 @@ static CPAppBannerActionBlock appBannerActionCallback;
     });
 }
 
+#pragma mark - HTML banner non-blocking touchable rect detection
+- (void)updateHTMLBannerTouchableRects {
+    if (![CleverPush getAppBannersNonBlocking]
+        || ![self.data.contentType isEqualToString:@"html"]
+        || self.webView == nil
+        || self.htmlTouchableRectsDidChangeBlock == nil) {
+        return;
+    }
+
+    NSString *script =
+    @"(function() {"
+    @"var selector = 'a, button, input, select, textarea, label, summary, [onclick], [role=\"button\"], [role=\"link\"], [data-action], [data-cp-action]';"
+    @"var interactiveNamePattern = /(button|btn|cta|link|close|submit|action|click)/i;"
+    @"var contentTags = /^(img|svg|canvas|video|audio|iframe)$/i;"
+    @"function colorHasAlpha(color) {"
+    @"if (!color || color === 'transparent') { return false; }"
+    @"var match = color.match(/rgba?\\(([^)]+)\\)/);"
+    @"if (!match) { return true; }"
+    @"var parts = match[1].split(',').map(function(part) { return part.trim(); });"
+    @"return parts.length < 4 || parseFloat(parts[3]) > 0;"
+    @"}"
+    @"var visualViewport = window.visualViewport;"
+    @"var viewportOffsetLeft = visualViewport ? visualViewport.offsetLeft : 0;"
+    @"var viewportOffsetTop = visualViewport ? visualViewport.offsetTop : 0;"
+    @"function nativeRectPayload(rect, tag, name, reason) {"
+    @"return { left: rect.left - viewportOffsetLeft, top: rect.top - viewportOffsetTop, width: rect.width, height: rect.height, tag: tag, name: name, reason: reason };"
+    @"}"
+    @"var elements = Array.prototype.slice.call(document.querySelectorAll('*'));"
+    @"var rects = [];"
+    @"var contentBounds = null;"
+    @"function addToContentBounds(rect) {"
+    @"if (!contentBounds) { contentBounds = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }; return; }"
+    @"contentBounds.left = Math.min(contentBounds.left, rect.left);"
+    @"contentBounds.top = Math.min(contentBounds.top, rect.top);"
+    @"contentBounds.right = Math.max(contentBounds.right, rect.right);"
+    @"contentBounds.bottom = Math.max(contentBounds.bottom, rect.bottom);"
+    @"}"
+    @"elements.forEach(function(el) {"
+    @"var style = window.getComputedStyle(el);"
+    @"if (!style || style.display === 'none' || style.visibility === 'hidden' || style.pointerEvents === 'none' || style.opacity === '0') { return; }"
+    @"var tag = (el.tagName || '').toLowerCase();"
+    @"var name = ((el.className && el.className.baseVal) || el.className || '') + ' ' + (el.id || '');"
+    @"var isInteractive = el.matches(selector) || typeof el.onclick === 'function' || style.cursor === 'pointer' || interactiveNamePattern.test(name);"
+    @"var hasVisibleContent = contentTags.test(tag) || (el.children.length === 0 && ((el.textContent || '').trim().length > 0));"
+    @"var borderWidth = parseFloat(style.borderTopWidth || '0') + parseFloat(style.borderRightWidth || '0') + parseFloat(style.borderBottomWidth || '0') + parseFloat(style.borderLeftWidth || '0');"
+    @"var hasVisualBox = colorHasAlpha(style.backgroundColor) || style.backgroundImage !== 'none' || borderWidth > 0 || style.boxShadow !== 'none';"
+    @"var rect = el.getBoundingClientRect();"
+    @"if (rect.width <= 0 || rect.height <= 0 || rect.bottom < 0 || rect.right < 0 || rect.top > window.innerHeight || rect.left > window.innerWidth) { return; }"
+    @"if ((tag === 'html' || tag === 'body') || (!isInteractive && rect.width >= window.innerWidth * 0.95 && rect.height >= window.innerHeight * 0.95)) { return; }"
+    @"var pseudoBefore = window.getComputedStyle(el, '::before');"
+    @"var pseudoAfter = window.getComputedStyle(el, '::after');"
+    @"var hasPseudoContent = (pseudoBefore && pseudoBefore.content && pseudoBefore.content !== 'none' && pseudoBefore.content !== 'normal') || (pseudoAfter && pseudoAfter.content && pseudoAfter.content !== 'none' && pseudoAfter.content !== 'normal');"
+    @"var looksLikeControl = rect.width >= 8 && rect.height >= 8 && rect.width <= 180 && rect.height <= 180 && (style.position === 'absolute' || style.position === 'fixed' || parseInt(style.zIndex, 10) > 0 || hasPseudoContent);"
+    @"if (!isInteractive && !hasVisibleContent && !hasVisualBox && !looksLikeControl) { return; }"
+    @"addToContentBounds(rect);"
+    @"var reason = isInteractive ? 'interactive' : (hasVisibleContent ? 'content' : (hasVisualBox ? 'visual' : 'control-candidate'));"
+    @"rects.push(nativeRectPayload(rect, tag, name.trim(), reason));"
+    @"});"
+    @"if (contentBounds) {"
+    @"rects.unshift({ left: contentBounds.left - viewportOffsetLeft, top: contentBounds.top - viewportOffsetTop, width: Math.max(0, contentBounds.right - contentBounds.left), height: Math.max(0, contentBounds.bottom - contentBounds.top), tag: 'content-bounds', name: '', reason: 'content-bounds' });"
+    @"var closeZoneTop = contentBounds.top - 240;"
+    @"var closeZoneHeight = Math.max(0, contentBounds.top - closeZoneTop + 80);"
+    @"rects.unshift({ left: window.innerWidth - 112 - viewportOffsetLeft, top: closeZoneTop - viewportOffsetTop, width: 112, height: closeZoneHeight, tag: 'html-close-zone', name: '', reason: 'html-close-zone' });"
+    @"}"
+    @"return JSON.stringify(rects);"
+    @"})();";
+
+    __weak typeof(self) weakSelf = self;
+    [self.webView evaluateJavaScript:script completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil || strongSelf.htmlTouchableRectsDidChangeBlock == nil) {
+            return;
+        }
+
+        if (error != nil || ![result isKindOfClass:[NSString class]]) {
+            strongSelf.htmlTouchableRectsDidChangeBlock(@[[NSValue valueWithCGRect:strongSelf.webView.bounds]]);
+            return;
+        }
+
+        NSData *data = [(NSString *)result dataUsingEncoding:NSUTF8StringEncoding];
+        NSArray *rectDictionaries = nil;
+        if (data != nil) {
+            rectDictionaries = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        }
+
+        if (![rectDictionaries isKindOfClass:[NSArray class]]) {
+            strongSelf.htmlTouchableRectsDidChangeBlock(@[[NSValue valueWithCGRect:strongSelf.webView.bounds]]);
+            return;
+        }
+
+        NSMutableArray<NSValue *> *touchableRects = [NSMutableArray array];
+        for (NSDictionary *rectDictionary in rectDictionaries) {
+            if (![rectDictionary isKindOfClass:[NSDictionary class]]) {
+                continue;
+            }
+
+            NSNumber *left = rectDictionary[@"left"];
+            NSNumber *top = rectDictionary[@"top"];
+            NSNumber *width = rectDictionary[@"width"];
+            NSNumber *height = rectDictionary[@"height"];
+            NSString *reason = rectDictionary[@"reason"];
+            if (![left isKindOfClass:[NSNumber class]] || ![top isKindOfClass:[NSNumber class]] ||
+                ![width isKindOfClass:[NSNumber class]] || ![height isKindOfClass:[NSNumber class]]) {
+                continue;
+            }
+
+            BOOL isContentBounds = [reason isKindOfClass:[NSString class]] && [reason isEqualToString:@"content-bounds"];
+            BOOL isHTMLCloseZone = [reason isKindOfClass:[NSString class]] && [reason isEqualToString:@"html-close-zone"];
+            CGRect rect = CGRectMake(left.doubleValue, top.doubleValue, width.doubleValue, height.doubleValue);
+            CGFloat rectInset = (isContentBounds || isHTMLCloseZone) ? -96.0 : -48.0;
+            rect = CGRectInset(rect, rectInset, rectInset);
+            [touchableRects addObject:[NSValue valueWithCGRect:rect]];
+        }
+
+        if (touchableRects.count == 0) {
+            [touchableRects addObject:[NSValue valueWithCGRect:strongSelf.webView.bounds]];
+        }
+
+        strongSelf.htmlTouchableRectsDidChangeBlock(touchableRects);
+    }];
+}
+
 #pragma mark - UIWebView Delgate Method
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    if (![CleverPush getAppBannersNonBlocking]) {
+        return;
+    }
+    if (webView == self.webView) {
+        [self updateHTMLBannerTouchableRects];
+    }
+}
+
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
     if (message != nil && message.body != nil && message.name != nil) {
@@ -903,7 +1023,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (self.handleBannerClosed) {
             self.handleBannerClosed();
         }
-        [self dismissViewControllerAnimated:NO completion:nil];
+        if (self.windowDismissBlock) {
+            self.windowDismissBlock();
+        } else {
+            [self dismissViewControllerAnimated:NO completion:nil];
+        }
         [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }
@@ -927,14 +1051,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSMutableArray *imageURLsToPreload = [NSMutableArray array];
     
     if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.imageUrl]) {
+        NSString *bgKey = [CPUtils imageCacheKeyForURLString:self.data.background.imageUrl];
+        if (bgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:bgKey]) {
             if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && [self.data.background.imageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.imageUrl];
             }
         }
     }
     if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.darkImageUrl]) {
+        NSString *darkBgKey = [CPUtils imageCacheKeyForURLString:self.data.background.darkImageUrl];
+        if (darkBgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkBgKey]) {
             if (self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && [self.data.background.darkImageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.darkImageUrl];
             }
@@ -947,14 +1073,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -1001,14 +1129,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    // Check if image is already cached
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1021,9 +1154,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();
@@ -1065,14 +1198,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -1103,13 +1238,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1122,9 +1263,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();

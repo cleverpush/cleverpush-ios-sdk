@@ -65,6 +65,13 @@
 - (void)disableBanners;
 - (void)enableBanners;
 - (void)setTrackingEnabled:(BOOL)enabled;
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
+- (NSArray*)getStoredBannerFirstDisplayRecords;
+- (void)setBannerFirstDisplayDate:(CPAppBanner*)banner;
+- (NSDate*)getBannerFirstDisplayDate:(NSString*)bannerId;
+- (void)clearBannerDeliveryDate:(NSString*)bannerId;
+- (void)clearAllBannerDeliveryDates;
+- (BOOL)getAppBannersNonBlocking;
 - (void)setCurrentEventId:(NSString*)eventId;
 
 #pragma mark - refactor for testcases
@@ -101,6 +108,7 @@
 + (NSMutableArray*)getBannersForDeepLink;
 + (void)updateBannersForDeepLinkWithURL:(NSURL*)url;
 + (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId;
++ (void)addSilentPushAppBannersId:(NSString*)appBannerId notificationId:(NSString*)notificationId bypassConditions:(BOOL)bypassConditions;
 + (void)setAppBannerPerDayValue:(int)dayValue;
 + (void)setAppBannerPerEachSessionValue:(int)sessionValue;
 + (int)getAppBannerPerDayValue;
