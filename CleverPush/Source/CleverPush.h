@@ -166,6 +166,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)setBadgeCountEnabledForNotifications:(BOOL)enabled;
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
 + (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
++ (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled;
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 + (void)addChatView:(CPChatView* _Nullable)chatView;
 + (void)showTopicsDialog;
