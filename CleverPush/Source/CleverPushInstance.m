@@ -1179,8 +1179,10 @@ static id isNil(id object) {
 #pragma mark - Returns if the user has currently given the notification permission
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
-        BOOL isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized) ||
-            (notificationSettings.authorizationStatus == UNAuthorizationStatusProvisional);
+        BOOL isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
+        if (@available(iOS 12.0, *)) {
+            isEnabled = isEnabled || (notificationSettings.authorizationStatus == UNAuthorizationStatusProvisional);
+        }
         if (callback) {
             callback(isEnabled);
         }
