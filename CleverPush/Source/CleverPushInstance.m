@@ -1537,10 +1537,14 @@ static id isNil(id object) {
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             [self setUnsubscribeStatus:YES];
             [self clearSubscriptionData];
-            callback(YES);
+            if (callback) {
+                callback(YES);
+            }
         } onFailure:^(NSError* error) {
             [self clearSubscriptionData];
-            callback(NO);
+            if (callback) {
+                callback(NO);
+            }
             if (failureBlock) {
                 failureBlock(error);
             }
@@ -1548,7 +1552,9 @@ static id isNil(id object) {
 
     } else {
         [self clearSubscriptionData];
-        callback(YES);
+        if (callback) {
+            callback(YES);
+        }
     }
 }
 
@@ -2420,11 +2426,19 @@ static id isNil(id object) {
         } else {
             NSMutableDictionary*requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to parse request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
             NSData*updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to re-serialize request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [urlRequest setHTTPBody:updatedRequestData];

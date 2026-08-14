@@ -338,13 +338,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     } onFailure:failureBlock];
 }
 
@@ -355,7 +359,9 @@ static CleverPush* singleInstance = nil;
 
 + (void)addSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
     [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -365,13 +371,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     } onFailure:failureBlock];
 }
 
@@ -381,7 +391,9 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
     [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -455,19 +467,25 @@ static CleverPush* singleInstance = nil;
 
 + (void)getAvailableTags:(void(^ _Nullable)(NSArray <CPChannelTag*>*))callback {
     [self.CPSharedInstance getAvailableTags:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAvailableTopics:(void(^ _Nullable)(NSArray <CPChannelTopic*>*))callback {
     [self.CPSharedInstance getAvailableTopics:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAvailableAttributes:(void(^ _Nullable)(NSMutableArray* _Nullable))callback {
     [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -589,13 +607,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
     [self.CPSharedInstance getChannelConfig:^(NSDictionary*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance getSubscriptionId:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -645,31 +667,41 @@ static CleverPush* singleInstance = nil;
 
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerOpenedCallback:^(CPAppBannerAction*action) {
-        callback(action);
+        if (callback) {
+            callback(action);
+        }
     }];
 }
 
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerShownCallback:^(CPAppBanner*appBanner) {
-        callback(appBanner);
+        if (callback) {
+            callback(appBanner);
+        }
     }];
 }
 
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback {
     [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController*viewController) {
-        callback(viewController);
+        if (callback) {
+            callback(viewController);
+        }
     }];
 }
 
 + (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
     [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAppBannersByGroup:(NSString* _Nullable)groupId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
     [self.CPSharedInstance getAppBannersByGroup:groupId callback:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
