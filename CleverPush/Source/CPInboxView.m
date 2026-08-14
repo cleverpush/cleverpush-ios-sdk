@@ -81,7 +81,9 @@ CPNotificationClickBlock handleClick;
                     [CleverPush getChannelConfig:^(NSDictionary *config) {
                         NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
                         if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
-                            self.notificationThumbnail = channelIcon;
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                self.notificationThumbnail = channelIcon;
+                            });
                         }
                     }];
                     self.messageList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , frame.size.height)];
@@ -453,15 +455,18 @@ CPNotificationClickBlock handleClick;
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
 
-        NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
-        jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
-
+        id bannersValue = [result objectForKey:@"banners"];
+        if (bannersValue != nil && [bannersValue isKindOfClass:[NSArray class]]) {
+            NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
+            jsonBanners = [[bannersValue filteredArrayUsingPredicate:predicate] mutableCopy];
+        } else {
+            [CPLog error:@"CPInboxView getBanners: 'banners' key missing or not an array in response"];
+        }
 
         if (jsonBanners != nil) {
             if (notificationId && callback) {
                 callback(jsonBanners);
             }
-
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];

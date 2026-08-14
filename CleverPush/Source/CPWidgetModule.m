@@ -18,7 +18,7 @@
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         if (result != nil) {
             CPWidgetsStories *widgets = [[CPWidgetsStories alloc] initWithJson:result];
-            if (widgets != nil) {
+            if (widgets != nil && callback) {
                 callback(widgets);
                 return;
             }
