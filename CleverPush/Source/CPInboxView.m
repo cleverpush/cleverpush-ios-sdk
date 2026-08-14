@@ -78,14 +78,6 @@ CPNotificationClickBlock handleClick;
                         self.divider_colour = [UIColor lightGrayColor];
                     }
 
-                    [CleverPush getChannelConfig:^(NSDictionary *config) {
-                        NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
-                        if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                self.notificationThumbnail = channelIcon;
-                            });
-                        }
-                    }];
                     self.messageList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , frame.size.height)];
                     NSBundle *bundle = [CPUtils getAssetsBundle];
                     if (bundle) {
@@ -101,6 +93,16 @@ CPNotificationClickBlock handleClick;
                     if (self.notifications.count == 0) {
                         [self presentEmptyView:frame];
                     }
+
+                    [CleverPush getChannelConfig:^(NSDictionary *config) {
+                        NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
+                        if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                self.notificationThumbnail = channelIcon;
+                                [self.messageList reloadData];
+                            });
+                        }
+                    }];
                 });
 
             }];
@@ -453,20 +455,17 @@ CPNotificationClickBlock handleClick;
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
-
         id bannersValue = [result objectForKey:@"banners"];
-        if (bannersValue != nil && [bannersValue isKindOfClass:[NSArray class]]) {
-            NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
-            jsonBanners = [[bannersValue filteredArrayUsingPredicate:predicate] mutableCopy];
-        } else {
+        if (bannersValue == nil || ![bannersValue isKindOfClass:[NSArray class]]) {
             [CPLog error:@"CPInboxView getBanners: 'banners' key missing or not an array in response"];
+            return;
         }
 
-        if (jsonBanners != nil) {
-            if (notificationId && callback) {
-                callback(jsonBanners);
-            }
+        NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
+        NSMutableArray *jsonBanners = [[bannersValue filteredArrayUsingPredicate:predicate] mutableCopy];
+
+        if (notificationId && callback) {
+            callback(jsonBanners);
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
