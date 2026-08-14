@@ -90,6 +90,7 @@ static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
+static BOOL isProvisionalNotificationAuthorizationEnabled = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
@@ -1179,6 +1180,9 @@ static id isNil(id object) {
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
         BOOL isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
+        if (@available(iOS 12.0, *)) {
+            isEnabled = isEnabled || (notificationSettings.authorizationStatus == UNAuthorizationStatusProvisional);
+        }
         if (callback) {
             callback(isEnabled);
         }
@@ -1270,6 +1274,11 @@ static id isNil(id object) {
     }
     if (shouldSetBadge) {
         options |= UNAuthorizationOptionBadge;
+    }
+    if (@available(iOS 12.0, *)) {
+        if (isProvisionalNotificationAuthorizationEnabled) {
+            options |= UNAuthorizationOptionProvisional;
+        }
     }
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -4553,6 +4562,10 @@ static id isNil(id object) {
 
 - (void)setAutoRequestNotificationPermission:(BOOL)autoRequest {
     autoRequestNotificationPermission = autoRequest;
+}
+
+- (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled {
+    isProvisionalNotificationAuthorizationEnabled = enabled;
 }
 
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
