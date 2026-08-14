@@ -18,6 +18,7 @@
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
 #import "CPIabTcfMode.h"
+#import "CPGroupNotificationSoundMode.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
@@ -193,6 +194,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 - (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 - (void)setIncrementBadge:(BOOL)increment;
+- (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled;
 - (void)setSoundEnabledForNotifications:(BOOL)enabled;
@@ -267,6 +269,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (int)getLocalEventTrackingRetentionDays;
 - (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler;
 - (CPIabTcfMode)getIabTcfMode;
+- (CPGroupNotificationSoundMode)getGroupNotificationSoundMode;
 
 - (UIColor* _Nullable)getBrandingColor;
 
