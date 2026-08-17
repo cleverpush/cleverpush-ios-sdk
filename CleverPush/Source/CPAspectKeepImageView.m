@@ -2,6 +2,7 @@
 #import "CPLog.h"
 #import "CPUtils.h"
 
+#import <math.h>
 #import <objc/runtime.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
@@ -50,23 +51,30 @@ static char kCPImageURLKey;
     CGFloat aspectRatio = imageSize.height > 0.0f
     ? imageSize.width / imageSize.height
     : 0.0f;
-    if (_aspectContraint.multiplier != aspectRatio)
-    {
-        [self removeConstraint:_aspectContraint];
-        
-        _aspectContraint =
-        [NSLayoutConstraint constraintWithItem:self
-                                     attribute:NSLayoutAttributeWidth
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self
-                                     attribute:NSLayoutAttributeHeight
-                                    multiplier:aspectRatio
-                                      constant:0.f];
-        
-        _aspectContraint.priority = UILayoutPriorityRequired;
-        
-        [self addConstraint:_aspectContraint];
+    if (!isfinite(aspectRatio) || aspectRatio <= 0.0f) {
+        if (_aspectContraint != nil) {
+            [self removeConstraint:_aspectContraint];
+            _aspectContraint = nil;
+        }
+        return;
     }
+    if (_aspectContraint != nil && fabs(_aspectContraint.multiplier - aspectRatio) < 0.0001) {
+        return;
+    }
+    if (_aspectContraint != nil) {
+        [self removeConstraint:_aspectContraint];
+        _aspectContraint = nil;
+    }
+    _aspectContraint =
+    [NSLayoutConstraint constraintWithItem:self
+                                 attribute:NSLayoutAttributeWidth
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:self
+                                 attribute:NSLayoutAttributeHeight
+                                multiplier:aspectRatio
+                                  constant:0.f];
+    _aspectContraint.priority = UILayoutPriorityRequired;
+    [self addConstraint:_aspectContraint];
 }
 
 #pragma mark - set data task
@@ -87,7 +95,11 @@ static char kCPImageURLKey;
 }
 
 - (BOOL)applyCachedImageForURLString:(NSString *)urlString callback:(void(^)(BOOL))callback {
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        return NO;
+    }
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (!cachedImage) {
         return NO;
     }
@@ -117,7 +129,8 @@ static char kCPImageURLKey;
             return;
         }
         __weak typeof(self) weakSelf = self;
-        self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSURLRequest *request = [NSURLRequest requestWithURL:imageURL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0];
+        self.dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (![strongSelf.currentImageURL isEqualToString:urlString]) {
                 return;
@@ -139,7 +152,10 @@ static char kCPImageURLKey;
                         dispatch_async(dispatch_get_main_queue(), ^{
                             strongSelf.image = image;
                             [strongSelf updateAspectConstraint];
-                            [[CPUtils sharedImageCache] setObject:image forKey:imageURL.absoluteString];
+                            NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+                            if (cacheKey.length > 0) {
+                                [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
+                            }
                             if (callback) {
                                 callback(true);
                             }
@@ -188,7 +204,8 @@ static char kCPImageURLKey;
             return;
         }
         __weak typeof(self) weakSelf = self;
-        self.dataTask = [[NSURLSession sharedSession] dataTaskWithURL:imageURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSURLRequest *request = [NSURLRequest requestWithURL:imageURL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0];
+        self.dataTask = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             if (![strongSelf.currentImageURL isEqualToString:urlString]) {
                 return;
@@ -205,7 +222,10 @@ static char kCPImageURLKey;
                         dispatch_async(dispatch_get_main_queue(), ^{
                             strongSelf.image = image;
                             [strongSelf updateAspectConstraint];
-                            [[CPUtils sharedImageCache] setObject:image forKey:imageURL.absoluteString];
+                            NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+                            if (cacheKey.length > 0) {
+                                [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
+                            }
                         });
                     } else {
                     }
@@ -235,8 +255,7 @@ static char kCPImageURLKey;
         return gifImage;
     }
 
-    UIImage *image = [UIImage imageWithData:data];
-    return image;
+    return [CPUtils decodedImageWithData:data];
 }
 
 - (BOOL)isGIFData:(NSData *)data {

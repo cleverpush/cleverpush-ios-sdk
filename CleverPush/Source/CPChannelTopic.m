@@ -31,6 +31,16 @@
         _defaultUnchecked = YES;
     }
 
+    _nameTranslationEnabled = NO;
+    if ([json objectForKey:@"nameTranslationEnabled"] != nil && ![[json objectForKey:@"nameTranslationEnabled"] isKindOfClass:[NSNull class]] && [[json objectForKey:@"nameTranslationEnabled"] boolValue]) {
+        _nameTranslationEnabled = YES;
+    }
+
+    id nameTranslationValue = [json objectForKey:@"nameTranslation"];
+    if (nameTranslationValue != nil && ![[json objectForKey:@"nameTranslation"] isKindOfClass:[NSNull class]] && [nameTranslationValue isKindOfClass:[NSDictionary class]]) {
+        _nameTranslation = (NSDictionary *)nameTranslationValue;
+    }
+
     if ([[json objectForKey:@"createdAt"] isKindOfClass:[NSString class]]) {
         _createdAt = [CPUtils getLocalDateTimeFromUTC:[json objectForKey:@"createdAt"]];
     }

@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <ImageIO/ImageIO.h>
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <sys/utsname.h>
@@ -268,6 +269,19 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return [UIFont fontWithName:fontFamily size:18.0f] != nil;
 }
 
+#pragma mark -  Resolve the font family to use, preferring the platform-specific one over the legacy shared one.
++ (NSString *)resolvedFontFamilyWithPlatformFamily:(NSString *)platformFontFamily fallbackFamily:(NSString *)fallbackFontFamily {
+    if ([self fontFamilyExists:platformFontFamily]) {
+        return platformFontFamily;
+    }
+
+    if ([self fontFamilyExists:fallbackFontFamily]) {
+        return fallbackFontFamily;
+    }
+
+    return nil;
+}
+
 #pragma mark -  Check the empty.
 + (BOOL)isEmpty:(id)thing {
     return thing == nil
@@ -314,6 +328,16 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             }
         });
     }];
+}
+
+#pragma mark - Resolve the app banner presentation style for a given presenter.
++ (UIModalPresentationStyle)appBannerPresentationStyleForPresenter:(UIViewController*)presenter {
+    UIModalPresentationStyle presentationStyle = [CleverPush getAppBannerModalPresentationStyle];
+    if ([presenter isKindOfClass:[UIAlertController class]]
+        && (presentationStyle == UIModalPresentationOverCurrentContext || presentationStyle == UIModalPresentationCurrentContext)) {
+        return UIModalPresentationOverFullScreen;
+    }
+    return presentationStyle;
 }
 
 #pragma mark -  get the device name based on their model names.
@@ -674,6 +698,12 @@ NSString * const localeIdentifier = @"en_US_POSIX";
            window.CleverPush.trackEvent = function trackEvent(ID, properties) {\
                window.webkit.messageHandlers.trackEvent.postMessage({ eventId: ID, properties: properties });\
            };\
+           window.CleverPush.getSubscriptionContext = function getSubscriptionContext() {\
+               return new Promise(function(resolveSubscriptionContext) {\
+                   window.CleverPush._subscriptionContextResolver = resolveSubscriptionContext;\
+                   window.webkit.messageHandlers.getSubscriptionContext.postMessage(null);\
+               });\
+           };\
            window.CleverPush.setSubscriptionAttribute = function setSubscriptionAttribute(attributeId, value) {\
                window.webkit.messageHandlers.setSubscriptionAttribute.postMessage({ attributeKey: attributeId, attributeValue: value });\
            };\
@@ -744,7 +774,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
 
 + (NSArray<NSString *> *)scriptMessageNames {
     return @[@"close", @"subscribe", @"unsubscribe", @"closeBanner", @"trackEvent",
-             @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
+             @"getSubscriptionContext", @"setSubscriptionAttribute", @"getSubscriptionAttribute", @"addSubscriptionTag", @"removeSubscriptionTag",
              @"setSubscriptionTopics", @"addSubscriptionTopic", @"removeSubscriptionTopic",
              @"showTopicsDialog", @"trackClick", @"openWebView", @"goToScreen", @"nextScreen", @"previousScreen", @"copyToClipboard", @"handleLinkBySystem"];
 }
@@ -756,19 +786,36 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     webView.contentMode = UIViewContentModeScaleToFill;
 }
 
++ (CPAppBannerViewController *)appBannerViewControllerForWebView:(WKWebView *)webView {
+    UIResponder *responder = webView;
+    while (responder != nil) {
+        if ([responder isKindOfClass:[CPAppBannerViewController class]]) {
+            return (CPAppBannerViewController *)responder;
+        }
+        responder = responder.nextResponder;
+    }
+    return nil;
+}
+
 + (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message withBanner:(CPAppBanner *)banner {
     [CPLog debug:@"Received message: %@ with body: %@", message.name, message.body];
 
     if (message != nil && message.name != nil) {
         if ([message.name isEqualToString:@"close"] || [message.name isEqualToString:@"closeBanner"]) {
-            UIViewController *topController = [CleverPush topViewController];
-            if (topController) {
-                [CPLog debug:@"Dismissing controller: %@", topController];
-                [topController dismissViewControllerAnimated:YES completion:^{
-                    [CPLog debug:@"Controller dismissed"];
-                }];
+            CPAppBannerViewController *bannerVC = [self appBannerViewControllerForWebView:message.webView];
+            if ([CleverPush getAppBannersNonBlocking] && bannerVC != nil) {
+                [CPLog debug:@"Dismissing non-blocking banner via onDismiss: %@", bannerVC];
+                [bannerVC onDismiss];
             } else {
-                [CPLog debug:@"No controller to dismiss"];
+                UIViewController *topController = [CleverPush topViewController];
+                if (topController) {
+                    [CPLog debug:@"Dismissing controller: %@", topController];
+                    [topController dismissViewControllerAnimated:YES completion:^{
+                        [CPLog debug:@"Controller dismissed"];
+                    }];
+                } else {
+                    [CPLog debug:@"No controller to dismiss"];
+                }
             }
         } else if ([message.name isEqualToString:@"nextScreen"]) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToNextPageNotification" object:nil];
@@ -784,6 +831,23 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             [CleverPush unsubscribe];
         } else if ([message.name isEqualToString:@"showTopicsDialog"]) {
             [CleverPush showTopicsDialog];
+        } else if ([message.name isEqualToString:@"getSubscriptionContext"]) {
+            NSString *subscriptionId = [CleverPush getSubscriptionId];
+            NSString *channelId = [CleverPush channelId];
+            NSDictionary *subscriptionContext = @{
+                @"subscriptionId": subscriptionId ? subscriptionId : @"",
+                @"channelId": channelId ? channelId : @"",
+            };
+
+            NSError *error = nil;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:subscriptionContext options:0 error:&error];
+            NSString *jsonString = (jsonData && !error) ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : @"{}";
+
+            NSString *subscriptionContextCallback =
+                [NSString stringWithFormat:
+                 @"try { if (window.CleverPush && window.CleverPush._subscriptionContextResolver) { window.CleverPush._subscriptionContextResolver(%@); window.CleverPush._subscriptionContextResolver = null; } } catch (e) {}",
+                 jsonString];
+            [message.webView evaluateJavaScript:subscriptionContextCallback completionHandler:nil];
         }
 
         if (message.body != nil && ![message.body isKindOfClass:[NSNull class]]) {
@@ -836,7 +900,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
             } else if ([message.name isEqualToString:@"openWebView"]) {
                 NSURL *webUrl = [NSURL URLWithString:[NSString stringWithFormat:@"%@", message.body]];
                 if (webUrl && webUrl.scheme && webUrl.host) {
-                    [self openSafari:webUrl dismissViewController:CleverPush.topViewController];
+                    [self openSafari:webUrl];
                 }
             } else if ([message.name isEqualToString:@"goToScreen"]) {
                 if (message.name != nil && [message.name isKindOfClass:[NSString class]]) {
@@ -1054,9 +1118,132 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return sharedImageCache;
 }
 
++ (NSCache *)sharedAttributedStringCache {
+    static NSCache *sharedAttributedStringCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedAttributedStringCache = [[NSCache alloc] init];
+        sharedAttributedStringCache.countLimit = 100;
+    });
+    return sharedAttributedStringCache;
+}
+
++ (NSURL *)normalizedImageURLFromString:(NSString *)urlString {
+    if (![urlString isKindOfClass:[NSString class]]) {
+        return nil;
+    }
+    NSString *trimmed = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmed.length == 0) {
+        return nil;
+    }
+    NSURL *url = [NSURL URLWithString:trimmed];
+    if (url) {
+        return url;
+    }
+    NSURLComponents *components = [NSURLComponents componentsWithString:trimmed];
+    if (components.URL) {
+        return components.URL;
+    }
+    NSString *encoded = [trimmed stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    if (encoded.length == 0) {
+        return nil;
+    }
+    return [NSURL URLWithString:encoded];
+}
+
++ (NSString *)imageCacheKeyForURLString:(NSString *)urlString {
+    NSURL *url = [self normalizedImageURLFromString:urlString];
+    return url.absoluteString ?: @"";
+}
+
++ (UIImage *)decodedImageWithData:(NSData *)data {
+    if (data.length == 0) {
+        return nil;
+    }
+    UIImage *image = [UIImage imageWithData:data];
+    if (image) {
+        return image;
+    }
+    CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)data, NULL);
+    if (!source) {
+        return nil;
+    }
+    CGImageRef cgImage = CGImageSourceCreateImageAtIndex(source, 0, NULL);
+    CFRelease(source);
+    if (!cgImage) {
+        return nil;
+    }
+    UIImage *decoded = [UIImage imageWithCGImage:cgImage];
+    CGImageRelease(cgImage);
+    return decoded;
+}
+
 #pragma mark - Convert HTML to NSAttributedString
++ (NSAttributedString *)plainAttributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    NSString *plain = html ?: @"";
+
+    @try {
+        plain = [plain stringByReplacingOccurrencesOfString:@"(?i)<\\s*br\\s*/?>"
+                                                 withString:@"\n"
+                                                    options:NSRegularExpressionSearch
+                                                      range:NSMakeRange(0, plain.length)];
+        plain = [plain stringByReplacingOccurrencesOfString:@"<[^>]+>"
+                                                 withString:@""
+                                                    options:NSRegularExpressionSearch
+                                                      range:NSMakeRange(0, plain.length)];
+    } @catch (NSException *exception) {
+        plain = html ?: @"";
+    }
+
+    plain = [plain stringByReplacingOccurrencesOfString:@"&nbsp;" withString:@" "];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&amp;" withString:@"&"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&lt;" withString:@"<"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&gt;" withString:@">"];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&quot;" withString:@"\""];
+    plain = [plain stringByReplacingOccurrencesOfString:@"&#39;" withString:@"'"];
+
+    NSMutableAttributedString *fallback = [[NSMutableAttributedString alloc] initWithString:plain];
+    if (fallback.length > 0) {
+        NSRange fullRange = NSMakeRange(0, fallback.length);
+        if (font) {
+            [fallback addAttribute:NSFontAttributeName value:font range:fullRange];
+        }
+        if (textColor) {
+            [fallback addAttribute:NSForegroundColorAttributeName value:textColor range:fullRange];
+        }
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = textAlignment;
+        paragraphStyle.paragraphSpacing = 0;
+        paragraphStyle.paragraphSpacingBefore = 0;
+        [fallback addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:fullRange];
+    }
+    return fallback;
+}
+
 + (NSAttributedString *)attributedStringFromHTML:(NSString *)html font:(UIFont *)font textColor:(UIColor *)textColor textAlignment:(NSTextAlignment)textAlignment {
+    NSString *safeHTML = html ?: @"";
     NSString *colorHex = [CPUtils hexStringFromColor:textColor];
+    NSString *cacheKey = [NSString stringWithFormat:@"%@|%@|%@|%.0f|%ld",
+                          safeHTML, colorHex, font.fontName, font.pointSize, (long)textAlignment];
+    NSCache *cache = [CPUtils sharedAttributedStringCache];
+    NSAttributedString *cached = [cache objectForKey:cacheKey];
+    if (cached != nil) {
+        return cached;
+    }
+    
+    if (![NSThread isMainThread]) {
+        __block NSAttributedString *result = nil;
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            result = [CPUtils attributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        });
+        return result;
+    }
+
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+        NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        return fallback.length > 0 ? fallback : nil;
+    }
+
     NSString *htmlString = [NSString stringWithFormat:
         @"<style>"
          "html,body{margin:0;padding:0;}"
@@ -1064,7 +1251,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
          "p,div,section,article,header,footer,blockquote,pre,h1,h2,h3,h4,h5,h6,ul,ol,li{margin:0;padding:0;}"
          "ul,ol{padding-left:1.2em;}"
          "</style>%@",
-        font.pointSize, colorHex, html];
+        font.pointSize, colorHex, safeHTML];
     
     NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *options = @{
@@ -1072,11 +1259,30 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)
     };
     
-    NSError *error = nil;
-    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithData:data options:options documentAttributes:nil error:&error];
-    
-    if (error || attributedString.length == 0) {
-        return nil;
+    NSMutableAttributedString *attributedString = nil;
+    BOOL parserThrew = NO;
+
+    @try {
+        NSError *error = nil;
+        attributedString = [[NSMutableAttributedString alloc] initWithData:data options:options documentAttributes:nil error:&error];
+        if (error) {
+            attributedString = nil;
+        }
+    } @catch (NSException *exception) {
+        [CPLog error:@"[CPUtils] Caught HTML parser exception: %@", exception.reason];
+        attributedString = nil;
+        parserThrew = YES;
+    }
+
+    if (attributedString.length == 0) {
+        NSAttributedString *fallback = [CPUtils plainAttributedStringFromHTML:safeHTML font:font textColor:textColor textAlignment:textAlignment];
+        if (fallback.length == 0) {
+            return nil;
+        }
+        if (!parserThrew) {
+            [cache setObject:fallback forKey:cacheKey];
+        }
+        return fallback;
     }
     
     [attributedString enumerateAttribute:NSFontAttributeName
@@ -1126,13 +1332,18 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         }
         endIndex--;
     }
+
+    NSAttributedString *result;
     if (endIndex == 0) {
-        return [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
+        result = [attributedString attributedSubstringFromRange:NSMakeRange(0, 0)];
+    } else if (endIndex < (NSInteger)attributedString.length) {
+        result = [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
+    } else {
+        result = attributedString;
     }
-    if (endIndex < (NSInteger)attributedString.length) {
-        return [attributedString attributedSubstringFromRange:NSMakeRange(0, (NSUInteger)endIndex)];
-    }
-    return attributedString;
+
+    [cache setObject:result forKey:cacheKey];
+    return result;
 }
 
 @end

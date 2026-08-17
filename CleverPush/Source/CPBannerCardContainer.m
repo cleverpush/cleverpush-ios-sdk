@@ -12,6 +12,8 @@
 #import "CPHTMLBlockCell.h"
 #import "CPAppBannerCarouselBlock.h"
 #import "CPLog.h"
+#import "CPUtils.h"
+#import "CPBorderObserver.h"
 
 @implementation CPBannerCardContainer
 @synthesize delegate;
@@ -42,6 +44,13 @@
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if (self.data.type == CPAppBannerTypeFull) {
+        [self setNeedsLayout];
+        [self layoutIfNeeded];
+        [self updateTableViewContentInset];
+        return;
+    }
+
     CGRect frame = self.tblCPBanner.frame;
     CGFloat maxHeight = [CPUtils frameHeightWithoutSafeArea] - 50;
     CGFloat contentHeight = self.tblCPBanner.contentSize.height;
@@ -245,18 +254,7 @@
             imageUrl = block.imageUrl;
         }
 
-        NSString *normalizedImageUrl = nil;
-        if ([imageUrl isKindOfClass:[NSString class]]) {
-            normalizedImageUrl = [imageUrl stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        }
-
-        if (normalizedImageUrl.length == 0) {
-            cell.imgCPBanner.image = nil;
-            [cell.activitydata stopAnimating];
-            return cell;
-        }
-
-        NSURL *url = [NSURL URLWithString:normalizedImageUrl];
+        NSURL *url = [CPUtils normalizedImageURLFromString:imageUrl];
         if (!url) {
             cell.imgCPBanner.image = nil;
             [cell.activitydata stopAnimating];
@@ -272,8 +270,7 @@
             cell.activitydata.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
         }
 
-        // Check cache first
-        NSString *cacheKey = url.absoluteString;
+        NSString *cacheKey = [CPUtils imageCacheKeyForURLString:imageUrl];
         UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
         if (cachedImage) {
             cell.imgCPBanner.image = cachedImage;
@@ -320,11 +317,12 @@
         [cell.btnCPBanner setTitleColor:titleColor forState:UIControlStateNormal];
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:block.family size:fontSize]];
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            [cell.btnCPBanner.titleLabel setFont:[UIFont fontWithName:resolvedFamily size:fontSize]];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for button block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for button block: %@", block.fontFamilyIos ?: block.family];
             }
             [cell.btnCPBanner.titleLabel setFont:[UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold]];
         }
@@ -360,6 +358,20 @@
         cell.btnCPBanner.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
         cell.btnCPBanner.translatesAutoresizingMaskIntoConstraints = false;
         cell.btnCPBanner.layer.cornerRadius = (CGFloat)block.radius * 0.6;
+
+        CGFloat borderWidth = (CGFloat)block.borderWidth * 0.6;
+        UIColor *borderColor;
+        if (block.borderColor != nil && ![block.borderColor isEqualToString:@""]) {
+            borderColor = [UIColor colorWithHexString:block.borderColor];
+        } else {
+            borderColor = [UIColor whiteColor];
+        }
+        [CPBorderObserver applyBorderToView:cell.btnCPBanner
+                                      width:borderWidth
+                                      color:borderColor
+                                      style:block.borderStyle
+                               cornerRadius:cell.btnCPBanner.layer.cornerRadius];
+
         cell.btnCPBanner.adjustsImageWhenHighlighted = YES;
         cell.btnCPBanner.titleLabel.numberOfLines = 0;
         cell.btnCPBanner.titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -410,11 +422,12 @@
 
         CGFloat fontSize = (CGFloat)(block.size) * 1.2;
         UIFont *font;
-        if ([CPUtils fontFamilyExists:block.family]) {
-            font = [UIFont fontWithName:block.family size:fontSize];
+        NSString *resolvedFamily = [CPUtils resolvedFontFamilyWithPlatformFamily:block.fontFamilyIos fallbackFamily:block.family];
+        if (resolvedFamily != nil) {
+            font = [UIFont fontWithName:resolvedFamily size:fontSize];
         } else {
-            if (block.family != nil) {
-                [CPLog error:@"Font Family not found for text block: %@", block.family];
+            if (block.fontFamilyIos != nil || block.family != nil) {
+                [CPLog error:@"Font Family not found for text block: %@", block.fontFamilyIos ?: block.family];
             }
             font = [UIFont systemFontOfSize:fontSize weight:UIFontWeightSemibold];
         }
@@ -547,7 +560,15 @@
     self.actionCallback(action);
     if (action.openInWebview) {
         if (action.dismiss) {
-            [CPUtils openSafari:action.url dismissViewController:self.controller];
+            if (((CPAppBannerViewController *)self.controller).windowDismissBlock) {
+                NSURL *url = action.url;
+                [self onDismiss];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [CPUtils openSafari:url];
+                });
+            } else {
+                [CPUtils openSafari:action.url dismissViewController:self.controller];
+            }
         } else {
             [CPUtils openSafari:action.url];
         }
@@ -559,7 +580,6 @@
         }
     } else if (action.dismiss) {
         [self onDismiss];
-        [CPAppBannerModule showNextActivePendingBanner:self.data];
     } else {
         if (self.data.carouselEnabled || self.data.multipleScreensEnabled) {
             [self.changePage navigateToNextPage];
@@ -591,14 +611,18 @@
 }
 
 - (void)onDismiss {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        if (self.handleBannerClosed) {
-            self.handleBannerClosed();
-        }
-        [self.controller dismissViewControllerAnimated:NO completion:nil];
-    });
+    if ([self.controller respondsToSelector:@selector(onDismiss)]) {
+        [self.controller onDismiss];
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (self.handleBannerClosed) {
+                self.handleBannerClosed();
+            }
+            [self.controller dismissViewControllerAnimated:NO completion:nil];
+        });
+    }
 }
 
 #pragma mark - setting up the popup shadow
@@ -651,6 +675,21 @@
         if (self.data.closeButtonEnabled && self.data.closeButtonPositionStaticEnabled) {
             self.tblviewTopBannerConstraint.constant = 25;
         }
+    }
+
+    if (self.data.type == CPAppBannerTypeFull) {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityDefaultLow;
+        if (self.data.marginEnabled) {
+            self.topViewBannerConstraint.constant = 0;
+        } else {
+            UIWindow *window = UIApplication.sharedApplication.windows.firstObject;
+            self.topViewBannerConstraint.constant = window.safeAreaInsets.top;
+        }
+        self.btnCloseTrailingConstraint.constant = self.btnCloseTopConstraint.constant;
+    } else {
+        self.tblCPBannerHeightConstraint.priority = UILayoutPriorityRequired;
+        self.topViewBannerConstraint.constant = 0;
+        self.btnCloseTrailingConstraint.constant = 10;
     }
 }
 

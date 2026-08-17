@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.40";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.52";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -90,6 +90,7 @@ static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
+static BOOL isProvisionalNotificationAuthorizationEnabled = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
@@ -194,8 +195,16 @@ static id isNil(id object) {
 
 - (void)setTrackingConsent:(BOOL)consent {
     BOOL previousTrackingConsent = hasTrackingConsent;
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    if (!previousTrackingConsent && [userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_KEY] != nil) {
+        previousTrackingConsent = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    }
+
     hasTrackingConsentCalled = YES;
     hasTrackingConsent = consent;
+    [userDefaults setBool:hasTrackingConsent forKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    [userDefaults setBool:hasTrackingConsentCalled forKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY];
+    [userDefaults synchronize];
 
     if (!hasTrackingConsent && previousTrackingConsent) {
         [self removeSubscriptionTagsAndAttributes];
@@ -447,11 +456,35 @@ static id isNil(id object) {
     hasInitialized = NO;
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSDate *installationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    
+    if ([userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_KEY] != nil) {
+        hasTrackingConsent = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_KEY];
+    }
+    if ([userDefaults objectForKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY] != nil) {
+        hasTrackingConsentCalled = [userDefaults boolForKey:CLEVERPUSH_TRACKING_CONSENT_CALLED_KEY];
+    }
+    
+    NSDate *installationDate = nil;
+    id rawInstallationDate = [userDefaults objectForKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
+    if (rawInstallationDate != nil && rawInstallationDate != [NSNull null] && [rawInstallationDate isKindOfClass:[NSDate class]]) {
+        NSDate *candidate = (NSDate *)rawInstallationDate;
+        if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+            installationDate = candidate;
+        }
+    }
 
-    if (installationDate == nil || [installationDate isKindOfClass:[NSNull class]]) {
-        NSDate *subscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
-        if (subscriptionCreatedAt != nil && ![subscriptionCreatedAt isKindOfClass:[NSNull class]]) {
+    if (installationDate == nil) {
+        NSDate *subscriptionCreatedAt = nil;
+
+        id rawSubscriptionCreatedAt = [userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_CREATED_AT_KEY];
+        if (rawSubscriptionCreatedAt != nil && rawSubscriptionCreatedAt != [NSNull null] && [rawSubscriptionCreatedAt isKindOfClass:[NSDate class]]) {
+            NSDate *candidate = (NSDate *)rawSubscriptionCreatedAt;
+            if (isfinite([candidate timeIntervalSince1970]) && [candidate timeIntervalSince1970] > 0) {
+                subscriptionCreatedAt = candidate;
+            }
+        }
+
+        if (subscriptionCreatedAt != nil) {
             [userDefaults setObject:subscriptionCreatedAt forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
         } else {
             [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_APP_INSTALLATION_DATE_KEY];
@@ -1147,6 +1180,9 @@ static id isNil(id object) {
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
         BOOL isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
+        if (@available(iOS 12.0, *)) {
+            isEnabled = isEnabled || (notificationSettings.authorizationStatus == UNAuthorizationStatusProvisional);
+        }
         if (callback) {
             callback(isEnabled);
         }
@@ -1156,6 +1192,10 @@ static id isNil(id object) {
 #pragma mark - channel subscription
 - (void)setConfirmAlertShown {
     [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: setConfirmAlertShown: channelId is nil or empty, skipping API call"];
+            return;
+        }
         confirmAlertShown = YES;
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"channel/confirm-alert"]];
 
@@ -1234,6 +1274,11 @@ static id isNil(id object) {
     }
     if (shouldSetBadge) {
         options |= UNAuthorizationOptionBadge;
+    }
+    if (@available(iOS 12.0, *)) {
+        if (isProvisionalNotificationAuthorizationEnabled) {
+            options |= UNAuthorizationOptionProvisional;
+        }
     }
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -1446,6 +1491,7 @@ static id isNil(id object) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_VERSION_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TAGS_KEY];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setHandleSubscribedCalled:NO];
@@ -1476,6 +1522,10 @@ static id isNil(id object) {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(syncSubscription:) object:nil];
 
     if (subscriptionId) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: unsubscribe: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/unsubscribe"];
         NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                  channelId, @"channelId",
@@ -1487,10 +1537,14 @@ static id isNil(id object) {
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             [self setUnsubscribeStatus:YES];
             [self clearSubscriptionData];
-            callback(YES);
+            if (callback) {
+                callback(YES);
+            }
         } onFailure:^(NSError* error) {
             [self clearSubscriptionData];
-            callback(NO);
+            if (callback) {
+                callback(NO);
+            }
             if (failureBlock) {
                 failureBlock(error);
             }
@@ -1498,8 +1552,70 @@ static id isNil(id object) {
 
     } else {
         [self clearSubscriptionData];
-        callback(YES);
+        if (callback) {
+            callback(YES);
+        }
     }
+}
+
+- (void)markSubscriptionAsTest {
+    [self markSubscriptionAsTestOnSuccess:nil onFailure:nil];
+}
+
+- (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionTestStatus:YES onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)unmarkSubscriptionAsTest {
+    [self unmarkSubscriptionAsTestOnSuccess:nil onFailure:nil];
+}
+
+- (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionTestStatus:NO onSuccess:successBlock onFailure:failureBlock];
+}
+
+- (void)setSubscriptionTestStatus:(BOOL)isTest onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    if (channelId == nil) {
+        channelId = [self getChannelIdFromUserDefaults];
+    }
+    if (channelId == nil || [channelId length] == 0) {
+        [CPLog debug:@"setSubscriptionTestStatus: Channel ID is null"];
+        if (failureBlock) {
+            failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is null or empty"}]);
+        }
+        return;
+    }
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil || [subscriptionId length] == 0) {
+            [CPLog debug:@"setSubscriptionTestStatus: There is no subscriptionId"];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is null or empty"}]);
+            }
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/mark-as-test"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     subscriptionId, @"subscriptionId",
+                                     @(isTest), @"isTest",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                [CPLog debug:@"setSubscriptionTestStatus: Successfully set subscription tester status to %@", isTest ? @"true" : @"false"];
+                if (successBlock) {
+                    successBlock(results);
+                }
+            } onFailure:^(NSError* error) {
+                [CPLog error:@"setSubscriptionTestStatus: Failed to set subscription tester status. %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
 }
 
 #pragma mark - identify the channels being subscribed or not
@@ -1657,6 +1773,11 @@ static id isNil(id object) {
         }
     }
 
+    NSArray* pianoSegments = [self getSubscriptionPianoSegments];
+    if (pianoSegments != nil && [pianoSegments count] > 0) {
+        [dataDic setObject:pianoSegments forKey:@"pianoSegments"];
+    }
+
     [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
 
     [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
@@ -1681,6 +1802,12 @@ static id isNil(id object) {
 
     if (channelId == nil) {
         channelId = [self getChannelIdFromUserDefaults];
+    }
+
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: makeSyncSubscriptionRequest: channelId is nil or empty, skipping API call"];
+        [self setSubscriptionInProgress:false];
+        return;
     }
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
@@ -1733,6 +1860,37 @@ static id isNil(id object) {
                 if ([userDefaults objectForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY] != nil) {
                     oldSubscriptionId = [userDefaults stringForKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
                 }
+                
+                id regeneratePushTokenRequestedAt = [results objectForKey:@"regeneratePushTokenRequestedAt"];
+                if (regeneratePushTokenRequestedAt != nil && ![regeneratePushTokenRequestedAt isKindOfClass:[NSNull class]]) {
+                    NSString *newRegenerateTimestamp = [NSString stringWithFormat:@"%@", regeneratePushTokenRequestedAt];
+                    NSString *storedRegenerateTimestamp = [userDefaults stringForKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
+                    
+                    BOOL timestampsAreDifferent = NO;
+                    if (storedRegenerateTimestamp == nil) {
+                        timestampsAreDifferent = YES;
+                    } else if (![newRegenerateTimestamp isEqualToString:storedRegenerateTimestamp]) {
+                        timestampsAreDifferent = YES;
+                    }
+                    
+                    if (timestampsAreDifferent) {
+                        [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: regeneratePushTokenRequestedAt changed, requesting fresh APNS token"];
+                        deviceToken = nil;
+                        hasRequestedDeviceToken = NO;
+                        [self requestDeviceToken];
+                        [self getDeviceToken:^(NSString * _Nullable freshDeviceToken) {
+                            if ([CPUtils isNullOrEmpty:freshDeviceToken]) {
+                                return;
+                            }
+                            NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                            [defaults setObject:newRegenerateTimestamp forKey:CLEVERPUSH_REGENERATE_PUSH_TOKEN_REQUESTED_AT_KEY];
+                            [defaults synchronize];
+                            [CPLog debug:@"CleverPush: makeSyncSubscriptionRequest: received fresh APNS token, resyncing subscription"];
+                            [self syncSubscription];
+                        }];
+                    }
+                }
+                
                 BOOL isSubscriptionChanged = ![newSubscriptionId isEqualToString:oldSubscriptionId];
                 [CleverPush setSubscriptionChanged:isSubscriptionChanged];
 
@@ -1887,6 +2045,8 @@ static id isNil(id object) {
     }
 
     if (!handleNotificationReceived) {
+        CPNotificationReceivedResult* pending = [[CPNotificationReceivedResult alloc] initWithPayload:messageDict];
+        pendingDeliveryResult = pending;
         return;
     }
 
@@ -1964,7 +2124,9 @@ static id isNil(id object) {
             [CPAppBannerModuleInstance setCurrentVoucherCodePlaceholder:voucherCodesByAppBanner];
         }
 
-        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        id bypassValue = [notification objectForKey:@"bypassConditions"];
+        BOOL bypassConditions = bypassValue != nil && ![bypassValue isKindOfClass:[NSNull class]] && [bypassValue boolValue];
+        [self showAppBanner:[notification valueForKey:@"appBanner"] channelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId force:bypassConditions];
     }
 
     payloadMutable = [self handleActionInNotification:notification withAction:action payloadMutable:payloadMutable];
@@ -2011,13 +2173,15 @@ static id isNil(id object) {
 
     NSString* appBanner = [notification cleverPushStringForKey:@"appBanner"];
     bool isSilent = [notification objectForKey:@"silent"] != nil && ![[notification objectForKey:@"silent"] isKindOfClass:[NSNull class]] && [[notification objectForKey:@"silent"] boolValue];
-
+    id bypassValue = [notification objectForKey:@"bypassConditions"];
+    BOOL bypassConditions = bypassValue != nil && ![bypassValue isKindOfClass:[NSNull class]] && [bypassValue boolValue];
+    
     if (![CPUtils isNullOrEmpty:appBanner] && isSilent) {
       BOOL isActive = [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
       if (isActive) {
-        [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId];
+        [self showAppBanner:appBanner channelId:[messageDict cleverPushStringForKeyPath:@"channel._id"] notificationId:notificationId force:bypassConditions];
       } else {
-        [CPAppBannerModuleInstance addSilentPushAppBannersId:appBanner notificationId:notificationId];
+        [CPAppBannerModuleInstance addSilentPushAppBannersId:appBanner notificationId:notificationId bypassConditions:bypassConditions];
       }
     }
 }
@@ -2104,6 +2268,10 @@ static id isNil(id object) {
 }
 
 - (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: setNotificationDelivered: channelId is nil or empty, skipping API call"];
+        return;
+    }
     NSString*notificationId = [notification valueForKey:@"_id"];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/delivered"];
@@ -2159,6 +2327,10 @@ static id isNil(id object) {
 }
 
 - (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: setNotificationClicked: channelId is nil or empty, skipping API call"];
+        return;
+    }
     [CPLog debug:@"setNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/clicked"];
@@ -2254,11 +2426,19 @@ static id isNil(id object) {
         } else {
             NSMutableDictionary*requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to parse request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
             NSData*updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to re-serialize request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [urlRequest setHTTPBody:updatedRequestData];
@@ -2383,6 +2563,13 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionTagFromApi: channelId is nil or empty, skipping API call"];
+                if (callback) {
+                    callback(tagId);
+                }
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/untag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2410,6 +2597,74 @@ static id isNil(id object) {
                 }
             } onFailure:^(NSError* error) {
                 [CPLog error:@"Error removing subscription tag: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
+            }];
+        });
+    }];
+}
+
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self removeSubscriptionAttribute:attributeId callback:nil onFailure:nil];
+}
+
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self waitForTrackingConsent:^{
+        [self removeSubscriptionAttributeFromApi:attributeId callback:^(NSString* attributeKey) {
+            if (callback) {
+                callback(attributeKey);
+            }
+        } onFailure:failureBlock];
+    }];
+}
+
+- (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    for (NSString* attributeId in attributeIds) {
+        [self removeSubscriptionAttribute:attributeId];
+    }
+}
+
+- (void)removeSubscriptionAttributeFromApi:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self getSubscriptionId:^(NSString*subscriptionId) {
+        if (subscriptionId == nil) {
+            [CPLog debug:@"CleverPushInstance: removeSubscriptionAttributeFromApi: There is no subscription for CleverPush SDK."];
+            return;
+        }
+        if (attributeId == nil || [attributeId isKindOfClass:[NSNull class]] || ![attributeId isKindOfClass:[NSString class]] || attributeId.length == 0) {
+            [CPLog error:@"CleverPushInstance: removeSubscriptionAttributeFromApi: attributeId is nil or invalid."];
+            if (failureBlock) {
+                failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Attribute ID is nil or empty"}]);
+            }
+            return;
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionAttributeFromApi: channelId is nil or empty, skipping API call"];
+                return;
+            }
+            NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/clear"];
+            NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     channelId, @"channelId",
+                                     attributeId, @"attributeId",
+                                     subscriptionId, @"subscriptionId",
+                                     nil];
+
+            NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
+            [request setHTTPBody:postData];
+            [self enqueueRequest:request onSuccess:^(NSDictionary* results) {
+                NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                NSDictionary* cachedAttributes = [userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                NSMutableDictionary* subscriptionAttributes = cachedAttributes ? [cachedAttributes mutableCopy] : [[NSMutableDictionary alloc] init];
+                [subscriptionAttributes removeObjectForKey:attributeId];
+                [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
+                [userDefaults synchronize];
+
+                if (callback) {
+                    callback(attributeId);
+                }
+            } onFailure:^(NSError *error) {
+                [CPLog error:@"Error removing subscription attribute: %@", error];
                 if (failureBlock) {
                     failureBlock(error);
                 }
@@ -2452,6 +2707,13 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: addSubscriptionTagToApi: channelId is nil or empty, skipping API call"];
+                if (callback) {
+                    callback(tagId);
+                }
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/tag"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2524,6 +2786,10 @@ static id isNil(id object) {
 
 - (void)stopCampaigns {
     if (subscriptionId != nil) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: stopCampaigns: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/stop-campaigns"];
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         channelId, @"channelId",
@@ -2546,6 +2812,10 @@ static id isNil(id object) {
 
 - (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
     if (subscriptionId != nil) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: startLiveActivity: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"subscription/sync/%@", channelId]];
         NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                         channelId, @"channelId",
@@ -2618,6 +2888,10 @@ static id isNil(id object) {
             return;
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: setSubscriptionAttributeObjectImplementation: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -2670,6 +2944,10 @@ static id isNil(id object) {
             }
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: pushSubscriptionAttributeValue: channelId is nil or empty, skipping API call"];
+                    return;
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/push-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -2737,6 +3015,10 @@ static id isNil(id object) {
             }
 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: pullSubscriptionAttributeValue: channelId is nil or empty, skipping API call"];
+                    return;
+                }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute/pull-value"];
                 NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                          channelId, @"channelId",
@@ -3007,6 +3289,10 @@ static id isNil(id object) {
         }
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: addSubscriptionTopic: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/add"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -3075,6 +3361,10 @@ static id isNil(id object) {
         [topics removeObject:topicId];
 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            if ([CPUtils isNullOrEmpty:channelId]) {
+                [CPLog error:@"CleverPush: removeSubscriptionTopic: channelId is nil or empty, skipping API call"];
+                return;
+            }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/topic/remove"];
             NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                      channelId, @"channelId",
@@ -3150,6 +3440,28 @@ static id isNil(id object) {
     }];
 }
 
+#pragma mark - Piano Segments
+- (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray* pianoSegments = [userDefaults arrayForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    if (!pianoSegments) {
+        return [[NSArray alloc] init];
+    }
+    return pianoSegments;
+}
+
+- (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments {
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    if (segments != nil && [segments count] > 0) {
+        [userDefaults setObject:segments forKey:CLEVERPUSH_SUBSCRIPTION_PIANO_SEGMENTS_KEY];
+    }
+    [userDefaults synchronize];
+    [self ensureMainThreadSync:^{
+        [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:1.0f];
+    }];
+}
+
 #pragma mark - Retrieving notifications which has been stored in NSUserDefaults by key "CleverPush_NOTIFICATIONS"
 - (NSArray<CPNotification*>* _Nullable)getNotifications {
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -3209,6 +3521,13 @@ static id isNil(id object) {
 - (void)getNotifications:(BOOL)combineWithApi limit:(int)limit skip:(int)skip callback:(void(^ _Nullable)(NSArray<CPNotification*>* _Nullable))callback {
     NSMutableArray<CPNotification*>* notifications = [[self getNotifications] mutableCopy];
     if (combineWithApi) {
+        if ([CPUtils isNullOrEmpty:channelId]) {
+            [CPLog error:@"CleverPush: getNotifications: channelId is nil or empty, skipping API call"];
+            if (callback) {
+                callback(notifications);
+            }
+            return;
+        }
         NSString*combinedURL = [self generateGetReceivedNotificationsPath:limit skip:skip];
         [self getReceivedNotificationsFromApi:combinedURL callback:^(NSArray*remoteNotifications) {
             for (NSDictionary*remoteNotification in remoteNotifications) {
@@ -3250,6 +3569,10 @@ static id isNil(id object) {
 #pragma mark - Track inbox clicked
 - (void)trackInboxClicked:(NSString* _Nullable)notificationId {
     if (![CPUtils isNullOrEmpty:notificationId]) {
+        if ([CPUtils isNullOrEmpty:[CleverPush channelId]]) {
+            [CPLog error:@"CleverPush: trackInboxClicked: channelId is nil or empty, skipping API call"];
+            return;
+        }
         NSString* path = [NSString stringWithFormat:@"/channel/%@/panel/clicked", [CleverPush channelId]];
         NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:path];
         
@@ -3400,6 +3723,10 @@ static id isNil(id object) {
                         [CPLog debug:@"CleverPushInstance: trackEvent: There is no subscription for CleverPush SDK."];
                         return;
                     }
+                    if ([CPUtils isNullOrEmpty:channelId]) {
+                        [CPLog error:@"CleverPush: trackEvent: channelId is nil or empty, skipping API call"];
+                        return;
+                    }
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/conversion"];
                     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                     channelId, @"channelId",
@@ -3413,9 +3740,15 @@ static id isNil(id object) {
                     NSString* lastClickedNotificationId = [userDefaults stringForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_ID_KEY];
                     NSDate* lastClickedNotificationTimeStamp = [userDefaults objectForKey:CLEVERPUSH_LAST_CLICKED_NOTIFICATION_TIME_KEY];
 
-                    if (![CPUtils isNullOrEmpty:lastClickedNotificationId] && lastClickedNotificationTimeStamp != nil && [lastClickedNotificationTimeStamp isKindOfClass:[NSDate class]]) {
+                    static const NSTimeInterval kNotificationClickValidityInterval = 24 * 60 * 60;
+                    
+                    if (![CPUtils isNullOrEmpty:lastClickedNotificationId] &&
+                        lastClickedNotificationTimeStamp != nil &&
+                        [lastClickedNotificationTimeStamp isKindOfClass:[NSDate class]]) {
+                        
                         NSTimeInterval secondsSinceLastClick = [[NSDate date] timeIntervalSinceDate:lastClickedNotificationTimeStamp];
-                        if (secondsSinceLastClick <= 60 * 60) {
+                        
+                        if (secondsSinceLastClick <= kNotificationClickValidityInterval) {
                             [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
                         }
                     }
@@ -3454,6 +3787,10 @@ static id isNil(id object) {
             [self getSubscriptionId:^(NSString* subscriptionId) {
                 if (subscriptionId == nil) {
                     [CPLog debug:@"CleverPushInstance: triggerFollowUpEvent: There is no subscription for CleverPush SDK."];
+                    return;
+                }
+                if ([CPUtils isNullOrEmpty:channelId]) {
+                    [CPLog error:@"CleverPush: triggerFollowUpEvent: channelId is nil or empty, skipping API call"];
                     return;
                 }
                 NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/event"];
@@ -3799,6 +4136,10 @@ static id isNil(id object) {
                     NSUserDefaults* groupUserDefaults = [CPUtils getUserDefaultsAppGroup];
                     NSString* lastNotificationId = [groupUserDefaults stringForKey:CLEVERPUSH_LAST_NOTIFICATION_ID_KEY];
 
+                    if ([CPUtils isNullOrEmpty:channelId]) {
+                        [CPLog error:@"CleverPush: trackSessionStart: channelId is nil or empty, skipping API call"];
+                        return;
+                    }
                     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/session/start"];
                     NSDictionary* dataDic = [NSDictionary dictionaryWithObjectsAndKeys:
                                              channelId, @"channelId",
@@ -3864,7 +4205,10 @@ static id isNil(id object) {
                     long sessionDuration = sessionEndedTimestamp - sessionStartedTimestamp;
                     long visits = MAX(sessionVisits, 0);
 
-                    if (channelId == nil || subscriptionId == nil || deviceToken == nil || sessionDuration < 0) {
+                    if ([CPUtils isNullOrEmpty:channelId] || subscriptionId == nil || deviceToken == nil || sessionDuration < 0) {
+                        if ([CPUtils isNullOrEmpty:channelId]) {
+                            [CPLog error:@"CleverPush: trackSessionEnd: channelId is nil or empty, skipping API call"];
+                        }
                         return;
                     }
 
@@ -4001,11 +4345,20 @@ static id isNil(id object) {
         }
         [self getChannelConfig:^(NSDictionary* channelConfig) {
             NSString* headerTitle = [CPTranslate translate:@"subscribedTopics"];
+            NSString* saveButtonTitle = [CPTranslate translate:@"save"];
+            BOOL topicsDialogBulkActions = ([channelConfig objectForKey:@"topicsDialogBulkActions"] != nil) &&
+                                                      ![[channelConfig objectForKey:@"topicsDialogBulkActions"] isKindOfClass:[NSNull class]] &&
+                                                      [[channelConfig objectForKey:@"topicsDialogBulkActions"] boolValue];
+            
 
             if (channelConfig != nil && [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"] != nil && ![[channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"] isEqualToString:@""]) {
                 headerTitle = [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsLaterTitle"];
             }
 
+            if (channelConfig != nil && ![CPUtils isNullOrEmpty:[channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsSaveText"]]) {
+                saveButtonTitle = [channelConfig cleverPushStringForKey:@"confirmAlertSelectTopicsSaveText"];
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (![self isSubscribed]) {
                     [self initTopicsDialogData:channelConfig syncToBackend:NO];
@@ -4026,7 +4379,9 @@ static id isNil(id object) {
                     topicsController.topicsDialogShowWhenNewAdded = [[channelConfig objectForKey:@"topicsDialogShowWhenNewAdded"] boolValue];
                 }
 
-                DWAlertAction*okAction = [DWAlertAction actionWithTitle:[CPTranslate translate:@"save"] style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
+                topicsController.topicsDialogBulkActions = topicsDialogBulkActions;
+
+                DWAlertAction*okAction = [DWAlertAction actionWithTitle:saveButtonTitle style:DWAlertActionStyleCancel handler:^(DWAlertAction* action) {
                     if (topicsController.topicsDialogShowUnsubscribe
                         && [self getDeselectValue] == YES) {
                         [self unsubscribe];
@@ -4133,6 +4488,13 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
+#pragma mark - Grouped notifications sound mode
+- (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    [userDefaults setInteger:mode forKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
+    [userDefaults synchronize];
+}
+
 #pragma mark - Show notifications in foreground
 - (void)setShowNotificationsInForeground:(BOOL)show {
     showNotificationsInForeground = show;
@@ -4216,6 +4578,10 @@ static id isNil(id object) {
     autoRequestNotificationPermission = autoRequest;
 }
 
+- (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled {
+    isProvisionalNotificationAuthorizationEnabled = enabled;
+}
+
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
     keepTargetingDataOnUnsubscribe = keepData;
 }
@@ -4280,6 +4646,11 @@ static id isNil(id object) {
     return currentIabTcfMode;
 }
 
+- (CPGroupNotificationSoundMode)getGroupNotificationSoundMode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    return (CPGroupNotificationSoundMode) [userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
+}
+
 - (UIViewController* _Nullable)getCustomTopViewController {
     return customTopViewController;
 }
@@ -4340,6 +4711,12 @@ static id isNil(id object) {
     [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:NO appBannerClosedCallback:appBannerClosedCallback];
 }
 
+- (void)showAppBanner:(NSString*)bannerId channelId:(NSString*)channelId notificationId:(NSString*)notificationId force:(BOOL)force {
+    BOOL fromNotification = notificationId != nil;
+    [CPAppBannerModule initBannersWithChannel:channelId showDrafts:isShowDraft fromNotification:fromNotification];
+    [CPAppBannerModule showBanner:channelId bannerId:bannerId notificationId:notificationId force:force appBannerClosedCallback:nil];
+}
+
 - (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
     [CPAppBannerModule setBannerOpenedCallback:callback];
 }
@@ -4362,6 +4739,22 @@ static id isNil(id object) {
 
 - (void)setAppBannerTrackingEnabled:(BOOL)enabled {
     [CPAppBannerModule setTrackingEnabled:enabled];
+}
+
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    [CPAppBannerModule setAppBannersNonBlocking:nonBlocking];
+}
+
+- (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    [CPAppBannerModule clearBannerDeliveryDate:bannerId];
+}
+
+- (void)clearAllBannerDeliveryDates {
+    [CPAppBannerModule clearAllBannerDeliveryDates];
+}
+
+- (BOOL)getAppBannersNonBlocking {
+    return [CPAppBannerModule getAppBannersNonBlocking];
 }
 
 - (BOOL)getAppBannerDraftsEnabled {
@@ -4484,7 +4877,13 @@ static id isNil(id object) {
 
 - (BOOL)isChannelIdChanged:(NSString* _Nullable)channelId; {
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([channelId isEqualToString:[userDefaults stringForKey:CLEVERPUSH_CHANNEL_ID_KEY]]) {
+    NSString *storedChannelId = nil;
+    id rawStoredChannelId = [userDefaults objectForKey:CLEVERPUSH_CHANNEL_ID_KEY];
+    if (rawStoredChannelId != nil && rawStoredChannelId != [NSNull null] && [rawStoredChannelId isKindOfClass:[NSString class]] && [((NSString *)rawStoredChannelId) length] > 0) {
+        storedChannelId = (NSString *)rawStoredChannelId;
+    }
+
+    if (channelId != nil && channelId != (id)[NSNull null] && [channelId isKindOfClass:[NSString class]] && [channelId length] > 0 && [channelId isEqualToString:storedChannelId]) {
         return false;
     } else {
         return true;
@@ -4537,6 +4936,10 @@ static id isNil(id object) {
     return handleUniversalLinksInApp;
 }
 
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    handleUrlFromSceneDelegate = handleFromSceneDelegate;
+}
+
 - (BOOL)getHandleUrlFromSceneDelegate {
     return handleUrlFromSceneDelegate;
 }
@@ -4554,6 +4957,47 @@ static id isNil(id object) {
     [CPLog setLogListener:listener];
 }
 
+#pragma mark - Silence the sound when the notification's group is already displayed
+- (void)silenceSoundForGroupedNotification:(UNMutableNotificationContent* _Nullable)replacementContent {
+    if (!replacementContent) {
+        return;
+    }
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY] != CPGroupNotificationSoundModeFirstInGroupOnly) {
+        return;
+    }
+
+    NSString* threadIdentifier = replacementContent.threadIdentifier;
+    if ([CPUtils isNullOrEmpty:threadIdentifier]) {
+        return;
+    }
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL groupAlreadyDisplayed = NO;
+    [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>* notifications) {
+        for (UNNotification* delivered in notifications) {
+            if ([delivered.request.content.threadIdentifier isEqualToString:threadIdentifier]) {
+                groupAlreadyDisplayed = YES;
+                break;
+            }
+        }
+        dispatch_semaphore_signal(semaphore);
+    }];
+
+    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC))) != 0) {
+        [CPLog info:@"silenceSoundForGroupedNotification - timed out fetching delivered notifications, keeping sound"];
+        return;
+    }
+
+    if (groupAlreadyDisplayed) {
+        [CPLog info:@"silenceSoundForGroupedNotification - group already displayed, removing sound"];
+        replacementContent.sound = nil;
+    } else {
+        [CPLog info:@"silenceSoundForGroupedNotification - no group displayed, keeping sound"];
+    }
+}
+
 #pragma mark - recieved notifications from the Extension.
 - (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent {
     [CPLog debug:@"didReceiveNotificationExtensionRequest"];
@@ -4567,8 +5011,20 @@ static id isNil(id object) {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     if (![CPUtils isNullOrEmpty:request.identifier]) {
-        NSMutableDictionary* mutablePayload = [payload mutableCopy];
-        NSMutableDictionary* mutableNotification = [notification mutableCopy];
+        NSMutableDictionary* mutablePayload;
+        if (payload) {
+            mutablePayload = [payload mutableCopy];
+        } else {
+            mutablePayload = [[NSMutableDictionary alloc] init];
+        }
+
+        NSMutableDictionary* mutableNotification;
+        if (notification) {
+            mutableNotification = [notification mutableCopy];
+        } else {
+            mutableNotification = [[NSMutableDictionary alloc] init];
+        }
+
         [mutableNotification setObject:request.identifier forKey:@"notificationIdentifier"];
         [mutablePayload setObject:mutableNotification forKey:@"notification"];
         payload = [mutablePayload copy];
@@ -4578,6 +5034,9 @@ static id isNil(id object) {
 
     // badge count
     [self updateBadge:replacementContent];
+
+    // grouped notifications sound
+    [self silenceSoundForGroupedNotification:replacementContent];
 
     // rich notifications
     if (notification != nil) {

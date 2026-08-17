@@ -18,6 +18,7 @@
 #import "CPChannelTag.h"
 #import "CPChannelTopic.h"
 #import "CPIabTcfMode.h"
+#import "CPGroupNotificationSoundMode.h"
 
 @interface CPNotificationReceivedResult : NSObject
 
@@ -123,12 +124,20 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)disableAppBanners;
 - (void)enableAppBanners;
 - (void)setAppBannerTrackingEnabled:(BOOL)enabled;
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking;
+- (void)clearBannerDeliveryDate:(NSString*)bannerId;
+- (void)clearAllBannerDeliveryDates;
+- (BOOL)getAppBannersNonBlocking;
 - (BOOL)popupVisible;
 - (void)unsubscribe;
 - (void)unsubscribe:(void(^ _Nullable)(BOOL))callback;
 - (void)syncSubscription;
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock;
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock successBlock:(void(^)())successBlock;
+- (void)markSubscriptionAsTest;
+- (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
+- (void)unmarkSubscriptionAsTest;
+- (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken;
 - (void)handleDidFailRegisterForRemoteNotification:(NSError* _Nullable)err;
 - (void)handleNotificationOpened:(NSDictionary* _Nullable)messageDict isActive:(BOOL)isActive actionIdentifier:(NSString* _Nullable)actionIdentifier;
@@ -153,6 +162,9 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback;
 - (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds;
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId;
+- (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
+- (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds;
 - (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 - (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 - (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
@@ -173,6 +185,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)setTopicsChangedListener:(CPTopicsChangedBlock _Nullable)changedBlock;
 - (void)setSubscriptionTopics:(NSMutableArray <NSString*>* _Nullable)topics;
 - (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure;
+- (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments;
 - (void)setBrandingColor:(UIColor* _Nullable)color;
 - (void)setNormalTintColor:(UIColor* _Nullable)color;
 - (UIColor* _Nullable)getNormalTintColor;
@@ -181,12 +194,14 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 - (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 - (void)setIncrementBadge:(BOOL)increment;
+- (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode;
 - (void)setShowNotificationsInForeground:(BOOL)show;
 - (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled;
 - (void)setSoundEnabledForNotifications:(BOOL)enabled;
 - (void)setBadgeCountEnabledForNotifications:(BOOL)enabled;
 - (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
 - (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
+- (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled;
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 - (void)addChatView:(CPChatView* _Nullable)chatView;
 - (void)showTopicsDialog;
@@ -241,6 +256,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (NSArray<NSString*>* _Nullable)getSeenStories;
 - (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains;
 - (NSMutableArray<NSString*>* _Nullable)getSubscriptionTopics;
+- (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments;
 - (NSArray* _Nullable)getAvailableTags __attribute__((deprecated));
 - (NSArray* _Nullable)getAvailableTopics __attribute__((deprecated));
 
@@ -254,6 +270,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (int)getLocalEventTrackingRetentionDays;
 - (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler;
 - (CPIabTcfMode)getIabTcfMode;
+- (CPGroupNotificationSoundMode)getGroupNotificationSoundMode;
 
 - (UIColor* _Nullable)getBrandingColor;
 
@@ -271,6 +288,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (BOOL)hasSubscriptionTopic:(NSString* _Nullable)topicId;
 - (BOOL)getDeselectValue;
 - (BOOL)getUnsubscribeStatus;
+- (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate;
 - (BOOL)getHandleUrlFromSceneDelegate;
 - (void)setConfirmAlertShown;
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;
@@ -329,6 +347,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)waitForSubscribeConsent:(void(^ _Nullable)(void))callback;
 - (void)addSubscriptionTagToApi:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)removeSubscriptionTagFromApi:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
+- (void)removeSubscriptionAttributeFromApi:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)initTopicsDialogData:(NSDictionary* _Nullable)config syncToBackend:(BOOL)syncToBackend;
 
 - (void)setLogListener:(CPLogListener _Nullable)listener;

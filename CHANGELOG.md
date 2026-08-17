@@ -1,3 +1,62 @@
+## 1.34.52 (14.08.2026)
+* Optimized callback functions for preventing crashes.
+* Added setProvisionalNotificationAuthorizationEnabled method to support Apple's provisional push authorization.
+* Added setGroupNotificationSoundMode: (CPGroupNotificationSoundMode) to play a sound only for the first notification in a group (CPGroupNotificationSoundModeFirstInGroupOnly), keeping CPGroupNotificationSoundModeAllNotifications as default.
+
+## 1.34.51 (17.07.2026)
+* Resolved the issue of broken app banner layout when presented while a UIAlertController is visible.
+* Extend the notificationId attribution window for /subscription/conversion from 60 minutes to 24 hours.
+* Added platform-specific font support for In-App Banners.
+* Resolved the close button UI Positing issue in appBanners.
+
+## 1.34.50 (02.07.2026)
+* Added iBeacon monitoring (iOS 13+) with automatic event tracking on beacon entry via the new initBeacons method, which registers CLBeaconRegions from the channel config.
+* Added onBeaconDetected callback for matched beacon entries, setBeaconEventInterval to throttle re-triggers per session, and setBeaconDebugScanAll for verbose diagnostic logging.
+* Added support for bypassConditions on banners attached to push notifications. When a push has an attached banner and bypassConditions is true, the banner's targeting/frequency conditions are skipped so it is shown directly (supported for both opened and silent pushes).
+
+## 1.34.49 (25.06.2026)
+* Adds support for RelativeToDelivery expiration for app banners and introduces clearAllBannerDeliveryDates() and clearBannerDeliveryDate(String bannerId) to clear stored delivery data.
+* Add configurable border (width, color, solid/dashed/dotted style) to banner buttons
+* Optimize didReceiveNotificationExtensionRequest to safely handle nil notification objects and prevent crashes.
+* Fixed issue in iOS in-app banner being dismissed when a WebView link triggers openWebView().
+
+## 1.34.48 (12.06.2026)
+* Resolved the issue of HTML buttons were not working when setAppBannersNonBlocking is true.
+
+## 1.34.47 (09.06.2026)
+* Optimized attributedStringFromHTML function for preventing crash.
+* Added unmarkSubscriptionAsTest method to unmark subscription as test.
+* Added a new Attribute condition type in Targeting for AppBanner: Exists/NotExists.
+
+## 1.34.46 (01.06.2026)
+* implemented setPianoSegments method to sync Piano segments.
+* implemented selectAll & removeAll buttons functionality for topicsDialogue.
+
+## 1.34.45 (21.05.2026)
+* implemented feature of regenerate APNS token on server-requested push token refresh via regeneratePushTokenRequestedAt timestamp comparison
+* Add topic name translation support with locale-based fallback.
+* implemented functionality of allow users to interact with app while in-app banner is visible.
+
+## 1.34.44 (skipped)
+* Version skipped. See 1.34.45 for the actual release.
+
+## 1.34.43 (16.04.2026)
+* Added functionality for preventing the API calls if there is no channelID.
+* Fixes issue of background colors by supporting 3- and 8-digit hex values.
+* Optimized uiapplicationdelegatecleverpush class for silent push notifications for flutter.
+* Added method markSubscriptionAsTest to mark subscription as test.
+* Fixed a rare crash related to html texts are displaying to the app-banners.
+
+## 1.34.42 (02.04.2026)
+* Added `window.CleverPush.getSubscriptionContext()` from banner JS to get subscriptionId and channelId from the iOS SDK to JS.
+* Fixed issue of tracking-consent cleanup by restoring previous consent from persisted state in setTrackingConsent, ensuring tags/attributes are removed on early post-restart false calls in iOS.
+* Implemented removing single and multiple subscription attributes, including callback-based failure handling and local attribute state sync in iOS.
+* Optimize isChannelIdChanged function for preventing crash.
+* Resolved the issue of images are not displaying in the in-app banners.
+
+## 1.34.41 (10.03.2026)
+* implemented a new method setHandleUrlFromSceneDelegate.
+
 ## 1.34.40 (16.02.2026)
 * Fix iOS deep-link opening in app banner/inbox by replacing direct openURL calls with CPUtils.tryOpenURL.
 * Fixed imageview not displaying in app banner.

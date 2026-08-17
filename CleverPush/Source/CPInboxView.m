@@ -78,12 +78,6 @@ CPNotificationClickBlock handleClick;
                         self.divider_colour = [UIColor lightGrayColor];
                     }
 
-                    [CleverPush getChannelConfig:^(NSDictionary *config) {
-                        NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
-                        if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
-                            self.notificationThumbnail = channelIcon;
-                        }
-                    }];
                     self.messageList = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width , frame.size.height)];
                     NSBundle *bundle = [CPUtils getAssetsBundle];
                     if (bundle) {
@@ -99,6 +93,16 @@ CPNotificationClickBlock handleClick;
                     if (self.notifications.count == 0) {
                         [self presentEmptyView:frame];
                     }
+
+                    [CleverPush getChannelConfig:^(NSDictionary *config) {
+                        NSString *channelIcon = [config cleverPushStringForKey:@"channelIcon"];
+                        if (channelIcon != nil && ![channelIcon isKindOfClass:[NSNull class]]) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                self.notificationThumbnail = channelIcon;
+                                [self.messageList reloadData];
+                            });
+                        }
+                    }];
                 });
 
             }];
@@ -255,11 +259,13 @@ CPNotificationClickBlock handleClick;
 - (void)presentAppBanner:(CPInboxDetailView*)appBannerViewController  banner:(CPAppBanner*)banner {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     UIViewController* topController = [CleverPush topViewController];
+
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+
     [topController presentViewController:appBannerViewController animated:YES completion:nil];
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
@@ -432,6 +438,11 @@ CPNotificationClickBlock handleClick;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: CPInboxView getBanners: channelId is nil or empty, skipping API call"];
+        return;
+    }
+
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
 
     if ([CleverPush isDevelopmentModeEnabled]) {
@@ -444,17 +455,17 @@ CPNotificationClickBlock handleClick;
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
+        id bannersValue = [result objectForKey:@"banners"];
+        if (bannersValue == nil || ![bannersValue isKindOfClass:[NSArray class]]) {
+            [CPLog error:@"CPInboxView getBanners: 'banners' key missing or not an array in response"];
+            return;
+        }
 
         NSPredicate *predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains '%@'", bannerId]]]];
-        jsonBanners = [[[result objectForKey:@"banners"] filteredArrayUsingPredicate:predicate] mutableCopy];
+        NSMutableArray *jsonBanners = [[bannersValue filteredArrayUsingPredicate:predicate] mutableCopy];
 
-
-        if (jsonBanners != nil) {
-            if (notificationId && callback) {
-                callback(jsonBanners);
-            }
-
+        if (notificationId && callback) {
+            callback(jsonBanners);
         }
     } onFailure:^(NSError* error) {
         [CPLog error:@"Failed getting app banners %@", error];
@@ -462,7 +473,10 @@ CPNotificationClickBlock handleClick;
 }
 
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
-
+    if ([CPUtils isNullOrEmpty:banner.channel]) {
+        [CPLog error:@"CleverPush: CPInboxView sendBannerEvent: channelId is nil or empty, skipping API call"];
+        return;
+    }
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:[NSString stringWithFormat:@"app-banner/event/%@", event]];
 

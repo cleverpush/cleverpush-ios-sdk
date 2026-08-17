@@ -33,7 +33,10 @@ static CleverPush* singleInstance = nil;
 #pragma mark - Singleton shared instance of the cleverpush.
 
 + (CleverPushInstance*)CPSharedInstance {
-    if (singletonInstance == nil) singletonInstance = [[CleverPushInstance alloc] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        singletonInstance = [[CleverPushInstance alloc] init];
+    });
     return singletonInstance;
 }
 
@@ -225,6 +228,22 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAppBannerTrackingEnabled:enabled];
 }
 
++ (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    [self.CPSharedInstance setAppBannersNonBlocking:nonBlocking];
+}
+
++ (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    [self.CPSharedInstance clearBannerDeliveryDate:bannerId];
+}
+
++ (void)clearAllBannerDeliveryDates {
+    [self.CPSharedInstance clearAllBannerDeliveryDates];
+}
+
++ (BOOL)getAppBannersNonBlocking {
+    return [self.CPSharedInstance getAppBannersNonBlocking];
+}
+
 + (BOOL)popupVisible {
     return [self.CPSharedInstance popupVisible];
 }
@@ -239,6 +258,22 @@ static CleverPush* singleInstance = nil;
 
 + (void)syncSubscription {
     [self.CPSharedInstance syncSubscription];
+}
+
++ (void)markSubscriptionAsTest {
+    [self.CPSharedInstance markSubscriptionAsTest];
+}
+
++ (void)markSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance markSubscriptionAsTestOnSuccess:successBlock onFailure:failureBlock];
+}
+
++ (void)unmarkSubscriptionAsTest {
+    [self.CPSharedInstance unmarkSubscriptionAsTest];
+}
+
++ (void)unmarkSubscriptionAsTestOnSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance unmarkSubscriptionAsTestOnSuccess:successBlock onFailure:failureBlock];
 }
 
 + (void)didRegisterForRemoteNotifications:(UIApplication* _Nullable)app deviceToken:(NSData* _Nullable)inDeviceToken {
@@ -303,13 +338,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)addSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance addSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     } onFailure:failureBlock];
 }
 
@@ -320,7 +359,9 @@ static CleverPush* singleInstance = nil;
 
 + (void)addSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
     [self.CPSharedInstance addSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -330,13 +371,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)removeSubscriptionTag:(NSString* _Nullable)tagId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
     [self.CPSharedInstance removeSubscriptionTag:tagId callback:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     } onFailure:failureBlock];
 }
 
@@ -346,8 +391,26 @@ static CleverPush* singleInstance = nil;
 
 + (void)removeSubscriptionTags:(NSArray <NSString*>* _Nullable)tagIds callback:(void(^ _Nullable)(NSArray <NSString*>* _Nullable))callback {
     [self.CPSharedInstance removeSubscriptionTags:tagIds callback:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId];
+}
+
++ (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self.CPSharedInstance removeSubscriptionAttribute:attributeId callback:^(NSString* callbackInner) {
+        if (callback) {
+            callback(callbackInner);
+        }
+    } onFailure:failureBlock];
+}
+
++ (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds {
+    [self.CPSharedInstance removeSubscriptionAttributes:attributeIds];
 }
 
 + (void)startLiveActivity:(NSString* _Nullable)activityId pushToken:(NSString* _Nullable)token {
@@ -404,19 +467,25 @@ static CleverPush* singleInstance = nil;
 
 + (void)getAvailableTags:(void(^ _Nullable)(NSArray <CPChannelTag*>*))callback {
     [self.CPSharedInstance getAvailableTags:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAvailableTopics:(void(^ _Nullable)(NSArray <CPChannelTopic*>*))callback {
     [self.CPSharedInstance getAvailableTopics:^(NSArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAvailableAttributes:(void(^ _Nullable)(NSMutableArray* _Nullable))callback {
     [self.CPSharedInstance getAvailableAttributes:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -442,6 +511,10 @@ static CleverPush* singleInstance = nil;
 
 + (void)setSubscriptionTopics:(NSMutableArray<NSString*>* _Nullable)topics onSuccess:(void (^ _Nullable)(void))successBlock onFailure:(CPFailureBlock _Nullable)failure {
     [self.CPSharedInstance setSubscriptionTopics:topics onSuccess:successBlock onFailure:failure];
+}
+
++ (void)setPianoSegments:(NSArray<NSString*>* _Nullable)segments {
+    [self.CPSharedInstance setPianoSegments:segments];
 }
 
 + (void)setBrandingColor:(UIColor* _Nullable)color {
@@ -480,12 +553,20 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setAutoRequestNotificationPermission:autoRequest];
 }
 
++ (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled {
+    [self.CPSharedInstance setProvisionalNotificationAuthorizationEnabled:enabled];
+}
+
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
     [self.CPSharedInstance setKeepTargetingDataOnUnsubscribe:keepData];
 }
 
 + (void)setIncrementBadge:(BOOL)increment {
     [self.CPSharedInstance setIncrementBadge:increment];
+}
+
++ (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
+    [self.CPSharedInstance setGroupNotificationSoundMode:mode];
 }
 
 + (void)setShowNotificationsInForeground:(BOOL)show {
@@ -526,13 +607,17 @@ static CleverPush* singleInstance = nil;
 
 + (void)getChannelConfig:(void(^ _Nullable)(NSDictionary* _Nullable))callback {
     [self.CPSharedInstance getChannelConfig:^(NSDictionary*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getSubscriptionId:(void(^ _Nullable)(NSString* _Nullable))callback {
     [self.CPSharedInstance getSubscriptionId:^(NSString*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -582,31 +667,41 @@ static CleverPush* singleInstance = nil;
 
 + (void)setAppBannerOpenedCallback:(CPAppBannerActionBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerOpenedCallback:^(CPAppBannerAction*action) {
-        callback(action);
+        if (callback) {
+            callback(action);
+        }
     }];
 }
 
 + (void)setAppBannerShownCallback:(CPAppBannerShownBlock _Nullable)callback {
     [self.CPSharedInstance setAppBannerShownCallback:^(CPAppBanner*appBanner) {
-        callback(appBanner);
+        if (callback) {
+            callback(appBanner);
+        }
     }];
 }
 
 + (void)setShowAppBannerCallback:(CPAppBannerDisplayBlock _Nullable)callback {
     [self.CPSharedInstance setShowAppBannerCallback:^(UIViewController*viewController) {
-        callback(viewController);
+        if (callback) {
+            callback(viewController);
+        }
     }];
 }
 
 + (void)getAppBanners:(NSString* _Nullable)channelId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
     [self.CPSharedInstance getAppBanners:channelId callback:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
 + (void)getAppBannersByGroup:(NSString* _Nullable)groupId callback:(void(^ _Nullable)(NSMutableArray <CPAppBanner*>* _Nullable))callback {
     [self.CPSharedInstance getAppBannersByGroup:groupId callback:^(NSMutableArray*callbackInner) {
-        callback(callbackInner);
+        if (callback) {
+            callback(callbackInner);
+        }
     }];
 }
 
@@ -718,6 +813,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getSubscriptionTopics];
 }
 
++ (NSArray<NSString*>* _Nullable)getSubscriptionPianoSegments {
+    return [self.CPSharedInstance getSubscriptionPianoSegments];
+}
+
 + (NSObject* _Nullable)getSubscriptionAttribute:(NSString* _Nullable)attributeId {
     return [self.CPSharedInstance getSubscriptionAttribute:attributeId];
 }
@@ -736,6 +835,10 @@ static CleverPush* singleInstance = nil;
 
 + (CPIabTcfMode)getIabTcfMode {
     return [self.CPSharedInstance getIabTcfMode];
+}
+
++ (CPGroupNotificationSoundMode)getGroupNotificationSoundMode {
+    return [self.CPSharedInstance getGroupNotificationSoundMode];
 }
 
 + (UIViewController* _Nullable)getCustomTopViewController {
@@ -805,6 +908,10 @@ static CleverPush* singleInstance = nil;
 
 + (BOOL)getUnsubscribeStatus {
     return [self.CPSharedInstance getUnsubscribeStatus];
+}
+
++ (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate {
+    [self.CPSharedInstance setHandleUrlFromSceneDelegate:handleFromSceneDelegate];
 }
 
 + (BOOL)getHandleUrlFromSceneDelegate {

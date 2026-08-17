@@ -13,6 +13,8 @@
 @property (readonly, nullable) NSDictionary *customData;
 @property (readonly, nullable) NSDate *createdAt;
 @property (nonatomic, readwrite) BOOL defaultUnchecked;
+@property (readonly) BOOL nameTranslationEnabled;
+@property (readonly, nullable) NSDictionary *nameTranslation;
 
 #pragma mark - Class Methods
 + (instancetype _Nonnull)initWithJson:(nonnull NSDictionary*)json;

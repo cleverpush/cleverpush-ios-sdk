@@ -360,6 +360,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
         } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
             [self.view setNeedsLayout];
             [self.view layoutIfNeeded];
+            if ([CleverPush getAppBannersNonBlocking]) {
+                [self updateHTMLBannerTouchableRects];
+            }
         }];
     } else {
         CGFloat currentWidth = [UIScreen mainScreen].bounds.size.width;
@@ -518,8 +521,8 @@ static CPAppBannerActionBlock appBannerActionCallback;
     } else if (self.data.type == CPAppBannerTypeBottom) {
         cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
     } else {
-        cell.topViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
-        cell.bottomViewBannerConstraint.priority = UILayoutPriorityDefaultHigh;
+        cell.topViewBannerConstraint.priority = UILayoutPriorityRequired;
+        cell.bottomViewBannerConstraint.priority = UILayoutPriorityRequired;
     }
 
     return cell;
@@ -821,7 +824,138 @@ static CPAppBannerActionBlock appBannerActionCallback;
     });
 }
 
+#pragma mark - HTML banner non-blocking touchable rect detection
+- (void)updateHTMLBannerTouchableRects {
+    if (![CleverPush getAppBannersNonBlocking]
+        || ![self.data.contentType isEqualToString:@"html"]
+        || self.webView == nil
+        || self.htmlTouchableRectsDidChangeBlock == nil) {
+        return;
+    }
+
+    NSString *script =
+    @"(function() {"
+    @"var selector = 'a, button, input, select, textarea, label, summary, [onclick], [role=\"button\"], [role=\"link\"], [data-action], [data-cp-action]';"
+    @"var interactiveNamePattern = /(button|btn|cta|link|close|submit|action|click)/i;"
+    @"var contentTags = /^(img|svg|canvas|video|audio|iframe)$/i;"
+    @"function colorHasAlpha(color) {"
+    @"if (!color || color === 'transparent') { return false; }"
+    @"var match = color.match(/rgba?\\(([^)]+)\\)/);"
+    @"if (!match) { return true; }"
+    @"var parts = match[1].split(',').map(function(part) { return part.trim(); });"
+    @"return parts.length < 4 || parseFloat(parts[3]) > 0;"
+    @"}"
+    @"var visualViewport = window.visualViewport;"
+    @"var viewportOffsetLeft = visualViewport ? visualViewport.offsetLeft : 0;"
+    @"var viewportOffsetTop = visualViewport ? visualViewport.offsetTop : 0;"
+    @"function nativeRectPayload(rect, tag, name, reason) {"
+    @"return { left: rect.left - viewportOffsetLeft, top: rect.top - viewportOffsetTop, width: rect.width, height: rect.height, tag: tag, name: name, reason: reason };"
+    @"}"
+    @"var elements = Array.prototype.slice.call(document.querySelectorAll('*'));"
+    @"var rects = [];"
+    @"var contentBounds = null;"
+    @"function addToContentBounds(rect) {"
+    @"if (!contentBounds) { contentBounds = { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom }; return; }"
+    @"contentBounds.left = Math.min(contentBounds.left, rect.left);"
+    @"contentBounds.top = Math.min(contentBounds.top, rect.top);"
+    @"contentBounds.right = Math.max(contentBounds.right, rect.right);"
+    @"contentBounds.bottom = Math.max(contentBounds.bottom, rect.bottom);"
+    @"}"
+    @"elements.forEach(function(el) {"
+    @"var style = window.getComputedStyle(el);"
+    @"if (!style || style.display === 'none' || style.visibility === 'hidden' || style.pointerEvents === 'none' || style.opacity === '0') { return; }"
+    @"var tag = (el.tagName || '').toLowerCase();"
+    @"var name = ((el.className && el.className.baseVal) || el.className || '') + ' ' + (el.id || '');"
+    @"var isInteractive = el.matches(selector) || typeof el.onclick === 'function' || style.cursor === 'pointer' || interactiveNamePattern.test(name);"
+    @"var hasVisibleContent = contentTags.test(tag) || (el.children.length === 0 && ((el.textContent || '').trim().length > 0));"
+    @"var borderWidth = parseFloat(style.borderTopWidth || '0') + parseFloat(style.borderRightWidth || '0') + parseFloat(style.borderBottomWidth || '0') + parseFloat(style.borderLeftWidth || '0');"
+    @"var hasVisualBox = colorHasAlpha(style.backgroundColor) || style.backgroundImage !== 'none' || borderWidth > 0 || style.boxShadow !== 'none';"
+    @"var rect = el.getBoundingClientRect();"
+    @"if (rect.width <= 0 || rect.height <= 0 || rect.bottom < 0 || rect.right < 0 || rect.top > window.innerHeight || rect.left > window.innerWidth) { return; }"
+    @"if ((tag === 'html' || tag === 'body') || (!isInteractive && rect.width >= window.innerWidth * 0.95 && rect.height >= window.innerHeight * 0.95)) { return; }"
+    @"var pseudoBefore = window.getComputedStyle(el, '::before');"
+    @"var pseudoAfter = window.getComputedStyle(el, '::after');"
+    @"var hasPseudoContent = (pseudoBefore && pseudoBefore.content && pseudoBefore.content !== 'none' && pseudoBefore.content !== 'normal') || (pseudoAfter && pseudoAfter.content && pseudoAfter.content !== 'none' && pseudoAfter.content !== 'normal');"
+    @"var looksLikeControl = rect.width >= 8 && rect.height >= 8 && rect.width <= 180 && rect.height <= 180 && (style.position === 'absolute' || style.position === 'fixed' || parseInt(style.zIndex, 10) > 0 || hasPseudoContent);"
+    @"if (!isInteractive && !hasVisibleContent && !hasVisualBox && !looksLikeControl) { return; }"
+    @"addToContentBounds(rect);"
+    @"var reason = isInteractive ? 'interactive' : (hasVisibleContent ? 'content' : (hasVisualBox ? 'visual' : 'control-candidate'));"
+    @"rects.push(nativeRectPayload(rect, tag, name.trim(), reason));"
+    @"});"
+    @"if (contentBounds) {"
+    @"rects.unshift({ left: contentBounds.left - viewportOffsetLeft, top: contentBounds.top - viewportOffsetTop, width: Math.max(0, contentBounds.right - contentBounds.left), height: Math.max(0, contentBounds.bottom - contentBounds.top), tag: 'content-bounds', name: '', reason: 'content-bounds' });"
+    @"var closeZoneTop = contentBounds.top - 240;"
+    @"var closeZoneHeight = Math.max(0, contentBounds.top - closeZoneTop + 80);"
+    @"rects.unshift({ left: window.innerWidth - 112 - viewportOffsetLeft, top: closeZoneTop - viewportOffsetTop, width: 112, height: closeZoneHeight, tag: 'html-close-zone', name: '', reason: 'html-close-zone' });"
+    @"}"
+    @"return JSON.stringify(rects);"
+    @"})();";
+
+    __weak typeof(self) weakSelf = self;
+    [self.webView evaluateJavaScript:script completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf == nil || strongSelf.htmlTouchableRectsDidChangeBlock == nil) {
+            return;
+        }
+
+        if (error != nil || ![result isKindOfClass:[NSString class]]) {
+            strongSelf.htmlTouchableRectsDidChangeBlock(@[[NSValue valueWithCGRect:strongSelf.webView.bounds]]);
+            return;
+        }
+
+        NSData *data = [(NSString *)result dataUsingEncoding:NSUTF8StringEncoding];
+        NSArray *rectDictionaries = nil;
+        if (data != nil) {
+            rectDictionaries = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        }
+
+        if (![rectDictionaries isKindOfClass:[NSArray class]]) {
+            strongSelf.htmlTouchableRectsDidChangeBlock(@[[NSValue valueWithCGRect:strongSelf.webView.bounds]]);
+            return;
+        }
+
+        NSMutableArray<NSValue *> *touchableRects = [NSMutableArray array];
+        for (NSDictionary *rectDictionary in rectDictionaries) {
+            if (![rectDictionary isKindOfClass:[NSDictionary class]]) {
+                continue;
+            }
+
+            NSNumber *left = rectDictionary[@"left"];
+            NSNumber *top = rectDictionary[@"top"];
+            NSNumber *width = rectDictionary[@"width"];
+            NSNumber *height = rectDictionary[@"height"];
+            NSString *reason = rectDictionary[@"reason"];
+            if (![left isKindOfClass:[NSNumber class]] || ![top isKindOfClass:[NSNumber class]] ||
+                ![width isKindOfClass:[NSNumber class]] || ![height isKindOfClass:[NSNumber class]]) {
+                continue;
+            }
+
+            BOOL isContentBounds = [reason isKindOfClass:[NSString class]] && [reason isEqualToString:@"content-bounds"];
+            BOOL isHTMLCloseZone = [reason isKindOfClass:[NSString class]] && [reason isEqualToString:@"html-close-zone"];
+            CGRect rect = CGRectMake(left.doubleValue, top.doubleValue, width.doubleValue, height.doubleValue);
+            CGFloat rectInset = (isContentBounds || isHTMLCloseZone) ? -96.0 : -48.0;
+            rect = CGRectInset(rect, rectInset, rectInset);
+            [touchableRects addObject:[NSValue valueWithCGRect:rect]];
+        }
+
+        if (touchableRects.count == 0) {
+            [touchableRects addObject:[NSValue valueWithCGRect:strongSelf.webView.bounds]];
+        }
+
+        strongSelf.htmlTouchableRectsDidChangeBlock(touchableRects);
+    }];
+}
+
 #pragma mark - UIWebView Delgate Method
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    if (![CleverPush getAppBannersNonBlocking]) {
+        return;
+    }
+    if (webView == self.webView) {
+        [self updateHTMLBannerTouchableRects];
+    }
+}
+
 - (void)userContentController:(WKUserContentController*)userContentController
       didReceiveScriptMessage:(WKScriptMessage*)message {
     if (message != nil && message.body != nil && message.name != nil) {
@@ -889,7 +1023,11 @@ static CPAppBannerActionBlock appBannerActionCallback;
         if (self.handleBannerClosed) {
             self.handleBannerClosed();
         }
-        [self dismissViewControllerAnimated:NO completion:nil];
+        if (self.windowDismissBlock) {
+            self.windowDismissBlock();
+        } else {
+            [self dismissViewControllerAnimated:NO completion:nil];
+        }
         [CPAppBannerModule showNextActivePendingBanner:self.data];
     });
 }
@@ -913,14 +1051,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
     NSMutableArray *imageURLsToPreload = [NSMutableArray array];
     
     if (self.data.background.imageUrl && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && ![self.data.background.imageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.imageUrl]) {
+        NSString *bgKey = [CPUtils imageCacheKeyForURLString:self.data.background.imageUrl];
+        if (bgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:bgKey]) {
             if (self.data.background.imageUrl != nil && ![self.data.background.imageUrl isKindOfClass:[NSNull class]] && [self.data.background.imageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.imageUrl];
             }
         }
     }
     if (self.data.background.darkImageUrl && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && ![self.data.background.darkImageUrl isEqualToString:@""]) {
-        if (![[CPUtils sharedImageCache] objectForKey:self.data.background.darkImageUrl]) {
+        NSString *darkBgKey = [CPUtils imageCacheKeyForURLString:self.data.background.darkImageUrl];
+        if (darkBgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkBgKey]) {
             if (self.data.background.darkImageUrl != nil && ![self.data.background.darkImageUrl isKindOfClass:[NSNull class]] && [self.data.background.darkImageUrl isKindOfClass:[NSString class]]) {
                 [imageURLsToPreload addObject:self.data.background.darkImageUrl];
             }
@@ -933,14 +1073,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -987,14 +1129,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    // Check if image is already cached
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1007,9 +1154,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();
@@ -1051,14 +1198,16 @@ static CPAppBannerActionBlock appBannerActionCallback;
             if ([block isKindOfClass:[CPAppBannerImageBlock class]]) {
                 CPAppBannerImageBlock *imageBlock = (CPAppBannerImageBlock *)block;
                 if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.imageUrl]) {
+                    NSString *imgKey = [CPUtils imageCacheKeyForURLString:imageBlock.imageUrl];
+                    if (imgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:imgKey]) {
                         if (imageBlock.imageUrl != nil && ![imageBlock.imageUrl isKindOfClass:[NSNull class]] && [imageBlock.imageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.imageUrl];
                         }
                     }
                 }
                 if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
-                    if (![[CPUtils sharedImageCache] objectForKey:imageBlock.darkImageUrl]) {
+                    NSString *darkImgKey = [CPUtils imageCacheKeyForURLString:imageBlock.darkImageUrl];
+                    if (darkImgKey.length > 0 && ![[CPUtils sharedImageCache] objectForKey:darkImgKey]) {
                         if (imageBlock.darkImageUrl != nil && ![imageBlock.darkImageUrl isKindOfClass:[NSNull class]] && [imageBlock.darkImageUrl isKindOfClass:[NSString class]]) {
                             [imageURLsToPreload addObject:imageBlock.darkImageUrl];
                         }
@@ -1089,13 +1238,19 @@ static CPAppBannerActionBlock appBannerActionCallback;
         return;
     }
     
-    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:urlString];
+    NSString *cacheKey = [CPUtils imageCacheKeyForURLString:urlString];
+    if (cacheKey.length == 0) {
+        if (completion) completion();
+        return;
+    }
+    
+    UIImage *cachedImage = [[CPUtils sharedImageCache] objectForKey:cacheKey];
     if (cachedImage) {
         if (completion) completion();
         return;
     }
     
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [CPUtils normalizedImageURLFromString:urlString];
     if (!url) {
         if (completion) completion();
         return;
@@ -1108,9 +1263,9 @@ static CPAppBannerActionBlock appBannerActionCallback;
             return;
         }
         
-        UIImage *image = [UIImage imageWithData:data];
+        UIImage *image = [CPUtils decodedImageWithData:data];
         if (image) {
-            [[CPUtils sharedImageCache] setObject:image forKey:urlString];
+            [[CPUtils sharedImageCache] setObject:image forKey:cacheKey];
         }
         
         if (completion) completion();

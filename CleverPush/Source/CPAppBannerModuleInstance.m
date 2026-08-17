@@ -1,4 +1,5 @@
 #import "CPAppBannerModuleInstance.h"
+#import "CPAppBannerPassthroughView.h"
 #import "CPUtils.h"
 #import "CPLog.h"
 #import "NSDictionary+SafeExpectations.h"
@@ -29,15 +30,18 @@ CPAppBannerShownBlock handleBannerShown;
 CPAppBannerClosedBlock handleBannerClosed;
 CPSQLiteManager *sqlManager;
 CPAppBannerDisplayBlock handleBannerDisplayed;
-
+CPAppBannerPassthroughView *activeBannerOverlay;
+CPAppBannerViewController *activeNonBlockingBannerController;
 
 static NSObject *callbackLock;
+static NSObject *bannerRequestLock;
 BOOL initialized = NO;
 BOOL showDrafts = NO;
 BOOL pendingBannerRequest = NO;
 BOOL bannersDisabled = NO;
 BOOL isFromNotification = NO;
 BOOL trackingEnabled = YES;
+BOOL appBannersNonBlocking = NO;
 
 long MIN_SESSION_LENGTH = 30 * 60;
 long MIN_SESSION_LENGTH_DEV = 30;
@@ -52,6 +56,7 @@ int appBannerPerDayValue = 0;
 + (void)initialize {
     if (self == [CPAppBannerModuleInstance class]) {
         callbackLock = [[NSObject alloc] init];
+        bannerRequestLock = [[NSObject alloc] init];
     }
 }
 
@@ -136,7 +141,7 @@ int appBannerPerDayValue = 0;
                     break;
                 }
                 if (![CPUtils isNullOrEmpty:notificationId]) {
-                    if (banner.triggers.count > 0) {
+                    if (!force && banner.triggers.count > 0) {
                         [self validatePushBannerTrigger:banner force:force notificationId:notificationId];
                     } else {
                         [self showBanner:banner force:force notificationId:notificationId];
@@ -208,6 +213,102 @@ int appBannerPerDayValue = 0;
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+#pragma mark - Safely read the stored first display records (always returns a valid array)
+- (NSArray*)getStoredBannerFirstDisplayRecords {
+    id stored = [[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    if (![stored isKindOfClass:[NSArray class]]) {
+        return @[];
+    }
+    return (NSArray*)stored;
+}
+
+#pragma mark - Store the first display date for a banner (used for relative_to_delivery expiry)
+- (void)setBannerFirstDisplayDate:(CPAppBanner*)banner {
+    if (banner == nil || ![banner isKindOfClass:[CPAppBanner class]]) {
+        return;
+    }
+
+    NSString *bannerId = banner.id;
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return;
+    }
+
+    NSMutableArray *firstDisplayRecords = [[self getStoredBannerFirstDisplayRecords] mutableCopy];
+
+    for (id record in firstDisplayRecords) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            return;
+        }
+    }
+
+    NSMutableDictionary *newRecord = [NSMutableDictionary dictionary];
+    newRecord[@"id"] = bannerId;
+    newRecord[@"date"] = [NSDate date];
+    [firstDisplayRecords addObject:newRecord];
+
+    [[NSUserDefaults standardUserDefaults] setObject:firstDisplayRecords forKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Retrieve the first display date for a banner
+- (NSDate*)getBannerFirstDisplayDate:(NSString*)bannerId {
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return nil;
+    }
+
+    for (id record in [self getStoredBannerFirstDisplayRecords]) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            id date = record[@"date"];
+            if ([date isKindOfClass:[NSDate class]]) {
+                return (NSDate*)date;
+            }
+            return nil;
+        }
+    }
+    return nil;
+}
+
+#pragma mark - Clear the stored first display date for a specific banner
+- (void)clearBannerDeliveryDate:(NSString*)bannerId {
+    if (![bannerId isKindOfClass:[NSString class]] || [CPUtils isNullOrEmpty:bannerId]) {
+        return;
+    }
+
+    NSArray *firstDisplayRecords = [self getStoredBannerFirstDisplayRecords];
+    if (firstDisplayRecords.count == 0) {
+        return;
+    }
+
+    NSMutableArray *updatedRecords = [NSMutableArray array];
+    for (id record in firstDisplayRecords) {
+        if (![record isKindOfClass:[NSDictionary class]]) {
+            continue;
+        }
+        id existingId = record[@"id"];
+        if ([existingId isKindOfClass:[NSString class]] && [existingId isEqualToString:bannerId]) {
+            continue;
+        }
+        [updatedRecords addObject:record];
+    }
+
+    [[NSUserDefaults standardUserDefaults] setObject:updatedRecords forKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Clear the stored first display dates for all banners
+- (void)clearAllBannerDeliveryDates {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_BANNER_FIRST_DISPLAY_DATE_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 #pragma mark - Initialised a session
 - (void)initSession:(NSString*)channelId afterInit:(BOOL)afterInit {
 	[self showPendingSilentPushAppBannersIds:channelId];
@@ -233,23 +334,27 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Initialised a banner with channel
 - (void)initBannersWithChannel:(NSString*)channelId showDrafts:(BOOL)showDraftsParam fromNotification:(BOOL)fromNotification {
-    if ([self isInitialized]) {
-        return;
+    @synchronized(bannerRequestLock) {
+        if ([self isInitialized]) {
+            return;
+        }
+
+        [self setPendingBannerListeners:[NSMutableArray new]];
+        [self setActiveBanners:[NSMutableArray new]];
+        [self setPendingBanners:[NSMutableArray new]];
+        activePendingBanners = [NSMutableArray new];
+        [self setEvents:[NSMutableArray new]];
+        [self updateInitialisedFlag:YES];
+        [self setFromNotification:fromNotification];
+        [self setPendingBannerRequest:NO];
     }
 
     [[NSUserDefaults standardUserDefaults] setBool:false forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    [self setPendingBannerListeners:[NSMutableArray new]];
-    [self setActiveBanners:[NSMutableArray new]];
-    [self setPendingBanners:[NSMutableArray new]];
-    activePendingBanners = [NSMutableArray new];
-    [self setEvents:[NSMutableArray new]];
     [self loadBannersDisabled];
     [self updateShowDraftsFlag:showDraftsParam];
     [self setSessions:[self getSessions]];
-    [self updateInitialisedFlag:YES];
-    [self setFromNotification:fromNotification];
     [self resetSessionBannerCount];
     if (![self isFromNotification]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
@@ -267,12 +372,29 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - Get the banner details by api call and load the banner data in to class variables
 - (void)getBanners:(NSString*)channelId bannerId:(NSString*)bannerId notificationId:(NSString*)notificationId groupId:(NSString*)groupId completion:(void(^)(NSMutableArray<CPAppBanner*>*))callback {
+    if ([CPUtils isNullOrEmpty:channelId]) {
+        [CPLog error:@"CleverPush: getBanners: channelId is nil or empty, skipping API call"];
+        return;
+    }
+
     if (notificationId == nil) {
-        [pendingBannerListeners addObject:callback];
-        if ([self getPendingBannerRequest]) {
+        BOOL shouldReturn = NO;
+        @synchronized(bannerRequestLock) {
+            if (pendingBannerListeners == nil) {
+                pendingBannerListeners = [NSMutableArray new];
+            }
+            if (callback != nil) {
+                [pendingBannerListeners addObject:[callback copy]];
+            }
+            if (pendingBannerRequest) {
+                shouldReturn = YES;
+            } else {
+                pendingBannerRequest = YES;
+            }
+        }
+        if (shouldReturn) {
             return;
         }
-        [self setPendingBannerRequest:YES];
     }
 
     NSString* bannersPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", channelId];
@@ -285,7 +407,26 @@ int appBannerPerDayValue = 0;
         bannersPath = [NSString stringWithFormat:@"%@&notificationId=%@", bannersPath, notificationId];
     }
 
-    NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_GET path:bannersPath];
+    CleverPushHTTPClient *httpClient = [CleverPushHTTPClient sharedClient];
+    if (httpClient == nil) {
+        [CPLog error:@"Failed getting app banners because HTTP client is nil"];
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
+        return;
+    }
+
+    NSMutableURLRequest* request = [httpClient requestWithMethod:HTTP_GET path:bannersPath];
+    if (request == nil) {
+        [CPLog error:@"Failed getting app banners because request creation failed"];
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
+        return;
+    }
+
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         NSMutableArray *jsonBanners = [[NSMutableArray alloc] init];
         BOOL useGroupId = groupId != nil && ![groupId isEqualToString:@""];
@@ -323,17 +464,31 @@ int appBannerPerDayValue = 0;
             if (notificationId && callback) {
                 callback([self getListOfBanners]);
             } else {
-                for (void (^listener)(NSMutableArray<CPAppBanner*>*) in pendingBannerListeners) {
+                NSArray *listeners = nil;
+                @synchronized(bannerRequestLock) {
+                    listeners = [pendingBannerListeners copy];
+                    pendingBannerRequest = NO;
+                    pendingBannerListeners = [NSMutableArray new];
+                }
+                for (void (^listener)(NSMutableArray<CPAppBanner*>*) in listeners) {
                     if (listener && [self getListOfBanners]) {
                         __strong void (^callbackBlock)(NSMutableArray<CPAppBanner*>*) = listener;
                         callbackBlock([self getListOfBanners]);
                     }
                 }
             }
-            [self setPendingBannerRequest:NO];
-            [self setPendingBannerListeners:[NSMutableArray new]];
+            if (notificationId != nil) {
+                @synchronized(bannerRequestLock) {
+                    pendingBannerRequest = NO;
+                    pendingBannerListeners = [NSMutableArray new];
+                }
+            }
         }
     } onFailure:^(NSError* error) {
+        @synchronized(bannerRequestLock) {
+            pendingBannerRequest = NO;
+            pendingBannerListeners = [NSMutableArray new];
+        }
         [CPLog error:@"Failed getting app banners %@", error];
     }];
 }
@@ -669,7 +824,21 @@ int appBannerPerDayValue = 0;
                 relation = @"equals";
             }
             
-            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
+            if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeExists)]) {
+                NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+                BOOL keyExists = NO;
+                if (subscriptionAttributes != nil && attributeId != nil) {
+                    keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
+                }
+                currentMatch = keyExists;
+            } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeNotExists)]) {
+                NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+                BOOL keyExists = NO;
+                if (subscriptionAttributes != nil && attributeId != nil) {
+                    keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
+                }
+                currentMatch = !keyExists;
+            } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
                 if ([attributeValueObj isKindOfClass:[NSString class]]) {
                     NSString *attributeValue = (NSString *)attributeValueObj;
                     currentMatch = [attributeValue containsString:compareAttributeValue];
@@ -786,6 +955,20 @@ int appBannerPerDayValue = 0;
         } else {
             return YES;
         }
+    } else if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+        if (banner.stopAtRelativeDays > 0 && [banner.id isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:banner.id]) {
+            NSDate *firstDisplayDate = [self getBannerFirstDisplayDate:banner.id];
+            if ([firstDisplayDate isKindOfClass:[NSDate class]]) {
+                NSCalendar *calendar = [NSCalendar currentCalendar];
+                NSDateComponents *components = [[NSDateComponents alloc] init];
+                [components setDay:banner.stopAtRelativeDays];
+                NSDate *expiryDate = [calendar dateByAddingComponents:components toDate:firstDisplayDate options:0];
+                if (expiryDate != nil && [expiryDate compare:[NSDate date]] == NSOrderedAscending) {
+                    return NO;
+                }
+            }
+        }
+        return YES;
     } else {
         return YES;
     }
@@ -1557,8 +1740,6 @@ int appBannerPerDayValue = 0;
 
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:CLEVERPUSH_APP_BANNER_VISIBLE_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [appBannerViewController setModalPresentationStyle:[CleverPush getAppBannerModalPresentationStyle]];
-    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
     appBannerViewController.data = banner;
 
     CPAppBannerClosedBlock closedCallback = nil;
@@ -1570,8 +1751,7 @@ int appBannerPerDayValue = 0;
     }
     
     [CPAppBannerViewController preloadImagesForBanner:banner];
-    UIViewController* topController = [CleverPush topViewController];
-    
+
     CPAppBannerDisplayBlock displayCallback = nil;
     @synchronized(callbackLock) {
         displayCallback = handleBannerDisplayed;
@@ -1579,22 +1759,13 @@ int appBannerPerDayValue = 0;
     
     if (displayCallback) {
         displayCallback(appBannerViewController);
-    } else {
-        if (!force && [CPUtils isNullOrEmpty:notificationId]) {
-            [self incrementSessionBannerCount];
-            [self incrementDailyBannerCount];
+        if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+            [self setBannerFirstDisplayDate:banner];
         }
-        appBannerViewController.view.alpha = 0.0;
-        [topController presentViewController:appBannerViewController animated:NO completion:^{
-            [appBannerViewController finishSetup];
-            if (!appBannerViewController.isPreloading) {
-                [appBannerViewController.cardCollectionView reloadData];
-                [appBannerViewController setBackground];
-                [UIView animateWithDuration:0.3 animations:^{
-                    appBannerViewController.view.alpha = 1.0;
-                }];
-            }
-        }];
+    } else if (appBannersNonBlocking) {
+        [self presentNonBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
+    } else {
+        [self presentBlockingBanner:appBannerViewController banner:banner notificationId:notificationId force:force];
     }
 
     if (banner.dismissType == CPAppBannerDismissTypeTimeout) {
@@ -1613,6 +1784,122 @@ int appBannerPerDayValue = 0;
     }
 }
 
+#pragma mark - Non-blocking banner presentation (child VC of top view controller)
+- (void)presentNonBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    if (!force && [CPUtils isNullOrEmpty:notificationId]) {
+        [self incrementSessionBannerCount];
+        [self incrementDailyBannerCount];
+    }
+    
+    UIViewController *hostVC = [CleverPush topViewController];
+    BOOL alertOnTop = NO;
+    while ([hostVC isKindOfClass:[UIAlertController class]] && hostVC.presentingViewController) {
+        alertOnTop = YES;
+        hostVC = hostVC.presentingViewController;
+    }
+    if (!hostVC) {
+        return;
+    }
+
+    BOOL attachToWindow = (alertOnTop && hostVC.view.window != nil);
+    UIView *overlayHostView = attachToWindow ? hostVC.view.window : hostVC.view;
+
+    CPAppBannerPassthroughView *overlay = [[CPAppBannerPassthroughView alloc] initWithFrame:overlayHostView.bounds];
+    overlay.backgroundColor = [UIColor clearColor];
+    overlay.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
+    if (!attachToWindow) {
+        [hostVC addChildViewController:appBannerViewController];
+    }
+    appBannerViewController.view.frame = overlay.bounds;
+    appBannerViewController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    appBannerViewController.view.alpha = 0.0;
+    [overlay addSubview:appBannerViewController.view];
+    if (!attachToWindow) {
+        [appBannerViewController didMoveToParentViewController:hostVC];
+    }
+
+    [overlayHostView addSubview:overlay];
+    activeBannerOverlay = overlay;
+    activeNonBlockingBannerController = appBannerViewController;
+
+    __weak CPAppBannerPassthroughView *weakOverlay = overlay;
+    __weak CPAppBannerViewController *weakBannerVC = appBannerViewController;
+
+    if ([banner.contentType isEqualToString:@"html"]) {
+        appBannerViewController.htmlTouchableRectsDidChangeBlock = ^(NSArray<NSValue *> *rects) {
+            weakOverlay.webViewTouchableRects = rects;
+        };
+    }
+
+    [appBannerViewController finishSetup];
+    if (!appBannerViewController.isPreloading) {
+        [appBannerViewController.cardCollectionView reloadData];
+        [appBannerViewController setBackground];
+    }
+
+    appBannerViewController.view.backgroundColor = [UIColor clearColor];
+
+    if ([banner.contentType isEqualToString:@"html"]) {
+        overlay.bannerContainerView = appBannerViewController.webView;
+        overlay.closeButtonView = appBannerViewController.htmlCloseButton;
+        overlay.htmlTouchPassthroughEnabled = YES;
+        overlay.webViewTouchableRects = @[[NSValue valueWithCGRect:appBannerViewController.webView.bounds]];
+    } else {
+        overlay.bannerContainerView = appBannerViewController.bannerContainer;
+        overlay.closeButtonView = appBannerViewController.btnClose;
+    }
+    [UIView animateWithDuration:0.3 animations:^{
+        appBannerViewController.view.alpha = 1.0;
+    }];
+
+    appBannerViewController.windowDismissBlock = ^{
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC willMoveToParentViewController:nil];
+        }
+        [weakOverlay removeFromSuperview];
+        if (weakBannerVC.parentViewController != nil) {
+            [weakBannerVC removeFromParentViewController];
+        }
+        activeBannerOverlay = nil;
+        activeNonBlockingBannerController = nil;
+    };
+
+    if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+        [self setBannerFirstDisplayDate:banner];
+    }
+}
+
+#pragma mark - Blocking banner presentation (default modal)
+- (void)presentBlockingBanner:(CPAppBannerViewController*)appBannerViewController banner:(CPAppBanner*)banner notificationId:(NSString*)notificationId force:(BOOL)force {
+    if (!force && [CPUtils isNullOrEmpty:notificationId]) {
+        [self incrementSessionBannerCount];
+        [self incrementDailyBannerCount];
+    }
+
+    UIViewController *topController = [CleverPush topViewController];
+    if (!topController) {
+        return;
+    }
+
+    [appBannerViewController setModalPresentationStyle:[CPUtils appBannerPresentationStyleForPresenter:topController]];
+    [appBannerViewController setModalTransitionStyle:UIModalTransitionStyleCrossDissolve];
+    appBannerViewController.view.alpha = 0.0;
+    [topController presentViewController:appBannerViewController animated:NO completion:^{
+        [appBannerViewController finishSetup];
+        if (!appBannerViewController.isPreloading) {
+            [appBannerViewController.cardCollectionView reloadData];
+            [appBannerViewController setBackground];
+            [UIView animateWithDuration:0.3 animations:^{
+                appBannerViewController.view.alpha = 1.0;
+            }];
+        }
+        if (banner.stopAtType == CPAppBannerStopAtTypeRelativeToDelivery) {
+            [self setBannerFirstDisplayDate:banner];
+        }
+    }];
+}
+
 #pragma mark - track the record of the banner callback events by calling an api (app-banner/event/@"event-name")
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type {
     [self sendBannerEvent:event forBanner:banner forScreen:screen forButtonBlock:block forImageBlock:image blockType:type withCustomData:nil];
@@ -1621,6 +1908,11 @@ int appBannerPerDayValue = 0;
 - (void)sendBannerEvent:(NSString*)event forBanner:(CPAppBanner*)banner forScreen:(CPAppBannerCarouselBlock*)screen forButtonBlock:(CPAppBannerButtonBlock*)block forImageBlock:(CPAppBannerImageBlock*)image blockType:(NSString*)type withCustomData:(NSMutableDictionary*)customData {
     if (!trackingEnabled) {
         [CPLog debug:@"sendBannerEvent: not sending event because tracking has been disabled."];
+        return;
+    }
+
+    if ([CPUtils isNullOrEmpty:banner.channel]) {
+        [CPLog error:@"CleverPush: sendBannerEvent: channelId is nil or empty, skipping API call"];
         return;
     }
 
@@ -1738,6 +2030,14 @@ int appBannerPerDayValue = 0;
 
 - (void)setTrackingEnabled:(BOOL)enabled {
     trackingEnabled = enabled;
+}
+
+- (void)setAppBannersNonBlocking:(BOOL)nonBlocking {
+    appBannersNonBlocking = nonBlocking;
+}
+
+- (BOOL)getAppBannersNonBlocking {
+    return appBannersNonBlocking;
 }
 
 - (void)setCurrentEventId:(NSString*)eventId {
@@ -1904,14 +2204,17 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - set app banner ids from silent push
 + (void)addSilentPushAppBannersId:(NSString *)appBannerId notificationId:(NSString *)notificationId {
+    [self addSilentPushAppBannersId:appBannerId notificationId:notificationId bypassConditions:NO];
+}
+
++ (void)addSilentPushAppBannersId:(NSString *)appBannerId notificationId:(NSString *)notificationId bypassConditions:(BOOL)bypassConditions {
     if ([CPUtils isNullOrEmpty:appBannerId] || [CPUtils isNullOrEmpty:notificationId]) {
         [CPLog debug:@"CPAppBannerModuleInstance: addSilentPushAppBannersId: appBannerId or notification ID is blank, null, or empty."];
         return;
     }
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *existingArray = [[NSMutableArray alloc] init];
-    existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    NSMutableArray *existingArray = [[defaults objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
 
     if (!existingArray) {
         existingArray = [[NSMutableArray alloc] init];
@@ -1921,11 +2224,20 @@ int appBannerPerDayValue = 0;
     NSArray *filteredArray = [existingArray filteredArrayUsingPredicate:predicate];
 
     if (filteredArray != nil && filteredArray.count > 0) {
-        NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
-        existingDict[@"appBanner"] = appBannerId;
+        NSUInteger index = [existingArray indexOfObject:filteredArray.firstObject];
+        if (index != NSNotFound) {
+            NSMutableDictionary *existingDict = [filteredArray.firstObject mutableCopy];
+            existingDict[@"appBanner"] = appBannerId;
+            existingDict[@"bypassConditions"] = @(bypassConditions);
+            [existingArray replaceObjectAtIndex:index withObject:existingDict];
+        }
     } else {
         if (notificationId != nil && appBannerId != nil) {
-            [existingArray addObject:@{ @"notificationId": notificationId, @"appBanner": appBannerId }];
+            [existingArray addObject:@{
+                @"notificationId": notificationId,
+                @"appBanner": appBannerId,
+                @"bypassConditions": @(bypassConditions)
+            }];
         }
     }
 
@@ -1935,20 +2247,25 @@ int appBannerPerDayValue = 0;
 
 #pragma mark - get app banner ids from silent push
 - (void)showPendingSilentPushAppBannersIds:(NSString*)channelId {
-	NSMutableArray *appBanners = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
-	if (appBanners != nil && appBanners.count > 0) {
-		NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
-
-		for (NSMutableDictionary *eventsObject in appBanners) {
-			[self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:NO];
-			[objectsToRemove addObject:eventsObject];
-		}
-
-		[appBanners removeObjectsInArray:objectsToRemove];
-
-		[[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
-		[[NSUserDefaults standardUserDefaults] synchronize];
-	}
+    NSMutableArray *appBanners = [[[NSUserDefaults standardUserDefaults] objectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY] mutableCopy];
+    if (appBanners == nil || appBanners.count == 0) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            return;
+        }
+        NSMutableArray *objectsToRemove = [[NSMutableArray alloc] init];
+        for (NSMutableDictionary *eventsObject in appBanners) {
+            BOOL storedBypassConditions = [[eventsObject objectForKey:@"bypassConditions"] boolValue];
+            [self showBanner:channelId bannerId:[eventsObject objectForKey:@"appBanner"] notificationId:[eventsObject objectForKey:@"notificationId"] force:storedBypassConditions];
+            [objectsToRemove addObject:eventsObject];
+        }
+        [appBanners removeObjectsInArray:objectsToRemove];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SILENT_PUSH_APP_BANNERS_KEY];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    });
 }
 
 #pragma mark - Get the value of pageControl from current index

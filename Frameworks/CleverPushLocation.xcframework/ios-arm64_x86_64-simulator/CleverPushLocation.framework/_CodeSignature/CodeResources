@@ -10,11 +10,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/objects-12.3+.nib</key>
 		<data>
-		n+Haw0g8gmSomex5yUNtoG+iJZQ=
+		6qUb4dfytJGWI+/lZAVwYSXQ8w8=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/runtime.nib</key>
 		<data>
-		hE5xhC3yChJMkmoXxNc0eq5tGWc=
+		SgLWr03rQMn49hUlg8ClpErJ+Zo=
 		</data>
 		<key>Frameworks/CleverPush.framework/CPButtonBlockCell.nib</key>
 		<data>
@@ -66,11 +66,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		2g1/diINGnnE/muvkuD+8o3l0mQ=
+		ZwXK88tQPnpuGPmV9gf/g1tdRao=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		Swih3QEP/Ix2AmjHkRPvqVt1OZs=
+		rMgE/ok/QJ38PEttE0+HBseraZo=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -78,11 +78,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		uiDKTV9tE78Z1TmTvpgj9Jk0W6U=
+		eXO+Pwm1VZa2+otIsJDZeob1ojE=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
 		ftuDLyjRQrALkaRzj0ULQ2Mzi7w=
+		</data>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<data>
+		73Uxl1yMsDBJg5nnRqZwN0bL9lc=
 		</data>
 		<key>Headers/CPIabTcfMode.h</key>
 		<data>
@@ -106,15 +110,15 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		wZRmnHLmBsf1pnC0YkxnMhMnnXw=
+		idGz2IeLlpQY4tZyAjrwxPmzQng=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
-		1wxK8A1k+ZGhOOqDcMtn45F/Ke4=
+		WE05nssdPAEMZBXB0AY6Obg9NiI=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		aK0VL4jk1sApk9YlpuMaTx44xS8=
+		5WH4MAqv2lbyZuOXcNdwUvfkxh8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -138,14 +142,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			g4bddQRBrLiMXeyQTkdU4j4uyXx+pt0Cw74V51g6huM=
+			968dc/ZHXSSz6MAYKNQFuU3/cglZslo4tYu4q2iZO7I=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPBannerCardContainer.nib/runtime.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			qWaumw5DbbnK9iyYNye5t9vcoDYic8TvH78Y6v+SUiI=
+			R6pzkSlrk5iHD6py8W17eFSAbgFNFB9GkJhi8SopgAI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/CPButtonBlockCell.nib</key>
@@ -236,14 +240,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			SwGkt0zlLEe9Lv/VH7YNi3wOsbazPwWzE0prNYoqAgc=
+			kBo2HlPSEmL+Tz2VsHcr0NWAjgbfhm1sxqX7lFIzpZE=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			d2RRIGaQ2Z6wzD+eQG7eWE4RtL4dLC1Oxpze151VJN8=
+			9iT514G6HdMAuGBPgWvSOtAS07WBg7GPE6PpJ5j17uI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -257,7 +261,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			o/eCD3d1g3SwUbfrVVgWXHEGtVPvrnasSBIOpbM01A0=
+			GbhyPXdSONevfVNYccG8Z1WdkNF76abiD3KtET1WxX8=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
@@ -265,6 +269,13 @@
 			<key>hash2</key>
 			<data>
 			vLYH4yl9FTVcGfbng397R7Kouj/d+rePqN0Wq2N5PRs=
+			</data>
+		</dict>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			4uoeJv0ZF5v5YdLYpfXFGhOzWAp0df1uyPOHszGJw0k=
 			</data>
 		</dict>
 		<key>Headers/CPIabTcfMode.h</key>
@@ -306,14 +317,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Lh966zUlyOhF/y1VqslwTeQOk044EvwIfcVN3GwzyWs=
+			NGpRbAJ5kyLW06MTy4E95t8Z3lqTs0qDSIgCq7NLFEs=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			BEj4rrT2ieOL7xnxnFc2KF1eBlJEInWkCGlaqE7x9SU=
+			ruy4O8JGpE912aKjGHLo+hqoq8AGwQk1+STMh9aftyI=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

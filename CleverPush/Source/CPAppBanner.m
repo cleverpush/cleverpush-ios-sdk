@@ -130,10 +130,19 @@
             self.everyXDays = [[json cleverPushStringForKey:@"everyXDays"] intValue];
         }
 
+        id stopAtRelativeDaysValue = [json objectForKey:@"stopAtRelativeDays"];
+        if ([stopAtRelativeDaysValue isKindOfClass:[NSNumber class]]) {
+            self.stopAtRelativeDays = [stopAtRelativeDaysValue intValue];
+        } else if ([stopAtRelativeDaysValue isKindOfClass:[NSString class]] && ![CPUtils isNullOrEmpty:stopAtRelativeDaysValue]) {
+            self.stopAtRelativeDays = [stopAtRelativeDaysValue intValue];
+        }
+
         if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"forever"]) {
             self.stopAtType = CPAppBannerStopAtTypeForever;
         } else if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"specific_time"]) {
             self.stopAtType = CPAppBannerStopAtTypeSpecificTime;
+        } else if ([[json cleverPushStringForKey:@"stopAtType"] isEqual:@"relative_to_delivery"]) {
+            self.stopAtType = CPAppBannerStopAtTypeRelativeToDelivery;
         }
 
         if ([[json cleverPushStringForKey:@"frequency"] isEqual:@"once"]) {
