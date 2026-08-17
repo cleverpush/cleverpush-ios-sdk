@@ -213,6 +213,18 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
         if (switcher.on && !contains) {
             if (topicId != nil && ![topicId isKindOfClass:[NSNull class]] && [topicId isKindOfClass:[NSString class]]) {
                 [selectedTopics addObject:topicId];
+                for (CPChannelTopic *childTopic in availableTopics) {
+                    NSString *childParentId = [childTopic parentTopic];
+                    if (childParentId != nil && [childParentId isEqualToString:topicId]) {
+                        NSString *childId = [childTopic id];
+                        if (childId != nil && ![childId isKindOfClass:[NSNull class]] && [childId isKindOfClass:[NSString class]]) {
+                            if (![selectedTopics containsObject:childId]) {
+                                [selectedTopics addObject:childId];
+                            }
+                            childTopic.defaultUnchecked = NO;
+                        }
+                    }
+                }
             }
         } else if ((!switcher.on && contains) || (switcher.on && contains) || (!switcher.on && !contains)) {
             [self setDefaultState:topicId];
@@ -236,7 +248,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     for (CPChannelTopic *topicone in availableTopics) {
         NSString* parentTopicId = [topicone parentTopic];
         if (parentTopicId != nil) {
-            if (topicId == parentTopicId) {
+            if ([topicId isEqualToString:parentTopicId]) {
                 BOOL contains = [selectedTopics containsObject:[topicone id]];
                 if (contains) {
                     NSString* topiconeId = [topicone id];
