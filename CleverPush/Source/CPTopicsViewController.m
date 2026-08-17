@@ -215,7 +215,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
                 [selectedTopics addObject:topicId];
                 for (CPChannelTopic *childTopic in availableTopics) {
                     NSString *childParentId = [childTopic parentTopic];
-                    if (childParentId != nil && [childParentId isEqualToString:topicId]) {
+                    if (childParentId != nil && [childParentId isKindOfClass:[NSString class]] && [childParentId isEqualToString:topicId]) {
                         NSString *childId = [childTopic id];
                         if (childId != nil && ![childId isKindOfClass:[NSNull class]] && [childId isKindOfClass:[NSString class]]) {
                             if (![selectedTopics containsObject:childId]) {
@@ -247,7 +247,7 @@ static CGFloat const CPTopicMinimumTitleWidth = 80.0;
     [selectedTopics removeObject:topicId];
     for (CPChannelTopic *topicone in availableTopics) {
         NSString* parentTopicId = [topicone parentTopic];
-        if (parentTopicId != nil) {
+        if (parentTopicId != nil && [parentTopicId isKindOfClass:[NSString class]]) {
             if ([topicId isEqualToString:parentTopicId]) {
                 BOOL contains = [selectedTopics containsObject:[topicone id]];
                 if (contains) {
