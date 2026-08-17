@@ -25,6 +25,7 @@
 #import "CPInboxView.h"
 #import "CleverPushUserDefaults.h"
 #import "CPIabTcfMode.h"
+#import "CPGroupNotificationSoundMode.h"
 #import "CPSQLiteManager.h"
 #import "CPWKWebKitView.h"
 
@@ -160,12 +161,14 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)setAppBannerDraftsEnabled:(BOOL)showDraft;
 + (void)setSubscriptionChanged:(BOOL)subscriptionChanged;
 + (void)setIncrementBadge:(BOOL)increment;
++ (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode;
 + (void)setShowNotificationsInForeground:(BOOL)show;
 + (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled;
 + (void)setSoundEnabledForNotifications:(BOOL)enabled;
 + (void)setBadgeCountEnabledForNotifications:(BOOL)enabled;
 + (void)setIgnoreDisabledNotificationPermission:(BOOL)ignore;
 + (void)setAutoRequestNotificationPermission:(BOOL)autoRequest;
++ (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled;
 + (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData;
 + (void)addChatView:(CPChatView* _Nullable)chatView;
 + (void)showTopicsDialog;
@@ -236,6 +239,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (int)getLocalEventTrackingRetentionDays;
 + (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler;
 + (CPIabTcfMode)getIabTcfMode;
++ (CPGroupNotificationSoundMode)getGroupNotificationSoundMode;
 
 + (UIColor* _Nullable)getBrandingColor;
 

@@ -66,11 +66,11 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/CleverPush</key>
 		<data>
-		wj0Hk07sj5ePPu7Yr3/EytHU4Ac=
+		ZwXK88tQPnpuGPmV9gf/g1tdRao=
 		</data>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<data>
-		RiZvnWCt1oyWqJNjNkFjE7j3BCc=
+		rMgE/ok/QJ38PEttE0+HBseraZo=
 		</data>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
 		<data>
@@ -78,11 +78,15 @@
 		</data>
 		<key>Frameworks/CleverPush.framework/_CodeSignature/CodeResources</key>
 		<data>
-		c54iu/+37lzD9cv4LlCugliaFjs=
+		eXO+Pwm1VZa2+otIsJDZeob1ojE=
 		</data>
 		<key>Headers/CPAppBannerEventFilters.h</key>
 		<data>
 		ftuDLyjRQrALkaRzj0ULQ2Mzi7w=
+		</data>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<data>
+		73Uxl1yMsDBJg5nnRqZwN0bL9lc=
 		</data>
 		<key>Headers/CPIabTcfMode.h</key>
 		<data>
@@ -106,7 +110,7 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		ErTTiQ52g3WGSyT7OelAVS6WZeU=
+		idGz2IeLlpQY4tZyAjrwxPmzQng=
 		</data>
 		<key>Headers/CleverPushLocation.h</key>
 		<data>
@@ -114,7 +118,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		rCGWg94XChVDcsQBVoHOcQYAT50=
+		5WH4MAqv2lbyZuOXcNdwUvfkxh8=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -236,14 +240,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			tIre+pWflQiPQa8m0lyrcFcThGUXa2OzzO419kwViw8=
+			kBo2HlPSEmL+Tz2VsHcr0NWAjgbfhm1sxqX7lFIzpZE=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			M19uAfBgWurUnidyEvJ8lDdLNMIMk1xTWNjnVff8ip0=
+			9iT514G6HdMAuGBPgWvSOtAS07WBg7GPE6PpJ5j17uI=
 			</data>
 		</dict>
 		<key>Frameworks/CleverPush.framework/PrivacyInfo.xcprivacy</key>
@@ -257,7 +261,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			3jq/viX1vObljEzcF8BddZx9edUPx5FZ6CvwfYVShGs=
+			GbhyPXdSONevfVNYccG8Z1WdkNF76abiD3KtET1WxX8=
 			</data>
 		</dict>
 		<key>Headers/CPAppBannerEventFilters.h</key>
@@ -265,6 +269,13 @@
 			<key>hash2</key>
 			<data>
 			vLYH4yl9FTVcGfbng397R7Kouj/d+rePqN0Wq2N5PRs=
+			</data>
+		</dict>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			4uoeJv0ZF5v5YdLYpfXFGhOzWAp0df1uyPOHszGJw0k=
 			</data>
 		</dict>
 		<key>Headers/CPIabTcfMode.h</key>
@@ -306,7 +317,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			wn9kiVd6vhYfhiCDYMSLFd24tmOW7dOp8e3zxq9eH5M=
+			NGpRbAJ5kyLW06MTy4E95t8Z3lqTs0qDSIgCq7NLFEs=
 			</data>
 		</dict>
 		<key>Headers/CleverPushLocation.h</key>
