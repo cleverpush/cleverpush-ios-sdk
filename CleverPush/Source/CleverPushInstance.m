@@ -2263,8 +2263,12 @@ static id isNil(id object) {
 #pragma clang diagnostic pop
 
 #pragma mark - Api call to recognise notification has been delivered or not
-- (void)setNotificationDelivered:(NSDictionary*)notification {
-    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
+- (void)setNotificationDelivered:(NSString*)notificationId {
+    NSDictionary *notificationDict = @{
+        @"_id": notificationId ?: @"",
+        @"notificationIdentifier": @""
+    };
+    [self setNotificationDelivered:notificationDict withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
 }
 
 - (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
