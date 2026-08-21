@@ -2081,7 +2081,7 @@ static id isNil(id object) {
     }
     [CPLog debug:@"handleNotificationOpened, %@, %@", action, payloadMutable];
 
-    [self trackNotificationDelivered:notificationId
+    [self trackNotificationClicked:notificationId
                    withChannelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"]
               withSubscriptionId:[payloadMutable cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
@@ -2336,19 +2336,19 @@ static id isNil(id object) {
 
 #pragma mark - Api call to recognise notification has been clicked or not
 - (void)trackNotificationClicked:(NSString*)notificationId {
-    [self trackNotificationDelivered:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
+    [self trackNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
 }
 
-- (void)trackNotificationDelivered:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+- (void)trackNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
     if ([CPUtils isNullOrEmpty:channelId]) {
-        [CPLog error:@"CleverPush: trackNotificationDelivered: channelId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationClicked: channelId is nil or empty, skipping API call"];
         return;
     }
     if ([CPUtils isNullOrEmpty:notificationId]) {
-        [CPLog error:@"CleverPush: trackNotificationDelivered: notificationId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationClicked: notificationId is nil or empty, skipping API call"];
         return;
     }
-    [CPLog debug:@"trackNotificationDelivered notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
+    [CPLog debug:@"trackNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/clicked"];
     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
