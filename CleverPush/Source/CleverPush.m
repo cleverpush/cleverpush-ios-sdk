@@ -956,6 +956,14 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance trackInboxClicked:notificationId];
 }
 
++ (void)trackNotificationDelivered:(NSString* _Nonnull)notificationId {
+    [self.CPSharedInstance trackNotificationDelivered:notificationId];
+}
+
++ (void)trackNotificationClicked:(NSString* _Nonnull)notificationId {
+    [self.CPSharedInstance trackNotificationClicked:notificationId];
+}
+
 #pragma mark - Notification Read Status Methods
 + (void)setNotificationRead:(NSString* _Nullable)notificationId read:(BOOL)read {
     [self.CPSharedInstance setNotificationRead:notificationId read:read];
