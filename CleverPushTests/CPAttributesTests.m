@@ -283,11 +283,13 @@
         if (handler) handler();
     }];
 
-    XCTAssertNoThrow([self.cleverPush setSubscriptionAttributes:@{ @"key1": @"val1", @"key2": @"val2" }]);
+    NSDictionary *attrs = @{ @"key1": @"val1", @"key2": @"val2" };
+    XCTAssertNoThrow([self.cleverPush setSubscriptionAttributes:attrs]);
 }
 
 - (void)testSetSubscriptionAttributesBulkWithEmptyDictionaryDoesNotCrash {
-    XCTAssertNoThrow([self.cleverPush setSubscriptionAttributes:@{}]);
+    NSDictionary *emptyAttrs = @{};
+    XCTAssertNoThrow([self.cleverPush setSubscriptionAttributes:emptyAttrs]);
 }
 
 - (void)testSetSubscriptionAttributesBulkWithNilDictionaryDoesNotCrash {
@@ -310,7 +312,6 @@
 }
 
 #pragma mark - removeSubscriptionAttribute (callback + onFailure)
-
 - (void)testRemoveSubscriptionAttributeSuccessCallsCallback {
     XCTestExpectation *exp = [self expectationWithDescription:@"remove attribute callback"];
 
