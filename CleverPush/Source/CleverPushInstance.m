@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.52";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.53";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -2030,7 +2030,7 @@ static id isNil(id object) {
 
     [CPLog debug:@"handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict];
 
-    [self setNotificationDelivered:notification
+    [self trackNotificationDelivered:notification
                      withChannelId:[messageDict cleverPushStringForKeyPath:@"channel._id"]
                 withSubscriptionId:[messageDict cleverPushStringForKeyPath:@"subscription._id"]
     ];
@@ -2081,7 +2081,7 @@ static id isNil(id object) {
     }
     [CPLog debug:@"handleNotificationOpened, %@, %@", action, payloadMutable];
 
-    [self setNotificationClicked:notificationId
+    [self trackNotificationClicked:notificationId
                    withChannelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"]
               withSubscriptionId:[payloadMutable cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
@@ -2263,13 +2263,22 @@ static id isNil(id object) {
 #pragma clang diagnostic pop
 
 #pragma mark - Api call to recognise notification has been delivered or not
-- (void)setNotificationDelivered:(NSDictionary*)notification {
-    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
+- (void)trackNotificationDelivered:(NSString*)notificationId {
+    if ([CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog error:@"CleverPush: trackNotificationDelivered: notificationId is nil or empty, skipping API call"];
+        return;
+    }
+    NSDictionary *notificationDict = @{ @"_id": notificationId };
+    [self trackNotificationDelivered:notificationDict withChannelId:channelId withSubscriptionId:[self getSubscriptionId] saveToStore:NO];
 }
 
-- (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+- (void)trackNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    [self trackNotificationDelivered:notification withChannelId:channelId withSubscriptionId:subscriptionId saveToStore:YES];
+}
+
+- (void)trackNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId saveToStore:(BOOL)saveToStore {
     if ([CPUtils isNullOrEmpty:channelId]) {
-        [CPLog error:@"CleverPush: setNotificationDelivered: channelId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationDelivered: channelId is nil or empty, skipping API call"];
         return;
     }
     NSString*notificationId = [notification valueForKey:@"_id"];
@@ -2284,6 +2293,10 @@ static id isNil(id object) {
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
+
+    if (!saveToStore) {
+        return;
+    }
 
     // save notification to user defaults
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -2322,16 +2335,20 @@ static id isNil(id object) {
 }
 
 #pragma mark - Api call to recognise notification has been clicked or not
-- (void)setNotificationClicked:(NSString*)notificationId {
-    [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
+- (void)trackNotificationClicked:(NSString*)notificationId {
+    [self trackNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
 }
 
-- (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+- (void)trackNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
     if ([CPUtils isNullOrEmpty:channelId]) {
-        [CPLog error:@"CleverPush: setNotificationClicked: channelId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationClicked: channelId is nil or empty, skipping API call"];
         return;
     }
-    [CPLog debug:@"setNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
+    if ([CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog error:@"CleverPush: trackNotificationClicked: notificationId is nil or empty, skipping API call"];
+        return;
+    }
+    [CPLog debug:@"trackNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/clicked"];
     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:

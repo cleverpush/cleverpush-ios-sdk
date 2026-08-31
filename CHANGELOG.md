@@ -1,3 +1,7 @@
+## 1.34.53 (28.08.2026)
+* Resolved the issue of subtopics not being selected while selecting the parent topics dialogue in iOS.
+* implemented setNotificationDelivered and setNotificationClicked  public methods for manually reporting notification delivered and clicked events.
+
 ## 1.34.52 (14.08.2026)
 * Optimized callback functions for preventing crashes.
 * Added setProvisionalNotificationAuthorizationEnabled method to support Apple's provisional push authorization.
