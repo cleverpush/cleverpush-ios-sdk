@@ -248,7 +248,7 @@ dispatch_queue_t dispatchQueue = nil;
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigfailure"];
     
-    NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"odcpZ3GhnwiGWxCbC"];
+    NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
@@ -284,7 +284,7 @@ dispatch_queue_t dispatchQueue = nil;
 - (void)testGetBannersWithWrongId {
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigfailure"];
-    NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"odcpZ3GhnwiGWxCbCe"];
+    NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"RHe2nXvQk9SZgdC4xe"];
     
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {

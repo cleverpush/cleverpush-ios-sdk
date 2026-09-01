@@ -179,14 +179,14 @@
     OCMStub([self.cleverPush subscriptionId]).andReturn(@"subscriptionId");
     OCMStub([self.cleverPush shouldSync]).andReturn(false);
     OCMStub([self.cleverPush getHandleSubscribedCalled]).andReturn(false);
-    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"odcpZ3GhnwiGWxCbC" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
     [_testUtilInstance performSelector:@selector(showTopicDialogOnNewAdded) withObject:self.cleverPush afterDelay:1.0f];
     [_testUtilInstance performSelector:@selector(initAppReview) withObject:self.cleverPush afterDelay:1.0f];
 }
 
 - (void)testChannelConfigApiWithSuccess {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfig"];
-    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"odcpZ3GhnwiGWxCbC"];
+    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"RHe2nXvQk9SZgdC4x"];
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
         XCTAssertNotNil(result);
@@ -254,6 +254,271 @@
         if (error) {
             NSLog(@"Timeout Error: %@", error);
         }
+    }];
+}
+
+- (void)testGetChannelConfigReturnsConfigWhenAlreadyCached {
+    NSDictionary *mockConfig = @{
+        @"channelId": @"RHe2nXvQk9SZgdC4x",
+        @"name": @"Test Channel",
+        @"confirmAlertSettingsEnabled": @NO
+    };
+    [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSDictionary *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(mockConfig);
+    }];
+    [self.cleverPush getChannelConfig:^(NSDictionary *config) {
+        XCTAssertNotNil(config);
+        XCTAssertEqualObjects([config objectForKey:@"channelId"], @"RHe2nXvQk9SZgdC4x");
+        XCTAssertEqualObjects([config objectForKey:@"name"], @"Test Channel");
+    }];
+}
+
+- (void)testGetChannelConfigReturnsNilWhenConfigNotAvailable {
+    [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSDictionary *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(nil);
+    }];
+    [self.cleverPush getChannelConfig:^(NSDictionary *config) {
+        XCTAssertNil(config);
+    }];
+}
+
+- (void)testGetChannelConfigFromChannelIdSuccess {
+    OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
+    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
+    OCMExpect([self.cleverPush getChannelConfigFromChannelId:configPath]);
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
+    OCMVerify([self.cleverPush getChannelConfigFromChannelId:configPath]);
+}
+
+- (void)testGetChannelConfigFromBundleIdSuccess {
+    OCMStub([self.cleverPush channelId]).andReturn(nil);
+    OCMStub([self.cleverPush getBundleName]).andReturn(@"com.example.app");
+    OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
+    NSString *configPath = [NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", @"com.example.app"];
+    OCMExpect([self.cleverPush getChannelConfigFromBundleId:configPath]);
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:nil handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
+    OCMVerify([self.cleverPush getChannelConfigFromBundleId:configPath]);
+}
+
+- (void)testGetChannelConfigFromChannelIdApiSuccess {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromChannelIdSuccess"];
+    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
+    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
+    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
+        XCTAssertNotNil(result);
+        XCTAssertNotNil([result objectForKey:@"channelId"]);
+        [expectation fulfill];
+    } onFailure:^(NSError *error) {
+        XCTFail(@"Expected success but got failure: %@", error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
+- (void)testGetChannelConfigFromChannelIdApiFailureWithInvalidId {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromChannelIdFailure"];
+    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"invalidChannelXXXX"];
+    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
+    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
+        NSLog(@"Unexpected success: %@", result);
+        [expectation fulfill];
+    } onFailure:^(NSError *error) {
+        XCTAssertNotNil(error);
+        NSInteger errorCode = error.code;
+        XCTAssertEqual(errorCode, 404);
+        XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"] valueForKey:@"error"], @"channel not found");
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
+- (void)testGetChannelConfigFromBundleIdApiSuccess {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromBundleIdSuccess"];
+    NSString *bundleId = @"com.cleverpush.demo";
+    NSString *configPath = [NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", bundleId];
+    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
+    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
+        XCTAssertNotNil(result);
+        XCTAssertNotNil([result objectForKey:@"channelId"]);
+        [expectation fulfill];
+    } onFailure:^(NSError *error) {
+        XCTAssertNotNil(error);
+        [expectation fulfill];
+        NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier: %@", error);
+    }];
+    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
+- (void)testGetChannelConfigFromBundleIdApiFailureWithInvalidBundleId {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromBundleIdFailure"];
+    NSString *configPath = [NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", @"com.invalid.bundle.notregistered"];
+    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
+    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
+        NSLog(@"Unexpected success: %@", result);
+        [expectation fulfill];
+    } onFailure:^(NSError *error) {
+        XCTAssertNotNil(error);
+        NSInteger errorCode = error.code;
+        XCTAssertEqual(errorCode, 404);
+        [expectation fulfill];
+        NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier: %@", error);
+    }];
+    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timeout Error: %@", error);
+        }
+    }];
+}
+
+- (void)testGetChannelConfigWithCallbackContainsExpectedKeys {
+    NSDictionary *mockConfig = @{
+        @"channelId": @"RHe2nXvQk9SZgdC4x",
+        @"channelTopics": @[],
+        @"channelTags": @[],
+        @"confirmAlertSettingsEnabled": @NO,
+        @"appReviewEnabled": @NO
+    };
+    [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSDictionary *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(mockConfig);
+    }];
+    [self.cleverPush getChannelConfig:^(NSDictionary *config) {
+        XCTAssertNotNil(config);
+        XCTAssertNotNil([config objectForKey:@"channelId"]);
+        XCTAssertNotNil([config objectForKey:@"channelTopics"]);
+        XCTAssertNotNil([config objectForKey:@"channelTags"]);
+        XCTAssertNotNil([config objectForKey:@"confirmAlertSettingsEnabled"]);
+    }];
+}
+
+- (void)testGetChannelConfigCallbackCalledOnce {
+    __block NSInteger callCount = 0;
+    NSDictionary *mockConfig = @{@"channelId": @"RHe2nXvQk9SZgdC4x"};
+    [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSDictionary *);
+        [invocation getArgument:&callback atIndex:2];
+        callCount++;
+        callback(mockConfig);
+    }];
+    [self.cleverPush getChannelConfig:^(NSDictionary *config) {}];
+    XCTAssertEqual(callCount, 1);
+}
+
+- (void)testFireChannelConfigListenersIsCalledAfterFetchSuccess {
+    OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
+    OCMExpect([self.cleverPush fireChannelConfigListeners]);
+    [self.cleverPush fireChannelConfigListeners];
+    OCMVerify([self.cleverPush fireChannelConfigListeners]);
+}
+
+- (void)testGetChannelConfigWithDevelopmentModeEnabled {
+    OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
+    OCMStub([self.cleverPush isDevelopmentModeEnabled]).andReturn(YES);
+    OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
+    OCMVerify([self.cleverPush getChannelConfigFromChannelId:[OCMArg checkWithBlock:^BOOL(NSString *path) {
+        return [path containsString:@"RHe2nXvQk9SZgdC4x"] && [path containsString:@"platformName=iOS"];
+    }]]);
+}
+
+- (void)testGetChannelConfigWithDevelopmentModeDisabled {
+    OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
+    OCMStub([self.cleverPush isDevelopmentModeEnabled]).andReturn(NO);
+    OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
+    (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
+    OCMVerify([self.cleverPush getChannelConfigFromChannelId:[OCMArg checkWithBlock:^BOOL(NSString *path) {
+        return [path containsString:@"RHe2nXvQk9SZgdC4x"] && ![path containsString:@"&t="];
+    }]]);
+}
+
+- (void)testGetAvailableTagsFromChannelConfig {
+    NSArray *mockTags = @[@{@"_id": @"tag1", @"name": @"Tag One"}, @{@"_id": @"tag2", @"name": @"Tag Two"}];
+    [OCMStub([self.cleverPush getAvailableTags:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(mockTags);
+    }];
+    [self.cleverPush getAvailableTags:^(NSArray *tags) {
+        XCTAssertNotNil(tags);
+        XCTAssertEqual(tags.count, 2);
+    }];
+}
+
+- (void)testGetAvailableTagsFromChannelConfigReturnsEmptyArray {
+    [OCMStub([self.cleverPush getAvailableTags:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(@[]);
+    }];
+    [self.cleverPush getAvailableTags:^(NSArray *tags) {
+        XCTAssertNotNil(tags);
+        XCTAssertEqual(tags.count, 0);
+    }];
+}
+
+- (void)testGetAvailableTopicsFromChannelConfig {
+    NSArray *mockTopics = @[@{@"_id": @"topic1", @"name": @"Topic One"}, @{@"_id": @"topic2", @"name": @"Topic Two"}];
+    [OCMStub([self.cleverPush getAvailableTopics:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(mockTopics);
+    }];
+    [self.cleverPush getAvailableTopics:^(NSArray *topics) {
+        XCTAssertNotNil(topics);
+        XCTAssertEqual(topics.count, 2);
+    }];
+}
+
+- (void)testGetAvailableTopicsFromChannelConfigReturnsNil {
+    [OCMStub([self.cleverPush getAvailableTopics:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(nil);
+    }];
+    [self.cleverPush getAvailableTopics:^(NSArray *topics) {
+        XCTAssertNil(topics);
+    }];
+}
+
+- (void)testGetAvailableAttributesFromChannelConfig {
+    NSMutableArray *mockAttributes = [NSMutableArray arrayWithArray:@[@{@"id": @"attr1", @"name": @"Attribute One"}]];
+    [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSMutableArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback(mockAttributes);
+    }];
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *attributes) {
+        XCTAssertNotNil(attributes);
+        XCTAssertEqual(attributes.count, 1);
+    }];
+}
+
+- (void)testGetAvailableAttributesFromChannelConfigReturnsEmpty {
+    [OCMStub([self.cleverPush getAvailableAttributes:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(NSMutableArray *);
+        [invocation getArgument:&callback atIndex:2];
+        callback([NSMutableArray new]);
+    }];
+    [self.cleverPush getAvailableAttributes:^(NSMutableArray *attributes) {
+        XCTAssertNotNil(attributes);
+        XCTAssertEqual(attributes.count, 0);
     }];
 }
 
