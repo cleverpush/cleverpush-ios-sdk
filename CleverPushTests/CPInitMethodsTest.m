@@ -373,4 +373,581 @@ static NSString * const kCPFailureChannelId = @"__invalid_channel_id__";
     }
 }
 
+#pragma mark - handleInitialization edge cases
+
+- (void)testHandleInitializationDoesNotFireCallbackWhenAlreadyInitialized {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock clearBadge]).andDo(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock initWithChannelId]).andDo(nil);
+
+    __block NSInteger callCount = 0;
+    CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {
+        callCount++;
+    };
+     
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
+
+    [instance handleInitialization:YES error:nil];
+    [instance handleInitialization:YES error:nil];
+    [instance handleInitialization:NO error:@"ignored second call"];
+
+    XCTAssertEqual(callCount, 1);
+}
+
+- (void)testHandleInitializationWithNilCallbackDoesNotCrash {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock clearBadge]).andDo(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock initWithChannelId]).andDo(nil);
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:nil];
+
+    XCTAssertNoThrow([instance handleInitialization:YES error:nil]);
+}
+
+- (void)testHandleInitializationSuccessPassesNilFailureMessage {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock clearBadge]).andDo(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock initWithChannelId]).andDo(nil);
+
+    XCTestExpectation *exp = [self expectationWithDescription:@"success with nil error"];
+    CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {
+        XCTAssertTrue(success);
+        XCTAssertNil(failureMessage);
+        [exp fulfill];
+    };
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
+    [instance handleInitialization:YES error:nil];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testHandleInitializationFailurePassesErrorMessage {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock clearBadge]).andDo(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock initWithChannelId]).andDo(nil);
+
+    NSString *expectedError = @"channel not found";
+    XCTestExpectation *exp = [self expectationWithDescription:@"failure with error message"];
+    CPInitializedBlock initialized = ^(BOOL success, NSString * _Nullable failureMessage) {
+        XCTAssertFalse(success);
+        XCTAssertEqualObjects(failureMessage, expectedError);
+        [exp fulfill];
+    };
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:initialized];
+    [instance handleInitialization:NO error:expectedError];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testHandleInitializationFiresChannelConfigListeners {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock clearBadge]).andDo(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock initWithChannelId]).andDo(nil);
+    OCMExpect([instanceMock fireChannelConfigListeners]);
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"testChannelId" handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:nil];
+    [instanceMock handleInitialization:YES error:nil];
+
+    OCMVerify([instanceMock fireChannelConfigListeners]);
+}
+
+#pragma mark - setTrackingConsentRequired
+
+- (void)testSetTrackingConsentRequiredTrue {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock setTrackingConsentRequired:YES]);
+    [instanceMock setTrackingConsentRequired:YES];
+    OCMVerify([instanceMock setTrackingConsentRequired:YES]);
+}
+
+- (void)testSetTrackingConsentRequiredFalse {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock setTrackingConsentRequired:NO]);
+    [instanceMock setTrackingConsentRequired:NO];
+    OCMVerify([instanceMock setTrackingConsentRequired:NO]);
+}
+
+- (void)testGetTrackingConsentRequiredReturnsExpectedValue {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock getTrackingConsentRequired]).andReturn(YES);
+    XCTAssertTrue([instanceMock getTrackingConsentRequired]);
+}
+
+- (void)testGetTrackingConsentRequiredReturnsFalseByDefault {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock getTrackingConsentRequired]).andReturn(NO);
+    XCTAssertFalse([instanceMock getTrackingConsentRequired]);
+}
+
+#pragma mark - setSubscribeConsentRequired
+
+- (void)testSetSubscribeConsentRequiredTrue {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock setSubscribeConsentRequired:YES]);
+    [instanceMock setSubscribeConsentRequired:YES];
+    OCMVerify([instanceMock setSubscribeConsentRequired:YES]);
+}
+
+- (void)testSetSubscribeConsentRequiredFalse {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock setSubscribeConsentRequired:NO]);
+    [instanceMock setSubscribeConsentRequired:NO];
+    OCMVerify([instanceMock setSubscribeConsentRequired:NO]);
+}
+
+#pragma mark - enableDevelopmentMode / isDevelopmentModeEnabled
+
+- (void)testEnableDevelopmentModeSetsDevelopmentFlag {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock enableDevelopmentMode]);
+    [instanceMock enableDevelopmentMode];
+    OCMVerify([instanceMock enableDevelopmentMode]);
+}
+
+- (void)testIsDevelopmentModeEnabledReturnsTrueAfterEnabling {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock isDevelopmentModeEnabled]).andReturn(YES);
+    XCTAssertTrue([instanceMock isDevelopmentModeEnabled]);
+}
+
+- (void)testIsDevelopmentModeEnabledReturnsFalseByDefault {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock isDevelopmentModeEnabled]).andReturn(NO);
+    XCTAssertFalse([instanceMock isDevelopmentModeEnabled]);
+}
+
+#pragma mark - subscribe from init
+
+- (void)testAutoRegisterTrueCallsSubscribeDuringInit {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock channelId]).andReturn(@"cid");
+    OCMStub([instanceMock subscriptionId]).andReturn(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock isDevelopmentModeEnabled]).andReturn(NO);
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"cid" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:YES];
+
+    OCMVerify([instanceMock subscribe]);
+}
+
+- (void)testAutoRegisterFalseDoesNotCallSubscribeDuringInit {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    OCMStub([instanceMock channelId]).andReturn(@"cid");
+    OCMStub([instanceMock subscriptionId]).andReturn(nil);
+    OCMStub([instanceMock incrementAppOpens]).andDo(nil);
+    OCMStub([instanceMock isDevelopmentModeEnabled]).andReturn(NO);
+
+    [[instanceMock reject] subscribe];
+
+    (void)[instanceMock initWithLaunchOptions:nil channelId:@"cid" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+}
+
+#pragma mark - markSubscriptionAsTest
+
+- (void)testMarkSubscriptionAsTestCallsVerify {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock markSubscriptionAsTest]);
+    [instanceMock markSubscriptionAsTest];
+    OCMVerify([instanceMock markSubscriptionAsTest]);
+}
+
+- (void)testMarkSubscriptionAsTestOnSuccessCallsSuccessBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"markSubscriptionAsTest success"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock markSubscriptionAsTestOnSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:2];
+        if (success) success(@{});
+    }];
+
+    [instanceMock markSubscriptionAsTestOnSuccess:^(NSDictionary * _Nullable result) {
+        XCTAssertNotNil(result);
+        [exp fulfill];
+    } onFailure:^(NSError * _Nullable error) {
+        XCTFail(@"Unexpected failure: %@", error);
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testMarkSubscriptionAsTestOnFailureCallsFailureBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"markSubscriptionAsTest failure"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSError *err = [NSError errorWithDomain:@"CleverPushError" code:400 userInfo:nil];
+    [OCMStub([instanceMock markSubscriptionAsTestOnSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:3];
+        if (failure) failure(err);
+    }];
+
+    [instanceMock markSubscriptionAsTestOnSuccess:^(NSDictionary * _Nullable result) {
+        XCTFail(@"Unexpected success");
+    } onFailure:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, 400);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testUnmarkSubscriptionAsTestOnSuccessCallsSuccessBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"unmarkSubscriptionAsTest success"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock unmarkSubscriptionAsTestOnSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:2];
+        if (success) success(@{});
+    }];
+
+    [instanceMock unmarkSubscriptionAsTestOnSuccess:^(NSDictionary * _Nullable result) {
+        XCTAssertNotNil(result);
+        [exp fulfill];
+    } onFailure:^(NSError * _Nullable error) {
+        XCTFail(@"Unexpected failure: %@", error);
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testUnmarkSubscriptionAsTestOnFailureCallsFailureBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"unmarkSubscriptionAsTest failure"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSError *err = [NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil];
+    [OCMStub([instanceMock unmarkSubscriptionAsTestOnSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:3];
+        if (failure) failure(err);
+    }];
+
+    [instanceMock unmarkSubscriptionAsTestOnSuccess:^(NSDictionary * _Nullable result) {
+        XCTFail(@"Unexpected success");
+    } onFailure:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, 500);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+#pragma mark - subscribe overloads
+
+- (void)testSubscribeWithSuccessBlockCallsBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"subscribe success block"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock subscribe:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPHandleSubscribedBlock block = nil;
+        [invocation getArgument:&block atIndex:2];
+        if (block) block(@"subscriptionId");
+    }];
+
+    [instanceMock subscribe:^(NSString * _Nullable subscriptionId) {
+        XCTAssertEqualObjects(subscriptionId, @"subscriptionId");
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testSubscribeWithSuccessAndFailureBlocksCallsSuccessBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"subscribe success with failure block"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock subscribe:[OCMArg any] failure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPHandleSubscribedBlock block = nil;
+        [invocation getArgument:&block atIndex:2];
+        if (block) block(@"subscriptionId");
+    }];
+
+    [instanceMock subscribe:^(NSString * _Nullable subscriptionId) {
+        XCTAssertEqualObjects(subscriptionId, @"subscriptionId");
+        [exp fulfill];
+    } failure:^(NSError * _Nullable error) {
+        XCTFail(@"Unexpected failure");
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testSubscribeWithSuccessAndFailureBlocksCallsFailureBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"subscribe calls failure block"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSError *err = [NSError errorWithDomain:@"CleverPushError" code:503 userInfo:nil];
+    [OCMStub([instanceMock subscribe:[OCMArg any] failure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:3];
+        if (failure) failure(err);
+    }];
+
+    [instanceMock subscribe:^(NSString * _Nullable subscriptionId) {
+        XCTFail(@"Unexpected success");
+    } failure:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, 503);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+#pragma mark - unsubscribe
+
+- (void)testUnsubscribeCallbackInvokedOnSuccess {
+    XCTestExpectation *exp = [self expectationWithDescription:@"unsubscribe success"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock unsubscribe:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(BOOL) = nil;
+        [invocation getArgument:&callback atIndex:2];
+        if (callback) callback(YES);
+    }];
+
+    [instanceMock unsubscribe:^(BOOL success) {
+        XCTAssertTrue(success);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testUnsubscribeCallbackInvokedOnFailure {
+    XCTestExpectation *exp = [self expectationWithDescription:@"unsubscribe failure"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock unsubscribe:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^callback)(BOOL) = nil;
+        [invocation getArgument:&callback atIndex:2];
+        if (callback) callback(NO);
+    }];
+
+    [instanceMock unsubscribe:^(BOOL success) {
+        XCTAssertFalse(success);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testUnsubscribeWithoutCallbackDoesNotCrash {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock unsubscribe]).andDo(nil);
+    XCTAssertNoThrow([instanceMock unsubscribe]);
+}
+
+#pragma mark - syncSubscription
+
+- (void)testSyncSubscriptionCallsVerify {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMExpect([instanceMock syncSubscription]);
+    [instanceMock syncSubscription];
+    OCMVerify([instanceMock syncSubscription]);
+}
+
+- (void)testSyncSubscriptionWithFailureBlockCallsFailureWhenError {
+    XCTestExpectation *exp = [self expectationWithDescription:@"syncSubscription failure"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSError *err = [NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil];
+    [OCMStub([instanceMock syncSubscription:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:2];
+        if (failure) failure(err);
+    }];
+
+    [instanceMock syncSubscription:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, 500);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+- (void)testSyncSubscriptionWithSuccessAndFailureBlocksCallsSuccessBlock {
+    XCTestExpectation *exp = [self expectationWithDescription:@"syncSubscription with success block"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    [OCMStub([instanceMock syncSubscription:[OCMArg any] successBlock:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^successBlock)(void) = nil;
+        [invocation getArgument:&successBlock atIndex:3];
+        if (successBlock) successBlock();
+    }];
+
+    [instanceMock syncSubscription:^(NSError * _Nullable error) {
+        XCTFail(@"Unexpected failure");
+    } successBlock:^{
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+}
+
+#pragma mark - isSubscribed
+
+- (void)testIsSubscribedReturnsTrueWhenSubscribed {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock isSubscribed]).andReturn(YES);
+    XCTAssertTrue([instanceMock isSubscribed]);
+}
+
+- (void)testIsSubscribedReturnsFalseWhenNotSubscribed {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+    OCMStub([instanceMock isSubscribed]).andReturn(NO);
+    XCTAssertFalse([instanceMock isSubscribed]);
+}
+
+#pragma mark - nil channelId launch options overload forwarding
+
+- (void)testInstanceInitWithNilChannelIdForwardsToCoreInitializerWithNullChannelId {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSDictionary *launchOptions = @{ @"k": @"v" };
+
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:NULL autoRegister:YES handleInitialized:NULL]);
+
+    (void)[instanceMock initWithLaunchOptions:launchOptions];
+    OCMVerifyAll(instanceMock);
+}
+
+- (void)testInstanceInitWithNilChannelIdAndOpenedCallbackForwards {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSDictionary *launchOptions = @{ @"k": @"v" };
+    CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
+
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:opened handleSubscribed:NULL autoRegister:YES handleInitialized:NULL]);
+
+    (void)[instanceMock initWithLaunchOptions:launchOptions handleNotificationOpened:opened];
+    OCMVerifyAll(instanceMock);
+}
+
+- (void)testInstanceInitWithNilChannelIdAndSubscribedCallbackForwards {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSDictionary *launchOptions = @{ @"k": @"v" };
+    CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
+
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:NULL handleSubscribed:subscribed autoRegister:YES handleInitialized:NULL]);
+
+    (void)[instanceMock initWithLaunchOptions:launchOptions handleSubscribed:subscribed];
+    OCMVerifyAll(instanceMock);
+}
+
+- (void)testInstanceInitWithNilChannelIdOpenedAndSubscribedCallbackForwards {
+    CleverPushInstance *instance = [CleverPushInstance new];
+    id instanceMock = OCMPartialMock(instance);
+
+    NSDictionary *launchOptions = @{ @"k": @"v" };
+    CPHandleNotificationOpenedBlock opened = ^(CPNotificationOpenedResult * _Nullable result) {};
+    CPHandleSubscribedBlock subscribed = ^(NSString * _Nullable result) {};
+
+    OCMExpect([instanceMock initWithLaunchOptions:launchOptions channelId:NULL handleNotificationReceived:NULL handleNotificationOpened:opened handleSubscribed:subscribed autoRegister:YES handleInitialized:NULL]);
+
+    (void)[instanceMock initWithLaunchOptions:launchOptions handleNotificationOpened:opened handleSubscribed:subscribed];
+    OCMVerifyAll(instanceMock);
+}
+
+#pragma mark - Live integration — subscribe/unsubscribe via API
+
+- (void)testLiveSubscribeAndUnsubscribeWithValidChannelId {
+    XCTestExpectation *subscribeExp = [self expectationWithDescription:@"subscribe success"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+ 
+    (void)[instance initWithLaunchOptions:nil channelId:kCPSuccessChannelId handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+        if (!success) {
+            XCTFail(@"Init failed: %@", failureMessage);
+            [subscribeExp fulfill];
+            return;
+        }
+        [instance subscribe:^(NSString * _Nullable subscriptionId) {
+            XCTAssertNotNil(subscriptionId);
+            [instance unsubscribe:^(BOOL unsubscribeSuccess) {
+                [subscribeExp fulfill];
+            }];
+        } failure:^(NSError * _Nullable error) {
+            XCTFail(@"Subscribe failed: %@", error);
+            [subscribeExp fulfill];
+        }];
+    }];
+
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+}
+
+- (void)testLiveInitWithInvalidChannelIdReturnsFailure {
+    XCTestExpectation *exp = [self expectationWithDescription:@"init failure with invalid channel"];
+
+    CleverPushInstance *instance = [CleverPushInstance new];
+    (void)[instance initWithLaunchOptions:nil channelId:kCPFailureChannelId handleNotificationReceived:nil handleNotificationOpened:nil handleSubscribed:nil autoRegister:NO handleInitialized:^(BOOL success, NSString * _Nullable failureMessage) {
+        XCTAssertFalse(success);
+        XCTAssertNotNil(failureMessage);
+        [exp fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:15.0 handler:nil];
+}
+
 @end
