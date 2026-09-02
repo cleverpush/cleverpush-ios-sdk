@@ -629,10 +629,6 @@ static id isNil(id object) {
     BOOL appVersionChanged = [self isAppVersionChanged];
     NSString* previousAppVersion = [userDefaults stringForKey:CLEVERPUSH_APP_VERSION_KEY];
     NSString* currentAppVersion = [self getCurrentAppVersion];
-    if (currentAppVersion != nil && currentAppVersion.length > 0) {
-        [userDefaults setObject:currentAppVersion forKey:CLEVERPUSH_APP_VERSION_KEY];
-        [userDefaults synchronize];
-    }
 
     if (subscriptionId != nil) {
         hasCalledSubscribe = YES;
@@ -1909,6 +1905,10 @@ static id isNil(id object) {
                 subscriptionId = [results objectForKey:@"id"];
                 [userDefaults setObject:subscriptionId forKey:CLEVERPUSH_SUBSCRIPTION_ID_KEY];
                 [userDefaults setObject:[NSDate date] forKey:CLEVERPUSH_SUBSCRIPTION_LAST_SYNC_KEY];
+                NSString* latestAppVersion = [self getCurrentAppVersion];
+                if (latestAppVersion != nil && latestAppVersion.length > 0) {
+                    [userDefaults setObject:latestAppVersion forKey:CLEVERPUSH_APP_VERSION_KEY];
+                }
                 [userDefaults synchronize];
 
                 if (handleSubscribed && ![self getHandleSubscribedCalled]) {
