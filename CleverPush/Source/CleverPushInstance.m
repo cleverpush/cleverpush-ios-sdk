@@ -626,14 +626,26 @@ static id isNil(id object) {
         }
     }
 
+    BOOL appVersionChanged = [self isAppVersionChanged];
+    NSString* previousAppVersion = [userDefaults stringForKey:CLEVERPUSH_APP_VERSION_KEY];
+    NSString* currentAppVersion = [self getCurrentAppVersion];
+    if (currentAppVersion != nil && currentAppVersion.length > 0) {
+        [userDefaults setObject:currentAppVersion forKey:CLEVERPUSH_APP_VERSION_KEY];
+        [userDefaults synchronize];
+    }
+
     if (subscriptionId != nil) {
         hasCalledSubscribe = YES;
         [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
             if (!notificationsEnabled && !ignoreDisabledNotificationPermission) {
                 [CPLog info:@"notification authorization revoked, unsubscribing"];
                 [self unsubscribe];
-            } else if ([self shouldSync]) {
-                [CPLog debug:@"syncSubscription called from initWithChannelId"];
+            } else if (appVersionChanged || [self shouldSync]) {
+                if (appVersionChanged) {
+                    [CPLog debug:@"syncSubscription called from initWithChannelId due to app version change: %@ -> %@", previousAppVersion, currentAppVersion];
+                } else {
+                    [CPLog debug:@"syncSubscription called from initWithChannelId"];
+                }
                 [self ensureMainThreadSync:^{
                     [self performSelector:@selector(syncSubscription) withObject:nil afterDelay:10.0f];
                 }];
@@ -5166,6 +5178,39 @@ static id isNil(id object) {
     [[NSUserDefaults standardUserDefaults] setObject:[dateFormatter stringFromDate:[NSDate date]] forKey:CLEVERPUSH_DATABASE_CREATED_TIME_KEY];
    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:CLEVERPUSH_DATABASE_CREATED_KEY];
    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Get current app version from bundle
+- (NSString*)getCurrentAppVersion {
+    NSDictionary* infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    if (infoDictionary == nil) {
+        return nil;
+    }
+    NSString* version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    if (version == nil || version.length == 0) {
+        return nil;
+    }
+    return version;
+}
+
+#pragma mark - Check if app version has changed and persist the new version
+- (BOOL)isAppVersionChanged {
+    if (subscriptionId == nil || subscriptionId.length == 0) {
+        return NO;
+    }
+    NSString* currentAppVersion = [self getCurrentAppVersion];
+    if (currentAppVersion == nil || currentAppVersion.length == 0) {
+        return NO;
+    }
+    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString* storedAppVersion = [userDefaults stringForKey:CLEVERPUSH_APP_VERSION_KEY];
+    BOOL changed = NO;
+    if (storedAppVersion == nil || storedAppVersion.length == 0) {
+        changed = YES;
+    } else if (![storedAppVersion isEqualToString:currentAppVersion]) {
+        changed = YES;
+    }
+    return changed;
 }
 
 @end
