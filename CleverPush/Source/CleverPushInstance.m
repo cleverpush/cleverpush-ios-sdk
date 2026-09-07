@@ -3067,7 +3067,7 @@ static id isNil(id object) {
                     } else if ([storedValue isKindOfClass:[NSString class]] && [(NSString*)storedValue length] > 0) {
                         [arrayValue addObject:storedValue];
                     }
-                    if (value != nil && [value isKindOfClass:[NSString class]] && [value length] > 0) {
+                    if (value != nil && [value isKindOfClass:[NSString class]]) {
                         [arrayValue removeObject:value];
                     }
 
