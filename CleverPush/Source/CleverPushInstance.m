@@ -2985,14 +2985,18 @@ static id isNil(id object) {
                         subscriptionAttributes = [[NSMutableDictionary alloc] init];
                     }
 
-                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                    if (!arrayValue) {
-                        arrayValue = [NSMutableArray new];
+                    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+                    NSMutableArray *arrayValue;
+                    if ([storedValue isKindOfClass:[NSArray class]]) {
+                        arrayValue = [storedValue mutableCopy];
                     } else {
-                        arrayValue = [arrayValue mutableCopy];
+                        arrayValue = [NSMutableArray new];
+                        if ([storedValue isKindOfClass:[NSString class]] && [(NSString *)storedValue length] > 0) {
+                            [arrayValue addObject:storedValue];
+                        }
                     }
                     if (value != nil && ![value isKindOfClass:[NSNull class]] && [value isKindOfClass:[NSString class]]) {
-                        if (![arrayValue containsString:value]) {
+                        if (![arrayValue containsObject:value]) {
                             [arrayValue addObject:value];
                         }
                     }
@@ -3056,13 +3060,16 @@ static id isNil(id object) {
                         subscriptionAttributes = [[NSMutableDictionary alloc] init];
                     }
 
-                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                    if (!arrayValue) {
-                        arrayValue = [NSMutableArray new];
-                    } else {
-                        arrayValue = [arrayValue mutableCopy];
+                    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+                    NSMutableArray* arrayValue = [NSMutableArray new];
+                    if ([storedValue isKindOfClass:[NSArray class]]) {
+                        [arrayValue addObjectsFromArray:(NSArray*)storedValue];
+                    } else if ([storedValue isKindOfClass:[NSString class]] && [(NSString*)storedValue length] > 0) {
+                        [arrayValue addObject:storedValue];
                     }
-                    [arrayValue removeObject:value];
+                    if (value != nil && [value isKindOfClass:[NSString class]]) {
+                        [arrayValue removeObject:value];
+                    }
 
                     [subscriptionAttributes setObject:arrayValue forKey:attributeId];
                     [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
@@ -3088,16 +3095,29 @@ static id isNil(id object) {
 
 #pragma mark - Check if subscription array attribute has a value.
 - (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    if ([CPUtils isNullOrEmpty:attributeId] ||
+        ![value isKindOfClass:[NSString class]]) {
+        return NO;
+    }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
     if (!subscriptionAttributes) {
         return NO;
     }
-    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-    if (!arrayValue) {
+    
+    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+    if (!storedValue || [storedValue isKindOfClass:[NSNull class]]) {
         return NO;
     }
-    return [arrayValue containsObject:value];
+    
+    if ([storedValue isKindOfClass:[NSArray class]]) {
+        return [(NSArray *)storedValue containsObject:value];
+    }
+    
+    if ([storedValue isKindOfClass:[NSString class]]) {
+        return [(NSString *)storedValue isEqualToString:value];
+    }
+    return NO;
 }
 
 #pragma mark - Retrieving all the available tags from the channelConfig
