@@ -2985,14 +2985,18 @@ static id isNil(id object) {
                         subscriptionAttributes = [[NSMutableDictionary alloc] init];
                     }
 
-                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                    if (!arrayValue) {
-                        arrayValue = [NSMutableArray new];
+                    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+                    NSMutableArray *arrayValue;
+                    if ([storedValue isKindOfClass:[NSArray class]]) {
+                        arrayValue = [storedValue mutableCopy];
                     } else {
-                        arrayValue = [arrayValue mutableCopy];
+                        arrayValue = [NSMutableArray new];
+                        if ([storedValue isKindOfClass:[NSString class]] && [(NSString *)storedValue length] > 0) {
+                            [arrayValue addObject:storedValue];
+                        }
                     }
                     if (value != nil && ![value isKindOfClass:[NSNull class]] && [value isKindOfClass:[NSString class]]) {
-                        if (![arrayValue containsString:value]) {
+                        if (![arrayValue containsObject:value]) {
                             [arrayValue addObject:value];
                         }
                     }
@@ -3056,11 +3060,15 @@ static id isNil(id object) {
                         subscriptionAttributes = [[NSMutableDictionary alloc] init];
                     }
 
-                    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-                    if (!arrayValue) {
-                        arrayValue = [NSMutableArray new];
+                    id storedPullValue = [subscriptionAttributes objectForKey:attributeId];
+                    NSMutableArray *arrayValue;
+                    if ([storedPullValue isKindOfClass:[NSArray class]]) {
+                        arrayValue = [storedPullValue mutableCopy];
                     } else {
-                        arrayValue = [arrayValue mutableCopy];
+                        arrayValue = [NSMutableArray new];
+                        if ([storedPullValue isKindOfClass:[NSString class]] && [(NSString *)storedPullValue length] > 0) {
+                            [arrayValue addObject:storedPullValue];
+                        }
                     }
                     [arrayValue removeObject:value];
 
@@ -3093,11 +3101,18 @@ static id isNil(id object) {
     if (!subscriptionAttributes) {
         return NO;
     }
-    NSMutableArray*arrayValue = [subscriptionAttributes objectForKey:attributeId];
-    if (!arrayValue) {
+    
+    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+    if (!storedValue) {
         return NO;
     }
-    return [arrayValue containsObject:value];
+    if ([storedValue isKindOfClass:[NSArray class]]) {
+        return [storedValue containsObject:value];
+    }
+    if ([storedValue isKindOfClass:[NSString class]]) {
+        return [(NSString *)storedValue isEqualToString:value];
+    }
+    return NO;
 }
 
 #pragma mark - Retrieving all the available tags from the channelConfig
