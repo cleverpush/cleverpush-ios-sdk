@@ -3060,17 +3060,16 @@ static id isNil(id object) {
                         subscriptionAttributes = [[NSMutableDictionary alloc] init];
                     }
 
-                    id storedPullValue = [subscriptionAttributes objectForKey:attributeId];
-                    NSMutableArray *arrayValue;
-                    if ([storedPullValue isKindOfClass:[NSArray class]]) {
-                        arrayValue = [storedPullValue mutableCopy];
-                    } else {
-                        arrayValue = [NSMutableArray new];
-                        if ([storedPullValue isKindOfClass:[NSString class]] && [(NSString *)storedPullValue length] > 0) {
-                            [arrayValue addObject:storedPullValue];
-                        }
+                    id storedValue = [subscriptionAttributes objectForKey:attributeId];
+                    NSMutableArray* arrayValue = [NSMutableArray new];
+                    if ([storedValue isKindOfClass:[NSArray class]]) {
+                        [arrayValue addObjectsFromArray:(NSArray*)storedValue];
+                    } else if ([storedValue isKindOfClass:[NSString class]] && [(NSString*)storedValue length] > 0) {
+                        [arrayValue addObject:storedValue];
                     }
-                    [arrayValue removeObject:value];
+                    if (value != nil && [value isKindOfClass:[NSString class]] && [value length] > 0) {
+                        [arrayValue removeObject:value];
+                    }
 
                     [subscriptionAttributes setObject:arrayValue forKey:attributeId];
                     [userDefaults setObject:subscriptionAttributes forKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY];
@@ -3096,6 +3095,10 @@ static id isNil(id object) {
 
 #pragma mark - Check if subscription array attribute has a value.
 - (BOOL)hasSubscriptionAttributeValue:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value {
+    if ([CPUtils isNullOrEmpty:attributeId] ||
+        ![value isKindOfClass:[NSString class]]) {
+        return NO;
+    }
     NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary* subscriptionAttributes = [NSMutableDictionary dictionaryWithDictionary:[userDefaults dictionaryForKey:CLEVERPUSH_SUBSCRIPTION_ATTRIBUTES_KEY]];
     if (!subscriptionAttributes) {
@@ -3103,12 +3106,14 @@ static id isNil(id object) {
     }
     
     id storedValue = [subscriptionAttributes objectForKey:attributeId];
-    if (!storedValue) {
+    if (!storedValue || [storedValue isKindOfClass:[NSNull class]]) {
         return NO;
     }
+    
     if ([storedValue isKindOfClass:[NSArray class]]) {
-        return [storedValue containsObject:value];
+        return [(NSArray *)storedValue containsObject:value];
     }
+    
     if ([storedValue isKindOfClass:[NSString class]]) {
         return [(NSString *)storedValue isEqualToString:value];
     }
