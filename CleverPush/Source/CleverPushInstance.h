@@ -166,6 +166,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 - (void)removeSubscriptionAttribute:(NSString* _Nullable)attributeId callback:(void(^ _Nullable)(NSString* _Nullable))callback onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds;
 - (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback;
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 - (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
 - (void)setSubscriptionAttributes:(NSDictionary<NSString *, NSString *> * _Nullable)attributes;

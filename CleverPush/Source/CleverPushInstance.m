@@ -2870,6 +2870,10 @@ static id isNil(id object) {
     }];
 }
 
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttribute:attributeId objectValue:value onSuccess:successBlock onFailure:failureBlock];
+}
+
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
     [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:nil onFailure:nil];
 }
