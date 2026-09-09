@@ -74,7 +74,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.51";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.53";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
@@ -90,6 +90,7 @@ static BOOL autoRegister = YES;
 static BOOL registrationInProgress = false;
 static BOOL ignoreDisabledNotificationPermission = NO;
 static BOOL autoRequestNotificationPermission = YES;
+static BOOL isProvisionalNotificationAuthorizationEnabled = NO;
 static BOOL keepTargetingDataOnUnsubscribe = NO;
 static BOOL hasCalledSubscribe = NO;
 static BOOL isSessionStartCalled = NO;
@@ -1179,6 +1180,9 @@ static id isNil(id object) {
 - (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback {
     [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings *_Nonnull notificationSettings) {
         BOOL isEnabled = (notificationSettings.authorizationStatus == UNAuthorizationStatusAuthorized);
+        if (@available(iOS 12.0, *)) {
+            isEnabled = isEnabled || (notificationSettings.authorizationStatus == UNAuthorizationStatusProvisional);
+        }
         if (callback) {
             callback(isEnabled);
         }
@@ -1270,6 +1274,11 @@ static id isNil(id object) {
     }
     if (shouldSetBadge) {
         options |= UNAuthorizationOptionBadge;
+    }
+    if (@available(iOS 12.0, *)) {
+        if (isProvisionalNotificationAuthorizationEnabled) {
+            options |= UNAuthorizationOptionProvisional;
+        }
     }
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -1528,10 +1537,14 @@ static id isNil(id object) {
         [self enqueueRequest:request onSuccess:^(NSDictionary* result) {
             [self setUnsubscribeStatus:YES];
             [self clearSubscriptionData];
-            callback(YES);
+            if (callback) {
+                callback(YES);
+            }
         } onFailure:^(NSError* error) {
             [self clearSubscriptionData];
-            callback(NO);
+            if (callback) {
+                callback(NO);
+            }
             if (failureBlock) {
                 failureBlock(error);
             }
@@ -1539,7 +1552,9 @@ static id isNil(id object) {
 
     } else {
         [self clearSubscriptionData];
-        callback(YES);
+        if (callback) {
+            callback(YES);
+        }
     }
 }
 
@@ -2015,7 +2030,7 @@ static id isNil(id object) {
 
     [CPLog debug:@"handleNotificationReceived, isActive %@, Payload %@", @(isActive), messageDict];
 
-    [self setNotificationDelivered:notification
+    [self trackNotificationDelivered:notification
                      withChannelId:[messageDict cleverPushStringForKeyPath:@"channel._id"]
                 withSubscriptionId:[messageDict cleverPushStringForKeyPath:@"subscription._id"]
     ];
@@ -2066,7 +2081,7 @@ static id isNil(id object) {
     }
     [CPLog debug:@"handleNotificationOpened, %@, %@", action, payloadMutable];
 
-    [self setNotificationClicked:notificationId
+    [self trackNotificationClicked:notificationId
                    withChannelId:[payloadMutable cleverPushStringForKeyPath:@"channel._id"]
               withSubscriptionId:[payloadMutable cleverPushStringForKeyPath:@"subscription._id"]
                       withAction:action
@@ -2267,13 +2282,22 @@ static id isNil(id object) {
 #pragma clang diagnostic pop
 
 #pragma mark - Api call to recognise notification has been delivered or not
-- (void)setNotificationDelivered:(NSDictionary*)notification {
-    [self setNotificationDelivered:notification withChannelId:channelId withSubscriptionId:[self getSubscriptionId]];
+- (void)trackNotificationDelivered:(NSString*)notificationId {
+    if ([CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog error:@"CleverPush: trackNotificationDelivered: notificationId is nil or empty, skipping API call"];
+        return;
+    }
+    NSDictionary *notificationDict = @{ @"_id": notificationId };
+    [self trackNotificationDelivered:notificationDict withChannelId:channelId withSubscriptionId:[self getSubscriptionId] saveToStore:NO];
 }
 
-- (void)setNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+- (void)trackNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId {
+    [self trackNotificationDelivered:notification withChannelId:channelId withSubscriptionId:subscriptionId saveToStore:YES];
+}
+
+- (void)trackNotificationDelivered:(NSDictionary*)notification withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId saveToStore:(BOOL)saveToStore {
     if ([CPUtils isNullOrEmpty:channelId]) {
-        [CPLog error:@"CleverPush: setNotificationDelivered: channelId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationDelivered: channelId is nil or empty, skipping API call"];
         return;
     }
     NSString*notificationId = [notification valueForKey:@"_id"];
@@ -2288,6 +2312,10 @@ static id isNil(id object) {
     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
     [request setHTTPBody:postData];
     [self enqueueRequest:request onSuccess:nil onFailure:nil withRetry:NO];
+
+    if (!saveToStore) {
+        return;
+    }
 
     // save notification to user defaults
     NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
@@ -2326,16 +2354,20 @@ static id isNil(id object) {
 }
 
 #pragma mark - Api call to recognise notification has been clicked or not
-- (void)setNotificationClicked:(NSString*)notificationId {
-    [self setNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
+- (void)trackNotificationClicked:(NSString*)notificationId {
+    [self trackNotificationClicked:notificationId withChannelId:channelId withSubscriptionId:[self getSubscriptionId] withAction:nil];
 }
 
-- (void)setNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
+- (void)trackNotificationClicked:(NSString*)notificationId withChannelId:(NSString*)channelId withSubscriptionId:(NSString*)subscriptionId withAction:(NSString*)action {
     if ([CPUtils isNullOrEmpty:channelId]) {
-        [CPLog error:@"CleverPush: setNotificationClicked: channelId is nil or empty, skipping API call"];
+        [CPLog error:@"CleverPush: trackNotificationClicked: channelId is nil or empty, skipping API call"];
         return;
     }
-    [CPLog debug:@"setNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
+    if ([CPUtils isNullOrEmpty:notificationId]) {
+        [CPLog error:@"CleverPush: trackNotificationClicked: notificationId is nil or empty, skipping API call"];
+        return;
+    }
+    [CPLog debug:@"trackNotificationClicked notification:%@, subscription:%@, channel:%@, action:%@", notificationId, subscriptionId, channelId, action];
 
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"notification/clicked"];
     NSMutableDictionary* dataDic = [NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -2430,11 +2462,19 @@ static id isNil(id object) {
         } else {
             NSMutableDictionary*requestParameters = [[NSJSONSerialization JSONObjectWithData:[urlRequest HTTPBody] options:0 error:&error] mutableCopy];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to parse request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [requestParameters setObject:authorizationToken forKey:@"authorizationToken"];
             NSData*updatedRequestData = [NSJSONSerialization dataWithJSONObject:requestParameters options:0 error:&error];
             if (error) {
+                [CPLog error:@"enqueueRequest: Failed to re-serialize request body JSON: %@", error];
+                if (failureBlock) {
+                    failureBlock(error);
+                }
                 return;
             }
             [urlRequest setHTTPBody:updatedRequestData];
@@ -4494,6 +4534,13 @@ static id isNil(id object) {
     [userDefaults synchronize];
 }
 
+#pragma mark - Grouped notifications sound mode
+- (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    [userDefaults setInteger:mode forKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
+    [userDefaults synchronize];
+}
+
 #pragma mark - Show notifications in foreground
 - (void)setShowNotificationsInForeground:(BOOL)show {
     showNotificationsInForeground = show;
@@ -4577,6 +4624,10 @@ static id isNil(id object) {
     autoRequestNotificationPermission = autoRequest;
 }
 
+- (void)setProvisionalNotificationAuthorizationEnabled:(BOOL)enabled {
+    isProvisionalNotificationAuthorizationEnabled = enabled;
+}
+
 - (void)setKeepTargetingDataOnUnsubscribe:(BOOL)keepData {
     keepTargetingDataOnUnsubscribe = keepData;
 }
@@ -4639,6 +4690,11 @@ static id isNil(id object) {
 
 - (CPIabTcfMode)getIabTcfMode {
     return currentIabTcfMode;
+}
+
+- (CPGroupNotificationSoundMode)getGroupNotificationSoundMode {
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    return (CPGroupNotificationSoundMode) [userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY];
 }
 
 - (UIViewController* _Nullable)getCustomTopViewController {
@@ -4947,6 +5003,47 @@ static id isNil(id object) {
     [CPLog setLogListener:listener];
 }
 
+#pragma mark - Silence the sound when the notification's group is already displayed
+- (void)silenceSoundForGroupedNotification:(UNMutableNotificationContent* _Nullable)replacementContent {
+    if (!replacementContent) {
+        return;
+    }
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults integerForKey:CLEVERPUSH_GROUP_NOTIFICATION_SOUND_MODE_KEY] != CPGroupNotificationSoundModeFirstInGroupOnly) {
+        return;
+    }
+
+    NSString* threadIdentifier = replacementContent.threadIdentifier;
+    if ([CPUtils isNullOrEmpty:threadIdentifier]) {
+        return;
+    }
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block BOOL groupAlreadyDisplayed = NO;
+    [UNUserNotificationCenter.currentNotificationCenter getDeliveredNotificationsWithCompletionHandler:^(NSArray<UNNotification*>* notifications) {
+        for (UNNotification* delivered in notifications) {
+            if ([delivered.request.content.threadIdentifier isEqualToString:threadIdentifier]) {
+                groupAlreadyDisplayed = YES;
+                break;
+            }
+        }
+        dispatch_semaphore_signal(semaphore);
+    }];
+
+    if (dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC))) != 0) {
+        [CPLog info:@"silenceSoundForGroupedNotification - timed out fetching delivered notifications, keeping sound"];
+        return;
+    }
+
+    if (groupAlreadyDisplayed) {
+        [CPLog info:@"silenceSoundForGroupedNotification - group already displayed, removing sound"];
+        replacementContent.sound = nil;
+    } else {
+        [CPLog info:@"silenceSoundForGroupedNotification - no group displayed, keeping sound"];
+    }
+}
+
 #pragma mark - recieved notifications from the Extension.
 - (UNMutableNotificationContent* _Nullable)didReceiveNotificationExtensionRequest:(UNNotificationRequest* _Nullable)request withMutableNotificationContent:(UNMutableNotificationContent* _Nullable)replacementContent {
     [CPLog debug:@"didReceiveNotificationExtensionRequest"];
@@ -4983,6 +5080,9 @@ static id isNil(id object) {
 
     // badge count
     [self updateBadge:replacementContent];
+
+    // grouped notifications sound
+    [self silenceSoundForGroupedNotification:replacementContent];
 
     // rich notifications
     if (notification != nil) {

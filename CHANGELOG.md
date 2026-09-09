@@ -1,3 +1,12 @@
+## 1.34.53 (28.08.2026)
+* Resolved the issue of subtopics not being selected while selecting the parent topics dialogue in iOS.
+* implemented setNotificationDelivered and setNotificationClicked  public methods for manually reporting notification delivered and clicked events.
+
+## 1.34.52 (14.08.2026)
+* Optimized callback functions for preventing crashes.
+* Added setProvisionalNotificationAuthorizationEnabled method to support Apple's provisional push authorization.
+* Added setGroupNotificationSoundMode: (CPGroupNotificationSoundMode) to play a sound only for the first notification in a group (CPGroupNotificationSoundModeFirstInGroupOnly), keeping CPGroupNotificationSoundModeAllNotifications as default.
+
 ## 1.34.51 (17.07.2026)
 * Resolved the issue of broken app banner layout when presented while a UIAlertController is visible.
 * Extend the notificationId attribution window for /subscription/conversion from 60 minutes to 24 hours.

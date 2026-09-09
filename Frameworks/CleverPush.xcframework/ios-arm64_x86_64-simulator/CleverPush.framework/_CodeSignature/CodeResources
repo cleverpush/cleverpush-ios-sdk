@@ -180,6 +180,10 @@
 		<data>
 		Pwk4IzZvARr/e5K28aN46u2IEoY=
 		</data>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<data>
+		73Uxl1yMsDBJg5nnRqZwN0bL9lc=
+		</data>
 		<key>Headers/CPIabTcfMode.h</key>
 		<data>
 		JPqi4iGSM+8nfnQHTGhQkOwYkXI=
@@ -262,7 +266,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		re5NbNSd7nFFKtDaB4PGkLkz19k=
+		Ebrrf0QY4fc9i4fMu6bvhpsk0vY=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -270,11 +274,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		ErTTiQ52g3WGSyT7OelAVS6WZeU=
+		L1u0QZG7Ln+eoqLuv0dCeZaBF0Q=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		EWPSXqJUNihqoaK0rmwRuPqNtn4=
+		Vh3xcRcEVPb46Cdr9jwHVJ4mJLc=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -282,7 +286,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		RiZvnWCt1oyWqJNjNkFjE7j3BCc=
+		GDlUMaCt+fnl6Ss6O9TE4EUHAek=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -603,6 +607,13 @@
 			/GQnkXLwsxYzdeRCyMSHYSsWEWLr4zdh0dD0nkCQE2Q=
 			</data>
 		</dict>
+		<key>Headers/CPGroupNotificationSoundMode.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			4uoeJv0ZF5v5YdLYpfXFGhOzWAp0df1uyPOHszGJw0k=
+			</data>
+		</dict>
 		<key>Headers/CPIabTcfMode.h</key>
 		<dict>
 			<key>hash2</key>
@@ -747,7 +758,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Zpc4kdlI/Uw3Hcb4QvnWcdB5eOVFYm9Jb2/pzV1k9hM=
+			gqeio5EafN/cfqxuRgrPJH+YErhF+KD4TghiFNhksgY=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -761,14 +772,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			wn9kiVd6vhYfhiCDYMSLFd24tmOW7dOp8e3zxq9eH5M=
+			y+AUUo/HYOCJSx3dOXzG1w4zDYY6BAzuya70i5w0gOw=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			HjM5tNgiTpv8ml9BkvMsi7VegRUtMr9AMPQ+/nfSZwQ=
+			RxP9k2wv9Jck6pX2HIdl2Gz2XLTIf2col6zrQ8HLYxU=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>
