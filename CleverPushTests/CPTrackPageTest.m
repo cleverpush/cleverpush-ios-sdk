@@ -30,6 +30,8 @@
 - (void)setUp {
     self.testableInstance = [[CleverPushInstance alloc] init];
     self.cleverPush = OCMPartialMock(self.testableInstance);
+    OCMStub([self.cleverPush topViewController]).andReturn(nil);
+    [self.cleverPush trackPageView:nil];
 }
 
 - (void)testTrackPageViewVerifyCheckTags {
@@ -323,11 +325,7 @@
         handler(mockTags);
     }];
 
-    [OCMStub([self.cleverPush autoAssignTagMatches:[OCMArg any] pathname:[OCMArg any] params:[OCMArg any] callback:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^callback)(BOOL);
-        [invocation getArgument:&callback atIndex:5];
-        callback(YES);
-    }];
+    OCMStub([self.cleverPush addSubscriptionTag:[OCMArg any] callback:[OCMArg any]]);
 
     [self.cleverPush trackPageView:@"https://example.com/sports/news"];
     OCMVerify([self.cleverPush autoAssignTagMatches:[OCMArg any] pathname:[OCMArg any] params:[OCMArg any] callback:[OCMArg any]]);
@@ -346,61 +344,24 @@
         handler(mockTags);
     }];
 
-    [OCMStub([self.cleverPush autoAssignTagMatches:[OCMArg any] pathname:[OCMArg any] params:[OCMArg any] callback:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^callback)(BOOL);
-        [invocation getArgument:&callback atIndex:5];
-        callback(NO);
-    }];
-
-    [[self.cleverPush reject] addSubscriptionTag:[OCMArg any]];
+    [[self.cleverPush reject] addSubscriptionTag:[OCMArg any] callback:[OCMArg any]];
 
     [self.cleverPush trackPageView:@"https://example.com/sports/news"];
     OCMVerifyAll(self.cleverPush);
 }
 
-#pragma mark - trackPageView live API test
+#pragma mark - trackPageView (no live network)
 
-- (void)testTrackPageViewApiCallWithValidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"trackPageView API"];
-
-    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"RHe2nXvQk9SZgdC4x"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
-
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        XCTAssertNotNil(result);
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTFail(@"Unexpected failure: %@", error);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+- (void)testTrackPageViewWithValidUrlCallsCheckTags {
+    OCMExpect([self.cleverPush checkTags:@"https://example.com/page" params:nil]);
+    [self.cleverPush trackPageView:@"https://example.com/page"];
+    OCMVerify([self.cleverPush checkTags:@"https://example.com/page" params:nil]);
 }
 
-- (void)testTrackPageViewApiCallWithInvalidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"trackPageView API failure"];
-
-    NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"__invalid_channel__"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
-
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        NSLog(@"Unexpected success response: %@", result);
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.code, 404);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+- (void)testTrackPageViewWithInvalidUrlDoesNotCallGetAvailableTags {
+    [[self.cleverPush reject] getAvailableTags:[OCMArg any]];
+    [self.cleverPush trackPageView:@"not a valid url !!!"];
+    OCMVerifyAll(self.cleverPush);
 }
 
 - (void)tearDown {

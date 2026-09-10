@@ -15,6 +15,7 @@
 #import "CleverPushHTTPClient.h"
 #import "CleverPushInstance.h"
 #import "CleverPushUserDefaults.h"
+#import "CPUtils.h"
 #import "TestUtils.h"
 
 @interface CPTopicDialogueTest : XCTestCase
@@ -235,48 +236,41 @@
     }];
 
     [self.cleverPush getAvailableTopics:^(NSArray *topics) {
-        XCTAssertGreaterThanOrEqual(topics.count, 0);
+        XCTAssertEqual(topics.count, 1);
+        XCTAssertEqualObjects([topics.firstObject objectForKey:@"_id"], @"t1");
+        XCTAssertEqualObjects([topics.firstObject objectForKey:@"name"], @"News");
     }];
 }
 
 #pragma mark - addSubscriptionTopic (no callback)
 
-- (void)testAddSubscriptionTopicNoCallbackCallsWaitForTrackingConsent {
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+- (void)testAddSubscriptionTopicNoCallbackCallsGetSubscriptionId {
+    XCTestExpectation *exp = [self expectationWithDescription:@"add topic getSubscriptionId"];
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
+        [exp fulfill];
     }];
-
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[@"topic1"]);
     [self.cleverPush addSubscriptionTopic:@"topic1"];
-    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
 #pragma mark - addSubscriptionTopic (callback only)
 
 - (void)testAddSubscriptionTopicWithCallbackOnlyInvokesCallback {
     XCTestExpectation *exp = [self expectationWithDescription:@"add topic callback"];
-
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
     }];
-    [OCMStub([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^callback)(NSString * _Nullable) = nil;
-        [invocation getArgument:&callback atIndex:3];
-        if (callback) callback(@"topic1");
-    }];
-
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[@"topic1"]);
     [self.cleverPush addSubscriptionTopic:@"topic1" callback:^(NSString * _Nullable result) {
         XCTAssertEqualObjects(result, @"topic1");
         [exp fulfill];
     }];
-
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
@@ -284,80 +278,70 @@
 
 - (void)testAddSubscriptionTopicSuccessCallsCallback {
     XCTestExpectation *exp = [self expectationWithDescription:@"add topic success"];
-
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
     }];
-    [OCMStub([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^callback)(NSString * _Nullable) = nil;
-        [invocation getArgument:&callback atIndex:3];
-        if (callback) callback(@"topic1");
-    }];
-
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[@"topic1"]);
     [self.cleverPush addSubscriptionTopic:@"topic1" callback:^(NSString * _Nullable result) {
         XCTAssertEqualObjects(result, @"topic1");
         [exp fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTFail(@"Unexpected failure: %@", error);
     }];
-
     [self waitForExpectationsWithTimeout:1.0 handler:nil];
 }
 
 - (void)testAddSubscriptionTopicFailureCallsFailureBlock {
     XCTestExpectation *exp = [self expectationWithDescription:@"add topic failure"];
-
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
     }];
-    NSError *err = [NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil];
-    [OCMStub([self.cleverPush addSubscriptionTopic:[OCMArg any] callback:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[]);
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
         CPFailureBlock failure = nil;
         [invocation getArgument:&failure atIndex:4];
-        if (failure) failure(err);
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil]);
     }];
-
     [self.cleverPush addSubscriptionTopic:@"topic1" callback:^(NSString * _Nullable result) {
         XCTFail(@"Unexpected success: %@", result);
     } onFailure:^(NSError * _Nullable error) {
         XCTAssertEqual(error.code, 500);
         [exp fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testAddSubscriptionTopicSuccessWithNilCallbackDoesNotCrash {
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
     }];
-
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[@"topic1"]);
     XCTAssertNoThrow([self.cleverPush addSubscriptionTopic:@"topic1" callback:nil onFailure:nil]);
 }
 
-#pragma mark - addSubscriptionTopic - tracking consent blocked
+#pragma mark - addSubscriptionTopic skips API when channel is empty
 
-- (void)testAddSubscriptionTopicDoesNotCallApiWhenTrackingConsentNotGranted {
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(true);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(false);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        // consent withheld — do not invoke handler
+- (void)testAddSubscriptionTopicDoesNotCallApiWhenChannelIdEmpty {
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
+        [invocation getArgument:&handler atIndex:2];
+        handler(@"sub-123");
     }];
-
+    OCMStub([self.cleverPush getSubscriptionTopics]).andReturn(@[]);
+    [[self.cleverPush reject] enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES];
     [self.cleverPush addSubscriptionTopic:@"topic1" callback:nil onFailure:nil];
-    OCMVerify([self.cleverPush waitForTrackingConsent:[OCMArg any]]);
+    XCTestExpectation *delay = [self expectationWithDescription:@"async skip"];
+    delay.inverted = YES;
+    [self waitForExpectationsWithTimeout:0.4 handler:nil];
 }
 
 #pragma mark - removeSubscriptionTopic (no callback)
@@ -586,18 +570,22 @@
 
 #pragma mark - hasNewTopicAfterOneHour
 
-- (void)testHasNewTopicAfterOneHourReturnsTrueFromStub {
+- (void)testHasNewTopicAfterOneHourReturnsTrueWhenNewTopicAndFirstCheck {
     NSDictionary *config = @{ @"channelTopics": @[] };
-    OCMStub([self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600]).andReturn(YES);
-    BOOL result = [self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600];
-    XCTAssertTrue(result);
+    id utils = OCMClassMock([CPUtils class]);
+    OCMStub([utils newTopicAdded:config]).andReturn(YES);
+    OCMStub([self.cleverPush secondsAfterLastCheck]).andReturn(0);
+    XCTAssertTrue([self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600]);
+    [utils stopMocking];
 }
 
-- (void)testHasNewTopicAfterOneHourReturnsFalseFromStub {
+- (void)testHasNewTopicAfterOneHourReturnsFalseWhenNoNewTopic {
     NSDictionary *config = @{ @"channelTopics": @[] };
-    OCMStub([self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600]).andReturn(NO);
-    BOOL result = [self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600];
-    XCTAssertFalse(result);
+    id utils = OCMClassMock([CPUtils class]);
+    OCMStub([utils newTopicAdded:config]).andReturn(NO);
+    OCMStub([self.cleverPush secondsAfterLastCheck]).andReturn(0);
+    XCTAssertFalse([self.cleverPush hasNewTopicAfterOneHour:config initialDifference:0 displayDialogDifference:3600]);
+    [utils stopMocking];
 }
 
 #pragma mark - hasSubscriptionTopics
@@ -607,16 +595,14 @@
     [[NSUserDefaults standardUserDefaults] setObject:topics forKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    OCMStub([self.cleverPush hasSubscriptionTopics]).andReturn(YES);
-    XCTAssertTrue([self.cleverPush hasSubscriptionTopics]);
+    XCTAssertTrue([self.testableInstance hasSubscriptionTopics]);
 }
 
 - (void)testHasSubscriptionTopicsReturnsFalseWhenNoTopics {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SUBSCRIPTION_TOPICS_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
-    OCMStub([self.cleverPush hasSubscriptionTopics]).andReturn(NO);
-    XCTAssertFalse([self.cleverPush hasSubscriptionTopics]);
+    XCTAssertFalse([self.testableInstance hasSubscriptionTopics]);
 }
 
 #pragma mark - showTopicDialogOnNewAdded / showPendingTopicsDialog

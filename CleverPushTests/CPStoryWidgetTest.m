@@ -50,6 +50,8 @@
         @"content": @{}
     };
     self.sampleStory = [[CPStory alloc] initWithJson:storyJson];
+    self.sampleStory.subStoryCount = 3;
+    self.sampleStory.unreadCount = 2;
 
     // Build a sample CPWidgetsStories
     NSDictionary *wsJson = @{
@@ -57,14 +59,16 @@
         @"stories": @[storyJson]
     };
     self.sampleWidgetsStories = [[CPWidgetsStories alloc] initWithJson:wsJson];
-
-    // Partial mock of CPWidgetModule (class mock)
-    self.widgetModuleMock = OCMClassMock([CPWidgetModule class]);
 }
 
 - (void)tearDown {
     [self.widgetModuleMock stopMocking];
+    self.widgetModuleMock = nil;
     [super tearDown];
+}
+
+- (void)startWidgetModuleMock {
+    self.widgetModuleMock = OCMClassMock([CPWidgetModule class]);
 }
 
 #pragma mark - CPStoryWidget model properties
@@ -145,6 +149,7 @@
 #pragma mark - getWidgetsStories (mocked - success)
 
 - (void)testGetWidgetsStoriesCallsCompletionWithResult {
+    [self startWidgetModuleMock];
     XCTestExpectation *exp = [self expectationWithDescription:@"getWidgetsStories success"];
 
     [OCMStub([self.widgetModuleMock getWidgetsStories:[OCMArg any] completion:[OCMArg any]]) andDo:^(NSInvocation *inv) {
@@ -164,6 +169,7 @@
 }
 
 - (void)testGetWidgetsStoriesCompletionReturnsCorrectWidgetId {
+    [self startWidgetModuleMock];
     XCTestExpectation *exp = [self expectationWithDescription:@"widgetId matches"];
 
     [OCMStub([self.widgetModuleMock getWidgetsStories:[OCMArg any] completion:[OCMArg any]]) andDo:^(NSInvocation *inv) {
@@ -181,6 +187,7 @@
 }
 
 - (void)testGetWidgetsStoriesCompletionReturnsStoriesArray {
+    [self startWidgetModuleMock];
     XCTestExpectation *exp = [self expectationWithDescription:@"stories array"];
 
     [OCMStub([self.widgetModuleMock getWidgetsStories:[OCMArg any] completion:[OCMArg any]]) andDo:^(NSInvocation *inv) {
@@ -198,6 +205,7 @@
 }
 
 - (void)testGetWidgetsStoriesWithEmptyStoriesArray {
+    [self startWidgetModuleMock];
     XCTestExpectation *exp = [self expectationWithDescription:@"empty stories"];
 
     CPWidgetsStories *emptyWS = [[CPWidgetsStories alloc] initWithJson:@{
@@ -235,6 +243,7 @@
 #pragma mark - getWidgetsStories (mocked - failure / nil)
 
 - (void)testGetWidgetsStoriesCompletionWithNilDoesNotCrash {
+    [self startWidgetModuleMock];
     XCTestExpectation *exp = [self expectationWithDescription:@"nil result"];
 
     [OCMStub([self.widgetModuleMock getWidgetsStories:[OCMArg any] completion:[OCMArg any]]) andDo:^(NSInvocation *inv) {
@@ -502,74 +511,86 @@
     XCTAssertNil([CPStoryView getWidgetId]);
 }
 
-#pragma mark - live API - getWidgetsStories (valid widget ID)
+#pragma mark - getWidgetsStories / track (mocked HTTP)
 
 - (void)testGetWidgetsStoriesWithValidId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"getWidgetsStories valid"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) {
+            success(@{
+                @"widget": @{ @"_id": @"o76RepCskiS9QiHsy", @"channel": @"hrPmxqynN7NJ7qtAz", @"name": @"Test Widget" },
+                @"stories": @[]
+            });
+        }
+    }];
     [CPWidgetModule getWidgetsStories:@"o76RepCskiS9QiHsy" completion:^(CPWidgetsStories *widget) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            XCTAssertNotNil(widget);
-            XCTAssertNotNil(widget.widgets);
-            XCTAssertNotNil(widget.stories);
-            [expectation fulfill];
-        });
+        XCTAssertNotNil(widget);
+        XCTAssertNotNil(widget.widgets);
+        [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
-#pragma mark - live API - trackWidgetOpened (valid widget ID)
-
 - (void)testTrackWidgetOpenedWithValidId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"trackWidgetOpened live"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"trackWidgetOpened"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"ok": @YES });
+    }];
     [CPWidgetModule trackWidgetOpened:@"o76RepCskiS9QiHsy"
                           withStories:@[@"story123"]
                             onSuccess:^(NSDictionary * _Nullable result) {
         XCTAssertNotNil(result);
         [expectation fulfill];
     } onFailure:^(NSError * _Nullable error) {
-        // Some channels may return 404 for non-existent stories — still not a crash
-        XCTAssertNotNil(error);
+        XCTFail(@"Unexpected failure: %@", error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
-#pragma mark - live API - trackWidgetShown (valid widget ID)
-
 - (void)testTrackWidgetShownWithValidId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"trackWidgetShown live"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"trackWidgetShown"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"ok": @YES });
+    }];
     [CPWidgetModule trackWidgetShown:@"o76RepCskiS9QiHsy"
                          withStories:@[@"story123"]
                            onSuccess:^(NSDictionary * _Nullable result) {
         XCTAssertNotNil(result);
         [expectation fulfill];
     } onFailure:^(NSError * _Nullable error) {
-        XCTAssertNotNil(error);
+        XCTFail(@"Unexpected failure: %@", error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
-#pragma mark - live API - getWidgetsStories (invalid widget ID — expects nil callback)
-
 - (void)testGetWidgetsStoriesWithInvalidIdDoesNotCallCallback {
-    // The real implementation silently skips the callback on nil result
-    // We verify no crash occurs with a bad widget ID using a short timeout
-    XCTestExpectation *expectation = [self expectationWithDescription:@"getWidgetsStories invalid — timeout expected"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"getWidgetsStories invalid"];
     expectation.inverted = YES;
-
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+    }];
     [CPWidgetModule getWidgetsStories:@"invalidWidgetId_xyz_9999" completion:^(CPWidgetsStories *widget) {
-        // Callback should NOT be called for a bad/non-existent widget
         [expectation fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:5.0 handler:nil];
+    [self waitForExpectationsWithTimeout:0.4 handler:nil];
+    [cleverPush stopMocking];
 }
 
 #pragma mark - performance

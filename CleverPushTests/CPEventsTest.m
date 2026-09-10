@@ -37,11 +37,24 @@
     }];
 }
 
+- (void)stubEnqueueRequestOnSuccess:(void (^)(void))onEnqueue {
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{});
+        if (onEnqueue) onEnqueue();
+    }];
+}
+
 - (void)stubChannelConfigWithEvents:(NSArray *)events {
     [OCMStub([self.cleverPush getChannelConfig:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
         void (^handler)(NSDictionary *);
         [invocation getArgument:&handler atIndex:2];
-        handler(@{ @"channelEvents": events ?: @[] });
+        if (events == nil) {
+            handler(@{});
+        } else {
+            handler(@{ @"channelEvents": events });
+        }
     }];
 }
 
@@ -52,7 +65,11 @@
     [self stubTrackingConsentGranted];
     OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
     [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"trackEvent name enqueue"];
+    [self stubEnqueueRequestOnSuccess:^{ [exp fulfill]; }];
     XCTAssertNoThrow([self.cleverPush trackEvent:@"purchase"]);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testTrackEventWithAmountDoesNotCrash {
@@ -60,7 +77,11 @@
     [self stubTrackingConsentGranted];
     OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
     [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"trackEvent amount enqueue"];
+    [self stubEnqueueRequestOnSuccess:^{ [exp fulfill]; }];
     XCTAssertNoThrow([self.cleverPush trackEvent:@"purchase" amount:@(9.99)]);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testTrackEventWithPropertiesDoesNotCrash {
@@ -68,7 +89,11 @@
     [self stubTrackingConsentGranted];
     OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
     [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"trackEvent properties enqueue"];
+    [self stubEnqueueRequestOnSuccess:^{ [exp fulfill]; }];
     XCTAssertNoThrow([self.cleverPush trackEvent:@"add_to_cart" properties:@{ @"product": @"shoes" }]);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testTrackEventCallsGetChannelConfig {
@@ -100,7 +125,10 @@
 
 - (void)testTrackEventWhenChannelEventsMissingDoesNotCrash {
     [self stubChannelConfigWithEvents:nil];
+    XCTestExpectation *exp = [self expectationWithDescription:@"missing channelEvents"];
+    exp.inverted = YES;
     XCTAssertNoThrow([self.cleverPush trackEvent:@"unknown"]);
+    [self waitForExpectationsWithTimeout:0.3 handler:nil];
 }
 
 - (void)testTrackEventWhenEventNameNotFoundDoesNotCrash {
@@ -222,46 +250,34 @@
     OCMVerify([self.cleverPush triggerFollowUpEvent:@"winback" parameters:[OCMArg any]]);
 }
 
-#pragma mark - live API subscription/conversion and subscription/event
+#pragma mark - mocked conversion / follow-up HTTP
 
-- (void)testTrackEventApiWithValidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"trackEvent live"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/conversion"];
-    NSDictionary *body = @{
-        @"channelId": @"RHe2nXvQk9SZgdC4x",
-        @"eventId": @"unknown-event",
-        @"subscriptionId": @"test-subscription"
-    };
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:body options:0 error:nil]];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+- (void)testTrackEventEnqueuesConversionRequest {
+    [self stubChannelConfigWithEvents:@[ @{ @"_id": @"evt1", @"name": @"purchase" } ]];
+    [self stubTrackingConsentGranted];
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"conversion enqueue"];
+    [self stubEnqueueRequestOnSuccess:^{ [exp fulfill]; }];
+    [self.cleverPush trackEvent:@"purchase" properties:@{ @"amount": @"10" }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testTriggerFollowUpEventApiWithInvalidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"followUp live failure"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/event"];
-    NSDictionary *body = @{
-        @"channelId": @"",
-        @"name": @"follow_up",
-        @"subscriptionId": @"test-subscription"
-    };
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:body options:0 error:nil]];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        [expectation fulfill];
+- (void)testTriggerFollowUpEventEnqueuesFailurePath {
+    [self stubTrackingConsentGranted];
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"follow-up enqueue failure"];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:400 userInfo:nil]);
+        }
+        [exp fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self.cleverPush triggerFollowUpEvent:@"follow_up" parameters:@{ @"days": @"3" }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 @end

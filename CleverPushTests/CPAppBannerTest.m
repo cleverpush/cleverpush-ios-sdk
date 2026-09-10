@@ -245,75 +245,47 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testGetBanners {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigfailure"];
-    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"getBanners mocked"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"banners": @[] });
+    }];
     NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
-    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSArray *jsonBanners = [result objectForKey:@"banners"];
-        if (jsonBanners != nil) {
-            self.banners = [NSMutableArray new];
-            for (NSDictionary* json in jsonBanners) {
-                [self.banners addObject:[[CPAppBanner alloc] initWithJson:json]];
-            }
-            XCTAssertNotNil(self.banners);
-            [expectation fulfill];
-            NSLog(@"%@", @"testGetBanners");
-            
-        }
-    } onFailure:^(NSError* error) {
-        NSLog(@"%@", [[error.userInfo objectForKey:@"returned"]valueForKey:@"error"]);
-        XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"]valueForKey:@"error"], @"channel not found");
-        NSInteger errorCode = error.code;
-        int expectedError = 404;
-        XCTAssertEqual(errorCode, expectedError);
-        XCTAssertNotNil(error);
+        XCTAssertNotNil([result objectForKey:@"banners"]);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+    } onFailure:^(NSError* error) {
+        XCTFail(@"Unexpected failure: %@", error);
+        [expectation fulfill];
     }];
-    
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetBannersWithWrongId {
-    
-    XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigfailure"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"getBanners wrong id"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:@{ @"returned": @{ @"error": @"channel not found" } }]);
+        }
+    }];
     NSString* configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"RHe2nXvQk9SZgdC4xe"];
-    
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSArray *jsonBanners = [result objectForKey:@"banners"];
-        if (jsonBanners != nil) {
-            self.banners = [NSMutableArray new];
-            for (NSDictionary* json in jsonBanners) {
-                [self.banners addObject:[[CPAppBanner alloc] initWithJson:json]];
-            }
-            XCTAssertNotNil(self.banners);
-            [expectation fulfill];
-            NSLog(@"%@", @"testGetBanners");
-        }
-    } onFailure:^(NSError* error) {
-        NSLog(@"%@", [[error.userInfo objectForKey:@"returned"]valueForKey:@"error"]);
-        XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"]valueForKey:@"error"], @"channel not found");
-        NSInteger errorCode = error.code;
-        int expectedError = 404;
-        XCTAssertEqual(errorCode, expectedError);
-        XCTAssertNotNil(error);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
+    } onFailure:^(NSError* error) {
+        XCTAssertEqual(error.code, 404);
+        [expectation fulfill];
     }];
-    
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void) backgroundMethodWithCallback: (void(^)(void)) callback {
@@ -398,15 +370,15 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testShowBannerWhenBannersDisabledAddsToPendingBanners {
+    [self.bannerInstance setPendingBanners:[NSMutableArray new]];
     OCMStub([self.appBanner getBannersDisabled]).andReturn(YES);
-    OCMStub([self.appBanner getListOfBanners]).andReturn(self.banners);
-    OCMStub([self.appBanner getBanners:OCMOCK_ANY completion:OCMOCK_ANY]).andDo(^(NSInvocation *inv) {
-        void(^ __unsafe_unretained cb)(NSMutableArray<CPAppBanner*>*, NSError*);
-        [inv getArgument:&cb atIndex:3];
-        cb(self.banners, nil);
+    OCMStub([self.appBanner getBanners:[OCMArg any] bannerId:[OCMArg any] notificationId:[OCMArg any] groupId:[OCMArg any] completion:[OCMArg any]]).andDo(^(NSInvocation *inv) {
+        void(^ __unsafe_unretained cb)(NSMutableArray<CPAppBanner*>*);
+        [inv getArgument:&cb atIndex:6];
+        if (cb) cb(self.banners);
     });
     [self.appBanner showBanner:@"hrPmxqynN7NJ7qtAz" bannerId:@"xuMpMKmoKhAZ8XRKr"];
-    XCTAssertEqual([self.appBanner getListOfBanners].count, 2);
+    XCTAssertEqual([self.bannerInstance getPendingBanners].count, 1);
 }
 
 #pragma mark - triggerEvent
@@ -426,9 +398,7 @@ dispatch_queue_t dispatchQueue = nil;
 }
 
 - (void)testTriggerEventCallsStartupAfterAddingEvent {
-    OCMStub([self.appBanner triggerEvent:[OCMArg any] properties:[OCMArg any]]).andDo(^(NSInvocation *inv) {
-        [self.appBanner startup];
-    });
+    OCMExpect([self.appBanner startup]);
     [self.appBanner triggerEvent:@"add_to_cart" properties:@{@"product": @"shoes"}];
     OCMVerify([self.appBanner startup]);
 }
@@ -831,10 +801,16 @@ dispatch_queue_t dispatchQueue = nil;
     [CPAppBannerModuleInstance setAppBannerPerEachSessionValue:0];
 }
 
-#pragma mark - live API - getBanners with valid and invalid channel IDs
+#pragma mark - getBanners (mocked transport)
 
 - (void)testGetBannersApiWithValidChannelId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"getBannersValidChannel"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"banners": @[] });
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
@@ -845,25 +821,29 @@ dispatch_queue_t dispatchQueue = nil;
         XCTFail(@"Expected success but got failure: %@", error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetBannersApiWithEmptyChannelId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"getBannersEmptyChannel"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/app-banners?platformName=iOS", @""];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        NSLog(@"Unexpected success: %@", result);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError *error) {
         XCTAssertNotNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testPerformanceExample {

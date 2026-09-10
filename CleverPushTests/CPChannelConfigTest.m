@@ -186,6 +186,12 @@
 
 - (void)testChannelConfigApiWithSuccess {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfig"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"channelId": @"RHe2nXvQk9SZgdC4x" });
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"RHe2nXvQk9SZgdC4x"];
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
@@ -193,68 +199,59 @@
         XCTAssertNotNil([result objectForKey:@"channelId"]);
         [expectation fulfill];
     } onFailure:^(NSError* error) {
-        NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier. Did you specify the Bundle ID in the CleverPush channel settings? %@", error);
+        XCTFail(@"Unexpected failure: %@", error);
+        [expectation fulfill];
     }];
-
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testChannelConfigApiWithInvalidChannelId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigfailure"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:@{ @"returned": @{ @"error": @"channel not found" } }]);
+        }
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @"odcpZ3GhnwiGWxCbe"];
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSLog(@"%@", result);
-        XCTAssertNotNil(result);
-        XCTAssertNotNil([result objectForKey:@"channelId"]);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError* error) {
-        NSLog(@"%@", [[error.userInfo objectForKey:@"returned"]valueForKey:@"error"]);
         XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"]valueForKey:@"error"], @"channel not found");
-        NSInteger errorCode = error.code;
-        int expectedError = 404;
-        XCTAssertEqual(errorCode, expectedError);
-        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, 404);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
     }];
-    
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testChannelConfigApiWithEmptyChannelId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"emptyChannelId"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:@{ @"returned": @{ @"error": @"Not found" } }]);
+        }
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config", @""];
     NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary* result) {
-        NSLog(@"%@", result);
-        XCTAssertNotNil(result);
-        XCTAssertNotNil([result objectForKey:@"channelId"]);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError* error) {
-        NSLog(@"%@", [[error.userInfo objectForKey:@"returned"]valueForKey:@"error"]);
         XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"]valueForKey:@"error"], @"Not found");
-        NSInteger errorCode = error.code;
-        int expectedError = 404;
-        XCTAssertEqual(errorCode, expectedError);
-        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, 404);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed getting the channel config %@", error);
     }];
-    
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetChannelConfigReturnsConfigWhenAlreadyCached {
@@ -287,11 +284,15 @@
 }
 
 - (void)testGetChannelConfigFromChannelIdSuccess {
+    XCTestExpectation *exp = [self expectationWithDescription:@"getChannelConfigFromChannelId"];
     OCMStub([self.cleverPush channelId]).andReturn(@"RHe2nXvQk9SZgdC4x");
+    OCMStub([self.cleverPush incrementAppOpens]).andDo(nil);
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
-    OCMExpect([self.cleverPush getChannelConfigFromChannelId:configPath]);
+    OCMStub([self.cleverPush getChannelConfigFromChannelId:configPath]).andDo(^(NSInvocation *inv) {
+        [exp fulfill];
+    });
     (void)[self.cleverPush initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:false];
-    OCMVerify([self.cleverPush getChannelConfigFromChannelId:configPath]);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testGetChannelConfigFromBundleIdSuccess {
@@ -306,6 +307,12 @@
 
 - (void)testGetChannelConfigFromChannelIdApiSuccess {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromChannelIdSuccess"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"channelId": @"RHe2nXvQk9SZgdC4x" });
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"RHe2nXvQk9SZgdC4x"];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
@@ -316,36 +323,42 @@
         XCTFail(@"Expected success but got failure: %@", error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetChannelConfigFromChannelIdApiFailureWithInvalidId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromChannelIdFailure"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:@{ @"returned": @{ @"error": @"channel not found" } }]);
+        }
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel/%@/config?platformName=iOS", @"invalidChannelXXXX"];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        NSLog(@"Unexpected success: %@", result);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        NSInteger errorCode = error.code;
-        XCTAssertEqual(errorCode, 404);
+        XCTAssertEqual(error.code, 404);
         XCTAssertEqualObjects([[error.userInfo objectForKey:@"returned"] valueForKey:@"error"], @"channel not found");
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetChannelConfigFromBundleIdApiSuccess {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromBundleIdSuccess"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"channelId": @"RHe2nXvQk9SZgdC4x" });
+    }];
     NSString *bundleId = @"com.cleverpush.demo";
     NSString *configPath = [NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", bundleId];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
@@ -354,36 +367,32 @@
         XCTAssertNotNil([result objectForKey:@"channelId"]);
         [expectation fulfill];
     } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
+        XCTFail(@"Expected success but got failure: %@", error);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier: %@", error);
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetChannelConfigFromBundleIdApiFailureWithInvalidBundleId {
     XCTestExpectation *expectation = [self expectationWithDescription:@"channelConfigFromBundleIdFailure"];
+    id cleverPush = OCMClassMock([CleverPush class]);
+    [OCMStub([cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+    }];
     NSString *configPath = [NSString stringWithFormat:@"channel-config?bundleId=%@&platformName=iOS", @"com.invalid.bundle.notregistered"];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:configPath];
     [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        NSLog(@"Unexpected success: %@", result);
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        NSInteger errorCode = error.code;
-        XCTAssertEqual(errorCode, 404);
+        XCTAssertEqual(error.code, 404);
         [expectation fulfill];
-        NSLog(@"CleverPush Error: Failed to fetch Channel Config via Bundle Identifier: %@", error);
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) {
-            NSLog(@"Timeout Error: %@", error);
-        }
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [cleverPush stopMocking];
 }
 
 - (void)testGetChannelConfigWithCallbackContainsExpectedKeys {

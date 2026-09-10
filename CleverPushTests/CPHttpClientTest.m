@@ -166,66 +166,86 @@
 
 #pragma mark - enqueueRequest (success / failure)
 
-- (void)testEnqueueRequestSuccessWithValidChannelConfig {
+- (void)testEnqueueRequestForwardsToRetryVariantOnSuccess {
     XCTestExpectation *expectation = [self expectationWithDescription:@"enqueue success"];
+    id mock = OCMPartialMock(self.instance);
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:@"channel/RHe2nXvQk9SZgdC4x/config"];
-    [self.instance enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
+    [OCMStub([mock enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"channelId": @"RHe2nXvQk9SZgdC4x" });
+    }];
+    [mock enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
         XCTAssertNotNil(result);
         [expectation fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTFail(@"Expected success: %@", error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [mock stopMocking];
 }
 
-- (void)testEnqueueRequestFailureWithInvalidPath {
+- (void)testEnqueueRequestForwardsToRetryVariantOnFailure {
     XCTestExpectation *expectation = [self expectationWithDescription:@"enqueue failure"];
+    id mock = OCMPartialMock(self.instance);
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:@"channel/__invalid_channel__/config"];
-    [self.instance enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
+    [OCMStub([mock enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+    }];
+    [mock enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [mock stopMocking];
 }
 
-- (void)testEnqueueRequestWithRetryNoDoesNotCrash {
+- (void)testEnqueueRequestWithRetryNoForwardsToInnerFailure {
     XCTestExpectation *expectation = [self expectationWithDescription:@"enqueue no retry"];
+    id mock = OCMPartialMock(self.instance);
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:@"channel/__invalid_channel__/config"];
-    [self.instance enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
+    [OCMStub([mock enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:NO]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+    }];
+    [mock enqueueRequest:request onSuccess:^(NSDictionary * _Nullable result) {
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTAssertNotNil(error);
         [expectation fulfill];
     } withRetry:NO];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [mock stopMocking];
 }
 
 - (void)testEnqueueRequestWithNilCallbacksDoesNotCrash {
+    id mock = OCMPartialMock(self.instance);
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:@"channel/RHe2nXvQk9SZgdC4x/config"];
-    XCTAssertNoThrow([self.instance enqueueRequest:request onSuccess:nil onFailure:nil]);
+    OCMStub([mock enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]);
+    XCTAssertNoThrow([mock enqueueRequest:request onSuccess:nil onFailure:nil]);
+    [mock stopMocking];
 }
 
 - (void)testEnqueueFailedRequestEventuallyCallsFailure {
     XCTestExpectation *expectation = [self expectationWithDescription:@"enqueueFailedRequest"];
     NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:@"channel/__invalid_channel__/config"];
-    [self.instance enqueueFailedRequest:request withRetryCount:99 onSuccess:^(NSDictionary * _Nullable result) {
+    NSError *error = [NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil];
+    [self.instance handleJSONNSURLResponse:[self responseWithStatus:500] data:nil error:error onSuccess:^(NSDictionary * _Nullable result) {
+        XCTFail(@"Unexpected success: %@", result);
         [expectation fulfill];
-    } onFailure:^(NSError * _Nullable error) {
-        XCTAssertNotNil(error);
+    } onFailure:^(NSError * _Nullable failure) {
+        XCTAssertNotNil(failure);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 @end

@@ -144,10 +144,11 @@
 - (void)testGetNotificationsCombineWithApiWithEmptyChannelIdReturnsLocalOnly {
     XCTestExpectation *exp = [self expectationWithDescription:@"getNotifications api skipped"];
     [self storeLocalNotifications:@[[self sampleNotificationDictionaryWithId:@"local-only"]]];
-    OCMStub([self.cleverPush channelId]).andReturn(@"");
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
 
-    [self.cleverPush getNotifications:YES callback:^(NSArray<CPNotification *> * _Nullable notifications) {
+    [self.testableInstance getNotifications:YES callback:^(NSArray<CPNotification *> * _Nullable notifications) {
         XCTAssertEqual(notifications.count, 1);
+        XCTAssertEqualObjects(notifications.firstObject.id, @"local-only");
         [exp fulfill];
     }];
 
@@ -156,14 +157,10 @@
 
 - (void)testGetNotificationsWithLimitAndSkipCallsCallback {
     XCTestExpectation *exp = [self expectationWithDescription:@"getNotifications limit/skip"];
-    [OCMStub([self.cleverPush getNotifications:YES limit:10 skip:5 callback:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(NSArray<CPNotification *> *);
-        [invocation getArgument:&handler atIndex:5];
-        handler(@[]);
-    }];
-
-    [self.cleverPush getNotifications:YES limit:10 skip:5 callback:^(NSArray<CPNotification *> * _Nullable notifications) {
+    [self storeLocalNotifications:@[[self sampleNotificationDictionaryWithId:@"n1"]]];
+    [self.testableInstance getNotifications:NO limit:10 skip:5 callback:^(NSArray<CPNotification *> * _Nullable notifications) {
         XCTAssertNotNil(notifications);
+        XCTAssertEqual(notifications.count, 1);
         [exp fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -372,37 +369,41 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-#pragma mark - live API getNotifications
+#pragma mark - getNotifications combineWithApi (mocked transport)
 
 - (void)testGetNotificationsApiWithValidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"getNotifications live"];
-    NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?limit=5&skip=0&", @"RHe2nXvQk9SZgdC4x"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:path];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        XCTAssertNotNil(result);
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"getNotifications mocked"];
+    [self storeLocalNotifications:@[[self sampleNotificationDictionaryWithId:@"local-1"]]];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{ @"notifications": @[ [self sampleNotificationDictionaryWithId:@"remote-1"] ] });
+    }];
+
+    [self.cleverPush getNotifications:YES callback:^(NSArray<CPNotification *> * _Nullable notifications) {
+        XCTAssertNotNil(notifications);
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testGetNotificationsApiWithInvalidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"getNotifications invalid"];
-    NSString *path = [NSString stringWithFormat:@"channel/%@/received-notifications?limit=5&skip=0&", @"__invalid_channel__"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"GET" path:path];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        [expectation fulfill];
+- (void)testGetNotificationsApiWithInvalidChannelIdDoesNotInvokeSuccessCallback {
+    XCTestExpectation *noSuccess = [self expectationWithDescription:@"getNotifications invalid no success"];
+    noSuccess.inverted = YES;
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"__invalid_channel__" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock failure = nil;
+        [invocation getArgument:&failure atIndex:4];
+        if (failure) {
+            failure([NSError errorWithDomain:@"CleverPushError" code:404 userInfo:nil]);
+        }
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
+
+    [self.cleverPush getNotifications:YES callback:^(NSArray<CPNotification *> * _Nullable notifications) {
+        [noSuccess fulfill];
     }];
+    [self waitForExpectationsWithTimeout:0.4 handler:nil];
 }
 
 @end

@@ -220,7 +220,6 @@
 
 - (void)testSetSubscriptionAttributeArrayValueOnSuccessCallsSuccessBlock {
     XCTestExpectation *exp = [self expectationWithDescription:@"set array attribute onSuccess"];
-
     OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
     OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
     [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
@@ -228,20 +227,23 @@
         [invocation getArgument:&handler atIndex:2];
         if (handler) handler();
     }];
-
-    [OCMStub([self.cleverPush setSubscriptionAttribute:[OCMArg any] arrayValue:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
+        [invocation getArgument:&handler atIndex:2];
+        handler(@"sub-123");
+    }];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
         CPResultSuccessBlock success = nil;
-        [invocation getArgument:&success atIndex:4];
+        [invocation getArgument:&success atIndex:3];
         if (success) success(@{});
     }];
-
     [self.cleverPush setSubscriptionAttribute:@"attr_id" arrayValue:@[ @"v1" ] onSuccess:^(NSDictionary * _Nullable result) {
         [exp fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTFail(@"Unexpected failure: %@", error);
     }];
-
-    [self waitForExpectationsWithTimeout:1.0 handler:nil];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testSetSubscriptionAttributeArrayValueOnFailureCallsFailureBlock {
@@ -256,9 +258,15 @@
     }];
 
     NSError *err = [NSError errorWithDomain:@"CleverPushError" code:500 userInfo:nil];
-    [OCMStub([self.cleverPush setSubscriptionAttribute:[OCMArg any] arrayValue:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
+        [invocation getArgument:&handler atIndex:2];
+        handler(@"sub-123");
+    }];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
         CPFailureBlock failure = nil;
-        [invocation getArgument:&failure atIndex:5];
+        [invocation getArgument:&failure atIndex:4];
         if (failure) failure(err);
     }];
 
@@ -274,17 +282,24 @@
 
 #pragma mark - setSubscriptionAttributes (bulk dictionary)
 
-- (void)testSetSubscriptionAttributesBulkCallsWaitForTrackingConsentForEachKey {
-    OCMStub([self.cleverPush getTrackingConsentRequired]).andReturn(false);
-    OCMStub([self.cleverPush getHasTrackingConsent]).andReturn(true);
-    [OCMStub([self.cleverPush waitForTrackingConsent:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        void (^handler)(void);
+- (void)testSetSubscriptionAttributesBulkEnqueuesRequestForEachKey {
+    [OCMStub([self.cleverPush getSubscriptionId:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(NSString *);
         [invocation getArgument:&handler atIndex:2];
-        if (handler) handler();
+        handler(@"sub-123");
     }];
-
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    XCTestExpectation *exp = [self expectationWithDescription:@"bulk attributes enqueue"];
+    exp.expectedFulfillmentCount = 2;
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPResultSuccessBlock success = nil;
+        [invocation getArgument:&success atIndex:3];
+        if (success) success(@{});
+        [exp fulfill];
+    }];
     NSDictionary *attrs = @{ @"key1": @"val1", @"key2": @"val2" };
     XCTAssertNoThrow([self.cleverPush setSubscriptionAttributes:attrs]);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testSetSubscriptionAttributesBulkWithEmptyDictionaryDoesNotCrash {

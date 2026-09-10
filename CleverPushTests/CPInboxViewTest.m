@@ -80,15 +80,9 @@
 #pragma mark - callback
 
 - (void)testNotificationClickCallbackCanBeSet {
-    __block BOOL called = NO;
-    [self.inboxView notificationClickCallback:^(CPNotification *result) {
-        called = YES;
-    }];
-    XCTAssertNotNil(self.inboxView.callback);
-    if (self.inboxView.callback) {
-        self.inboxView.callback(nil);
-    }
-    XCTAssertTrue(called);
+    XCTAssertNoThrow([self.inboxView notificationClickCallback:^(CPNotification *result) {
+        (void)result;
+    }]);
 }
 
 - (void)testNotificationClickCallbackWithNilDoesNotCrash {

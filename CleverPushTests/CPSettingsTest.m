@@ -31,6 +31,8 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:CLEVERPUSH_SEEN_STORIES_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self.instance setApiEndpoint:@"https://api-mobile.cleverpush.com"];
+    [self.instance setAppGroupIdentifierSuffix:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self.instance];
     [super tearDown];
 }
 
@@ -112,6 +114,7 @@
     OCMStub([mock syncSubscription]);
     [mock setSubscriptionLanguage:@"de"];
     XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_LANGUAGE_KEY], @"de");
+    [NSObject cancelPreviousPerformRequestsWithTarget:mock];
     [mock stopMocking];
 }
 
@@ -120,6 +123,7 @@
     OCMStub([mock syncSubscription]);
     [mock setSubscriptionCountry:@"DE"];
     XCTAssertEqualObjects([[NSUserDefaults standardUserDefaults] stringForKey:CLEVERPUSH_SUBSCRIPTION_COUNTRY_KEY], @"DE");
+    [NSObject cancelPreviousPerformRequestsWithTarget:mock];
     [mock stopMocking];
 }
 
@@ -132,6 +136,7 @@
     NSArray *segments = [mock getSubscriptionPianoSegments];
     XCTAssertEqual(segments.count, 2);
     XCTAssertTrue([segments containsObject:@"seg-1"]);
+    [NSObject cancelPreviousPerformRequestsWithTarget:mock];
     [mock stopMocking];
 }
 
@@ -141,6 +146,7 @@
     [mock setPianoSegments:@[ @"seg-1" ]];
     [mock setPianoSegments:nil];
     XCTAssertEqual([mock getSubscriptionPianoSegments].count, 0);
+    [NSObject cancelPreviousPerformRequestsWithTarget:mock];
     [mock stopMocking];
 }
 

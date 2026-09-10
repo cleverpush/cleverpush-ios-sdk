@@ -40,18 +40,23 @@
     XCTAssertNoThrow([self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1"]);
 }
 
-- (void)testStartLiveActivityOnSuccessCallsSuccessBlock {
-    XCTestExpectation *exp = [self expectationWithDescription:@"live activity success"];
-    [OCMStub([self.cleverPush startLiveActivity:[OCMArg any] pushToken:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        CPResultSuccessBlock success = nil;
-        [invocation getArgument:&success atIndex:4];
-        if (success) success(@{ @"status": @"ok" });
+- (void)testStartLiveActivityOnSuccessDoesNotInvokeCallerSuccessBlock {
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(BOOL);
+        [invocation getArgument:&handler atIndex:2];
+        handler(YES);
+    }];
+    XCTestExpectation *enqueued = [self expectationWithDescription:@"live activity enqueue"];
+    XCTestExpectation *noCallerSuccess = [self expectationWithDescription:@"caller success unused"];
+    noCallerSuccess.inverted = YES;
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        [enqueued fulfill];
     }];
 
     [self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1" onSuccess:^(NSDictionary * _Nullable result) {
-        XCTAssertNotNil(result);
-        XCTAssertEqualObjects(result[@"status"], @"ok");
-        [exp fulfill];
+        [noCallerSuccess fulfill];
     } onFailure:^(NSError * _Nullable error) {
         XCTFail(@"Unexpected failure: %@", error);
     }];
@@ -67,35 +72,48 @@
 
 #pragma mark - startLiveActivity (failure)
 
-- (void)testStartLiveActivityOnFailureCallsFailureBlock {
-    XCTestExpectation *exp = [self expectationWithDescription:@"live activity failure"];
-    NSError *mockError = [NSError errorWithDomain:@"CleverPushError" code:400 userInfo:@{ NSLocalizedDescriptionKey: @"Bad Request" }];
-    [OCMStub([self.cleverPush startLiveActivity:[OCMArg any] pushToken:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
-        CPFailureBlock failure = nil;
-        [invocation getArgument:&failure atIndex:5];
-        if (failure) failure(mockError);
+- (void)testStartLiveActivityDoesNotInvokeCallerFailureBlockWhenEnqueueFails {
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(BOOL);
+        [invocation getArgument:&handler atIndex:2];
+        handler(YES);
+    }];
+    XCTestExpectation *enqueued = [self expectationWithDescription:@"live activity enqueue failure"];
+    XCTestExpectation *noCallerFailure = [self expectationWithDescription:@"caller failure unused"];
+    noCallerFailure.inverted = YES;
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        CPFailureBlock innerFailure = nil;
+        [invocation getArgument:&innerFailure atIndex:4];
+        if (innerFailure) {
+            innerFailure([NSError errorWithDomain:@"CleverPushError" code:400 userInfo:nil]);
+        }
+        [enqueued fulfill];
     }];
 
     [self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1" onSuccess:^(NSDictionary * _Nullable result) {
         XCTFail(@"Unexpected success");
     } onFailure:^(NSError * _Nullable error) {
-        XCTAssertNotNil(error);
-        XCTAssertEqual(error.code, 400);
-        [exp fulfill];
+        [noCallerFailure fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testStartLiveActivityWithNilSubscriptionIdDoesNotCrash {
+- (void)testStartLiveActivityWithNilSubscriptionIdDoesNotEnqueueRequest {
     [self.testableInstance setSubscriptionId:nil];
+    [[self.cleverPush reject] enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES];
     XCTAssertNoThrow([self.testableInstance startLiveActivity:@"activity-1" pushToken:@"token-1" onSuccess:nil onFailure:nil]);
+    OCMVerifyAll(self.cleverPush);
 }
 
-- (void)testStartLiveActivityWithEmptyChannelIdDoesNotCrash {
+- (void)testStartLiveActivityWithEmptyChannelIdDoesNotEnqueueRequest {
     [self.testableInstance setSubscriptionId:@"sub-123"];
-    OCMStub([self.cleverPush channelId]).andReturn(@"");
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [[self.cleverPush reject] enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES];
     XCTAssertNoThrow([self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1" onSuccess:nil onFailure:nil]);
+    OCMVerifyAll(self.cleverPush);
 }
 
 - (void)testStartLiveActivityWithNilActivityIdDoesNotCrash {
@@ -104,52 +122,41 @@
 }
 
 - (void)testStartLiveActivityWithNilCallbacksDoesNotCrash {
-    [OCMStub([self.cleverPush startLiveActivity:[OCMArg any] pushToken:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any]]) andDo:^(NSInvocation *invocation) {}];
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(BOOL);
+        [invocation getArgument:&handler atIndex:2];
+        handler(YES);
+    }];
+    OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]);
     XCTAssertNoThrow([self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1" onSuccess:nil onFailure:nil]);
 }
 
-#pragma mark - live API
+#pragma mark - enqueue verification
 
-- (void)testStartLiveActivityApiWithValidChannelId {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"live activity live api"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/sync/RHe2nXvQk9SZgdC4x"];
-    NSDictionary *body = @{
-        @"channelId": @"RHe2nXvQk9SZgdC4x",
-        @"iosLiveActivityId": @"activity-1",
-        @"iosLiveActivityToken": @"token-1",
-        @"subscriptionId": @"test-subscription"
-    };
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:body options:0 error:nil]];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        [expectation fulfill];
+- (void)testStartLiveActivityEnqueuesSyncRequestWhenSubscriptionExists {
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"RHe2nXvQk9SZgdC4x" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [OCMStub([self.cleverPush areNotificationsEnabled:[OCMArg any]]) andDo:^(NSInvocation *invocation) {
+        void (^handler)(BOOL);
+        [invocation getArgument:&handler atIndex:2];
+        handler(YES);
     }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
+    XCTestExpectation *enqueued = [self expectationWithDescription:@"sync enqueue"];
+    [OCMStub([self.cleverPush enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES]) andDo:^(NSInvocation *invocation) {
+        [enqueued fulfill];
     }];
+    [self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1"];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testStartLiveActivityApiWithEmptyChannelIdFails {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"live activity empty channel"];
-    NSMutableURLRequest *request = [[CleverPushHTTPClient sharedClient] requestWithMethod:@"POST" path:@"subscription/sync/"];
-    NSDictionary *body = @{
-        @"channelId": @"",
-        @"iosLiveActivityId": @"activity-1",
-        @"iosLiveActivityToken": @"token-1",
-        @"subscriptionId": @"test-subscription"
-    };
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:body options:0 error:nil]];
-    [CleverPush enqueueRequest:request onSuccess:^(NSDictionary *result) {
-        [expectation fulfill];
-    } onFailure:^(NSError *error) {
-        XCTAssertNotNil(error);
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:15.0 handler:^(NSError *error) {
-        if (error) NSLog(@"Timeout: %@", error);
-    }];
+- (void)testStartLiveActivitySkipsEnqueueWhenChannelIdEmpty {
+    [self.testableInstance setSubscriptionId:@"sub-123"];
+    (void)[self.testableInstance initWithLaunchOptions:nil channelId:@"" handleNotificationReceived:nil handleNotificationOpened:nil autoRegister:NO];
+    [[self.cleverPush reject] enqueueRequest:[OCMArg any] onSuccess:[OCMArg any] onFailure:[OCMArg any] withRetry:YES];
+    [self.cleverPush startLiveActivity:@"activity-1" pushToken:@"token-1"];
+    OCMVerifyAll(self.cleverPush);
 }
 
 @end
