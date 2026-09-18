@@ -44,6 +44,7 @@
 		93AEEB97293A2B3800A137F5 /* CleverPushWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 93AEEB83293A2B3700A137F5 /* CleverPushWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		93AEEBA1293A323900A137F5 /* CPLiveActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */; };
 		93AEEBA2293A323900A137F5 /* CPLiveActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */; };
+		AA000001000000000000AAA1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AA000001000000000000AAA0 /* SceneDelegate.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +142,8 @@
 		93AEEBA0293A323900A137F5 /* CPLiveActivityVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CPLiveActivityVC.swift; sourceTree = "<group>"; };
 		93AEEBA3293A325900A137F5 /* CleverPushExample-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CleverPushExample-Bridging-Header.h"; sourceTree = "<group>"; };
 		93AEEBA4293A371900A137F5 /* CleverPushWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CleverPushWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
+		AA000001000000000000AA9F /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		AA000001000000000000AAA0 /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +228,8 @@
 				93A9904328D35DD500F990A4 /* CleverPushExample.entitlements */,
 				93A9902428D35ACB00F990A4 /* AppDelegate.h */,
 				93A9902528D35ACB00F990A4 /* AppDelegate.m */,
+				AA000001000000000000AA9F /* SceneDelegate.h */,
+				AA000001000000000000AAA0 /* SceneDelegate.m */,
 				93A9902A28D35ACB00F990A4 /* ViewController.h */,
 				93A9902B28D35ACB00F990A4 /* ViewController.m */,
 				93A9902D28D35ACB00F990A4 /* Main.storyboard */,
@@ -416,6 +421,7 @@
 				93A9902C28D35ACB00F990A4 /* ViewController.m in Sources */,
 				93AEEB94293A2B3800A137F5 /* CleverPushWidgetExtension.intentdefinition in Sources */,
 				93A9902628D35ACB00F990A4 /* AppDelegate.m in Sources */,
+				AA000001000000000000AAA1 /* SceneDelegate.m in Sources */,
 				93AEEBA1293A323900A137F5 /* CPLiveActivityVC.swift in Sources */,
 				93A9903728D35ACD00F990A4 /* main.m in Sources */,
 			);
@@ -650,7 +656,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -689,7 +695,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

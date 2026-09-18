@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import "SceneDelegate.h"
 #import <CleverPush/CleverPush.h>
 
 @interface AppDelegate ()
@@ -11,7 +12,7 @@
     [CleverPush enableDevelopmentMode];
 
     [CleverPush initWithLaunchOptions:launchOptions
-      channelId:@"7R8nkAxtrY5wy5TsS"
+      channelId:@"RHe2nXvQk9SZgdC4x"
       handleNotificationOpened:^(CPNotificationOpenedResult *result) {
         NSLog(@"Received Notification with URL: %@", [result.notification valueForKey:@"url"]);
     } handleSubscribed:^(NSString *subscriptionId) {
@@ -23,6 +24,16 @@
     }];
 
     return YES;
+}
+
+#pragma mark - UISceneSession Lifecycle
+
+- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+    return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+}
+
+- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
+    // Called when the user discards a scene session.
 }
 
 @end
