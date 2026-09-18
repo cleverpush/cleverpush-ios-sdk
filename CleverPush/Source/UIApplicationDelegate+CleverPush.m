@@ -3,9 +3,11 @@
 #import <objc/runtime.h>
 
 #import "UIApplicationDelegate+CleverPush.h"
+#import "UISceneDelegate+CleverPush.h"
 #import "CleverPush.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CleverPushSwizzlingForwarder.h"
+#import "CPDeepLinkTracker.h"
 #import "CPLog.h"
 
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -103,6 +105,7 @@ static NSMutableSet<Class>* swizzledClasses;
 
     [CleverPushAppDelegate injectSilentNotificationHandlerInto:delegateClass];
     [CleverPushAppDelegate injectLaunchOptionsHandlerInto:delegateClass];
+    [CleverPushAppDelegate injectDeepLinkHandlersInto:delegateClass];
 
     [CleverPushAppDelegate injectPreiOS10MethodsPhase1];
 
@@ -110,8 +113,41 @@ static NSMutableSet<Class>* swizzledClasses;
     injectSelector(delegateClass, @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:), newClass, @selector(cleverPushDidRegisterForRemoteNotifications:deviceToken:));
 
     [CleverPushAppDelegate injectPreiOS10MethodsPhase2];
+
+    [CleverPushSceneDelegate injectSelectors];
     
     [self setCleverPushDelegate:delegate];
+}
+
++ (void)injectDeepLinkHandlersInto:(Class)delegateClass {
+    [self injectExistingSelector:@selector(application:openURL:options:)
+              intoDelegateClass:delegateClass
+                   replacement:@selector(cleverPushApplication:openURL:options:)];
+    [self injectExistingSelector:@selector(application:continueUserActivity:restorationHandler:)
+              intoDelegateClass:delegateClass
+                   replacement:@selector(cleverPushApplication:continueUserActivity:restorationHandler:)];
+}
+
++ (void)injectExistingSelector:(SEL)targetSel
+            intoDelegateClass:(Class)delegateClass
+                 replacement:(SEL)cpSel {
+    if (delegateClass == nil || class_getInstanceMethod(delegateClass, targetSel) == NULL) {
+        return;
+    }
+
+    Class cpClass = [CleverPushAppDelegate class];
+
+    if (![self classDefinesSelector:targetSel directlyOnClass:delegateClass]) {
+        Method inheritedMeth = class_getInstanceMethod(delegateClass, targetSel);
+        if (inheritedMeth) {
+            class_addMethod(delegateClass,
+                            targetSel,
+                            method_getImplementation(inheritedMeth),
+                            method_getTypeEncoding(inheritedMeth));
+        }
+    }
+
+    injectSelector(delegateClass, targetSel, cpClass, cpSel);
 }
 
 + (BOOL)isIOSVersionGreaterOrEqual:(float)version {
@@ -185,6 +221,8 @@ static NSMutableSet<Class>* swizzledClasses;
     if ([self respondsToSelector:@selector(cleverPushReceivedDidFinishLaunching:launchOptions:)]) {
         result = [self cleverPushReceivedDidFinishLaunching:application launchOptions:launchOptions];
     }
+    [CPDeepLinkTracker captureFromLaunchOptions:launchOptions];
+    [CleverPushSceneDelegate injectSelectors];
     NSDictionary *remoteNotif = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
     if (remoteNotif && [CleverPush channelId]) {
         [CleverPush handleSilentNotificationReceived:application
@@ -192,6 +230,28 @@ static NSMutableSet<Class>* swizzledClasses;
                                    completionHandler:nil];
     }
     return result;
+}
+
+- (BOOL)cleverPushApplication:(UIApplication *)application
+                      openURL:(NSURL *)url
+                      options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    [CPDeepLinkTracker captureFromURL:url requireAllowlist:YES];
+
+    if ([self respondsToSelector:@selector(cleverPushApplication:openURL:options:)]) {
+        return [self cleverPushApplication:application openURL:url options:options];
+    }
+    return NO;
+}
+
+- (BOOL)cleverPushApplication:(UIApplication *)application
+         continueUserActivity:(NSUserActivity *)userActivity
+           restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
+    [CPDeepLinkTracker captureFromUserActivity:userActivity];
+
+    if ([self respondsToSelector:@selector(cleverPushApplication:continueUserActivity:restorationHandler:)]) {
+        return [self cleverPushApplication:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+    }
+    return NO;
 }
 
 - (void)cleverPushReceivedSilentRemoteNotification:(UIApplication*)application UserInfo:(NSDictionary*)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult)) completionHandler {

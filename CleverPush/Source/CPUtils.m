@@ -1080,6 +1080,25 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     return components.URL;
 }
 
++ (NSString *)getQueryParameterFromURL:(NSURL *)url forKey:(NSString *)key {
+    if (!url || !key) {
+        return nil;
+    }
+    
+    NSURLComponents *components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    if (!components || !components.queryItems) {
+        return nil;
+    }
+    
+    for (NSURLQueryItem *queryItem in components.queryItems) {
+        if ([queryItem.name isEqualToString:key]) {
+            return queryItem.value;
+        }
+    }
+    
+    return nil;
+}
+
 #pragma mark - Converts UISceneConnectionOptions to launch options.
 + (NSDictionary *)convertConnectionOptionsToLaunchOptions:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
     NSMutableDictionary *launchOptions = [NSMutableDictionary dictionary];
@@ -1087,6 +1106,20 @@ NSString * const localeIdentifier = @"en_US_POSIX";
     if (connectionOptions.notificationResponse) {
         NSDictionary *userInfo = connectionOptions.notificationResponse.notification.request.content.userInfo;
         [launchOptions setObject:userInfo forKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    }
+
+    UIOpenURLContext *urlContext = connectionOptions.URLContexts.anyObject;
+    if (urlContext.URL) {
+        [launchOptions setObject:urlContext.URL forKey:UIApplicationLaunchOptionsURLKey];
+    }
+
+    NSUserActivity *userActivity = connectionOptions.userActivities.anyObject;
+    if (userActivity) {
+        NSDictionary *userActivityDictionary = @{
+            @"UIApplicationLaunchOptionsUserActivityKey": userActivity,
+            @"UIApplicationLaunchOptionsUserActivityTypeKey": userActivity.activityType ?: @""
+        };
+        [launchOptions setObject:userActivityDictionary forKey:UIApplicationLaunchOptionsUserActivityDictionaryKey];
     }
 
     return launchOptions;

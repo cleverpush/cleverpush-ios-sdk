@@ -918,6 +918,10 @@ static CleverPush* singleInstance = nil;
     return [self.CPSharedInstance getHandleUrlFromSceneDelegate];
 }
 
++ (void)captureDeepLinkURL:(NSURL * _Nullable)url {
+    [self.CPSharedInstance captureDeepLinkURL:url];
+}
+
 + (void)setLogListener:(CPLogListener _Nullable)listener {
     [self.CPSharedInstance setLogListener:listener];
 }
