@@ -7,16 +7,7 @@
 static NSString * const kCPDeepLinkDateTimeFormat = @"yyyy-MM-dd HH:mm:ss";
 static const NSTimeInterval kCPDeepLinkAttributionWindowSeconds = 24.0 * 60.0 * 60.0;
 
-static NSString *lastProcessedURL;
-static NSObject *processLock;
-
 @implementation CPDeepLinkTracker
-
-+ (void)initialize {
-    if (self == [CPDeepLinkTracker class]) {
-        processLock = [NSObject new];
-    }
-}
 
 + (NSDateFormatter *)deepLinkDateFormatter {
     static NSDateFormatter *formatter;
@@ -41,13 +32,6 @@ static NSObject *processLock;
     }
     if (requireAllowlist && ![CPDeepLinkAllowlist allowsURLString:normalized]) {
         return;
-    }
-
-    @synchronized (processLock) {
-        if ([normalized isEqualToString:lastProcessedURL]) {
-            return;
-        }
-        lastProcessedURL = normalized;
     }
 
     [self storeNormalizedDeepLinkURLString:normalized];
@@ -110,9 +94,6 @@ static NSObject *processLock;
     NSString *normalized = [self normalizeDeepLinkURLString:urlString];
     if (normalized == nil) {
         return;
-    }
-    @synchronized (processLock) {
-        lastProcessedURL = normalized;
     }
     [self storeNormalizedDeepLinkURLString:normalized];
 }

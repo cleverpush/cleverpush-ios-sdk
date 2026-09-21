@@ -1089,20 +1089,6 @@ NSString * const localeIdentifier = @"en_US_POSIX";
         [launchOptions setObject:userInfo forKey:UIApplicationLaunchOptionsRemoteNotificationKey];
     }
 
-    UIOpenURLContext *urlContext = connectionOptions.URLContexts.anyObject;
-    if (urlContext.URL) {
-        [launchOptions setObject:urlContext.URL forKey:UIApplicationLaunchOptionsURLKey];
-    }
-
-    NSUserActivity *userActivity = connectionOptions.userActivities.anyObject;
-    if (userActivity) {
-        NSDictionary *userActivityDictionary = @{
-            @"UIApplicationLaunchOptionsUserActivityKey": userActivity,
-            @"UIApplicationLaunchOptionsUserActivityTypeKey": userActivity.activityType ?: @""
-        };
-        [launchOptions setObject:userActivityDictionary forKey:UIApplicationLaunchOptionsUserActivityDictionaryKey];
-    }
-
     return launchOptions;
 }
 
