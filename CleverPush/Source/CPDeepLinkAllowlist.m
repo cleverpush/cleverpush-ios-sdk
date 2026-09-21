@@ -105,8 +105,9 @@ static NSObject *rulesLock;
                 continue;
             }
             NSString *trimmed = [domain stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            BOOL schemeLess = !([trimmed hasPrefix:@"http://"] || [trimmed hasPrefix:@"https://"]);
             NSURL *domainURL = nil;
-            if ([trimmed hasPrefix:@"http://"] || [trimmed hasPrefix:@"https://"]) {
+            if (!schemeLess) {
                 domainURL = [NSURL URLWithString:trimmed];
             } else {
                 domainURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@", trimmed]];
@@ -120,7 +121,7 @@ static NSObject *rulesLock;
             if ([self isUsableRule:httpsRule]) {
                 [rules addObject:httpsRule];
             }
-            if (![scheme isEqualToString:@"http"]) {
+            if (schemeLess) {
                 CPDeepLinkAllowlistRule *httpRule = [[CPDeepLinkAllowlistRule alloc] initWithScheme:@"http" host:host];
                 if ([self isUsableRule:httpRule]) {
                     [rules addObject:httpRule];
