@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isTrackableDeepLinkURLString:(NSString * _Nullable)urlString;
 + (NSString * _Nullable)normalizeDeepLinkURLString:(NSString * _Nullable)urlString;
 + (BOOL)isWithinAttributionWindowForTimeString:(NSString * _Nullable)lastDeepLinkTime;
-+ (BOOL)isWithinAttributionWindowForTime:(NSDate * _Nullable)lastDeepLinkTime;
 
 @end
 

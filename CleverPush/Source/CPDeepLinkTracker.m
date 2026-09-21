@@ -208,13 +208,6 @@ static NSObject *processLock;
     return schemeSpecificPart.length > 0;
 }
 
-+ (BOOL)isWithinAttributionWindowForTime:(NSDate *)lastDeepLinkTime {
-    if (![lastDeepLinkTime isKindOfClass:[NSDate class]]) {
-        return NO;
-    }
-    return [self isWithinAttributionWindowForTimeString:[[self deepLinkDateFormatter] stringFromDate:lastDeepLinkTime]];
-}
-
 + (BOOL)isWithinAttributionWindowForTimeString:(NSString *)lastDeepLinkTime {
     if (lastDeepLinkTime.length == 0) {
         return NO;
