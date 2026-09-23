@@ -14,6 +14,9 @@
 #import "CleverPush.h"
 #import "UNUserNotificationCenter+CleverPush.h"
 #import "UIApplicationDelegate+CleverPush.h"
+#import "UISceneDelegate+CleverPush.h"
+#import "CPDeepLinkTracker.h"
+#import "CPDeepLinkAllowlist.h"
 #import "CleverPushSelectorHelpers.h"
 #import "CPNotificationCategoryController.h"
 #import "CPUtils.h"
@@ -428,6 +431,7 @@ static id isNil(id object) {
                                 handleInitialized:(CPInitializedBlock _Nullable)initializedCallback API_AVAILABLE(ios(13.0)) {
     NSDictionary *launchOptions = [CPUtils convertConnectionOptionsToLaunchOptions:connectionOptions];
     handleUrlFromSceneDelegate = YES;
+    [CPDeepLinkTracker captureFromConnectionOptions:connectionOptions];
     return [self initWithLaunchOptions:launchOptions channelId:channelId handleNotificationReceived:receivedCallback handleNotificationOpened:openedCallback handleSubscribed:subscribedCallback autoRegister:autoRegister handleInitialized:initializedCallback];
 }
 
@@ -548,6 +552,11 @@ static id isNil(id object) {
 
     if (!handleUrlFromSceneDelegate) {
         handleUrlFromAppDelegate = YES;
+    }
+
+    [CPDeepLinkTracker captureFromLaunchOptions:launchOptions];
+    if (@available(iOS 13.0, *)) {
+        [CleverPushSceneDelegate injectSelectors];
     }
 
     return self;
@@ -2110,6 +2119,11 @@ static id isNil(id object) {
         }
     }
     
+    NSString *notificationUrl = [notification objectForKey:@"url"];
+    if (notificationUrl != nil && ![notificationUrl isKindOfClass:[NSNull class]] && [notificationUrl length] > 0) {
+        [CPDeepLinkTracker storeDeepLinkURLString:notificationUrl];
+    }
+
     BOOL hasValidUrl = notification != nil &&
                        [notification objectForKey:@"url"] != nil &&
                        ![[notification objectForKey:@"url"] isKindOfClass:[NSNull class]] &&
@@ -3808,6 +3822,8 @@ static id isNil(id object) {
                             [dataDic setObject:lastClickedNotificationId forKey:@"notificationId"];
                         }
                     }
+                    
+                    [CPDeepLinkTracker addAttributionToEventData:dataDic];
 
                     NSData* postData = [NSJSONSerialization dataWithJSONObject:dataDic options:0 error:nil];
                     [request setHTTPBody:postData];
@@ -4986,6 +5002,7 @@ static id isNil(id object) {
 #pragma mark - Handle the universal links from notification tap event
 - (void)setHandleUniversalLinksInAppForDomains:(NSArray<NSString *> *_Nullable)domains {
     handleUniversalLinksInApp = domains;
+    [CPDeepLinkAllowlist resetCachedRules];
 }
 
 - (NSArray<NSString*>* _Nullable)getHandleUniversalLinksInAppForDomains {
@@ -4998,6 +5015,10 @@ static id isNil(id object) {
 
 - (BOOL)getHandleUrlFromSceneDelegate {
     return handleUrlFromSceneDelegate;
+}
+
+- (void)captureDeepLinkURL:(NSURL * _Nullable)url {
+    [CPDeepLinkTracker captureFromURL:url requireAllowlist:YES];
 }
 
 #pragma mark - Handle the style of the topViewController (the presented app banner controller).
