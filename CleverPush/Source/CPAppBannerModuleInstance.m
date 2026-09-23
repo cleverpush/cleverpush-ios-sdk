@@ -838,6 +838,15 @@ int appBannerPerDayValue = 0;
                     keyExists = [subscriptionAttributes objectForKey:attributeId] != nil;
                 }
                 currentMatch = !keyExists;
+            } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeIsEmpty)]) {
+                NSDictionary *subscriptionAttributes = [CleverPush getSubscriptionAttributes];
+                id storedValue = nil;
+                BOOL keyExists = NO;
+                if (subscriptionAttributes != nil && attributeId != nil) {
+                    storedValue = [subscriptionAttributes objectForKey:attributeId];
+                    keyExists = storedValue != nil;
+                }
+                currentMatch = keyExists && [self isSubscriptionAttributeValueEmpty:storedValue];
             } else if ([relation isEqualToString:filterRelationType(CPFilterRelationTypeContainsSubstring)]) {
                 if ([attributeValueObj isKindOfClass:[NSString class]]) {
                     NSString *attributeValue = (NSString *)attributeValueObj;
@@ -1040,6 +1049,28 @@ int appBannerPerDayValue = 0;
         }
     }
     return nil;
+}
+
+#pragma mark - Treat null, empty, and whitespace-only subscription attribute values as empty.
+- (BOOL)isSubscriptionAttributeValueEmpty:(id)value {
+    if (value == nil || [value isKindOfClass:[NSNull class]]) {
+        return YES;
+    }
+
+    if ([value isKindOfClass:[NSString class]]) {
+        NSString *trimmedValue = [(NSString *)value stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        return trimmedValue.length == 0;
+    }
+
+    if ([value isKindOfClass:[NSArray class]]) {
+        return [(NSArray *)value count] == 0;
+    }
+
+    if ([value isKindOfClass:[NSDictionary class]]) {
+        return [(NSDictionary *)value count] == 0;
+    }
+
+    return NO;
 }
 
 #pragma mark - check the banner triggering allowed as per selected custom attributes.
