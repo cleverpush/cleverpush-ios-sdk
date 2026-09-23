@@ -2870,6 +2870,10 @@ static id isNil(id object) {
     }];
 }
 
+- (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock {
+    [self setSubscriptionAttribute:attributeId objectValue:value onSuccess:successBlock onFailure:failureBlock];
+}
+
 - (void)setSubscriptionAttributeObjectImplementation:(NSString*)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value {
     [self setSubscriptionAttributeObjectImplementation:attributeId objectValue:value callback:nil onSuccess:nil onFailure:nil];
 }
@@ -2907,6 +2911,9 @@ static id isNil(id object) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
             if ([CPUtils isNullOrEmpty:channelId]) {
                 [CPLog error:@"CleverPush: setSubscriptionAttributeObjectImplementation: channelId is nil or empty, skipping API call"];
+                if (failureBlock) {
+                    failureBlock([NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is nil or empty"}]);
+                }
                 return;
             }
             NSMutableURLRequest* request = [[CleverPushHTTPClient sharedClient] requestWithMethod:HTTP_POST path:@"subscription/attribute"];
