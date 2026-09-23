@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
     s.homepage                = "https://cleverpush.com"
     s.license                 = { :type => "MIT (modified)", :file => "LICENSE" }
     s.author                  = { "CleverPush" => "support@cleverpush.com" }
-    s.platform                = :ios, '15.0'
+    s.platform                = :ios, '11.0'
     s.source                  = { :git => "https://github.com/cleverpush/cleverpush-ios-sdk.git", :tag => s.version.to_s }
     s.requires_arc            = true
     s.frameworks              = ["SystemConfiguration", "UIKit", "UserNotifications", "StoreKit", "WebKit", "JavaScriptCore", "SafariServices", "ImageIO", "MobileCoreServices"]
