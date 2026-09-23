@@ -101,6 +101,9 @@ static const int secDifferenceAtVeryFirstTime = 0;
 static const int validationSeconds = 3600;
 static const NSInteger httpRequestRetryCount = 3;
 static const NSInteger httpRequestRetryBackoffMultiplier = 2;
+static const NSInteger APNS_TOKEN_TIMEOUT_SECONDS = 60;
+static NSString * const ERROR_APNS_TOKEN_TIMEOUT = @"APNS_TOKEN_TIMEOUT";
+static NSString * const ERROR_APNS_TOKEN_REGISTRATION_FAILED = @"APNS_TOKEN_REGISTRATION_FAILED";
 int maximumNotifications = 100;
 int iabtcfVendorConsentPosition = 1139;
 static UIViewController*customTopViewController = nil;
@@ -131,6 +134,7 @@ NSMutableArray* pendingDeviceTokenListeners;
 NSMutableArray* pendingTrackingConsentListeners;
 NSMutableArray* pendingSubscribeConsentListeners;
 NSMutableArray* subscriptionTags;
+NSError* lastDeviceTokenError;
 
 NSMutableDictionary* autoAssignSessionsCounted;
 UIBackgroundTaskIdentifier mediaBackgroundTask;
@@ -1039,12 +1043,91 @@ static id isNil(id object) {
 }
 
 #pragma mark - getDeviceToken.
+- (NSError *)deviceTokenTimeoutError {
+    return [NSError errorWithDomain:@"com.cleverpush"
+                               code:408
+                           userInfo:@{NSLocalizedDescriptionKey: ERROR_APNS_TOKEN_TIMEOUT}];
+}
+
+- (NSError *)deviceTokenRegistrationFailedError:(NSError * _Nullable)underlyingError {
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:ERROR_APNS_TOKEN_REGISTRATION_FAILED
+                                                                       forKey:NSLocalizedDescriptionKey];
+    if (underlyingError) {
+        userInfo[NSUnderlyingErrorKey] = underlyingError;
+    }
+    return [NSError errorWithDomain:@"com.cleverpush"
+                               code:underlyingError.code != 0 ? underlyingError.code : 400
+                           userInfo:userInfo];
+}
+
+- (void)failAllPendingDeviceTokenListenersWithError:(NSError *)error {
+    NSArray *listeners;
+    @synchronized (self) {
+        lastDeviceTokenError = error;
+        listeners = [pendingDeviceTokenListeners copy];
+        pendingDeviceTokenListeners = [NSMutableArray new];
+        hasRequestedDeviceToken = NO;
+    }
+
+    for (void (^listener)(NSString *) in listeners) {
+        if (listener) {
+            listener(nil);
+        }
+    }
+}
+
 - (void)getDeviceToken:(void(^ _Nullable)(NSString* _Nullable))callback {
+    if (!callback) {
+        return;
+    }
+
     if (deviceToken) {
         callback(deviceToken);
-    } else {
-        [pendingDeviceTokenListeners addObject:[callback copy]];
+        return;
     }
+
+    __block BOOL completed = NO;
+    void (^safeCallback)(NSString *) = ^(NSString *token) {
+        @synchronized (self) {
+            if (completed) {
+                return;
+            }
+            completed = YES;
+        }
+        callback(token);
+    };
+
+    void (^copiedCallback)(NSString *) = [safeCallback copy];
+    @synchronized (self) {
+        if (!pendingDeviceTokenListeners) {
+            pendingDeviceTokenListeners = [NSMutableArray new];
+        }
+        [pendingDeviceTokenListeners addObject:copiedCallback];
+    }
+
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(APNS_TOKEN_TIMEOUT_SECONDS * NSEC_PER_SEC)),
+                   dispatch_get_main_queue(), ^{
+        typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+
+        @synchronized (strongSelf) {
+            if (completed) {
+                return;
+            }
+            if (![pendingDeviceTokenListeners containsObject:copiedCallback]) {
+                return;
+            }
+            [pendingDeviceTokenListeners removeObject:copiedCallback];
+            lastDeviceTokenError = [strongSelf deviceTokenTimeoutError];
+        }
+
+        [CPLog error:@"CleverPush: getDeviceToken timed out after %ld seconds (APNS token never arrived)",
+         (long)APNS_TOKEN_TIMEOUT_SECONDS];
+        copiedCallback(nil);
+    });
 }
 
 - (NSString* _Nullable)getDeviceToken {
@@ -1299,27 +1382,19 @@ static id isNil(id object) {
 - (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     hasCalledSubscribe = YES;
 
-	[self requestDeviceToken];
-
-    [self getDeviceToken:^(NSString * _Nullable deviceToken) {
-        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
-    }];
-}
-
-- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     [self areNotificationsEnabled:^(BOOL hasPermission) {
         if (!hasPermission && autoRequestNotificationPermission) {
             [self requestNotificationPermission:isDisplayAlertEnabledForNotifications playSound:isSoundEnabledForNotifications setBadge:isBadgeCountEnabledForNotifications completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && !ignoreDisabledNotificationPermission) {
-                        [self handleSubscriptionWithCompletion:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+                        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+                        return;
                     }
 
                     if (!granted && !ignoreDisabledNotificationPermission) {
                         if (completion) {
                             completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:410 userInfo:@{NSLocalizedDescriptionKey:@"Cannot subscribe because notifications have been disabled by the user."}]);
                         }
-
                         [self setConfirmAlertShown];
                     }
                 });
@@ -1337,58 +1412,80 @@ static id isNil(id object) {
             return;
         }
 
-        if (subscriptionId != nil) {
+        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    }];
+}
+
+- (void)waitForDeviceTokenThenProceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    [self requestDeviceToken];
+
+    [self getDeviceToken:^(NSString * _Nullable token) {
+        if ([CPUtils isNullOrEmpty:token]) {
+            NSError *error = lastDeviceTokenError ?: [self deviceTokenTimeoutError];
+            lastDeviceTokenError = nil;
+            [CPLog error:@"CleverPush: subscribe aborted — APNS device token unavailable: %@",
+             error.localizedDescription];
             if (completion) {
-                completion(subscriptionId, nil);
+                completion(nil, error);
             }
             return;
         }
+        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    }];
+}
 
-        [CPLog debug:@"syncSubscription called from subscribe"];
-        if (failureBlock) {
-            [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
-        } else {
-            [self performSelector:@selector(syncSubscription) withObject:nil];
+- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+    if (subscriptionId != nil) {
+        if (completion) {
+            completion(subscriptionId, nil);
         }
+        return;
+    }
 
-        [self getChannelConfig:^(NSDictionary* channelConfig) {
-            if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
-                if (![self isSubscribed]) {
-                    [self initTopicsDialogData:channelConfig syncToBackend:YES];
-                }
+    [CPLog debug:@"syncSubscription called from subscribe"];
+    if (failureBlock) {
+        [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
+    } else {
+        [self performSelector:@selector(syncSubscription) withObject:nil];
+    }
 
-                if (!skipTopicsDialog) {
-                    NSArray* channelTopics = [channelConfig cleverPushArrayForKey:@"channelTopics"];
-                    if (channelTopics != nil && [channelTopics count] > 0) {
-                        NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-                        [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
-                        [userDefaults synchronize];
-                        
-                        if (completion) {
-                            @synchronized(self) {
-                                isTopicsDialogBeingShown = YES;
-                                handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
-                                    completion(subscriptionId, nil);
-                                };
-                            }
+    [self getChannelConfig:^(NSDictionary* channelConfig) {
+        if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
+            if (![self isSubscribed]) {
+                [self initTopicsDialogData:channelConfig syncToBackend:YES];
+            }
+
+            if (!skipTopicsDialog) {
+                NSArray* channelTopics = [channelConfig cleverPushArrayForKey:@"channelTopics"];
+                if (channelTopics != nil && [channelTopics count] > 0) {
+                    NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
+                    [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
+                    [userDefaults synchronize];
+                    
+                    if (completion) {
+                        @synchronized(self) {
+                            isTopicsDialogBeingShown = YES;
+                            handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
+                                completion(subscriptionId, nil);
+                            };
                         }
-                        
-                        [self showPendingTopicsDialog];
                     }
+                    
+                    [self showPendingTopicsDialog];
                 }
             }
-        }];
-
-        if (completion && !isTopicsDialogBeingShown) {
-            [self getSubscriptionId:^(NSString *subscriptionId) {
-                if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                    completion(subscriptionId, nil);
-                } else {
-                    completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
-                }
-            }];
         }
     }];
+
+    if (completion && !isTopicsDialogBeingShown) {
+        [self getSubscriptionId:^(NSString *subscriptionId) {
+            if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
+                completion(subscriptionId, nil);
+            } else {
+                completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+            }
+        }];
+    }
 }
 
 - (void)autoSubscribeWithDelays {
@@ -1645,16 +1742,26 @@ static id isNil(id object) {
         [userDefaults setBool:NO forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
         [userDefaults synchronize];
     }
+
+    [self failAllPendingDeviceTokenListenersWithError:[self deviceTokenRegistrationFailedError:err]];
 }
 
 #pragma mark - register Device Token
 - (void)registerDeviceToken:(id)newDeviceToken {
     deviceToken = newDeviceToken;
+    lastDeviceTokenError = nil;
 
-    for (id(^listener)() in pendingDeviceTokenListeners) {
-        listener(deviceToken);
+    NSArray *listeners;
+    @synchronized (self) {
+        listeners = [pendingDeviceTokenListeners copy];
+        pendingDeviceTokenListeners = [NSMutableArray new];
     }
-    pendingDeviceTokenListeners = [NSMutableArray new];
+
+    for (void (^listener)(NSString *) in listeners) {
+        if (listener) {
+            listener(deviceToken);
+        }
+    }
 
     [[NSUserDefaults standardUserDefaults] setObject:deviceToken forKey:CLEVERPUSH_DEVICE_TOKEN_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -1674,17 +1781,27 @@ static id isNil(id object) {
 }
 
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock {
-    [self syncSubscription:nil successBlock:nil];
+    [self syncSubscription:failureBlock successBlock:nil];
 }
 
 - (void)syncSubscription:(CPFailureBlock _Nullable)failureBlock successBlock:(void(^)())successBlock {
     if (!hasCalledSubscribe) {
         [CPLog debug:@"CleverPushInstance: syncSubscription: Cleverpush SDK not initialised"];
+        if (failureBlock) {
+            failureBlock([NSError errorWithDomain:@"com.cleverpush"
+                                             code:400
+                                         userInfo:@{NSLocalizedDescriptionKey:@"CleverPush SDK not initialised / subscribe not called"}]);
+        }
         return;
     }
 
     if ([self isSubscriptionInProgress]) {
         [CPLog debug:@"syncSubscription aborted - registration already in progress"];
+        if (failureBlock) {
+            failureBlock([NSError errorWithDomain:@"com.cleverpush"
+                                             code:409
+                                         userInfo:@{NSLocalizedDescriptionKey:@"Subscription registration is already in progress"}]);
+        }
         return;
     }
 
@@ -1807,6 +1924,11 @@ static id isNil(id object) {
     if ([CPUtils isNullOrEmpty:channelId]) {
         [CPLog error:@"CleverPush: makeSyncSubscriptionRequest: channelId is nil or empty, skipping API call"];
         [self setSubscriptionInProgress:false];
+        if (failureBlock) {
+            failureBlock([NSError errorWithDomain:@"com.cleverpush"
+                                             code:400
+                                         userInfo:@{NSLocalizedDescriptionKey:@"Channel ID is null or empty"}]);
+        }
         return;
     }
 
