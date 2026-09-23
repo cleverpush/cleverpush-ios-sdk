@@ -1096,8 +1096,9 @@ static id isNil(id object) {
     @synchronized (self) {
         if (deviceToken) {
             completed = YES;
+            NSString *currentDeviceToken = deviceToken;
             dispatch_async(dispatch_get_main_queue(), ^{
-                callback(deviceToken);
+                callback(currentDeviceToken);
             });
             return;
         }
@@ -1490,7 +1491,11 @@ static id isNil(id object) {
         }
     }];
 
-    if (!isTopicsDialogBeingShown) {
+    BOOL topicsDialogBeingShown;
+    @synchronized (self) {
+        topicsDialogBeingShown = isTopicsDialogBeingShown;
+    }
+    if (!topicsDialogBeingShown) {
         [self getSubscriptionId:^(NSString *pendingSubscriptionId) {
             if (pendingSubscriptionId != nil && ![pendingSubscriptionId isKindOfClass:[NSNull class]] && ![pendingSubscriptionId isEqualToString:@""]) {
                 settle(pendingSubscriptionId, nil);
