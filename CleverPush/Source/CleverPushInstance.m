@@ -1081,11 +1081,6 @@ static id isNil(id object) {
         return;
     }
 
-    if (deviceToken) {
-        callback(deviceToken);
-        return;
-    }
-
     __block BOOL completed = NO;
     void (^safeCallback)(NSString *) = ^(NSString *token) {
         @synchronized (self) {
@@ -1099,6 +1094,14 @@ static id isNil(id object) {
 
     void (^copiedCallback)(NSString *) = [safeCallback copy];
     @synchronized (self) {
+        if (deviceToken) {
+            completed = YES;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                callback(deviceToken);
+            });
+            return;
+        }
+
         if (!pendingDeviceTokenListeners) {
             pendingDeviceTokenListeners = [NSMutableArray new];
         }
@@ -1122,6 +1125,7 @@ static id isNil(id object) {
             }
             [pendingDeviceTokenListeners removeObject:copiedCallback];
             lastDeviceTokenError = [strongSelf deviceTokenTimeoutError];
+            hasRequestedDeviceToken = NO;
         }
 
         [CPLog error:@"CleverPush: getDeviceToken timed out after %ld seconds (APNS token never arrived)",
@@ -1442,12 +1446,23 @@ static id isNil(id object) {
         return;
     }
 
+    __block BOOL settled = NO;
+    void (^settle)(NSString * _Nullable, NSError * _Nullable) = ^(NSString * _Nullable sid, NSError * _Nullable error) {
+        @synchronized (self) {
+            if (settled) {
+                return;
+            }
+            settled = YES;
+        }
+        if (completion) {
+            completion(sid, error);
+        }
+    };
+
     [CPLog debug:@"syncSubscription called from subscribe"];
-    if (failureBlock) {
-        [self performSelector:@selector(syncSubscription:) withObject:failureBlock];
-    } else {
-        [self performSelector:@selector(syncSubscription) withObject:nil];
-    }
+    [self syncSubscription:^(NSError *error) {
+        settle(nil, error);
+    }];
 
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
@@ -1462,13 +1477,11 @@ static id isNil(id object) {
                     [userDefaults setBool:YES forKey:CLEVERPUSH_TOPICS_DIALOG_PENDING_KEY];
                     [userDefaults synchronize];
                     
-                    if (completion) {
-                        @synchronized(self) {
-                            isTopicsDialogBeingShown = YES;
-                            handlePendingSubscriptionCallback = ^(NSString * _Nullable subscriptionId) {
-                                completion(subscriptionId, nil);
-                            };
-                        }
+                    @synchronized(self) {
+                        isTopicsDialogBeingShown = YES;
+                        handlePendingSubscriptionCallback = ^(NSString * _Nullable pendingSubscriptionId) {
+                            settle(pendingSubscriptionId, nil);
+                        };
                     }
                     
                     [self showPendingTopicsDialog];
@@ -1477,12 +1490,12 @@ static id isNil(id object) {
         }
     }];
 
-    if (completion && !isTopicsDialogBeingShown) {
-        [self getSubscriptionId:^(NSString *subscriptionId) {
-            if (subscriptionId != nil && ![subscriptionId isKindOfClass:[NSNull class]] && ![subscriptionId isEqualToString:@""]) {
-                completion(subscriptionId, nil);
+    if (!isTopicsDialogBeingShown) {
+        [self getSubscriptionId:^(NSString *pendingSubscriptionId) {
+            if (pendingSubscriptionId != nil && ![pendingSubscriptionId isKindOfClass:[NSNull class]] && ![pendingSubscriptionId isEqualToString:@""]) {
+                settle(pendingSubscriptionId, nil);
             } else {
-                completion(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
+                settle(nil, [NSError errorWithDomain:@"com.cleverpush" code:400 userInfo:@{NSLocalizedDescriptionKey:@"Subscription ID is nil or empty"}]);
             }
         }];
     }
@@ -1748,11 +1761,10 @@ static id isNil(id object) {
 
 #pragma mark - register Device Token
 - (void)registerDeviceToken:(id)newDeviceToken {
-    deviceToken = newDeviceToken;
-    lastDeviceTokenError = nil;
-
     NSArray *listeners;
     @synchronized (self) {
+        deviceToken = newDeviceToken;
+        lastDeviceTokenError = nil;
         listeners = [pendingDeviceTokenListeners copy];
         pendingDeviceTokenListeners = [NSMutableArray new];
     }
