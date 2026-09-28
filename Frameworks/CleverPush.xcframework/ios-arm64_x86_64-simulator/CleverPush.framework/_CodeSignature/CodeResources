@@ -178,7 +178,7 @@
 		</data>
 		<key>Headers/CPFilterRelationType.h</key>
 		<data>
-		Pwk4IzZvARr/e5K28aN46u2IEoY=
+		gz/gQhgbMSDG4TSlZa+L78bX/JY=
 		</data>
 		<key>Headers/CPGroupNotificationSoundMode.h</key>
 		<data>
@@ -266,7 +266,7 @@
 		</data>
 		<key>Headers/CleverPush.h</key>
 		<data>
-		Ebrrf0QY4fc9i4fMu6bvhpsk0vY=
+		bShx+ilc9EKPgi2cGmOBe8EsQ4g=
 		</data>
 		<key>Headers/CleverPushHTTPClient.h</key>
 		<data>
@@ -274,11 +274,11 @@
 		</data>
 		<key>Headers/CleverPushInstance.h</key>
 		<data>
-		L1u0QZG7Ln+eoqLuv0dCeZaBF0Q=
+		Kwy7KzDKa6mBSrkLLq87+kEg/iE=
 		</data>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<data>
-		Vh3xcRcEVPb46Cdr9jwHVJ4mJLc=
+		FOJt79msAiFh9U2+YVxpOGTshMg=
 		</data>
 		<key>Headers/UIImageView+CleverPush.h</key>
 		<data>
@@ -604,7 +604,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			/GQnkXLwsxYzdeRCyMSHYSsWEWLr4zdh0dD0nkCQE2Q=
+			WDja8M5FFxnY7AbG9slCVXgDi2U8LaALRyDhKVhCl80=
 			</data>
 		</dict>
 		<key>Headers/CPGroupNotificationSoundMode.h</key>
@@ -758,7 +758,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			gqeio5EafN/cfqxuRgrPJH+YErhF+KD4TghiFNhksgY=
+			siF3Gew6l3Pl5c9Dmut+r9afOv3uXcxMBnvN3MDu6B8=
 			</data>
 		</dict>
 		<key>Headers/CleverPushHTTPClient.h</key>
@@ -772,14 +772,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			y+AUUo/HYOCJSx3dOXzG1w4zDYY6BAzuya70i5w0gOw=
+			yS3ucTvGgsMBnr69PSJuM8pxiGGZZJWN7hpe7JXlfIQ=
 			</data>
 		</dict>
 		<key>Headers/CleverPushUserDefaults.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			RxP9k2wv9Jck6pX2HIdl2Gz2XLTIf2col6zrQ8HLYxU=
+			bsh1iy/adcEnnxTaZXodaA2WfcijsHtV0K7iNzuCwMI=
 			</data>
 		</dict>
 		<key>Headers/UIImageView+CleverPush.h</key>

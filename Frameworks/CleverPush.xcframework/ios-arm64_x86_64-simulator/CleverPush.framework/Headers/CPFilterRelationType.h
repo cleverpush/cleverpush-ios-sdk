@@ -8,7 +8,8 @@ typedef NS_ENUM(NSInteger, CPFilterRelationType) {
     CPFilterRelationTypeNotContains,
     CPFilterRelationTypeContainsSubstring,
     CPFilterRelationTypeExists,
-    CPFilterRelationTypeNotExists
+    CPFilterRelationTypeNotExists,
+    CPFilterRelationTypeIsEmpty
 };
 
-#define filterRelationType(enum) [@[@"equals",@"lessThan",@"greaterThan",@"between",@"notEquals",@"contains",@"notContains",@"containsSubstring",@"exists",@"notExists"] objectAtIndex:enum]
+#define filterRelationType(enum) [@[@"equals",@"lessThan",@"greaterThan",@"between",@"notEquals",@"contains",@"notContains",@"containsSubstring",@"exists",@"notExists",@"isEmpty"] objectAtIndex:enum]

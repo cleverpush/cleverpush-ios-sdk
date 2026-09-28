@@ -132,6 +132,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)removeSubscriptionAttributes:(NSArray <NSString*>* _Nullable)attributeIds;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value callback:(void(^ _Nullable)(void))callback;
++ (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId value:(NSString* _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value;
 + (void)setSubscriptionAttribute:(NSString* _Nullable)attributeId arrayValue:(NSArray <NSString*>* _Nullable)value callback:(void(^ _Nullable)(void))callback;
 + (void)setSubscriptionAttribute:(NSString * _Nullable)attributeId arrayValue:(NSArray<NSString *> * _Nullable)value onSuccess:(CPResultSuccessBlock _Nullable)successBlock onFailure:(CPFailureBlock _Nullable)failureBlock;
@@ -258,6 +259,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (BOOL)getUnsubscribeStatus;
 + (void)setHandleUrlFromSceneDelegate:(BOOL)handleFromSceneDelegate;
 + (BOOL)getHandleUrlFromSceneDelegate;
++ (void)captureDeepLinkURL:(NSURL * _Nullable)url;
 + (void)setConfirmAlertShown;
 + (void)areNotificationsEnabled:(void(^ _Nullable)(BOOL))callback;
 

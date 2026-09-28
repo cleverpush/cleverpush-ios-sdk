@@ -1,3 +1,12 @@
+## 1.34.54 (28.09.2026)
+* Optimized APNs device token registration by adding a timeout while waiting for the device token and failing the subscription instead of hanging on fresh installs.
+* Add Unit test cases methods of cleverpush SDKS for success and failure cases.
+- implemented the feature of passing deepLinkID in the track event functionality.
+- implemented functionality of sync subscription method should be immediately called when the app version had been changed.
+- Optimized pushSubscriptionAttributeValue & pushSubscriptionAttributeValue functions for preventing crash.
+- Optimized setSubscriptionAttribute methods for success and failure callbacks.
+- Added support within the iOS SDK for evaluating the new "is empty" attribute condition for App Banners.
+
 ## 1.34.53 (28.08.2026)
 * Resolved the issue of subtopics not being selected while selecting the parent topics dialogue in iOS.
 * implemented setNotificationDelivered and setNotificationClicked  public methods for manually reporting notification delivered and clicked events.
