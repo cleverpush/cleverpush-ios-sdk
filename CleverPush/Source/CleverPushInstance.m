@@ -1344,7 +1344,13 @@ static id isNil(id object) {
 }
 
 - (void)subscribeInternal {
-    [self handleSubscription:nil failure:nil skipTopicsDialog:NO forceSync:NO];
+    if ([CleverPush getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
+        [self waitForSubscribeConsent:^{
+            [self handleSubscription:nil failure:nil skipTopicsDialog:NO forceSync:NO];
+        }];
+    } else {
+        [self handleSubscription:nil failure:nil skipTopicsDialog:NO forceSync:NO];
+    }
 }
 
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
@@ -1464,11 +1470,18 @@ static id isNil(id object) {
     if (subscriptionId != nil) {
         if (forceSync || [self shouldSync]) {
             [CPLog debug:@"syncSubscription called from proceedWithSubscription (existing subscriptionId, forceSync=%d)", forceSync];
-            
+            if ([self isSubscriptionInProgress]) {
+                [CPLog debug:@"proceedWithSubscription: sync already in progress, completing with cached id"];
+                if (completion) {
+                    completion(subscriptionId, nil);
+                }
+                return;
+            }
+
             [self syncSubscription:^(NSError *error) {
                 [CPLog warn:@"syncSubscription error on re-subscribe: %@", error.localizedDescription];
                 if (completion) {
-                    completion(subscriptionId, nil);
+                    completion(subscriptionId, error);
                 }
             } successBlock:^{
                 if (completion) {
