@@ -747,7 +747,7 @@ static id isNil(id object) {
     [self areNotificationsEnabled:^(BOOL notificationsEnabled) {
         if (subscriptionId == nil) {
             if (autoResubscribe && notificationsEnabled) {
-                [self subscribe];
+                [self subscribeInternal];
             } else {
                 [CPLog debug:@"CleverPushInstance: applicationWillEnterForeground: There is no subscription for CleverPush SDK."];
             }
@@ -1343,18 +1343,22 @@ static id isNil(id object) {
     [self subscribe:subscribedBlock failure:nil skipTopicsDialog:skipTopicsDialog];
 }
 
+- (void)subscribeInternal {
+    [self handleSubscription:nil failure:nil skipTopicsDialog:NO forceSync:NO];
+}
+
 - (void)subscribe:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
     if ([CleverPush getIabTcfMode] == CPIabTcfModeSubscribeWaitForConsent) {
         void(^consentBlock)(void) = ^{
-            [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+            [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:YES];
         };
         [self waitForSubscribeConsent:consentBlock];
     } else {
-        [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        [self handleSubscription:subscribedBlock failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:YES];
     }
 }
 
-- (void)handleSubscription:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+- (void)handleSubscription:(CPHandleSubscribedBlock _Nullable)subscribedBlock failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog forceSync:(BOOL)forceSync {
     [self handleSubscriptionWithCompletion:^(NSString * _Nullable subscriptionId, NSError * _Nullable error) {
         if (error) {
             if (failureBlock) {
@@ -1365,7 +1369,7 @@ static id isNil(id object) {
                 subscribedBlock(subscriptionId);
             }
         }
-    } failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+    } failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:forceSync];
 }
 
 - (void)requestNotificationPermission:(BOOL)shouldShowAlert playSound:(BOOL)shouldPlaySound setBadge:(BOOL)shouldSetBadge
@@ -1401,7 +1405,7 @@ static id isNil(id object) {
     }];
 }
 
-- (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+- (void)handleSubscriptionWithCompletion:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog forceSync:(BOOL)forceSync {
     hasCalledSubscribe = YES;
 
     [self areNotificationsEnabled:^(BOOL hasPermission) {
@@ -1409,7 +1413,7 @@ static id isNil(id object) {
             [self requestNotificationPermission:isDisplayAlertEnabledForNotifications playSound:isSoundEnabledForNotifications setBadge:isBadgeCountEnabledForNotifications completionHandler:^(BOOL granted, NSError* error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (granted && !ignoreDisabledNotificationPermission) {
-                        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+                        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:forceSync];
                         return;
                     }
 
@@ -1434,11 +1438,11 @@ static id isNil(id object) {
             return;
         }
 
-        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        [self waitForDeviceTokenThenProceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:forceSync];
     }];
 }
 
-- (void)waitForDeviceTokenThenProceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+- (void)waitForDeviceTokenThenProceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog forceSync:(BOOL)forceSync {
     [self requestDeviceToken];
 
     [self getDeviceToken:^(NSString * _Nullable token) {
@@ -1452,14 +1456,29 @@ static id isNil(id object) {
             }
             return;
         }
-        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog];
+        [self proceedWithSubscription:completion failure:failureBlock skipTopicsDialog:skipTopicsDialog forceSync:forceSync];
     }];
 }
 
-- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog {
+- (void)proceedWithSubscription:(void (^)(NSString * _Nullable, NSError * _Nullable))completion failure:(CPFailureBlock _Nullable)failureBlock skipTopicsDialog:(BOOL)skipTopicsDialog forceSync:(BOOL)forceSync {
     if (subscriptionId != nil) {
-        if (completion) {
-            completion(subscriptionId, nil);
+        if (forceSync || [self shouldSync]) {
+            [CPLog debug:@"syncSubscription called from proceedWithSubscription (existing subscriptionId, forceSync=%d)", forceSync];
+            
+            [self syncSubscription:^(NSError *error) {
+                [CPLog warn:@"syncSubscription error on re-subscribe: %@", error.localizedDescription];
+                if (completion) {
+                    completion(subscriptionId, nil);
+                }
+            } successBlock:^{
+                if (completion) {
+                    completion(subscriptionId, nil);
+                }
+            }];
+        } else {
+            if (completion) {
+                completion(subscriptionId, nil);
+            }
         }
         return;
     }
@@ -1542,13 +1561,13 @@ static id isNil(id object) {
                     ) {
                         int milliseconds = [[channelConfig objectForKey:@"alertTimeout"] intValue];
                         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_MSEC* milliseconds),  dispatch_get_main_queue(), ^(void) {
-                            [self subscribe];
+                            [self subscribeInternal];
                         });
                     } else {
-                        [self subscribe];
+                        [self subscribeInternal];
                     }
             } else {
-                [self subscribe];
+                [self subscribeInternal];
             }
     }];
 }
