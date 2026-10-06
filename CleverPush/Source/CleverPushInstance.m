@@ -1509,6 +1509,15 @@ static id isNil(id object) {
         }
     };
 
+    if ([self isSubscriptionInProgress]) {
+        [CPLog debug:@"proceedWithSubscription: first-time sync already in progress, skipping duplicate"];
+    } else {
+        [CPLog debug:@"syncSubscription called from subscribe"];
+        [self syncSubscription:^(NSError *error) {
+            settle(nil, error);
+        }];
+    }
+
     [self getChannelConfig:^(NSDictionary* channelConfig) {
         if (channelConfig != nil && ([channelConfig objectForKey:@"confirmAlertHideChannelTopics"] == nil || ![[channelConfig objectForKey:@"confirmAlertHideChannelTopics"] boolValue])) {
             if (![self isSubscribed]) {
@@ -1533,16 +1542,6 @@ static id isNil(id object) {
                 }
             }
         }
-
-        if ([self isSubscriptionInProgress]) {
-            [CPLog debug:@"proceedWithSubscription: first-time sync already in progress, skipping duplicate"];
-            return;
-        }
-
-        [CPLog debug:@"syncSubscription called from subscribe"];
-        [self syncSubscription:^(NSError *error) {
-            settle(nil, error);
-        }];
     }];
 
     BOOL topicsDialogBeingShown;
