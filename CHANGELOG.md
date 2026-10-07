@@ -1,3 +1,6 @@
+## 1.34.55 (07.10.2026)
+* Optimized the syncSubscription function on explicit subscribe() calls for existing subscribers to ensure getSubscriptionTags() returns fresh server data.
+
 ## 1.34.54 (28.09.2026)
 * Optimized APNs device token registration by adding a timeout while waiting for the device token and failing the subscription instead of hanging on fresh installs.
 * Add Unit test cases methods of cleverpush SDKS for success and failure cases.

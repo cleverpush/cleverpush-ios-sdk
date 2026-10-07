@@ -77,7 +77,7 @@
 
 @implementation CleverPushInstance
 
-NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.54";
+NSString* const CLEVERPUSH_SDK_VERSION = @"1.34.55";
 
 static BOOL startFromNotification = NO;
 static BOOL autoClearBadge = YES;
