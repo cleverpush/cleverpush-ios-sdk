@@ -812,6 +812,7 @@ NSString * const localeIdentifier = @"en_US_POSIX";
                     [CPLog debug:@"Dismissing controller: %@", topController];
                     [topController dismissViewControllerAnimated:YES completion:^{
                         [CPLog debug:@"Controller dismissed"];
+                        [bannerVC onDismiss];
                     }];
                 } else {
                     [CPLog debug:@"No controller to dismiss"];
