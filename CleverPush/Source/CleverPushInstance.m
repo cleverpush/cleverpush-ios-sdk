@@ -1965,6 +1965,16 @@ static id isNil(id object) {
         [dataDic setObject:pianoSegments forKey:@"pianoSegments"];
     }
 
+    NSArray* tags = [self getSubscriptionTags];
+    if (tags != nil && [tags count] > 0) {
+        [dataDic setObject:tags forKey:@"tags"];
+    }
+
+    NSDictionary* customAttributes = [self getSubscriptionAttributes];
+    if (customAttributes != nil && [customAttributes count] > 0) {
+        [dataDic setObject:customAttributes forKey:@"customAttributes"];
+    }
+
     [dataDic setObject:@(notificationsEnabled) forKey:@"hasNotificationPermission"];
 
     [CPLog info:@"syncSubscription request data:%@ id:%@", dataDic, subscriptionId];
