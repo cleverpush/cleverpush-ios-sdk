@@ -13,6 +13,8 @@
 
 @end
 
+static NSTimeInterval const CLEVERPUSH_NOTIFICATION_HANDLER_TIMEOUT = 3.5;
+
 @implementation CleverPushUNUserNotificationCenter
 
 static Class delegateUNClass = nil;
@@ -61,19 +63,68 @@ __weak static id previousDelegate;
     [self setCleverPushUNDelegate:delegate];
 }
 
++ (UNNotificationPresentationOptions)defaultForegroundPresentationOptions {
+    UNNotificationPresentationOptions options = UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
+    if (@available(iOS 14.0, *)) {
+        options |= UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionList;
+    } else {
+        options |= UNNotificationPresentationOptionAlert;
+    }
+
+    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
+    if ([userDefaults objectForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY] != nil) {
+        BOOL showInForeground = [userDefaults boolForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY];
+        if (!showInForeground) {
+            options = UNNotificationPresentationOptionNone;
+        }
+    }
+    return options;
+}
+
++ (UNNotificationPresentationOptions)presentationOptionsForBehavior:(CPNotificationBehavior *)behavior {
+    if (!behavior.shouldShowAlert) {
+        UNNotificationPresentationOptions options = UNNotificationPresentationOptionNone;
+        if (behavior.shouldPlaySound) {
+            options |= UNNotificationPresentationOptionSound;
+        }
+        if (behavior.shouldSetBadge) {
+            options |= UNNotificationPresentationOptionBadge;
+        }
+        return options;
+    }
+
+    UNNotificationPresentationOptions options = UNNotificationPresentationOptionNone;
+    if (@available(iOS 14.0, *)) {
+        if (behavior.shouldShowBanner) {
+            options |= UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionList;
+        }
+    } else if (behavior.shouldShowBanner) {
+        options |= UNNotificationPresentationOptionAlert;
+    }
+    if (behavior.shouldPlaySound) {
+        options |= UNNotificationPresentationOptionSound;
+    }
+    if (behavior.shouldSetBadge) {
+        options |= UNNotificationPresentationOptionBadge;
+    }
+    return options;
+}
+
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
                  willPresentNotification:(UNNotification *)notification
                    withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
-    NSUInteger completionHandlerOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
-
     [CPLog info:@"cleverPushUserNotificationCenter willPresentNotification"];
 
     if ([CleverPush channelId]) {
         [CleverPush handleNotificationReceived:notification.request.content.userInfo isActive:YES];
     }
 
+    CPNotificationHandlerBlock handler = [CleverPush notificationHandler];
+
+    void (^forwardCompletion)(UNNotificationPresentationOptions) = handler ? ^(UNNotificationPresentationOptions ignored) {} : completionHandler;
+
     if ([self respondsToSelector:@selector(cleverPushUserNotificationCenter:willPresentNotification:withCompletionHandler:)]) {
-        [self cleverPushUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:completionHandler];
+        [self cleverPushUserNotificationCenter:center willPresentNotification:notification withCompletionHandler:forwardCompletion];
     } else {
         [CleverPushUNUserNotificationCenter callLegacyAppDeletegateSelector:notification
                                                                 isTextReply:false
@@ -83,15 +134,37 @@ __weak static id previousDelegate;
                                                       withCompletionHandler:^() {}];
     }
 
-    NSUserDefaults* userDefaults = [CPUtils getUserDefaultsAppGroup];
-    if ([userDefaults objectForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY] != nil) {
-        BOOL showInForeground = [userDefaults boolForKey:CLEVERPUSH_SHOW_NOTIFICATIONS_IN_FOREGROUND_KEY];
-        if (!showInForeground) {
-            completionHandlerOptions = UNNotificationPresentationOptionNone;
+    if (handler) {
+        CPNotification *cpNotification = nil;
+        NSDictionary *notificationJson = [notification.request.content.userInfo objectForKey:@"notification"];
+        if ([notificationJson isKindOfClass:[NSDictionary class]]) {
+            cpNotification = [CPNotification initWithJson:[notificationJson mutableCopy]];
         }
+        __block BOOL finished = NO;
+        void (^finish)(UNNotificationPresentationOptions) = ^(UNNotificationPresentationOptions options) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (finished) {
+                    return;
+                }
+                finished = YES;
+                completionHandler(options);
+            });
+        };
+
+        handler(cpNotification, ^(CPNotificationBehavior *behavior) {
+            UNNotificationPresentationOptions options = behavior
+                ? [CleverPushUNUserNotificationCenter presentationOptionsForBehavior:behavior]
+                : [CleverPushUNUserNotificationCenter defaultForegroundPresentationOptions];
+            finish(options);
+        });
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CLEVERPUSH_NOTIFICATION_HANDLER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            finish([CleverPushUNUserNotificationCenter defaultForegroundPresentationOptions]);
+        });
+        return;
     }
 
-    completionHandler(completionHandlerOptions);
+    completionHandler([CleverPushUNUserNotificationCenter defaultForegroundPresentationOptions]);
 }
 
 - (void)cleverPushUserNotificationCenter:(UNUserNotificationCenter *)center
