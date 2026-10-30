@@ -85,7 +85,7 @@ __weak static id previousDelegate;
     UNNotificationPresentationOptions options = UNNotificationPresentationOptionNone;
     if (behavior.shouldShowAlert) {
         if (@available(iOS 14.0, *)) {
-            options |= UNNotificationPresentationOptionList;
+            options |= UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionList;
         } else {
             options |= UNNotificationPresentationOptionAlert;
         }
@@ -141,6 +141,10 @@ __weak static id previousDelegate;
         };
 
         handler(cpNotification, ^(CPNotificationBehavior *behavior) {
+            // An explicit behavior is a per-notification instruction and intentionally takes
+            // precedence over the global setShowNotificationsInForeground: toggle. When the
+            // handler returns no behavior, defaultForegroundPresentationOptions still honors
+            // that global toggle.
             UNNotificationPresentationOptions options = behavior
                 ? [CleverPushUNUserNotificationCenter presentationOptionsForBehavior:behavior]
                 : [CleverPushUNUserNotificationCenter defaultForegroundPresentationOptions];
