@@ -577,6 +577,20 @@ static CleverPush* singleInstance = nil;
     [self.CPSharedInstance setShowNotificationsInForeground:show];
 }
 
+static CPNotificationHandlerBlock notificationHandler = nil;
+
++ (void)setNotificationHandler:(CPNotificationHandlerBlock)handler {
+    @synchronized (self) {
+        notificationHandler = [handler copy];
+    }
+}
+
++ (CPNotificationHandlerBlock)notificationHandler {
+    @synchronized (self) {
+        return notificationHandler;
+    }
+}
+
 + (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled {
     [self.CPSharedInstance setDisplayAlertEnabledForNotifications:enabled];
 }

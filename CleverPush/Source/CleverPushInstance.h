@@ -52,6 +52,18 @@ typedef void (^CPTopicsChangedBlock)(void);
 
 typedef void (^CPHandleNotificationReceivedBlock)(CPNotificationReceivedResult* _Nullable result);
 typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* _Nullable result);
+
+@interface CPNotificationBehavior : NSObject
+
+@property (nonatomic, assign) BOOL shouldShowAlert;
+@property (nonatomic, assign) BOOL shouldPlaySound;
+@property (nonatomic, assign) BOOL shouldSetBadge;
+
+@end
+
+typedef void (^CPNotificationHandlerCompletionBlock)(CPNotificationBehavior* _Nullable behavior);
+typedef void (^CPNotificationHandlerBlock)(CPNotification* _Nullable notification, CPNotificationHandlerCompletionBlock _Nonnull completion);
+
 typedef void (^CPInitializedBlock)(BOOL success, NSString* _Nullable failureMessage);
 
 typedef void (^CPResultSuccessBlock)(NSDictionary* _Nullable result);

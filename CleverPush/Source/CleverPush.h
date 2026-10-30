@@ -164,6 +164,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)setIncrementBadge:(BOOL)increment;
 + (void)setGroupNotificationSoundMode:(CPGroupNotificationSoundMode)mode;
 + (void)setShowNotificationsInForeground:(BOOL)show;
++ (void)setNotificationHandler:(CPNotificationHandlerBlock _Nullable)handler;
 + (void)setDisplayAlertEnabledForNotifications:(BOOL)enabled;
 + (void)setSoundEnabledForNotifications:(BOOL)enabled;
 + (void)setBadgeCountEnabledForNotifications:(BOOL)enabled;
@@ -243,6 +244,7 @@ extern NSString* _Nullable const CLEVERPUSH_SDK_VERSION;
 + (void)getBadgeCount:(void (^ _Nullable)(NSInteger))completionHandler;
 + (CPIabTcfMode)getIabTcfMode;
 + (CPGroupNotificationSoundMode)getGroupNotificationSoundMode;
++ (CPNotificationHandlerBlock _Nullable)notificationHandler;
 
 + (UIColor* _Nullable)getBrandingColor;
 
