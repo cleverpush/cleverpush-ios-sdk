@@ -41,7 +41,6 @@
     self = [super init];
     if (self) {
         _shouldShowAlert = YES;
-        _shouldShowBanner = YES;
         _shouldPlaySound = YES;
         _shouldSetBadge = YES;
     }

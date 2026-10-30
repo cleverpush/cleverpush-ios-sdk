@@ -56,7 +56,6 @@ typedef void (^CPHandleNotificationOpenedBlock)(CPNotificationOpenedResult* _Nul
 @interface CPNotificationBehavior : NSObject
 
 @property (nonatomic, assign) BOOL shouldShowAlert;
-@property (nonatomic, assign) BOOL shouldShowBanner;
 @property (nonatomic, assign) BOOL shouldPlaySound;
 @property (nonatomic, assign) BOOL shouldSetBadge;
 

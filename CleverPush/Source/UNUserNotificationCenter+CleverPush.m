@@ -86,9 +86,6 @@ __weak static id previousDelegate;
     if (behavior.shouldShowAlert) {
         if (@available(iOS 14.0, *)) {
             options |= UNNotificationPresentationOptionList;
-            if (behavior.shouldShowBanner) {
-                options |= UNNotificationPresentationOptionBanner;
-            }
         } else {
             options |= UNNotificationPresentationOptionAlert;
         }
