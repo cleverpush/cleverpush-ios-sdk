@@ -82,24 +82,16 @@ __weak static id previousDelegate;
 }
 
 + (UNNotificationPresentationOptions)presentationOptionsForBehavior:(CPNotificationBehavior *)behavior {
-    if (!behavior.shouldShowAlert) {
-        UNNotificationPresentationOptions options = UNNotificationPresentationOptionNone;
-        if (behavior.shouldPlaySound) {
-            options |= UNNotificationPresentationOptionSound;
-        }
-        if (behavior.shouldSetBadge) {
-            options |= UNNotificationPresentationOptionBadge;
-        }
-        return options;
-    }
-
     UNNotificationPresentationOptions options = UNNotificationPresentationOptionNone;
-    if (@available(iOS 14.0, *)) {
-        if (behavior.shouldShowBanner) {
-            options |= UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionList;
+    if (behavior.shouldShowAlert) {
+        if (@available(iOS 14.0, *)) {
+            options |= UNNotificationPresentationOptionList;
+            if (behavior.shouldShowBanner) {
+                options |= UNNotificationPresentationOptionBanner;
+            }
+        } else {
+            options |= UNNotificationPresentationOptionAlert;
         }
-    } else if (behavior.shouldShowBanner) {
-        options |= UNNotificationPresentationOptionAlert;
     }
     if (behavior.shouldPlaySound) {
         options |= UNNotificationPresentationOptionSound;
