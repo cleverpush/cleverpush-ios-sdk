@@ -35,6 +35,20 @@
 #import "CleverPushSelectorHelpers.h"
 #endif
 
+@implementation CPNotificationBehavior
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _shouldShowAlert = YES;
+        _shouldPlaySound = YES;
+        _shouldSetBadge = YES;
+    }
+    return self;
+}
+
+@end
+
 @implementation CPNotificationReceivedResult
 
 - (instancetype _Nullable)initWithPayload:(NSDictionary* _Nullable)inPayload {
