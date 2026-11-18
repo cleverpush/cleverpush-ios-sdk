@@ -1,3 +1,8 @@
+## 1.34.56 (18.11.2026)
+* Added subscription tags and custom attributes to the iOS subscription sync request..
+* Fixed an issue where pending banners were not displayed after the previous HTML banner was dismissed..
+* Added setNotificationHandler: to control how each foreground notification is presented (shouldShowAlert, shouldPlaySound, shouldSetBadge).
+
 ## 1.34.55 (07.10.2026)
 * Optimized the syncSubscription function on explicit subscribe() calls for existing subscribers to ensure getSubscriptionTags() returns fresh server data.
 
