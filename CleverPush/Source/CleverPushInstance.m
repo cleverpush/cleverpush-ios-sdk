@@ -4590,6 +4590,17 @@ static id isNil(id object) {
     [self showTopicsDialog:targetWindow callback:nil];
 }
 
+- (UIViewController *)presenterForTopicsDialogInWindow:(UIWindow *)targetWindow {
+    UIViewController *presenter = [CleverPush getCustomTopViewController] ?: targetWindow.rootViewController;
+    if (presenter == nil) {
+        return [self topViewController];
+    }
+    while (presenter.presentedViewController != nil && !presenter.presentedViewController.isBeingDismissed) {
+        presenter = presenter.presentedViewController;
+    }
+    return presenter;
+}
+
 - (void)showTopicsDialog:(UIWindow* _Nullable)targetWindow callback:(void(^ _Nullable)(void))callback {
     [self getAvailableTopics:^(NSArray* channelTopics_) {
         channelTopics = channelTopics_;
@@ -4694,9 +4705,8 @@ static id isNil(id object) {
                 }];
                 [channelTopicsPicker addAction:okAction];
 
-                UIViewController* topViewController = [CleverPush topViewController];
-
-                [topViewController presentViewController:channelTopicsPicker animated:YES completion:nil];
+                UIViewController *presenter = [self presenterForTopicsDialogInWindow:targetWindow];
+                [presenter presentViewController:channelTopicsPicker animated:YES completion:nil];
             });
         }];
     }];

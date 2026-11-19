@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addActionButton:(DWAlertViewActionBaseView *)button;
 - (void)resetActionsState;
 - (void)removeAllActions;
+- (void)updateButtonsLayoutForAlertWidth:(CGFloat)alertWidth;
 
 - (instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 - (instancetype)initWithArrangedSubviews:(NSArray<__kindof UIView *> *)views NS_UNAVAILABLE;

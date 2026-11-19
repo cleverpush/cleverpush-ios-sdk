@@ -326,6 +326,10 @@ NS_ASSUME_NONNULL_BEGIN
     [self.actionsStackView resetActionsState];
 }
 
+- (void)updateActionsLayoutForAlertWidth:(CGFloat)alertWidth {
+    [self.actionsStackView updateButtonsLayoutForAlertWidth:alertWidth];
+}
+
 - (void)removeAllActions {
     [self.actionsStackView removeAllActions];
 }
