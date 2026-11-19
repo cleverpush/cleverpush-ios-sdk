@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, strong, nonatomic) DWAlertViewActionBaseView *cancelButton;
 @property (null_resettable, strong, nonatomic) id /* UISelectionFeedbackGenerator */ feedbackGenerator;
 @property (nullable, strong, nonatomic) DWAlertViewActionBaseView *highlightedButton;
+@property (assign, nonatomic) CGFloat buttonsLayoutWidth;
 
 @end
 
@@ -162,6 +163,28 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
+- (void)updateButtonsLayoutForAlertWidth:(CGFloat)alertWidth {
+    if (alertWidth < 1.0) {
+        alertWidth = DWAlertViewWidth;
+    }
+    if (self.buttonsLayoutWidth > 1.0 && fabs(self.buttonsLayoutWidth - alertWidth) < 0.5) {
+        return;
+    }
+    self.buttonsLayoutWidth = alertWidth;
+    [self updateButtonsLayout];
+}
+
+- (CGFloat)alertWidthForButtonLayout {
+    if (self.buttonsLayoutWidth > 1.0) {
+        return self.buttonsLayoutWidth;
+    }
+    const CGFloat boundsWidth = CGRectGetWidth(self.bounds);
+    if (boundsWidth > 1.0) {
+        return boundsWidth;
+    }
+    return DWAlertViewWidth;
+}
+
 - (void)updateButtonsLayout {
     NSArray<DWAlertViewActionBaseView *> *buttons = self.arrangedSubviews;
     const NSUInteger buttonsCount = buttons.count;
@@ -171,7 +194,7 @@ NS_ASSUME_NONNULL_BEGIN
     else if (buttonsCount == 2) {
         BOOL shouldBeVertical = NO;
         // only 2 horizontal buttons are allowed
-        const CGFloat actionWidth = DWAlertViewWidth / 2.0 - DWAlertViewSeparatorSize();
+        const CGFloat actionWidth = [self alertWidthForButtonLayout] / 2.0 - DWAlertViewSeparatorSize();
         for (UIView *button in buttons) {
             const CGSize size = [button systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
             if (size.width > actionWidth) {

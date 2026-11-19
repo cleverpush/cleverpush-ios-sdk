@@ -53,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addAction:(DWAlertAction *)action;
 - (void)resetActionsState;
 - (void)removeAllActions;
+- (void)updateActionsLayoutForAlertWidth:(CGFloat)alertWidth;
 
 - (nullable instancetype)initWithCoder:(NSCoder *)aDecoder NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;

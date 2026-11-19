@@ -381,8 +381,10 @@ NS_ASSUME_NONNULL_BEGIN
     if (_alertView == nil) {
         return;
     }
+    CGFloat alertWidth = [self maximumAllowedAlertWidth];
     self.alertViewHeightConstraint.constant = [self maximumAllowedAlertHeightWithKeyboard:self.dw_keyboardHeight];
-    self.alertViewWidthConstraint.constant = [self maximumAllowedAlertWidth];
+    self.alertViewWidthConstraint.constant = alertWidth;
+    [self.alertView updateActionsLayoutForAlertWidth:alertWidth];
 }
 
 - (CGSize)alertContainerSize {
@@ -403,13 +405,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (UIEdgeInsets)alertContainerSafeAreaInsets {
-    CGSize containerSize = [self alertContainerSize];
-    CGSize screenSize = [UIScreen mainScreen].bounds.size;
-    BOOL fillsScreen = fabs(containerSize.width - screenSize.width) < 24.0 &&
-                       fabs(containerSize.height - screenSize.height) < 24.0;
-    if (!fillsScreen) {
-        return UIEdgeInsetsZero;
-    }
     if (@available(iOS 11.0, *)) {
         return self.view.safeAreaInsets;
     }
