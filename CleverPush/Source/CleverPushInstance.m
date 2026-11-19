@@ -4591,7 +4591,7 @@ static id isNil(id object) {
 }
 
 - (UIViewController *)presenterForTopicsDialogInWindow:(UIWindow *)targetWindow {
-    UIViewController *presenter = targetWindow.rootViewController;
+    UIViewController *presenter = [CleverPush getCustomTopViewController] ?: targetWindow.rootViewController;
     if (presenter == nil) {
         return [self topViewController];
     }
