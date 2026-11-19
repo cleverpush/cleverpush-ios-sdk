@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (null_resettable, strong, nonatomic) DWAlertView *alertView;
 @property (strong, nonatomic) NSLayoutConstraint *alertViewCenterYConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *alertViewHeightConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *alertViewWidthConstraint;
 
 @property (nullable, strong, nonatomic) __kindof UIViewController *contentController;
 @property (copy, nonatomic) NSArray<DWAlertAction *> *actions;
@@ -86,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
         [NSLayoutConstraint activateConstraints:@[
             [alertView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
             (self.alertViewCenterYConstraint = [alertView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor]),
-            [alertView.widthAnchor constraintEqualToConstant:DWAlertViewWidth],
+            (self.alertViewWidthConstraint = [alertView.widthAnchor constraintEqualToConstant:[self maximumAllowedAlertWidth]]),
             (self.alertViewHeightConstraint = [alertView.heightAnchor constraintLessThanOrEqualToConstant:maximumAllowedViewHeight]),
         ]];
         _alertView = alertView;
@@ -109,6 +110,11 @@ NS_ASSUME_NONNULL_BEGIN
     [self.view endEditing:YES];
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self updateAlertSizeConstraints];
+}
+
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
 
@@ -120,10 +126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     [coordinator
         animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-            const CGFloat maximumAllowedViewHeight =
-                [self maximumAllowedAlertHeightWithKeyboard:self.dw_keyboardHeight];
-
-            self.alertViewHeightConstraint.constant = maximumAllowedViewHeight;
+            [self updateAlertSizeConstraints];
             [self.alertView setNeedsLayout];
             [self.alertView layoutIfNeeded];
             [self.alertView resetActionsState];
@@ -267,8 +270,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dw_keyboardWillShowOrHideWithHeight:(CGFloat)height
                           animationDuration:(NSTimeInterval)animationDuration
                              animationCurve:(UIViewAnimationCurve)animationCurve {
-    CGFloat maximumAllowedViewHeight = [self maximumAllowedAlertHeightWithKeyboard:height];
-    self.alertViewHeightConstraint.constant = maximumAllowedViewHeight;
+    [self updateAlertSizeConstraints];
     self.alertViewCenterYConstraint.constant = -height / 2.0;
 }
 
@@ -375,24 +377,66 @@ NS_ASSUME_NONNULL_BEGIN
         }];
 }
 
-- (CGFloat)maximumAllowedAlertHeightWithKeyboard:(CGFloat)keyboardHeight {
-    CGFloat minInset;
-    if (@available(iOS 11.0, *)) {
-        UIWindow *window = UIApplication.sharedApplication.keyWindow;
-        UIEdgeInsets insets = window.safeAreaInsets;
-        minInset = MAX(insets.top, insets.bottom);
+- (void)updateAlertSizeConstraints {
+    if (_alertView == nil) {
+        return;
     }
-    else {
+    self.alertViewHeightConstraint.constant = [self maximumAllowedAlertHeightWithKeyboard:self.dw_keyboardHeight];
+    self.alertViewWidthConstraint.constant = [self maximumAllowedAlertWidth];
+}
+
+- (CGSize)alertContainerSize {
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    CGSize viewSize = self.view.bounds.size;
+    UIWindow *window = self.view.window;
+    if (viewSize.width > 1.0 && viewSize.height > 1.0) {
+        if (window != nil) {
+            viewSize.width = MIN(viewSize.width, CGRectGetWidth(window.bounds));
+            viewSize.height = MIN(viewSize.height, CGRectGetHeight(window.bounds));
+        }
+        return viewSize;
+    }
+    if (window != nil && CGRectGetWidth(window.bounds) > 1.0 && CGRectGetHeight(window.bounds) > 1.0) {
+        return window.bounds.size;
+    }
+    return screenSize;
+}
+
+- (UIEdgeInsets)alertContainerSafeAreaInsets {
+    CGSize containerSize = [self alertContainerSize];
+    CGSize screenSize = [UIScreen mainScreen].bounds.size;
+    BOOL fillsScreen = fabs(containerSize.width - screenSize.width) < 24.0 &&
+                       fabs(containerSize.height - screenSize.height) < 24.0;
+    if (!fillsScreen) {
+        return UIEdgeInsetsZero;
+    }
+    if (@available(iOS 11.0, *)) {
+        return self.view.safeAreaInsets;
+    }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        minInset = MAX(self.topLayoutGuide.length, self.bottomLayoutGuide.length);
+    return UIEdgeInsetsMake(self.topLayoutGuide.length, 0.0, self.bottomLayoutGuide.length, 0.0);
 #pragma clang diagnostic pop
+}
+
+- (CGFloat)maximumAllowedAlertWidth {
+    CGSize containerSize = [self alertContainerSize];
+    UIEdgeInsets insets = [self alertContainerSafeAreaInsets];
+    CGFloat available = containerSize.width - insets.left - insets.right - 16.0;
+    if (available < 160.0) {
+        available = containerSize.width - 16.0;
     }
+    return MIN(DWAlertViewWidth, MAX(available, 160.0));
+}
 
-    CGFloat padding = DWAlertViewVerticalPadding(minInset, keyboardHeight > 0.0);
-    CGFloat height = CGRectGetHeight([UIScreen mainScreen].bounds) - padding * 2.0 - keyboardHeight;
-
-    return height;
+- (CGFloat)maximumAllowedAlertHeightWithKeyboard:(CGFloat)keyboardHeight {
+    CGSize containerSize = [self alertContainerSize];
+    UIEdgeInsets insets = [self alertContainerSafeAreaInsets];
+    CGFloat available = containerSize.height - insets.top - insets.bottom - 16.0 - keyboardHeight;
+    if (available < 160.0) {
+        available = containerSize.height - 16.0 - keyboardHeight;
+    }
+    return MAX(available, 120.0);
 }
 
 @end
